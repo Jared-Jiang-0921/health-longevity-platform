@@ -1,0 +1,109 @@
+.page-tcm-prevention {
+  max-width: 800px;
+}
+
+.tcm-header {
+  margin-bottom: 2rem;
+}
+
+.tcm-header h1 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.tcm-header p {
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.tcm-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.tcm-tabs button {
+  padding: 0.6rem 1.25rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.tcm-tabs button:hover {
+  border-color: var(--color-primary);
+  color: var(--color-text);
+}
+
+.tcm-tabs button.active {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.tcm-section h2 {
+  font-size: 1.1rem;
+  color: var(--color-text-muted);
+  margin-bottom: 1rem;
+}
+
+.tcm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tcm-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  transition: border-color 0.2s;
+}
+
+.tcm-card:hover {
+  border-color: var(--color-primary);
+}
+
+.tcm-card h3 {
+  font-size: 1.15rem;
+  margin: 0 0 0.75rem;
+  color: var(--color-primary);
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tcm-card dl {
+  margin: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.tcm-card dt {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin: 0;
+  font-weight: 600;
+}
+
+.tcm-card dd {
+  margin: 0 0 0 0;
+  font-size: 0.9rem;
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+.tcm-card dd:last-child {
+  margin-bottom: 0;
+}
+
+.herb-card dt::before {
+  content: '';
+}
+
+.prescription-card dd {
+  padding-left: 0;
+}

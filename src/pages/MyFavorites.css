@@ -1,0 +1,95 @@
+.page-my-favorites {
+  max-width: 900px;
+}
+
+.page-my-favorites h1 {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.subtitle {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.empty-msg {
+  color: var(--color-text-muted);
+}
+
+.empty-msg a {
+  color: var(--color-primary);
+}
+
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.favorite-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.favorite-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 20px rgba(34, 197, 94, 0.1);
+}
+
+.favorite-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.favorite-card .course-category {
+  font-size: 0.75rem;
+  color: var(--color-primary);
+  background: rgba(34, 197, 94, 0.15);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.btn-unfavorite {
+  background: none;
+  border: none;
+  color: #f472b6;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.btn-unfavorite:hover {
+  text-decoration: underline;
+}
+
+.favorite-card h3 {
+  font-size: 1rem;
+  margin: 0 0 0.5rem;
+}
+
+.favorite-card p {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin: 0 0 1rem;
+  line-height: 1.5;
+}
+
+.favorite-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.favorite-actions a {
+  font-size: 0.875rem;
+}
+
+.favorite-actions .btn-learn {
+  color: var(--color-primary);
+  font-weight: 500;
+}

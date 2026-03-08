@@ -1,0 +1,84 @@
+import { useState, useEffect } from 'react'
+import { loadStripe } from '@stripe/stripe-js'
+import { Elements } from '@stripe/react-stripe-js'
+import PaymentForm from '../components/PaymentForm'
+
+const stripePk = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || ''
+const stripePromise = stripePk ? loadStripe(stripePk) : null
+
+// 后端创建 PaymentIntent 的接口（需自行部署）
+const PAYMENT_INTENT_API = import.meta.env.VITE_PAYMENT_INTENT_API || '/api/create-payment-intent'
+
+export default function Payment() {
+  const [clientSecret, setClientSecret] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    if (!stripePk) return
+    setLoading(true)
+    fetch(PAYMENT_INTENT_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount: 1999, currency: 'usd' }), // 示例：19.99 USD
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.clientSecret) setClientSecret(data.clientSecret)
+        else setError(data.error || '无法创建支付会话')
+      })
+      .catch(() => setError('网络错误，请确认后端已启动'))
+      .finally(() => setLoading(false))
+  }, [])
+
+  if (!stripePk) {
+    return (
+      <div className="page-content">
+        <h1>在线全球化支付结算</h1>
+        <p>使用 Stripe 安全完成支付。请先在项目根目录创建 <code>.env</code> 并配置：</p>
+        <pre>VITE_STRIPE_PUBLISHABLE_KEY=pk_test_xxx</pre>
+        <p>可选：<code>VITE_PAYMENT_INTENT_API=你的后端创建 PaymentIntent 的地址</code></p>
+      </div>
+    )
+  }
+
+  if (loading) {
+    return (
+      <div className="page-content">
+        <h1>在线全球化支付结算</h1>
+        <p>正在准备支付…</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="page-content">
+        <h1>在线全球化支付结算</h1>
+        <p>{error}</p>
+        <p>请确保已启动后端服务并实现 <code>POST {PAYMENT_INTENT_API}</code>，返回 <code>{"{ clientSecret }"}</code>。</p>
+      </div>
+    )
+  }
+
+  if (!clientSecret) {
+    return (
+      <div className="page-content">
+        <h1>在线全球化支付结算</h1>
+        <p>无法获取支付会话，请检查后端与 .env 配置。</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="page-content">
+      <h1>在线全球化支付结算</h1>
+      <p>使用 Stripe 安全完成支付，支持多币种与多地区。</p>
+      <section className="payment-section">
+        <Elements stripe={stripePromise} options={{ clientSecret }}>
+          <PaymentForm />
+        </Elements>
+      </section>
+    </div>
+  )
+}

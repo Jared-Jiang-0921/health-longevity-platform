@@ -1,0 +1,15 @@
+{
+  "name": "health-longevity-platform-api",
+  "private": true,
+  "description": "示例：为前端创建 Stripe PaymentIntent",
+  "scripts": {
+    "start": "node create-payment-intent.js",
+    "coze": "node coze-chat.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.2",
+    "stripe": "^14.10.0"
+  }
+}
