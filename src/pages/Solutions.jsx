@@ -41,7 +41,9 @@ export default function Solutions() {
 
   return (
     <div className="page-solutions">
-      <h1>{t('solutions.title')}</h1>
+      <h1>
+        {t('solutions.title')}（单入口）
+      </h1>
       <p className="subtitle">{t('solutions.subtitle')}</p>
 
       {isFreeUser && (
