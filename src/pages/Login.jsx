@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../context/AuthContext'
 import './Auth.css'
 
 export default function Login() {
+  const { t } = useTranslation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [level, setLevel] = useState('standard')
@@ -19,10 +21,10 @@ export default function Login() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <h1>会员登录</h1>
+        <h1>{t('login.title')}</h1>
         <form onSubmit={handleSubmit}>
           <label>
-            <span>邮箱</span>
+            <span>{t('login.email')}</span>
             <input
               type="email"
               value={email}
@@ -32,27 +34,27 @@ export default function Login() {
             />
           </label>
           <label>
-            <span>密码</span>
+            <span>{t('login.password')}</span>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="请输入密码"
+              placeholder={t('login.passwordPlaceholder')}
               required
             />
           </label>
           <label>
-            <span>登录为（演示）</span>
+            <span>{t('login.demoAs')}</span>
             <select value={level} onChange={(e) => setLevel(e.target.value)}>
-              <option value="free">免费会员</option>
-              <option value="standard">标准会员</option>
-              <option value="premium">高级会员</option>
+              <option value="free">{t('membership.free')}</option>
+              <option value="standard">{t('membership.standard')}</option>
+              <option value="premium">{t('membership.premium')}</option>
             </select>
           </label>
-          <button type="submit" className="btn-primary">登录</button>
+          <button type="submit" className="btn-primary">{t('login.submit')}</button>
         </form>
         <p className="auth-switch">
-          还没有账号？<Link to="/register">注册</Link>
+          {t('login.noAccount')}<Link to="/register">{t('nav.register')}</Link>
         </p>
       </div>
     </div>

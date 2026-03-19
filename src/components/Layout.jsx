@@ -1,22 +1,27 @@
 import { Link, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../context/AuthContext'
 import { MEMBERSHIP_LEVELS, canAccess } from '../data/membership'
+import LanguageSwitcher from './LanguageSwitcher'
 import './Layout.css'
 
 const navItems = [
-  { path: '/', label: '首页' },
-  { path: '/health-skills', label: '健康技能学习' },
-  { path: '/solutions', label: '健康长寿方案' },
-  { path: '/products', label: '健康产品' },
-  { path: '/longevity-news', label: '前沿长寿医学资讯' },
-  { path: '/tcm-prevention', label: '治未病' },
-  { path: '/favorites', label: '我的收藏' },
+  { path: '/', labelKey: 'nav.home' },
+  { path: '/health-skills', labelKey: 'nav.healthSkills' },
+  { path: '/solutions', labelKey: 'nav.solutions' },
+  { path: '/products', labelKey: 'nav.products' },
+  { path: '/longevity-news', labelKey: 'nav.longevityNews' },
+  { path: '/tcm-prevention', labelKey: 'nav.tcmPrevention' },
+  { path: '/account', labelKey: 'nav.account' },
+  { path: '/favorites', labelKey: 'nav.favorites' },
 ]
 
 export default function Layout({ children }) {
   const location = useLocation()
+  const { t } = useTranslation()
   const { user, logout } = useAuth()
   const visibleNavItems = navItems.filter((item) => canAccess(item.path, user?.level))
+  const levelName = user?.level ? t(`membership.${user.level}`) : ''
 
   return (
     <>
@@ -26,29 +31,30 @@ export default function Layout({ children }) {
             Health Longevity Platform
           </Link>
           <nav className="nav">
-            {visibleNavItems.map(({ path, label }) => {
-            const active = location.pathname === path || (path !== '/' && path !== '/favorites' && location.pathname.startsWith(path))
-            return (
-              <Link
-                key={path}
-                to={path}
-                className={active ? 'active' : ''}
-              >
-                {label}
-              </Link>
-            )
+            {visibleNavItems.map(({ path, labelKey }) => {
+              const active = location.pathname === path || (path !== '/' && path !== '/favorites' && location.pathname.startsWith(path))
+              return (
+                <Link
+                  key={path}
+                  to={path}
+                  className={active ? 'active' : ''}
+                >
+                  {t(labelKey)}
+                </Link>
+              )
             })}
+            <LanguageSwitcher />
             <span className="nav-auth">
               {user ? (
                 <>
-                  <span className="nav-user">{user.name}（{MEMBERSHIP_LEVELS[user.level]?.name || user.level}）</span>
-                  <button type="button" className="btn-logout" onClick={logout}>退出</button>
+                  <span className="nav-user">{user.name}（{levelName}）</span>
+                  <button type="button" className="btn-logout" onClick={logout}>{t('nav.logout')}</button>
                 </>
               ) : (
                 <>
-                  <Link to="/login">登录</Link>
+                  <Link to="/login">{t('nav.login')}</Link>
                   <span className="nav-sep">|</span>
-                  <Link to="/register">注册</Link>
+                  <Link to="/register">{t('nav.register')}</Link>
                 </>
               )}
             </span>
@@ -58,7 +64,7 @@ export default function Layout({ children }) {
       <main className="main">{children}</main>
       <footer className="site-footer">
         <div className="footer-inner">
-          <p>© Health Longevity Platform. 健康技能 · 长寿方案 · 健康产品.</p>
+          <p>{t('footer.copyright')}</p>
         </div>
       </footer>
     </>

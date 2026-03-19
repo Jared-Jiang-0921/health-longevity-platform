@@ -1,10 +1,12 @@
 import { useLocation } from 'react-router-dom'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../context/AuthContext'
-import { canAccess, getRequiredLevel, MEMBERSHIP_LEVELS } from '../data/membership'
+import { canAccess, getRequiredLevel } from '../data/membership'
 
 export default function ProtectedModule({ children }) {
   const location = useLocation()
+  const { t } = useTranslation()
   const { user } = useAuth()
   const path = location.pathname
   const allowed = canAccess(path, user?.level)
@@ -12,24 +14,24 @@ export default function ProtectedModule({ children }) {
 
   if (allowed) return children
 
-  const levelName = required ? MEMBERSHIP_LEVELS[required]?.name : '登录'
+  const levelName = required ? t(`membership.${required}`) : t('nav.login')
 
   return (
     <div className="page-content">
-      <h1>权限不足</h1>
+      <h1>{t('protected.insufficientTitle')}</h1>
       <p>
         {user
-          ? `该模块需要「${levelName}」及以上等级。请升级会员后使用。`
-          : `请先登录或注册后使用。部分模块需升级会员。`}
+          ? t('protected.insufficientMember', { level: levelName })
+          : t('protected.insufficientLogin')}
       </p>
       {!user ? (
         <p>
-          <Link to="/login">登录</Link>
+          <Link to="/login">{t('nav.login')}</Link>
           {' · '}
-          <Link to="/register">注册</Link>
+          <Link to="/register">{t('nav.register')}</Link>
         </p>
       ) : (
-        <p><Link to="/">返回首页</Link></p>
+        <p><Link to="/">{t('protected.backHome')}</Link></p>
       )}
     </div>
   )

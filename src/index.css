@@ -34,3 +34,8 @@ a:hover {
 #root {
   min-height: 100vh;
 }
+
+[dir="rtl"] .nav-auth {
+  margin-left: 0;
+  margin-right: auto;
+}

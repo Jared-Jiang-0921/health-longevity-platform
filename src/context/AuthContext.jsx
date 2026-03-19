@@ -36,8 +36,13 @@ export function AuthProvider({ children }) {
 
   const logout = () => setUser(null)
 
+  const upgradeMembership = (level) => {
+    if (!user) return
+    setUser({ ...user, level })
+  }
+
   return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
+    <AuthContext.Provider value={{ user, login, register, logout, upgradeMembership }}>
       {children}
     </AuthContext.Provider>
   )

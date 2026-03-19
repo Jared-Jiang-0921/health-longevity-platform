@@ -1,10 +1,13 @@
 /**
  * 最小示例：创建 Stripe PaymentIntent（需在项目外或单独服务中运行）
  * 使用方式：node server/create-payment-intent.js
- * 依赖：npm install stripe express cors
+ * 依赖：npm install stripe express cors dotenv
  *
  * 或使用 Stripe CLI 转发 webhook、或部署到 Vercel/Netlify 等作为 serverless
  */
+
+// 加载 server/.env 中的 STRIPE_SECRET_KEY 等配置
+require('dotenv').config({ path: require('path').join(__dirname, '.env') })
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 const express = require('express')

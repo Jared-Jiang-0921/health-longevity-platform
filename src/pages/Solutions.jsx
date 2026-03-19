@@ -1,108 +1,81 @@
-import { useState, useRef, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useAuth } from '../context/AuthContext'
+import { getConsultTrialCount, incrementConsultTrial } from '../data/storageKeys'
 import './Solutions.css'
 
-const COZE_PROXY = import.meta.env.VITE_COZE_PROXY || ''
+const MANUS_DEFAULT_URL = 'https://longevityconsult.vip'
+const MANUS_PROFESSIONAL_URL = import.meta.env.VITE_MANUS_PROFESSIONAL_URL || MANUS_DEFAULT_URL
+const MANUS_SELF_URL = import.meta.env.VITE_MANUS_SELF_URL || MANUS_DEFAULT_URL
+const FREE_TRIAL_LIMIT = 5
 
-function SolutionsChat() {
-  const [messages, setMessages] = useState([
-    { role: 'assistant', content: '您好，我是健康长寿方案顾问。您可以问我关于营养、运动、睡眠、压力管理等健康相关问题，我会为您提供个性化建议。如有紧急情况或需要真人咨询，请点击下方「转人工」。' },
-  ])
-  const [input, setInput] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [conversationId, setConversationId] = useState(null)
-  const [error, setError] = useState(null)
-  const listRef = useRef(null)
+export default function Solutions() {
+  const { t } = useTranslation()
+  const { user } = useAuth()
+  const isFreeUser = !user || user.level === 'free'
+  const trialUsed = isFreeUser ? getConsultTrialCount(user?.email || '') : 0
+  const trialExhausted = isFreeUser && trialUsed >= FREE_TRIAL_LIMIT
+  const manusUrl = MANUS_PROFESSIONAL_URL || MANUS_SELF_URL || MANUS_DEFAULT_URL
+  const embedRef = useRef(null)
 
+  // 对于免费用户：由于 iframe 默认自动加载，我们这里在本次会话首次展示时消耗 1 次试用次数。
   useEffect(() => {
-    listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' })
-  }, [messages])
+    if (trialExhausted) return
+    if (!isFreeUser) return
+    if (!manusUrl) return
 
-  const send = async () => {
-    const text = input.trim()
-    if (!text || loading) return
-    if (!COZE_PROXY) {
-      setError('请配置 VITE_COZE_PROXY，并启动 Coze 代理服务。')
-      return
-    }
-    setInput('')
-    setError(null)
-    setMessages((prev) => [...prev, { role: 'user', content: text }])
-    setLoading(true)
+    const email = user?.email || ''
+    if (!email) return // 未登录/无邮箱时，不做试用计数（与原逻辑保持一致）
 
-    try {
-      const body = { message: text, user_id: 'web-user' }
-      if (conversationId) body.conversation_id = conversationId
+    const sessionKey = `health-platform-consult-trial-viewed:${email}`
+    if (sessionStorage.getItem(sessionKey)) return
 
-      const res = await fetch(`${COZE_PROXY}/coze/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      })
-      const data = await res.json()
+    incrementConsultTrial(email)
+    sessionStorage.setItem(sessionKey, '1')
+  }, [trialExhausted, isFreeUser, manusUrl, user?.email])
 
-      if (!res.ok) {
-        setMessages((prev) => [...prev, { role: 'assistant', content: `请求失败：${data.error || res.statusText}` }])
-        return
-      }
-
-      if (data.conversation_id) setConversationId(data.conversation_id)
-      const answer = data.answer || data.content || '暂无回复。'
-      setMessages((prev) => [...prev, { role: 'assistant', content: answer }])
-    } catch (e) {
-      setMessages((prev) => [...prev, { role: 'assistant', content: `网络错误：${e.message}` }])
-    } finally {
-      setLoading(false)
-    }
+  const handleButtonClick = () => {
+    embedRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   return (
-    <div className="solutions-chat">
-      <div className="chat-messages" ref={listRef}>
-        {messages.map((m, i) => (
-          <div key={i} className={`chat-msg ${m.role}`}>
-            <span className="msg-label">{m.role === 'user' ? '您' : '顾问'}</span>
-            <div className="msg-content">{m.content}</div>
-          </div>
-        ))}
-        {loading && (
-          <div className="chat-msg assistant">
-            <span className="msg-label">顾问</span>
-            <div className="msg-content typing">正在思考…</div>
-          </div>
-        )}
-      </div>
-      {error && <div className="chat-error">{error}</div>}
-      <div className="chat-input-row">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && send()}
-          placeholder="输入您的问题…"
-          disabled={loading}
-        />
-        <button type="button" className="btn-send" onClick={send} disabled={loading}>
-          发送
-        </button>
-      </div>
-      <a
-        href={import.meta.env.VITE_HUMAN_CONTACT_URL || 'mailto:support@example.com'}
-        className="btn-human"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        转人工
-      </a>
-    </div>
-  )
-}
-
-export default function Solutions() {
-  return (
     <div className="page-solutions">
-      <h1>数字化健康长寿解决方案</h1>
-      <p className="subtitle">由 Coze 智能体提供咨询，遇到极端情况可转人工。</p>
-      <SolutionsChat />
+      <h1>
+        {t('solutions.title')}（单入口）
+      </h1>
+      <p className="subtitle">{t('solutions.subtitle')}</p>
+
+      {isFreeUser && (
+        <p className="trial-remaining">
+          {t('solutions.trialRemaining', { count: FREE_TRIAL_LIMIT - trialUsed })}
+        </p>
+      )}
+
+      {trialExhausted ? (
+        <div className="solutions-trial-exhausted">
+          <p>{t('solutions.trialExhaustedText')}</p>
+          <Link to="/payment?plan=member-basic" className="btn-primary">
+            {t('common.upgradeMember')}
+          </Link>
+        </div>
+      ) : (
+        <div className="solutions-single-consult">
+          <button type="button" className="solutions-link-btn solutions-consult-btn" onClick={handleButtonClick}>
+            健康长寿咨询
+          </button>
+
+          <section className="manus-embed" ref={embedRef}>
+            <iframe
+              title="manus-consult"
+              src={manusUrl}
+              className="manus-embed-frame"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allow="clipboard-read; clipboard-write"
+            />
+          </section>
+        </div>
+      )}
     </div>
   )
 }
