@@ -127,6 +127,28 @@
   border: 1px solid var(--color-border);
 }
 
+.payment-tabs {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.payment-tabs button {
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.payment-tabs button.active {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
 .payment-form .payment-error {
   color: #f87171;
   font-size: 0.875rem;
@@ -156,4 +178,53 @@
 .btn-primary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* 会员中心 */
+.account-section {
+  margin-bottom: 2rem;
+  padding: 1.25rem;
+  background: var(--color-surface);
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+}
+
+.account-section h2 {
+  font-size: 1rem;
+  margin: 0 0 1rem;
+  color: var(--color-text-muted);
+}
+
+.account-section .btn-primary {
+  margin-top: 0.5rem;
+}
+
+.benefits-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--color-text-muted);
+}
+
+.benefits-list li {
+  margin-bottom: 0.35rem;
+}
+
+.payment-history-list {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+}
+
+.payment-history-item {
+  display: grid;
+  grid-template-columns: 80px 1fr auto auto;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.payment-history-item:last-child {
+  border-bottom: none;
 }

@@ -1,12 +1,14 @@
+import { useTranslation } from 'react-i18next'
 import { RESEARCH_UPDATES, getMonthLabel } from '../data/longevityNews'
 import './LongevityNews.css'
 
 export default function LongevityNews() {
+  const { t } = useTranslation()
   return (
     <div className="page-longevity-news">
       <section className="news-header">
-        <h1>前沿长寿医学资讯</h1>
-        <p>国际权威期刊每月更新的高影响因子健康长寿研究资讯，供参考学习。</p>
+        <h1>{t('longevityNews.title')}</h1>
+        <p>{t('longevityNews.subtitle')}</p>
       </section>
 
       <section className="news-list">
@@ -17,11 +19,11 @@ export default function LongevityNews() {
               <span className="news-if">IF {item.impactFactor}</span>
               <span className="news-month">{getMonthLabel(item.month)}</span>
             </div>
-            <h3>{item.title}</h3>
-            <p>{item.summary}</p>
+            <h3>{t('longevityNews.' + item.id + '.title', { defaultValue: item.title })}</h3>
+            <p>{t('longevityNews.' + item.id + '.summary', { defaultValue: item.summary })}</p>
             {item.url && (
               <a href={item.url} className="news-link" target="_blank" rel="noopener noreferrer">
-                阅读原文 →
+                {t('longevityNews.readMore')} →
               </a>
             )}
           </article>

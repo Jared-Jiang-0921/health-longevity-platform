@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout'
 import ProtectedModule from './components/ProtectedModule'
@@ -16,8 +18,18 @@ import Register from './pages/Register'
 import Payment from './pages/Payment'
 import PaymentSuccess from './pages/PaymentSuccess'
 import Tax from './pages/Tax'
+import Account from './pages/Account'
+import OfflinePayment from './pages/OfflinePayment'
 
 export default function App() {
+  const { i18n } = useTranslation()
+  useEffect(() => {
+    const lang = i18n.language || 'zh'
+    const isRTL = lang.startsWith('ar')
+    document.documentElement.lang = lang.startsWith('zh') ? 'zh-CN' : lang === 'ar' ? 'ar' : 'en'
+    document.documentElement.dir = isRTL ? 'rtl' : 'ltr'
+  }, [i18n.language])
+
   return (
     <Layout>
       <Routes>
@@ -36,6 +48,8 @@ export default function App() {
         <Route path="/payment" element={<Payment />} />
         <Route path="/payment/success" element={<PaymentSuccess />} />
         <Route path="/tax" element={<Tax />} />
+        <Route path="/account" element={<ProtectedModule><Account /></ProtectedModule>} />
+        <Route path="/offline-payment" element={<OfflinePayment />} />
       </Routes>
     </Layout>
   )

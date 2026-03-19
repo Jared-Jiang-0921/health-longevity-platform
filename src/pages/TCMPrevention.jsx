@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { TCM_HERBS, TCM_PRESCRIPTIONS } from '../data/tcmPrevention'
 import './TCMPrevention.css'
 
@@ -6,13 +7,14 @@ const TAB_HERBS = 'herbs'
 const TAB_PRESCRIPTIONS = 'prescriptions'
 
 export default function TCMPrevention() {
+  const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState(TAB_HERBS)
 
   return (
     <div className="page-tcm-prevention">
       <section className="tcm-header">
-        <h1>中医药特色 · 治未病</h1>
-        <p>展示治未病相关中草药单药的药性、功效、适宜人群、注意事项，以及中国传统经典治未病处方与出处。</p>
+        <h1>{t('tcmPrevention.title')}</h1>
+        <p>{t('tcmPrevention.subtitle')}</p>
       </section>
 
       <div className="tcm-tabs">
@@ -21,33 +23,33 @@ export default function TCMPrevention() {
           className={activeTab === TAB_HERBS ? 'active' : ''}
           onClick={() => setActiveTab(TAB_HERBS)}
         >
-          中草药单药
+          {t('tcmPrevention.tabHerbs')}
         </button>
         <button
           type="button"
           className={activeTab === TAB_PRESCRIPTIONS ? 'active' : ''}
           onClick={() => setActiveTab(TAB_PRESCRIPTIONS)}
         >
-          经典处方
+          {t('tcmPrevention.tabPrescriptions')}
         </button>
       </div>
 
       {activeTab === TAB_HERBS && (
         <section className="tcm-section">
-          <h2>治未病相关中草药单药</h2>
+          <h2>{t('tcmPrevention.sectionHerbs')}</h2>
           <div className="tcm-list">
             {TCM_HERBS.map((herb) => (
               <article key={herb.id} className="tcm-card herb-card">
-                <h3>{herb.name}</h3>
+                <h3>{t('tcmPrevention.herbs.' + herb.id + '.name', { defaultValue: herb.name })}</h3>
                 <dl>
-                  <dt>药性</dt>
-                  <dd>{herb.property}</dd>
-                  <dt>功效</dt>
-                  <dd>{herb.efficacy}</dd>
-                  <dt>适宜人群</dt>
-                  <dd>{herb.suitableFor}</dd>
-                  <dt>注意事项</dt>
-                  <dd>{herb.caution}</dd>
+                  <dt>{t('tcmPrevention.property')}</dt>
+                  <dd>{t('tcmPrevention.herbs.' + herb.id + '.property', { defaultValue: herb.property })}</dd>
+                  <dt>{t('tcmPrevention.efficacy')}</dt>
+                  <dd>{t('tcmPrevention.herbs.' + herb.id + '.efficacy', { defaultValue: herb.efficacy })}</dd>
+                  <dt>{t('tcmPrevention.suitableFor')}</dt>
+                  <dd>{t('tcmPrevention.herbs.' + herb.id + '.suitableFor', { defaultValue: herb.suitableFor })}</dd>
+                  <dt>{t('tcmPrevention.caution')}</dt>
+                  <dd>{t('tcmPrevention.herbs.' + herb.id + '.caution', { defaultValue: herb.caution })}</dd>
                 </dl>
               </article>
             ))}
@@ -57,18 +59,18 @@ export default function TCMPrevention() {
 
       {activeTab === TAB_PRESCRIPTIONS && (
         <section className="tcm-section">
-          <h2>中国传统经典治未病处方</h2>
+          <h2>{t('tcmPrevention.sectionPrescriptions')}</h2>
           <div className="tcm-list">
             {TCM_PRESCRIPTIONS.map((rx) => (
               <article key={rx.id} className="tcm-card prescription-card">
-                <h3>{rx.name}</h3>
+                <h3>{t('tcmPrevention.prescriptions.' + rx.id + '.name', { defaultValue: rx.name })}</h3>
                 <dl>
-                  <dt>功效</dt>
-                  <dd>{rx.efficacy}</dd>
-                  <dt>适宜人群</dt>
-                  <dd>{rx.suitableFor}</dd>
-                  <dt>出处</dt>
-                  <dd>{rx.source}</dd>
+                  <dt>{t('tcmPrevention.efficacy')}</dt>
+                  <dd>{t('tcmPrevention.prescriptions.' + rx.id + '.efficacy', { defaultValue: rx.efficacy })}</dd>
+                  <dt>{t('tcmPrevention.suitableFor')}</dt>
+                  <dd>{t('tcmPrevention.prescriptions.' + rx.id + '.suitableFor', { defaultValue: rx.suitableFor })}</dd>
+                  <dt>{t('tcmPrevention.source')}</dt>
+                  <dd>{t('tcmPrevention.prescriptions.' + rx.id + '.source', { defaultValue: rx.source })}</dd>
                 </dl>
               </article>
             ))}
