@@ -83,7 +83,7 @@ export default function Payment() {
       <p>使用 Stripe 安全完成支付，支持多币种与多地区。</p>
       <section className="payment-section">
         <Elements stripe={stripePromise} options={{ clientSecret }}>
-          <PaymentForm />
+          <PaymentForm clientSecret={clientSecret} />
         </Elements>
       </section>
     </div>
