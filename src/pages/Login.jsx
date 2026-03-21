@@ -11,9 +11,15 @@ export default function Login() {
   const { login } = useAuth()
   const navigate = useNavigate()
 
+  const emailOk = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v).trim())
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    if (!emailOk(email)) {
+      setError('请输入有效邮箱，例如：name@example.com')
+      return
+    }
     setSubmitting(true)
     const { ok, error: err } = await login(email, password)
     setSubmitting(false)
@@ -28,14 +34,16 @@ export default function Login() {
     <div className="auth-page">
       <div className="auth-card">
         <h1>会员登录</h1>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate>
           <label>
             <span>邮箱</span>
             <input
-              type="email"
+              type="text"
+              inputMode="email"
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="your@email.com"
+              placeholder="name@example.com"
               required
             />
           </label>

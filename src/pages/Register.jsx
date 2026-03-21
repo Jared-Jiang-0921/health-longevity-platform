@@ -13,9 +13,15 @@ export default function Register() {
   const { register } = useAuth()
   const navigate = useNavigate()
 
+  const emailOk = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v).trim())
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    if (!emailOk(email)) {
+      setError('请输入有效邮箱，例如：name@example.com')
+      return
+    }
     if (password !== confirm) {
       setError('两次密码不一致')
       return
@@ -34,14 +40,16 @@ export default function Register() {
     <div className="auth-page">
       <div className="auth-card">
         <h1>会员注册</h1>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate>
           <label>
             <span>邮箱</span>
             <input
-              type="email"
+              type="text"
+              inputMode="email"
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="your@email.com"
+              placeholder="name@example.com"
               required
             />
           </label>
