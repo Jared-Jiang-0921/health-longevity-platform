@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { canAccess, getRequiredLevel, MEMBERSHIP_LEVELS } from '../data/membership'
+import { SITE_LEGAL } from '../data/siteLegal'
 import './Home.css'
 
 const modules = [
@@ -44,7 +45,7 @@ export default function Home() {
       <section className="hero">
         <div className="hero-bg" aria-hidden="true" />
         <div className="hero-content">
-          <h1>Health Longevity Platform</h1>
+          <h1>{SITE_LEGAL.brandName}</h1>
           <p className="tagline">高级健康技能 · 数字化长寿方案 · 优质健康产品 · 前沿医学资讯</p>
           <div className="hero-auth">
             {user ? (

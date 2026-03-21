@@ -16,6 +16,10 @@ import Register from './pages/Register'
 import Payment from './pages/Payment'
 import PaymentSuccess from './pages/PaymentSuccess'
 import Tax from './pages/Tax'
+import LegalTerms from './pages/LegalTerms'
+import LegalPrivacy from './pages/LegalPrivacy'
+import LegalDisclaimer from './pages/LegalDisclaimer'
+import Account from './pages/Account'
 
 export default function App() {
   return (
@@ -35,7 +39,11 @@ export default function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/payment" element={<Payment />} />
         <Route path="/payment/success" element={<PaymentSuccess />} />
+        <Route path="/account" element={<Account />} />
         <Route path="/tax" element={<Tax />} />
+        <Route path="/terms" element={<LegalTerms />} />
+        <Route path="/privacy" element={<LegalPrivacy />} />
+        <Route path="/disclaimer" element={<LegalDisclaimer />} />
       </Routes>
     </Layout>
   )

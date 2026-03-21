@@ -1,0 +1,70 @@
+.account-page {
+  max-width: 520px;
+}
+
+.account-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.account-toolbar h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.btn-refresh {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.875rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.btn-refresh:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.account-dl {
+  margin: 0;
+}
+
+.account-row {
+  display: grid;
+  grid-template-columns: 7rem 1fr;
+  gap: 0.75rem 1rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.account-row dt {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  font-weight: normal;
+}
+
+.account-row dd {
+  margin: 0;
+  font-size: 0.95rem;
+  word-break: break-all;
+}
+
+.account-hint {
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.account-hint a {
+  color: var(--color-primary);
+}
+
+.account-muted {
+  color: var(--color-text-muted);
+}

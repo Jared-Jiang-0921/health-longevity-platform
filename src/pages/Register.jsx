@@ -22,6 +22,10 @@ export default function Register() {
       setError('请输入有效邮箱，例如：name@example.com')
       return
     }
+    if (!password || password.length < 6) {
+      setError('密码至少 6 位')
+      return
+    }
     if (password !== confirm) {
       setError('两次密码不一致')
       return
@@ -50,7 +54,6 @@ export default function Register() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="name@example.com"
-              required
             />
           </label>
           <label>
@@ -69,7 +72,6 @@ export default function Register() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="请输入密码"
-              required
             />
           </label>
           <label>
@@ -79,7 +81,6 @@ export default function Register() {
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
               placeholder="再次输入密码"
-              required
             />
           </label>
           <p className="auth-note">注册即成为免费会员，可体验部分模块。</p>

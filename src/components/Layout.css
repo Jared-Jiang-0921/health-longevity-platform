@@ -99,10 +99,37 @@
   text-align: center;
   color: var(--color-text-muted);
   font-size: 0.875rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.footer-inner p {
+.footer-copy {
   margin: 0;
+}
+
+.footer-legal {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+}
+
+.footer-legal a {
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.footer-legal a:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.footer-sep {
+  user-select: none;
+  opacity: 0.6;
 }
 
 .page-content {

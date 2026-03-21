@@ -37,6 +37,15 @@ export function AuthProvider({ children }) {
     })
   }, [fetchUser])
 
+  async function parseJsonRes(res) {
+    const text = await res.text()
+    try {
+      return JSON.parse(text)
+    } catch {
+      throw new Error('服务器返回异常（可能未部署 API 或路径错误）')
+    }
+  }
+
   const login = async (email, password) => {
     try {
       const res = await fetch('/api/auth/login', {
@@ -44,7 +53,7 @@ export function AuthProvider({ children }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       })
-      const data = await res.json()
+      const data = await parseJsonRes(res)
       if (!res.ok) throw new Error(data.error || '登录失败')
       localStorage.setItem(STORAGE_KEY, data.token)
       setUser(data.user)
@@ -61,7 +70,7 @@ export function AuthProvider({ children }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, name: name || email?.split('@')[0] }),
       })
-      const data = await res.json()
+      const data = await parseJsonRes(res)
       if (!res.ok) throw new Error(data.error || '注册失败')
       localStorage.setItem(STORAGE_KEY, data.token)
       setUser(data.user)

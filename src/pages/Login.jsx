@@ -20,6 +20,10 @@ export default function Login() {
       setError('请输入有效邮箱，例如：name@example.com')
       return
     }
+    if (!password) {
+      setError('请输入密码')
+      return
+    }
     setSubmitting(true)
     const { ok, error: err } = await login(email, password)
     setSubmitting(false)
@@ -44,7 +48,6 @@ export default function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="name@example.com"
-              required
             />
           </label>
           <label>
@@ -54,7 +57,6 @@ export default function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="请输入密码"
-              required
             />
           </label>
           {error && <p className="auth-error">{error}</p>}

@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { MEMBERSHIP_LEVELS, canAccess } from '../data/membership'
+import { SITE_LEGAL } from '../data/siteLegal'
 import './Layout.css'
 
 const navItems = [
@@ -12,19 +13,22 @@ const navItems = [
   { path: '/tcm-prevention', label: '治未病' },
   { path: '/favorites', label: '我的收藏' },
   { path: '/payment', label: '支付结算' },
+  { path: '/account', label: '会员信息', authOnly: true },
 ]
 
 export default function Layout({ children }) {
   const location = useLocation()
   const { user, logout } = useAuth()
-  const visibleNavItems = navItems.filter((item) => canAccess(item.path, user?.level))
+  const visibleNavItems = navItems.filter(
+    (item) => (!item.authOnly || user) && canAccess(item.path, user?.level),
+  )
 
   return (
     <>
       <header className="site-header">
         <div className="header-inner">
           <Link to="/" className="logo">
-            Health Longevity Platform
+            {SITE_LEGAL.brandName}
           </Link>
           <nav className="nav">
             {visibleNavItems.map(({ path, label }) => {
@@ -59,7 +63,14 @@ export default function Layout({ children }) {
       <main className="main">{children}</main>
       <footer className="site-footer">
         <div className="footer-inner">
-          <p>© Health Longevity Platform. 健康技能 · 长寿方案 · 健康产品.</p>
+          <p className="footer-copy">© {SITE_LEGAL.brandName}. 健康技能 · 长寿方案 · 健康产品.</p>
+          <nav className="footer-legal" aria-label="法律与合规">
+            <Link to="/terms">用户协议（简）</Link>
+            <span className="footer-sep">·</span>
+            <Link to="/privacy">隐私政策（简）</Link>
+            <span className="footer-sep">·</span>
+            <Link to="/disclaimer">健康免责声明（简）</Link>
+          </nav>
         </div>
       </footer>
     </>

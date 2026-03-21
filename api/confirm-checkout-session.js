@@ -1,12 +1,12 @@
 /**
  * 支付成功页备用：用 Stripe Checkout Session ID 拉取会话并更新会员
- * 不依赖 Webhook（Vercel 上 Webhook 验签常因 raw body 失败）
+ * 与 Webhook 共用 applyMembershipFromPlan；Webhook 失败或延迟时由本接口兜底
  * POST /api/confirm-checkout-session  body: { session_id }
  */
 import Stripe from 'stripe'
 import { verifyToken, getUserById } from '../lib/auth.js'
-import { sql } from '../lib/db.js'
-import { PLANS, getExpiresAt } from '../lib/plans.js'
+import { applyMembershipFromPlan } from '../lib/membershipCheckout.js'
+import { PLANS } from '../lib/plans.js'
 
 export default async function handler(req, res) {
   try {
@@ -53,18 +53,14 @@ export default async function handler(req, res) {
       return res.status(403).json({ error: '该订单不属于当前登录账号' })
     }
 
-    const planConfig = PLANS[plan]
-    if (!planConfig) {
+    if (!PLANS[plan]) {
       return res.status(400).json({ error: '无效套餐' })
     }
 
-    const expiresAt = getExpiresAt(planConfig.months)
-
-    await sql`
-      UPDATE users
-      SET level = ${planConfig.level}, expires_at = ${expiresAt}, updated_at = NOW()
-      WHERE id = ${userIdFromJwt}
-    `
+    const { applied } = await applyMembershipFromPlan(userIdFromJwt, plan)
+    if (!applied) {
+      return res.status(500).json({ error: '会员写入失败' })
+    }
 
     const user = await getUserById(userIdFromJwt)
     return res.status(200).json({ ok: true, user })
