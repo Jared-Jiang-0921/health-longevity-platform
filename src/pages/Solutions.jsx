@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from 'react'
 import './Solutions.css'
 
 const COZE_PROXY = import.meta.env.VITE_COZE_PROXY || ''
+const CONSULT_PRO_URL = import.meta.env.VITE_CONSULT_PROFESSIONAL_URL || ''
+const CONSULT_GENERAL_URL = import.meta.env.VITE_CONSULT_GENERAL_URL || ''
 
 function SolutionsChat() {
   const [messages, setMessages] = useState([
@@ -97,12 +99,56 @@ function SolutionsChat() {
   )
 }
 
+function ConsultCard({ title, description, url, envHint }) {
+  const ready = Boolean(url?.trim())
+
+  return (
+    <article className="consult-card">
+      <h2>{title}</h2>
+      <p className="consult-card-desc">{description}</p>
+      {ready ? (
+        <a className="consult-card-btn" href={url.trim()} target="_blank" rel="noopener noreferrer">
+          进入咨询
+        </a>
+      ) : (
+        <p className="consult-card-missing">
+          请在 <code>.env</code> 中配置 <code>{envHint}</code>（完整地址，可含端口与路径）
+        </p>
+      )}
+    </article>
+  )
+}
+
 export default function Solutions() {
   return (
     <div className="page-solutions">
       <h1>数字化健康长寿解决方案</h1>
-      <p className="subtitle">由 Coze 智能体提供咨询，遇到极端情况可转人工。</p>
-      <SolutionsChat />
+      <p className="subtitle">
+        专业咨询与大众咨询分别接入您在 longevityconsult.vip 上搭建的页面；下方可选使用平台内置 Coze 智能体。
+      </p>
+
+      <div className="consult-grid">
+        <ConsultCard
+          title="专业健康长寿咨询"
+          description="面向专业人士，侧重专业知识和技能，涵盖临床医学、基础医学、功能医学、保健医学、运动医学、营养学等。"
+          url={CONSULT_PRO_URL}
+          envHint="VITE_CONSULT_PROFESSIONAL_URL"
+        />
+        <ConsultCard
+          title="自我健康提升咨询"
+          description="面向普通人群，侧重免疫与免疫力、激素与内分泌平衡、神经与情绪心理、睡眠、营养饮食、科学运动等日常生活关注领域。"
+          url={CONSULT_GENERAL_URL}
+          envHint="VITE_CONSULT_GENERAL_URL"
+        />
+      </div>
+
+      {COZE_PROXY ? (
+        <details className="solutions-coze-details">
+          <summary>平台内置智能体咨询（Coze）</summary>
+          <p className="solutions-coze-note">不跳转外链时使用；需已配置 VITE_COZE_PROXY 并启动代理服务。</p>
+          <SolutionsChat />
+        </details>
+      ) : null}
     </div>
   )
 }

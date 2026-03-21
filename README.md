@@ -46,22 +46,30 @@ npm run dev
      ```
    - 重新执行 `npm run dev` 后，打开「支付结算」页即可看到 Stripe 支付表单并完成测试支付。
 
-### 4. 配置 Coze 智能体（健康长寿方案）
+### 4. 健康长寿方案：双入口外链 + 可选 Coze
 
-1. 在 [Coze 开放平台](https://www.coze.cn) 获取 **PAT（个人访问令牌）** 和 **Bot ID**。
-2. 启动 Coze 代理服务（需在 server 目录）：
+**双入口（推荐）**：在 `.env` 中填写您在 **longevityconsult.vip**（或其它域名）上已部署的两个咨询页完整地址，可带 **端口** 与路径，例如：
+
+```
+VITE_CONSULT_PROFESSIONAL_URL=https://longevityconsult.vip:8443/pro
+VITE_CONSULT_GENERAL_URL=https://longevityconsult.vip:8444/general
+```
+
+保存后重新执行 `npm run dev`。打开「健康长寿方案」将先看到两个卡片，分别跳转到上述链接（新标签页）。
+
+**可选 Coze 内置对话**：若仍需要平台内嵌智能体：
+
+1. 在 [Coze 开放平台](https://www.coze.cn) 获取 **PAT** 与 **Bot ID**。
+2. 启动 Coze 代理（`server` 目录）：
    ```bash
    cd server
    npm install
    COZE_API_KEY=pat_xxx COZE_BOT_ID=xxx npm run coze
    ```
-   - 默认端口 4243。国际版请设置 `COZE_BASE=https://api.coze.com`。
-3. 在项目根目录 `.env` 中配置：
-   ```
-   VITE_COZE_PROXY=http://localhost:4243
-   ```
-4. 可选：转人工入口地址 `VITE_HUMAN_CONTACT_URL=mailto:support@your-domain.com`（或客服链接）。
-5. 重新运行前端，打开「健康长寿方案」即可与 Coze 智能体对话，极端情况可点击「转人工」。
+   - 默认端口 4243。国际版：`COZE_BASE=https://api.coze.com`。
+3. `.env` 中配置 `VITE_COZE_PROXY=http://localhost:4243`（或线上代理地址）。
+4. 可选：`VITE_HUMAN_CONTACT_URL=mailto:support@your-domain.com`。
+5. 页面底部会出现可展开的「平台内置智能体咨询（Coze）」。
 
 ## 项目结构
 
@@ -121,6 +129,7 @@ npm run preview   # 本地预览构建结果
 4. **Root Directory** 保持为仓库根目录（即 `health-longevity-platform` 所在目录）。
 5. **Build Command** 留空或填 `npm run build`，**Output Directory** 填 `dist`（Vercel 检测到 Vite 会自动填）。
 6. 在 **Environment Variables** 中配置（与本地 .env 对应）：
+   - `VITE_CONSULT_PROFESSIONAL_URL`、`VITE_CONSULT_GENERAL_URL`（健康长寿方案双入口外链，可含端口）
    - `VITE_STRIPE_PUBLISHABLE_KEY`（若使用支付）
    - `VITE_COZE_PROXY`（若使用 Coze，填你部署的后端地址）
    - `VITE_PAYMENT_INTENT_API`（若支付后端单独部署，填该 API 地址）
