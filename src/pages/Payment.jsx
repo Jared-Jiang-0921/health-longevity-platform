@@ -35,9 +35,13 @@ export default function Payment() {
     return (
       <div className="page-content">
         <h1>在线全球化支付结算</h1>
-        <p>使用 Stripe 安全完成支付。请先在项目根目录创建 <code>.env</code> 并配置：</p>
-        <pre>VITE_STRIPE_PUBLISHABLE_KEY=pk_test_xxx</pre>
-        <p>可选：<code>VITE_PAYMENT_INTENT_API=你的后端创建 PaymentIntent 的地址</code></p>
+        <p>使用 Stripe 安全完成支付。需要配置公钥（测试环境用 <code>pk_test_</code> 开头）：</p>
+        <ul>
+          <li><strong>本地开发</strong>：在项目根目录创建 <code>.env</code>，写入 <code>VITE_STRIPE_PUBLISHABLE_KEY=pk_test_xxx</code> 后重启 <code>npm run dev</code>。</li>
+          <li><strong>Vercel 等线上</strong>：项目 → <strong>Settings → Environment Variables</strong>，新增同名变量，值为 Stripe 里的公钥，保存后 <strong>Redeploy</strong> 一次。</li>
+        </ul>
+        <p>完成支付还需后端创建 PaymentIntent，并配置：</p>
+        <pre>VITE_PAYMENT_INTENT_API=https://你的后端地址/create-payment-intent</pre>
       </div>
     )
   }
