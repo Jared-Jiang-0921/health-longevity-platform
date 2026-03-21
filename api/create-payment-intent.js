@@ -30,10 +30,11 @@ export default async function handler(req, res) {
   try {
     const amount = body.amount ?? 1999
     const currency = String(body.currency || 'usd').toLowerCase()
+    // 仅 card，避免 automatic_payment_methods 下的 Link 等在国内网络易长时间挂起
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency,
-      automatic_payment_methods: { enabled: true },
+      payment_method_types: ['card'],
     })
     return res.status(200).json({ clientSecret: paymentIntent.client_secret })
   } catch (e) {
