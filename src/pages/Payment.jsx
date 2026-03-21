@@ -13,7 +13,7 @@ const PLANS = [
 ]
 
 export default function Payment() {
-  const { user, loading: authLoading, getToken, refreshUser } = useAuth()
+  const { user, loading: authLoading, getToken } = useAuth()
   const [selectedPlan, setSelectedPlan] = useState('standard_monthly')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
