@@ -11,6 +11,7 @@ const navItems = [
   { path: '/longevity-news', label: '前沿长寿医学资讯' },
   { path: '/tcm-prevention', label: '治未病' },
   { path: '/favorites', label: '我的收藏' },
+  { path: '/payment', label: '支付结算' },
 ]
 
 export default function Layout({ children }) {
