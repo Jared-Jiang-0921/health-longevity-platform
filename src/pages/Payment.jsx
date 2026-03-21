@@ -60,7 +60,10 @@ export default function Payment() {
       <div className="page-content">
         <h1>在线全球化支付结算</h1>
         <p>{error}</p>
-        <p>请确保已启动后端服务并实现 <code>POST {PAYMENT_INTENT_API}</code>，返回 <code>{"{ clientSecret }"}</code>。</p>
+        <p>
+          请确认能访问 <code>POST {PAYMENT_INTENT_API}</code> 并返回 <code>{"{ clientSecret }"}</code>。
+          若部署在 Vercel 且未单独配置 <code>VITE_PAYMENT_INTENT_API</code>，请使用仓库内 <code>api/create-payment-intent.js</code>，并在 Vercel 环境变量中设置 <code>STRIPE_SECRET_KEY</code>（与公钥同一 Stripe 账号下的 Secret key）。
+        </p>
       </div>
     )
   }
