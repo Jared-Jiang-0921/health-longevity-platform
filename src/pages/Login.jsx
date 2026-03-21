@@ -6,14 +6,22 @@ import './Auth.css'
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [level, setLevel] = useState('standard')
+  const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
   const { login } = useAuth()
   const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    login(email, password, level)
-    navigate('/')
+    setError('')
+    setSubmitting(true)
+    const { ok, error: err } = await login(email, password)
+    setSubmitting(false)
+    if (ok) {
+      navigate('/')
+    } else {
+      setError(err || '登录失败')
+    }
   }
 
   return (
@@ -41,15 +49,10 @@ export default function Login() {
               required
             />
           </label>
-          <label>
-            <span>登录为（演示）</span>
-            <select value={level} onChange={(e) => setLevel(e.target.value)}>
-              <option value="free">免费会员</option>
-              <option value="standard">标准会员</option>
-              <option value="premium">高级会员</option>
-            </select>
-          </label>
-          <button type="submit" className="btn-primary">登录</button>
+          {error && <p className="auth-error">{error}</p>}
+          <button type="submit" className="btn-primary" disabled={submitting}>
+            {submitting ? '登录中…' : '登录'}
+          </button>
         </form>
         <p className="auth-switch">
           还没有账号？<Link to="/register">注册</Link>

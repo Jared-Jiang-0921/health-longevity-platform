@@ -9,6 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^0.10.0",
+    "bcryptjs": "^2.4.3",
+    "jose": "^5.9.0",
     "stripe": "^17.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

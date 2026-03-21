@@ -1,0 +1,33 @@
+/**
+ * 初始化数据库表（仅开发/首次部署时调用一次）
+ * GET /api/init-db
+ */
+import { sql } from '../lib/db.js'
+
+export default async function handler(req, res) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' })
+  }
+  if (!process.env.DATABASE_URL && !process.env.POSTGRES_URL) {
+    return res.status(500).json({ error: 'Missing DATABASE_URL' })
+  }
+  try {
+    await sql`
+      CREATE TABLE IF NOT EXISTS users (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        email TEXT UNIQUE NOT NULL,
+        name TEXT NOT NULL,
+        password_hash TEXT NOT NULL,
+        level TEXT NOT NULL DEFAULT 'free',
+        expires_at TIMESTAMPTZ,
+        stripe_customer_id TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `
+    await sql`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`
+    return res.status(200).json({ ok: true, message: 'users table ready' })
+  } catch (e) {
+    return res.status(500).json({ error: e.message })
+  }
+}

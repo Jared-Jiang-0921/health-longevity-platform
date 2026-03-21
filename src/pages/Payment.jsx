@@ -1,78 +1,76 @@
-import { useState, useEffect } from 'react'
-import { loadStripe } from '@stripe/stripe-js'
-import { Elements } from '@stripe/react-stripe-js'
-import PaymentForm from '../components/PaymentForm'
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import { MEMBERSHIP_LEVELS } from '../data/membership'
 
-const stripePk = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || ''
-const stripePromise = stripePk ? loadStripe(stripePk) : null
+const CHECKOUT_API = import.meta.env.VITE_CHECKOUT_API || '/api/create-checkout-session'
 
-// 后端创建 PaymentIntent 的接口（需自行部署）
-const PAYMENT_INTENT_API = import.meta.env.VITE_PAYMENT_INTENT_API || '/api/create-payment-intent'
+const PLANS = [
+  { id: 'standard_monthly', name: '标准会员 · 月度', price: '9.99', desc: '1 个月' },
+  { id: 'standard_yearly', name: '标准会员 · 年度', price: '99.99', desc: '12 个月，省约 17%' },
+  { id: 'premium_monthly', name: '高级会员 · 月度', price: '19.99', desc: '1 个月' },
+  { id: 'premium_yearly', name: '高级会员 · 年度', price: '199.99', desc: '12 个月，省约 17%' },
+]
 
 export default function Payment() {
-  const [clientSecret, setClientSecret] = useState(null)
+  const { user, loading: authLoading, getToken, refreshUser } = useAuth()
+  const [selectedPlan, setSelectedPlan] = useState('standard_monthly')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  useEffect(() => {
-    if (!stripePk) return
+  const handlePay = async () => {
+    const token = getToken()
+    if (!user || !token) {
+      setError('请先登录')
+      return
+    }
+
     setLoading(true)
-    fetch(PAYMENT_INTENT_API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: 1999, currency: 'usd' }), // 示例：19.99 USD
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.clientSecret) setClientSecret(data.clientSecret)
-        else setError(data.error || '无法创建支付会话')
+    setError(null)
+    try {
+      const res = await fetch(CHECKOUT_API, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          plan: selectedPlan,
+          origin: window.location.origin,
+        }),
       })
-      .catch(() => setError('网络错误，请确认后端已启动'))
-      .finally(() => setLoading(false))
-  }, [])
+      const data = await res.json()
+      if (data.url) {
+        window.location.href = data.url
+        return
+      }
+      setError(data.error || '无法创建支付会话')
+    } catch (e) {
+      setError('网络错误：' + (e.message || '请稍后重试'))
+    } finally {
+      setLoading(false)
+    }
+  }
 
-  if (!stripePk) {
+  if (authLoading) {
     return (
       <div className="page-content">
         <h1>在线全球化支付结算</h1>
-        <p>使用 Stripe 安全完成支付。需要配置公钥（测试环境用 <code>pk_test_</code> 开头）：</p>
-        <ul>
-          <li><strong>本地开发</strong>：在项目根目录创建 <code>.env</code>，写入 <code>VITE_STRIPE_PUBLISHABLE_KEY=pk_test_xxx</code> 后重启 <code>npm run dev</code>。</li>
-          <li><strong>Vercel 等线上</strong>：项目 → <strong>Settings → Environment Variables</strong>，新增同名变量，值为 Stripe 里的公钥，保存后 <strong>Redeploy</strong> 一次。</li>
-        </ul>
-        <p>完成支付还需后端创建 PaymentIntent，并配置：</p>
-        <pre>VITE_PAYMENT_INTENT_API=https://你的后端地址/create-payment-intent</pre>
+        <p>加载中…</p>
       </div>
     )
   }
 
-  if (loading) {
+  if (!user) {
     return (
       <div className="page-content">
         <h1>在线全球化支付结算</h1>
-        <p>正在准备支付…</p>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="page-content">
-        <h1>在线全球化支付结算</h1>
-        <p>{error}</p>
+        <p>升级会员需先登录。</p>
         <p>
-          请确认能访问 <code>POST {PAYMENT_INTENT_API}</code> 并返回 <code>{"{ clientSecret }"}</code>。
-          若部署在 Vercel 且未单独配置 <code>VITE_PAYMENT_INTENT_API</code>，请使用仓库内 <code>api/create-payment-intent.js</code>，并在 Vercel 环境变量中设置 <code>STRIPE_SECRET_KEY</code>（与公钥同一 Stripe 账号下的 Secret key）。
+          <Link to="/login" className="btn-primary">登录</Link>
+          <span className="page-sep"> </span>
+          <Link to="/register" className="btn-secondary">注册</Link>
         </p>
-      </div>
-    )
-  }
-
-  if (!clientSecret) {
-    return (
-      <div className="page-content">
-        <h1>在线全球化支付结算</h1>
-        <p>无法获取支付会话，请检查后端与 .env 配置。</p>
       </div>
     )
   }
@@ -80,12 +78,42 @@ export default function Payment() {
   return (
     <div className="page-content">
       <h1>在线全球化支付结算</h1>
-      <p>使用 Stripe 安全完成支付，支持多币种与多地区。</p>
+      <p>当前：{user.name}（{MEMBERSHIP_LEVELS[user.level]?.name || user.level}）</p>
+      <p className="payment-desc">选择套餐后跳转到 Stripe 完成支付，支付成功后自动升级会员。</p>
+
       <section className="payment-section">
-        <Elements stripe={stripePromise} options={{ clientSecret }}>
-          <PaymentForm clientSecret={clientSecret} />
-        </Elements>
+        <div className="plan-grid">
+          {PLANS.map((plan) => (
+            <label key={plan.id} className={`plan-card ${selectedPlan === plan.id ? 'selected' : ''}`}>
+              <input
+                type="radio"
+                name="plan"
+                value={plan.id}
+                checked={selectedPlan === plan.id}
+                onChange={(e) => setSelectedPlan(e.target.value)}
+              />
+              <div className="plan-name">{plan.name}</div>
+              <div className="plan-price">${plan.price}</div>
+              <div className="plan-desc">{plan.desc}</div>
+            </label>
+          ))}
+        </div>
+        <div className="payment-summary">
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={handlePay}
+            disabled={loading}
+          >
+            {loading ? '跳转中…' : '去支付'}
+          </button>
+        </div>
+        {error && <div className="payment-error">{error}</div>}
       </section>
+
+      <p className="payment-note">
+        若跳转失败，请检查网络与 Vercel 环境变量（STRIPE_SECRET_KEY、DATABASE_URL 等）。
+      </p>
     </div>
   )
 }

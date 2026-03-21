@@ -5,16 +5,29 @@ import './Auth.css'
 
 export default function Register() {
   const [email, setEmail] = useState('')
+  const [name, setName] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
+  const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
   const { register } = useAuth()
   const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    if (password !== confirm) return
-    register(email, password, 'free')
-    navigate('/')
+    setError('')
+    if (password !== confirm) {
+      setError('两次密码不一致')
+      return
+    }
+    setSubmitting(true)
+    const { ok, error: err } = await register(email, password, name || undefined)
+    setSubmitting(false)
+    if (ok) {
+      navigate('/')
+    } else {
+      setError(err || '注册失败')
+    }
   }
 
   return (
@@ -30,6 +43,15 @@ export default function Register() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="your@email.com"
               required
+            />
+          </label>
+          <label>
+            <span>昵称（可选）</span>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="显示名称"
             />
           </label>
           <label>
@@ -53,7 +75,10 @@ export default function Register() {
             />
           </label>
           <p className="auth-note">注册即成为免费会员，可体验部分模块。</p>
-          <button type="submit" className="btn-primary">注册</button>
+          {error && <p className="auth-error">{error}</p>}
+          <button type="submit" className="btn-primary" disabled={submitting}>
+            {submitting ? '注册中…' : '注册'}
+          </button>
         </form>
         <p className="auth-switch">
           已有账号？<Link to="/login">登录</Link>
