@@ -127,10 +127,26 @@
   border: 1px solid var(--color-border);
 }
 
-.payment-form .payment-error {
+.payment-form .payment-error,
+.payment-section .payment-error {
   color: #f87171;
   font-size: 0.875rem;
   margin: 1rem 0 0;
+}
+
+.payment-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.payment-desc {
+  margin-bottom: 0.5rem !important;
+}
+
+.payment-note {
+  margin-top: 1.5rem !important;
+  font-size: 0.85rem !important;
 }
 
 .payment-form .btn-primary {
