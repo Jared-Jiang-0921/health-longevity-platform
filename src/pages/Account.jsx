@@ -50,7 +50,7 @@ export default function Account() {
       expiresDisplay = `已过期（${formatExpires(user.expires_at)}）`
     }
   } else if (user.level === 'free' && !user.expires_at) {
-    expiresDisplay = '免费会员（未开通付费）'
+    expiresDisplay = '普通会员（未开通付费）'
   }
 
   return (

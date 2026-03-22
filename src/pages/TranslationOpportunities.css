@@ -1,0 +1,24 @@
+.page-translation-opportunities {
+  max-width: 720px;
+}
+
+.opportunities-header h1 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.opportunities-lead {
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.opportunities-body {
+  margin-top: 2rem;
+}
+
+.opportunities-placeholder {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}

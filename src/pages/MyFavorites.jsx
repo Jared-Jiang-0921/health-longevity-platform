@@ -11,7 +11,7 @@ export default function MyFavorites() {
     return (
       <div className="page-content">
         <h1>我的收藏</h1>
-        <p className="empty-msg">暂无收藏课程，去 <Link to="/health-skills">健康技能学习</Link> 添加吧。</p>
+        <p className="empty-msg">暂无收藏课程，去 <Link to="/health-skills">长寿知识技能</Link> 添加吧。</p>
       </div>
     )
   }

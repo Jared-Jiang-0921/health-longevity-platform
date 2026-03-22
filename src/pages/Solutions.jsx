@@ -7,7 +7,7 @@ const CONSULT_GENERAL_URL = import.meta.env.VITE_CONSULT_GENERAL_URL || ''
 
 function SolutionsChat() {
   const [messages, setMessages] = useState([
-    { role: 'assistant', content: '您好，我是健康长寿方案顾问。您可以问我关于营养、运动、睡眠、压力管理等健康相关问题，我会为您提供个性化建议。如有紧急情况或需要真人咨询，请点击下方「转人工」。' },
+    { role: 'assistant', content: '您好，我是综合长寿方案顾问。您可以问我关于营养、运动、睡眠、压力管理等健康相关问题，我会为您提供个性化建议。如有紧急情况或需要真人咨询，请点击下方「转人工」。' },
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -122,7 +122,7 @@ function ConsultCard({ title, description, url, envHint }) {
 export default function Solutions() {
   return (
     <div className="page-solutions">
-      <h1>数字化健康长寿解决方案</h1>
+      <h1>综合长寿方案</h1>
       <p className="subtitle">
         专业咨询与大众咨询分别接入您在 longevityconsult.vip 上搭建的页面；下方可选使用平台内置 Coze 智能体。
       </p>

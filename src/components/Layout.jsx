@@ -6,11 +6,12 @@ import './Layout.css'
 
 const navItems = [
   { path: '/', label: '首页' },
-  { path: '/health-skills', label: '健康技能学习' },
-  { path: '/solutions', label: '健康长寿方案' },
-  { path: '/products', label: '健康产品' },
+  { path: '/health-skills', label: '长寿知识技能' },
+  { path: '/solutions', label: '综合长寿方案' },
+  { path: '/products', label: '循证健康产品' },
   { path: '/longevity-news', label: '前沿长寿医学资讯' },
   { path: '/tcm-prevention', label: '治未病' },
+  { path: '/translation-opportunities', label: '转化应用机遇' },
   { path: '/favorites', label: '我的收藏' },
   { path: '/payment', label: '支付结算' },
   { path: '/account', label: '会员信息', authOnly: true },
@@ -63,7 +64,7 @@ export default function Layout({ children }) {
       <main className="main">{children}</main>
       <footer className="site-footer">
         <div className="footer-inner">
-          <p className="footer-copy">© {SITE_LEGAL.brandName}. 健康技能 · 长寿方案 · 健康产品.</p>
+          <p className="footer-copy">© {SITE_LEGAL.brandName}. 长寿知识 · 综合方案 · 循证产品.</p>
           <nav className="footer-legal" aria-label="法律与合规">
             <Link to="/terms">用户协议（简）</Link>
             <span className="footer-sep">·</span>

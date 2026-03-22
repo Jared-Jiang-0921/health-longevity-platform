@@ -14,8 +14,8 @@ export default function Products() {
   return (
     <div className="page-products">
       <section className="products-header">
-        <h1>优质健康产品推荐</h1>
-        <p>精选健康产品与用品，支持跳转至支付结算。</p>
+        <h1>循证健康产品</h1>
+        <p>精选循证健康产品与用品，支持跳转至支付结算。</p>
       </section>
 
       <section className="categories">

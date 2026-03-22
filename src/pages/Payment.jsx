@@ -81,6 +81,15 @@ export default function Payment() {
       <p>当前：{user.name}（{MEMBERSHIP_LEVELS[user.level]?.name || user.level}）</p>
       <p className="payment-desc">选择套餐后跳转到 Stripe 完成支付，支付成功后自动升级会员。</p>
 
+      <details className="payment-tier-desc">
+        <summary>会员权益说明</summary>
+        <ul>
+          <li><strong>普通会员</strong>（注册即得）：长寿知识技能部分免费、循证健康产品大部分、前沿长寿医学资讯大部分、转化应用机遇部分免费。</li>
+          <li><strong>标准会员</strong>：在普通会员基础上增加长寿知识技能大部分内容、转化应用机遇全部、中医药特色治未病全部、综合长寿方案。</li>
+          <li><strong>高级会员</strong>：所有模块与内容。</li>
+        </ul>
+      </details>
+
       <section className="payment-section">
         <div className="plan-grid">
           {PLANS.map((plan) => (

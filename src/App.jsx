@@ -11,6 +11,7 @@ import Products from './pages/Products'
 import ProductDetail from './pages/ProductDetail'
 import LongevityNews from './pages/LongevityNews'
 import TCMPrevention from './pages/TCMPrevention'
+import TranslationOpportunities from './pages/TranslationOpportunities'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Payment from './pages/Payment'
@@ -35,6 +36,7 @@ export default function App() {
         <Route path="/products/:id" element={<ProtectedModule><ProductDetail /></ProtectedModule>} />
         <Route path="/longevity-news" element={<ProtectedModule><LongevityNews /></ProtectedModule>} />
         <Route path="/tcm-prevention" element={<ProtectedModule><TCMPrevention /></ProtectedModule>} />
+        <Route path="/translation-opportunities" element={<ProtectedModule><TranslationOpportunities /></ProtectedModule>} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/payment" element={<Payment />} />

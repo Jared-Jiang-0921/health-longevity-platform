@@ -59,14 +59,29 @@ export default function CourseLearn() {
           {activeModule.type === 'video' ? (
             <section className="learn-video">
               <h2>{activeModule.title}</h2>
-              <div className="video-wrapper">
-                <iframe
-                  title={activeModule.title}
-                  src={activeModule.embedUrl}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              </div>
+              {activeModule.videoUrl ? (
+                <div className="video-wrapper video-wrapper-native">
+                  <video
+                    controls
+                    playsInline
+                    preload="metadata"
+                    src={activeModule.videoUrl}
+                  >
+                    您的浏览器不支持视频播放。
+                  </video>
+                </div>
+              ) : activeModule.embedUrl ? (
+                <div className="video-wrapper">
+                  <iframe
+                    title={activeModule.title}
+                    src={activeModule.embedUrl}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+              ) : (
+                <p className="video-missing">未配置视频地址（请在课程数据中为该课时设置 videoUrl 或 embedUrl）。</p>
+              )}
               {activeModule.duration && (
                 <p className="video-duration">时长：{activeModule.duration}</p>
               )}

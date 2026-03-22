@@ -1,9 +1,14 @@
 /**
  * 会员等级与模块权限
- * free: 免费会员  standard: 标准会员  premium: 高级会员
+ * free: 普通会员  standard: 标准会员  premium: 高级会员
+ *
+ * 普通会员：长寿知识技能部分免费、循证健康产品大部分、前沿长寿医学资讯大部分、
+ *           转化应用机遇部分免费
+ * 标准会员：普通会员 + 长寿知识技能大部分、转化应用机遇全部、治未病全部、综合长寿方案
+ * 高级会员：所有模块与内容
  */
 export const MEMBERSHIP_LEVELS = {
-  free: { id: 'free', name: '免费会员', order: 0 },
+  free: { id: 'free', name: '普通会员', order: 0 },
   standard: { id: 'standard', name: '标准会员', order: 1 },
   premium: { id: 'premium', name: '高级会员', order: 2 },
 }
@@ -14,9 +19,10 @@ const LEVEL_ORDER = ['free', 'standard', 'premium']
 export const MODULE_ACCESS = {
   '/health-skills': 'free',
   '/solutions': 'standard',
-  '/products': 'standard',
+  '/products': 'free',
   '/longevity-news': 'free',
-  '/tcm-prevention': 'free',
+  '/tcm-prevention': 'standard',
+  '/translation-opportunities': 'free',
   '/favorites': 'premium',
 }
 

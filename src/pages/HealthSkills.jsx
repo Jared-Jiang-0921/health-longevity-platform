@@ -16,7 +16,7 @@ export default function HealthSkills() {
   return (
     <div className="page-health-skills">
       <section className="health-skills-header">
-        <h1>高级健康技能学习</h1>
+        <h1>长寿知识技能</h1>
         <p>系统化健康知识与技能课程，支持多语言与全球化学习。</p>
       </section>
 

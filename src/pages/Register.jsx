@@ -83,7 +83,7 @@ export default function Register() {
               placeholder="再次输入密码"
             />
           </label>
-          <p className="auth-note">注册即成为免费会员，可体验部分模块。</p>
+          <p className="auth-note">注册即成为普通会员，可体验部分模块。</p>
           {error && <p className="auth-error">{error}</p>}
           <button type="submit" className="btn-primary" disabled={submitting}>
             {submitting ? '注册中…' : '注册'}

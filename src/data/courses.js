@@ -1,3 +1,15 @@
+/**
+ * 课程视频两种写法（二选一，视频课时至少填一种）：
+ * - videoUrl：MP4 等直链，推荐阿里云 OSS 公开读地址，学习页用 <video> 播放。
+ * - embedUrl：嵌入页（如 YouTube），学习页用 iframe。
+ * 阿里云 OSS：请在控制台为该 Bucket 配置跨域 CORS，允许你的网站来源（如 https://xxx.vercel.app），
+ * 否则浏览器可能拦截跨域视频请求导致无法播放。
+ */
+
+/** 占位示例（可全局替换为你的 OSS 根路径或逐条改 videoUrl） */
+const DEMO_MP4 =
+  'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4'
+
 export const CATEGORIES = [
   { id: 'all', label: '全部' },
   { id: 'nutrition', label: '营养与饮食' },
@@ -8,31 +20,42 @@ export const CATEGORIES = [
   { id: 'mental', label: '心理健康' },
 ]
 
-// 课程模块：type: 'video' | 'document', video 用 embedUrl 占位，document 用 content
+// 课程模块：type: 'video' | 'document'；video 优先 videoUrl（MP4 直链），否则 embedUrl（嵌入页）
 const courseModules = {
   1: [
-    { type: 'video', title: '长寿饮食概述', duration: '12:00', embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ' },
+    {
+      type: 'video',
+      title: '长寿饮食概述',
+      duration: '12:00',
+      // 将下方替换为你的阿里云 OSS 等 MP4 直链（需可公网访问且已配置 CORS）
+      videoUrl: DEMO_MP4,
+    },
     { type: 'document', title: '宏量与微量营养素', content: '宏量营养素包括蛋白质、碳水、脂肪，微量营养素包括维生素与矿物质。平衡摄入是长寿饮食的基础。' },
-    { type: 'video', title: '抗炎饮食实操', duration: '18:00', embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ' },
+    {
+      type: 'video',
+      title: '抗炎饮食实操',
+      duration: '18:00',
+      videoUrl: DEMO_MP4,
+    },
     { type: 'document', title: '蓝区饮食模式', content: '蓝区居民饮食特点：以植物为主、适量豆类、少量红肉、天然食物为主。' },
   ],
   2: [
     { type: 'document', title: '断食机制简述', content: '间歇性断食通过延长空腹时间，促进自噬、改善代谢。常见模式：16:8、5:2、隔日断食。' },
-    { type: 'video', title: '16:8 实操指南', duration: '15:00', embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ' },
+    { type: 'video', title: '16:8 实操指南', duration: '15:00', videoUrl: DEMO_MP4 },
   ],
   3: [
-    { type: 'video', title: '基础动作示范', duration: '20:00', embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ' },
+    { type: 'video', title: '基础动作示范', duration: '20:00', videoUrl: DEMO_MP4 },
     { type: 'document', title: '训练计划编排', content: '建议每周 2–3 次，每次 45–60 分钟。渐进超负荷：逐步增加重量或次数。' },
   ],
-  4: [{ type: 'video', title: 'HIIT 入门', duration: '10:00', embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ' }, { type: 'document', title: '心率区间与恢复', content: '最大心率约 220 减年龄。有氧区约 60–70% 最大心率。' }],
-  5: [{ type: 'document', title: '睡眠周期', content: '每周期约 90 分钟，含浅睡、深睡、REM。建议固定作息，睡前避免蓝光。' }, { type: 'video', title: '睡眠环境优化', duration: '8:00', embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ' }],
-  6: [{ type: 'video', title: '拉伸与泡沫轴', duration: '15:00', embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ' }],
-  7: [{ type: 'document', title: '正念冥想入门', content: '关注呼吸，念头出现时温和带回。每天 5–10 分钟即可起步。' }, { type: 'video', title: '身体扫描练习', duration: '12:00', embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ' }],
+  4: [{ type: 'video', title: 'HIIT 入门', duration: '10:00', videoUrl: DEMO_MP4 }, { type: 'document', title: '心率区间与恢复', content: '最大心率约 220 减年龄。有氧区约 60–70% 最大心率。' }],
+  5: [{ type: 'document', title: '睡眠周期', content: '每周期约 90 分钟，含浅睡、深睡、REM。建议固定作息，睡前避免蓝光。' }, { type: 'video', title: '睡眠环境优化', duration: '8:00', videoUrl: DEMO_MP4 }],
+  6: [{ type: 'video', title: '拉伸与泡沫轴', duration: '15:00', videoUrl: DEMO_MP4 }],
+  7: [{ type: 'document', title: '正念冥想入门', content: '关注呼吸，念头出现时温和带回。每天 5–10 分钟即可起步。' }, { type: 'video', title: '身体扫描练习', duration: '12:00', videoUrl: DEMO_MP4 }],
   8: [{ type: 'document', title: '精力曲线', content: '多数人上午精力较高，午后下降。重要任务安排在精力峰值。' }],
-  9: [{ type: 'document', title: '心血管风险因素', content: '血压、血脂、血糖、吸烟、肥胖等。生活方式干预是预防核心。' }, { type: 'video', title: '监测与就医', duration: '10:00', embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ' }],
+  9: [{ type: 'document', title: '心血管风险因素', content: '血压、血脂、血糖、吸烟、肥胖等。生活方式干预是预防核心。' }, { type: 'video', title: '监测与就医', duration: '10:00', videoUrl: DEMO_MP4 }],
   10: [{ type: 'document', title: '骨骼健康', content: '钙与维生素 D、负重运动、避免烟酒。' }],
-  11: [{ type: 'video', title: '记忆策略', duration: '14:00', embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ' }, { type: 'document', title: '认知刺激', content: '学习新技能、社交、阅读等可增强认知储备。' }],
-  12: [{ type: 'document', title: '情绪 ABC 模型', content: 'A 事件 → B 信念 → C 情绪。改变 B 可调节 C。' }, { type: 'video', title: '心理韧性练习', duration: '11:00', embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ' }],
+  11: [{ type: 'video', title: '记忆策略', duration: '14:00', videoUrl: DEMO_MP4 }, { type: 'document', title: '认知刺激', content: '学习新技能、社交、阅读等可增强认知储备。' }],
+  12: [{ type: 'document', title: '情绪 ABC 模型', content: 'A 事件 → B 信念 → C 情绪。改变 B 可调节 C。' }, { type: 'video', title: '心理韧性练习', duration: '11:00', videoUrl: DEMO_MP4 }],
 }
 
 export const COURSES = [

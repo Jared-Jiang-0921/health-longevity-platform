@@ -146,6 +146,18 @@
   margin-bottom: 1.5rem;
 }
 
+.page-register-required .register-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.page-register-required .back-link {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
 .payment-section {
   margin-top: 2rem;
   padding: 1.5rem;
@@ -232,6 +244,32 @@
 
 .payment-desc {
   margin-bottom: 0.5rem !important;
+}
+
+.payment-tier-desc {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.payment-tier-desc summary {
+  cursor: pointer;
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.payment-tier-desc ul {
+  margin: 0.75rem 0 0;
+  padding-left: 1.25rem;
+  line-height: 1.7;
+}
+
+.payment-tier-desc li {
+  margin-bottom: 0.5rem;
 }
 
 .payment-note {
