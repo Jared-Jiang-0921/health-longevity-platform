@@ -8,20 +8,24 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
 
+  /** unauthorized：应清 token；error：网络/5xx，保留 token 与当前 user，避免误清空已登录态 */
   const fetchUser = useCallback(async (token) => {
-    if (!token) return null
+    if (!token) return { user: null, status: 'no_token' }
     try {
       const res = await fetch('/api/auth/me', {
         headers: { Authorization: `Bearer ${token}` },
       })
-      if (res.ok) {
-        const { user } = await res.json()
-        return user
+      if (res.status === 401) {
+        return { user: null, status: 'unauthorized' }
       }
+      if (!res.ok) {
+        return { user: null, status: 'error' }
+      }
+      const { user } = await res.json()
+      return { user, status: 'ok' }
     } catch {
-      return null
+      return { user: null, status: 'error' }
     }
-    return null
   }, [])
 
   useEffect(() => {
@@ -30,9 +34,13 @@ export function AuthProvider({ children }) {
       setLoading(false)
       return
     }
-    fetchUser(token).then((u) => {
-      setUser(u)
-      if (!u) localStorage.removeItem(STORAGE_KEY)
+    fetchUser(token).then(({ user, status }) => {
+      if (status === 'unauthorized') {
+        localStorage.removeItem(STORAGE_KEY)
+        setUser(null)
+      } else if (user) {
+        setUser(user)
+      }
       setLoading(false)
     })
   }, [fetchUser])
@@ -89,8 +97,13 @@ export function AuthProvider({ children }) {
 
   const refreshUser = async () => {
     const token = getToken()
-    const u = await fetchUser(token)
-    setUser(u)
+    const { user, status } = await fetchUser(token)
+    if (status === 'unauthorized') {
+      localStorage.removeItem(STORAGE_KEY)
+      setUser(null)
+      return
+    }
+    if (user) setUser(user)
   }
 
   return (

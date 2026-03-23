@@ -6,6 +6,19 @@ import Stripe from 'stripe'
 import { verifyToken } from '../lib/auth.js'
 import { PLANS } from '../lib/plans.js'
 
+function resolveCurrency() {
+  const raw = process.env.PAYMENT_CURRENCY || process.env.VITE_PAYMENT_CURRENCY || 'usd'
+  return String(raw).toLowerCase().trim()
+}
+
+function resolveAllowedCurrencies(defaultCurrency) {
+  const raw = process.env.PAYMENT_CURRENCY_OPTIONS || process.env.VITE_PAYMENT_CURRENCY_OPTIONS || defaultCurrency
+  return String(raw)
+    .split(',')
+    .map((v) => v.trim().toLowerCase())
+    .filter((v, i, arr) => /^[a-z]{3}$/.test(v) && arr.indexOf(v) === i)
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST')
@@ -48,13 +61,17 @@ export default async function handler(req, res) {
 
   const stripe = new Stripe(secret)
   try {
+    const defaultCurrency = resolveCurrency()
+    const allowedCurrencies = resolveAllowedCurrencies(defaultCurrency)
+    const requestedCurrency = String(body.currency || '').toLowerCase().trim()
+    const currency = allowedCurrencies.includes(requestedCurrency) ? requestedCurrency : defaultCurrency
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       client_reference_id: userId,
       metadata: { plan, user_id: userId },
       line_items: [{
         price_data: {
-          currency: 'usd',
+          currency,
           product_data: {
             name: planConfig.name,
             description: `${planConfig.months} 个月`,

@@ -1,9 +1,57 @@
 import { useState, useRef, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import { hasLevelAccess, MEMBERSHIP_LEVELS, normalizeLevel } from '../data/membership'
+import { SITE_LEGAL } from '../data/siteLegal'
 import './Solutions.css'
 
 const COZE_PROXY = import.meta.env.VITE_COZE_PROXY || ''
-const CONSULT_PRO_URL = import.meta.env.VITE_CONSULT_PROFESSIONAL_URL || ''
-const CONSULT_GENERAL_URL = import.meta.env.VITE_CONSULT_GENERAL_URL || ''
+const CONSULT_PRO_URL = (import.meta.env.VITE_CONSULT_PROFESSIONAL_URL || '').trim()
+/** 未单独配置自我咨询页时，与专业咨询同址（常见：同一 Manus 项目两条入口），由 hl_consult_entry 区分 */
+const CONSULT_GENERAL_RAW = (import.meta.env.VITE_CONSULT_GENERAL_URL || '').trim()
+const CONSULT_GENERAL_URL = CONSULT_GENERAL_RAW || CONSULT_PRO_URL
+
+/** 与会员信息一致：优先昵称，否则用邮箱 @ 前本地部分，保证外链始终有可展示名称 */
+function getConsultDisplayName(user) {
+  if (!user) return ''
+  const n = user.name?.trim()
+  if (n) return n
+  const em = user.email?.trim()
+  if (em?.includes('@')) return em.split('@')[0]
+  return ''
+}
+
+/** 在咨询链接后附加当前用户信息，供 longevityconsult / Manus 落地页识别身份与展示昵称。 */
+function appendUserParams(url, user, options = {}) {
+  if (!url?.trim()) return ''
+  const base = url.trim()
+  const sep = base.includes('?') ? '&' : '?'
+  const params = new URLSearchParams()
+  const levelNorm = normalizeLevel(user?.level)
+  const levelRank = { free: 0, standard: 1, premium: 2 }
+  params.set('source', 'healthlongevityplatform')
+  params.set('level', levelNorm)
+  params.set('hl_membership_level', levelNorm)
+  params.set('hl_level', String(levelRank[levelNorm] ?? 0))
+  if (options.consultEntry) {
+    params.set('hl_consult_entry', options.consultEntry)
+  }
+  if (user.email) params.set('email', user.email)
+  if (user.id) params.set('user_id', String(user.id))
+  const display = getConsultDisplayName(user)
+  if (display) {
+    params.set('name', display)
+    params.set('display_name', display)
+    params.set('nickname', display)
+    params.set('hl_display', display)
+  }
+  params.set('hl_brand', SITE_LEGAL.brandName)
+  if (typeof window !== 'undefined' && window.location?.hostname) {
+    params.set('hl_origin', window.location.hostname)
+  }
+  params.set('hl_ts', String(Date.now()))
+  return `${base}${sep}${params.toString()}`
+}
 
 function SolutionsChat() {
   const [messages, setMessages] = useState([
@@ -99,15 +147,26 @@ function SolutionsChat() {
   )
 }
 
-function ConsultCard({ title, description, url, envHint }) {
+function ConsultCard({ title, description, url, envHint, requiredLevel, user, consultEntry }) {
   const ready = Boolean(url?.trim())
+  const allowed = hasLevelAccess(user?.level, requiredLevel)
 
   return (
-    <article className="consult-card">
+    <article className={`consult-card ${!allowed ? 'consult-card-locked' : ''}`}>
       <h2>{title}</h2>
       <p className="consult-card-desc">{description}</p>
-      {ready ? (
-        <a className="consult-card-btn" href={url.trim()} target="_blank" rel="noopener noreferrer">
+      {!allowed ? (
+        <div className="consult-card-lock">
+          <p className="consult-lock-msg">需{MEMBERSHIP_LEVELS[requiredLevel]?.name}及以上</p>
+          <Link to="/payment" className="consult-card-btn consult-btn-upgrade">升级会员</Link>
+        </div>
+      ) : ready ? (
+        <a
+          className="consult-card-btn"
+          href={appendUserParams(url, user, { consultEntry })}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           进入咨询
         </a>
       ) : (
@@ -120,6 +179,12 @@ function ConsultCard({ title, description, url, envHint }) {
 }
 
 export default function Solutions() {
+  const { user, loading, refreshUser } = useAuth()
+
+  useEffect(() => {
+    refreshUser()
+  }, [refreshUser])
+
   return (
     <div className="page-solutions">
       <h1>综合长寿方案</h1>
@@ -127,20 +192,32 @@ export default function Solutions() {
         专业咨询与大众咨询分别接入您在 longevityconsult.vip 上搭建的页面；下方可选使用平台内置 Coze 智能体。
       </p>
 
+      {loading ? (
+        <p className="consult-auth-loading" role="status">
+          正在验证会员身份，请稍候…
+        </p>
+      ) : (
       <div className="consult-grid">
         <ConsultCard
           title="专业健康长寿咨询"
           description="面向专业人士，侧重专业知识和技能，涵盖临床医学、基础医学、功能医学、保健医学、运动医学、营养学等。"
           url={CONSULT_PRO_URL}
           envHint="VITE_CONSULT_PROFESSIONAL_URL"
+          requiredLevel="premium"
+          user={user}
+          consultEntry="professional"
         />
         <ConsultCard
-          title="自我健康提升咨询"
+          title="自我健康促进咨询"
           description="面向普通人群，侧重免疫与免疫力、激素与内分泌平衡、神经与情绪心理、睡眠、营养饮食、科学运动等日常生活关注领域。"
           url={CONSULT_GENERAL_URL}
-          envHint="VITE_CONSULT_GENERAL_URL"
+          envHint="VITE_CONSULT_GENERAL_URL（可与专业咨询同址；未填时自动使用 VITE_CONSULT_PROFESSIONAL_URL）"
+          requiredLevel="standard"
+          user={user}
+          consultEntry="general"
         />
       </div>
+      )}
 
       {COZE_PROXY ? (
         <details className="solutions-coze-details">

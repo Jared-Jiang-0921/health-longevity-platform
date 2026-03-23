@@ -3,18 +3,42 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { MEMBERSHIP_LEVELS } from '../data/membership'
 
-const CHECKOUT_API = import.meta.env.VITE_CHECKOUT_API || '/api/create-checkout-session'
+const PAYMENT_PROVIDER = String(import.meta.env.VITE_PAYMENT_PROVIDER || 'stripe').toLowerCase().trim()
+const CHECKOUT_API =
+  import.meta.env.VITE_CHECKOUT_API ||
+  (PAYMENT_PROVIDER === 'airwallex'
+    ? '/api/airwallex/create-checkout-session'
+    : '/api/create-checkout-session')
+const PAYMENT_CURRENCY = String(import.meta.env.VITE_PAYMENT_CURRENCY || 'USD').toUpperCase().trim()
+const PAYMENT_CURRENCY_OPTIONS = String(import.meta.env.VITE_PAYMENT_CURRENCY_OPTIONS || PAYMENT_CURRENCY)
+  .split(',')
+  .map((v) => v.trim().toUpperCase())
+  .filter((v, i, arr) => /^[A-Z]{3}$/.test(v) && arr.indexOf(v) === i)
 
 const PLANS = [
-  { id: 'standard_monthly', name: '标准会员 · 月度', price: '9.99', desc: '1 个月' },
-  { id: 'standard_yearly', name: '标准会员 · 年度', price: '99.99', desc: '12 个月，省约 17%' },
-  { id: 'premium_monthly', name: '高级会员 · 月度', price: '19.99', desc: '1 个月' },
-  { id: 'premium_yearly', name: '高级会员 · 年度', price: '199.99', desc: '12 个月，省约 17%' },
+  { id: 'standard_monthly', name: '标准会员 · 月度', amount: 999, desc: '1 个月' },
+  { id: 'standard_yearly', name: '标准会员 · 年度', amount: 9999, desc: '12 个月，省约 17%' },
+  { id: 'premium_monthly', name: '高级会员 · 月度', amount: 1999, desc: '1 个月' },
+  { id: 'premium_yearly', name: '高级会员 · 年度', amount: 19999, desc: '12 个月，省约 17%' },
 ]
+
+function formatPlanPrice(amountMinor, currency) {
+  const amount = Number(amountMinor) / 100
+  try {
+    return new Intl.NumberFormat('zh-CN', {
+      style: 'currency',
+      currency,
+      currencyDisplay: 'symbol',
+    }).format(amount)
+  } catch {
+    return `${currency} ${amount.toFixed(2)}`
+  }
+}
 
 export default function Payment() {
   const { user, loading: authLoading, getToken } = useAuth()
   const [selectedPlan, setSelectedPlan] = useState('standard_monthly')
+  const [selectedCurrency, setSelectedCurrency] = useState(PAYMENT_CURRENCY_OPTIONS[0] || PAYMENT_CURRENCY)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
@@ -36,6 +60,7 @@ export default function Payment() {
         },
         body: JSON.stringify({
           plan: selectedPlan,
+          currency: selectedCurrency,
           origin: window.location.origin,
         }),
       })
@@ -79,18 +104,33 @@ export default function Payment() {
     <div className="page-content">
       <h1>在线全球化支付结算</h1>
       <p>当前：{user.name}（{MEMBERSHIP_LEVELS[user.level]?.name || user.level}）</p>
-      <p className="payment-desc">选择套餐后跳转到 Stripe 完成支付，支付成功后自动升级会员。</p>
+      <p className="payment-note">当前支付通道：{PAYMENT_PROVIDER === 'airwallex' ? '空中云汇（Airwallex）' : 'Stripe'}</p>
+      <p className="payment-note">当前结算币种：{selectedCurrency}</p>
+      <p className="payment-desc">选择套餐后跳转到对应支付通道完成支付，支付成功后自动升级会员。</p>
 
       <details className="payment-tier-desc">
         <summary>会员权益说明</summary>
         <ul>
-          <li><strong>普通会员</strong>（注册即得）：长寿知识技能部分免费、循证健康产品大部分、前沿长寿医学资讯大部分、转化应用机遇部分免费。</li>
-          <li><strong>标准会员</strong>：在普通会员基础上增加长寿知识技能大部分内容、转化应用机遇全部、中医药特色治未病全部、综合长寿方案。</li>
-          <li><strong>高级会员</strong>：所有模块与内容。</li>
+          <li><strong>普通会员</strong>（注册即得）：长寿知识技能部分免费、循证健康产品大部分、前沿长寿医学资讯大部分、转化应用机遇部分免费；可打开「综合长寿方案」页面，但<strong>两个咨询入口均需升级会员</strong>。</li>
+          <li><strong>标准会员</strong>：在普通会员基础上增加长寿知识技能大部分、转化应用机遇全部、治未病全部；综合长寿方案中<strong>仅可进入「自我健康促进咨询」</strong>，专业健康长寿咨询需高级会员。</li>
+          <li><strong>高级会员</strong>：所有模块与内容；综合长寿方案中<strong>两个咨询均可进入</strong>。</li>
         </ul>
       </details>
 
       <section className="payment-section">
+        <p className="payment-note">
+          币种选择：
+          <select
+            value={selectedCurrency}
+            onChange={(e) => setSelectedCurrency(e.target.value)}
+            disabled={loading}
+            style={{ marginLeft: '0.5rem' }}
+          >
+            {PAYMENT_CURRENCY_OPTIONS.map((currency) => (
+              <option key={currency} value={currency}>{currency}</option>
+            ))}
+          </select>
+        </p>
         <div className="plan-grid">
           {PLANS.map((plan) => (
             <label key={plan.id} className={`plan-card ${selectedPlan === plan.id ? 'selected' : ''}`}>
@@ -102,7 +142,7 @@ export default function Payment() {
                 onChange={(e) => setSelectedPlan(e.target.value)}
               />
               <div className="plan-name">{plan.name}</div>
-              <div className="plan-price">${plan.price}</div>
+              <div className="plan-price">{formatPlanPrice(plan.amount, selectedCurrency)}</div>
               <div className="plan-desc">{plan.desc}</div>
             </label>
           ))}
@@ -121,7 +161,7 @@ export default function Payment() {
       </section>
 
       <p className="payment-note">
-        若跳转失败，请检查网络与 Vercel 环境变量（STRIPE_SECRET_KEY、DATABASE_URL 等）。
+        若跳转失败，请检查网络与支付环境变量配置（Stripe 或 Airwallex）。
       </p>
     </div>
   )
