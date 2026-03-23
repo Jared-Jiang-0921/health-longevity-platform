@@ -26,7 +26,26 @@ export default async function handler(req, res) {
       )
     `
     await sql`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`
-    return res.status(200).json({ ok: true, message: 'users table ready' })
+    await sql`
+      CREATE TABLE IF NOT EXISTS payment_event_logs (
+        id BIGSERIAL PRIMARY KEY,
+        provider TEXT NOT NULL,
+        event_key TEXT NOT NULL,
+        source TEXT,
+        user_id TEXT,
+        session_id TEXT,
+        plan TEXT,
+        currency TEXT,
+        status TEXT NOT NULL,
+        error_code TEXT,
+        error_message TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW(),
+        UNIQUE(provider, event_key)
+      )
+    `
+    await sql`CREATE INDEX IF NOT EXISTS idx_payment_event_logs_session_id ON payment_event_logs(session_id)`
+    return res.status(200).json({ ok: true, message: 'users/payment_event_logs tables ready' })
   } catch (e) {
     return res.status(500).json({ error: e.message })
   }

@@ -14,6 +14,16 @@ const PAYMENT_CURRENCY_OPTIONS = String(import.meta.env.VITE_PAYMENT_CURRENCY_OP
   .split(',')
   .map((v) => v.trim().toUpperCase())
   .filter((v, i, arr) => /^[A-Z]{3}$/.test(v) && arr.indexOf(v) === i)
+const CURRENCY_LABELS = {
+  USD: '美元',
+  EUR: '欧元',
+  CNY: '人民币',
+  HKD: '港币',
+  SGD: '新加坡元',
+  GBP: '英镑',
+  JPY: '日元',
+  AUD: '澳元',
+}
 
 const PLANS = [
   { id: 'standard_monthly', name: '标准会员 · 月度', amount: 999, desc: '1 个月' },
@@ -24,15 +34,7 @@ const PLANS = [
 
 function formatPlanPrice(amountMinor, currency) {
   const amount = Number(amountMinor) / 100
-  try {
-    return new Intl.NumberFormat('zh-CN', {
-      style: 'currency',
-      currency,
-      currencyDisplay: 'symbol',
-    }).format(amount)
-  } catch {
-    return `${currency} ${amount.toFixed(2)}`
-  }
+  return `${currency} ${amount.toFixed(2)}`
 }
 
 export default function Payment() {
@@ -127,7 +129,9 @@ export default function Payment() {
             style={{ marginLeft: '0.5rem' }}
           >
             {PAYMENT_CURRENCY_OPTIONS.map((currency) => (
-              <option key={currency} value={currency}>{currency}</option>
+              <option key={currency} value={currency}>
+                {`${currency} - ${CURRENCY_LABELS[currency] || currency}`}
+              </option>
             ))}
           </select>
         </p>

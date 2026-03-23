@@ -2,6 +2,12 @@
 
 健康长寿平台：高级健康技能学习、数字化健康长寿解决方案、优质健康产品推荐、在线全球化支付结算（Stripe）与税费缴纳。
 
+## 运营手册入口
+
+- 支付运营巡检手册：`docs/PAYMENT-OPS-RUNBOOK.md`
+- 支付上线验收闭环：`docs/PAYMENT-RELEASE-CHECKLIST.md`
+- 支付/会员安全自检：`docs/SECURITY-SELF-CHECK.md`
+
 ## 技术栈
 
 - **前端**：React 18 + Vite 5 + React Router 6

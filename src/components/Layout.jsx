@@ -14,6 +14,7 @@ const navItems = [
   { path: '/translation-opportunities', label: '转化应用机遇' },
   { path: '/favorites', label: '我的收藏' },
   { path: '/payment', label: '支付结算' },
+  { path: '/ops/payment-monitor', label: '支付巡检', authOnly: true },
   { path: '/account', label: '会员信息', authOnly: true },
 ]
 

@@ -16,6 +16,7 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import Payment from './pages/Payment'
 import PaymentSuccess from './pages/PaymentSuccess'
+import PaymentOpsMonitor from './pages/PaymentOpsMonitor'
 import Tax from './pages/Tax'
 import LegalTerms from './pages/LegalTerms'
 import LegalPrivacy from './pages/LegalPrivacy'
@@ -41,6 +42,7 @@ export default function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/payment" element={<Payment />} />
         <Route path="/payment/success" element={<PaymentSuccess />} />
+        <Route path="/ops/payment-monitor" element={<ProtectedModule><PaymentOpsMonitor /></ProtectedModule>} />
         <Route path="/account" element={<Account />} />
         <Route path="/tax" element={<Tax />} />
         <Route path="/terms" element={<LegalTerms />} />
