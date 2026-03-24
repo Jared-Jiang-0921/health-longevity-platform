@@ -13,12 +13,45 @@ function resolveCurrency() {
   return String(raw).toLowerCase().trim()
 }
 
+function resolveBaseCurrency(defaultCurrency) {
+  const raw = process.env.PAYMENT_BASE_CURRENCY || process.env.VITE_PAYMENT_BASE_CURRENCY || defaultCurrency
+  return String(raw).toLowerCase().trim()
+}
+
 function resolveAllowedCurrencies(defaultCurrency) {
   const raw = process.env.PAYMENT_CURRENCY_OPTIONS || process.env.VITE_PAYMENT_CURRENCY_OPTIONS || defaultCurrency
   return String(raw)
     .split(',')
     .map((v) => v.trim().toLowerCase())
     .filter((v, i, arr) => /^[a-z]{3}$/.test(v) && arr.indexOf(v) === i)
+}
+
+function resolveManualRates(baseCurrency) {
+  const raw = process.env.PAYMENT_MANUAL_RATES || process.env.VITE_PAYMENT_MANUAL_RATES || `${baseCurrency}:1`
+  const map = { [baseCurrency]: 1 }
+  for (const part of String(raw).split(',')) {
+    const [k, v] = String(part).split(':')
+    const code = String(k || '').trim().toLowerCase()
+    const num = Number(String(v || '').trim())
+    if (/^[a-z]{3}$/.test(code) && Number.isFinite(num) && num > 0) {
+      map[code] = num
+    }
+  }
+  return map
+}
+
+const ZERO_DECIMAL_CURRENCIES = new Set(['jpy', 'krw'])
+function minorFactor(currency) {
+  return ZERO_DECIMAL_CURRENCIES.has(String(currency).toLowerCase()) ? 1 : 100
+}
+
+function convertFromBaseMinor(baseMinorAmount, baseCurrency, targetCurrency, rates) {
+  const baseRate = rates[baseCurrency] || 1
+  const targetRate = rates[targetCurrency]
+  if (!targetRate) return null
+  const baseMajor = Number(baseMinorAmount) / minorFactor(baseCurrency)
+  const targetMajor = (baseMajor / baseRate) * targetRate
+  return Math.round(targetMajor * minorFactor(targetCurrency))
 }
 
 export default async function handler(req, res) {
@@ -66,9 +99,15 @@ export default async function handler(req, res) {
   try {
     const requestEventKey = `checkout_create:${randomUUID()}`
     const defaultCurrency = resolveCurrency()
+    const baseCurrency = resolveBaseCurrency(defaultCurrency)
     const allowedCurrencies = resolveAllowedCurrencies(defaultCurrency)
+    const manualRates = resolveManualRates(baseCurrency)
     const requestedCurrency = String(body.currency || '').toLowerCase().trim()
     const currency = allowedCurrencies.includes(requestedCurrency) ? requestedCurrency : defaultCurrency
+    const convertedUnitAmount = convertFromBaseMinor(planConfig.amount, baseCurrency, currency, manualRates)
+    if (!convertedUnitAmount || convertedUnitAmount <= 0) {
+      return fail(400, 'INVALID_MANUAL_RATE', '手动汇率配置无效，请联系管理员')
+    }
     await upsertPaymentLog({
       provider: 'stripe',
       eventKey: requestEventKey,
@@ -89,7 +128,7 @@ export default async function handler(req, res) {
             name: planConfig.name,
             description: `${planConfig.months} 个月`,
           },
-          unit_amount: planConfig.amount,
+          unit_amount: convertedUnitAmount,
         },
         quantity: 1,
       }],

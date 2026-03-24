@@ -9,11 +9,13 @@ const CHECKOUT_API =
   (PAYMENT_PROVIDER === 'airwallex'
     ? '/api/airwallex/create-checkout-session'
     : '/api/create-checkout-session')
+const PAYMENT_BASE_CURRENCY = String(import.meta.env.VITE_PAYMENT_BASE_CURRENCY || 'USD').toUpperCase().trim()
 const PAYMENT_CURRENCY = String(import.meta.env.VITE_PAYMENT_CURRENCY || 'USD').toUpperCase().trim()
 const PAYMENT_CURRENCY_OPTIONS = String(import.meta.env.VITE_PAYMENT_CURRENCY_OPTIONS || PAYMENT_CURRENCY)
   .split(',')
   .map((v) => v.trim().toUpperCase())
   .filter((v, i, arr) => /^[A-Z]{3}$/.test(v) && arr.indexOf(v) === i)
+const MANUAL_RATES_RAW = String(import.meta.env.VITE_PAYMENT_MANUAL_RATES || 'USD:1')
 const CURRENCY_LABELS = {
   USD: '美元',
   EUR: '欧元',
@@ -32,9 +34,43 @@ const PLANS = [
   { id: 'premium_yearly', name: '高级会员 · 年度', amount: 19999, desc: '12 个月，省约 17%' },
 ]
 
-function formatPlanPrice(amountMinor, currency) {
-  const amount = Number(amountMinor) / 100
-  return `${currency} ${amount.toFixed(2)}`
+const ZERO_DECIMAL_CURRENCIES = new Set(['JPY', 'KRW'])
+
+function minorFactor(currency) {
+  return ZERO_DECIMAL_CURRENCIES.has(String(currency).toUpperCase()) ? 1 : 100
+}
+
+function parseManualRates(raw, baseCurrency) {
+  const map = { [baseCurrency]: 1 }
+  const parts = String(raw || '').split(',')
+  for (const part of parts) {
+    const [k, v] = part.split(':')
+    const code = String(k || '').trim().toUpperCase()
+    const num = Number(String(v || '').trim())
+    if (/^[A-Z]{3}$/.test(code) && Number.isFinite(num) && num > 0) {
+      map[code] = num
+    }
+  }
+  return map
+}
+
+const MANUAL_RATES = parseManualRates(MANUAL_RATES_RAW, PAYMENT_BASE_CURRENCY)
+
+function convertFromBaseMinor(baseMinorAmount, targetCurrency) {
+  const baseRate = MANUAL_RATES[PAYMENT_BASE_CURRENCY] || 1
+  const targetRate = MANUAL_RATES[targetCurrency]
+  if (!targetRate) return null
+  const baseMajor = Number(baseMinorAmount) / minorFactor(PAYMENT_BASE_CURRENCY)
+  const targetMajor = (baseMajor / baseRate) * targetRate
+  return Math.round(targetMajor * minorFactor(targetCurrency))
+}
+
+function formatPlanPrice(baseMinorAmount, targetCurrency) {
+  const convertedMinor = convertFromBaseMinor(baseMinorAmount, targetCurrency)
+  if (convertedMinor == null) return `${targetCurrency} -`
+  const amount = Number(convertedMinor) / minorFactor(targetCurrency)
+  const decimals = minorFactor(targetCurrency) === 1 ? 0 : 2
+  return `${targetCurrency} ${amount.toFixed(decimals)}`
 }
 
 export default function Payment() {
@@ -43,6 +79,7 @@ export default function Payment() {
   const [selectedCurrency, setSelectedCurrency] = useState(PAYMENT_CURRENCY_OPTIONS[0] || PAYMENT_CURRENCY)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const selectedCurrencyRateMissing = !MANUAL_RATES[selectedCurrency]
 
   const handlePay = async () => {
     const token = getToken()
@@ -108,6 +145,7 @@ export default function Payment() {
       <p>当前：{user.name}（{MEMBERSHIP_LEVELS[user.level]?.name || user.level}）</p>
       <p className="payment-note">当前支付通道：{PAYMENT_PROVIDER === 'airwallex' ? '空中云汇（Airwallex）' : 'Stripe'}</p>
       <p className="payment-note">当前结算币种：{selectedCurrency}</p>
+      <p className="payment-note">手动汇率基准：{PAYMENT_BASE_CURRENCY}</p>
       <p className="payment-desc">选择套餐后跳转到对应支付通道完成支付，支付成功后自动升级会员。</p>
 
       <details className="payment-tier-desc">
@@ -135,6 +173,11 @@ export default function Payment() {
             ))}
           </select>
         </p>
+        {selectedCurrencyRateMissing ? (
+          <p className="payment-error">
+            当前币种 {selectedCurrency} 未配置手动汇率，请调整环境变量 VITE_PAYMENT_MANUAL_RATES / PAYMENT_MANUAL_RATES。
+          </p>
+        ) : null}
         <div className="plan-grid">
           {PLANS.map((plan) => (
             <label key={plan.id} className={`plan-card ${selectedPlan === plan.id ? 'selected' : ''}`}>
@@ -156,7 +199,7 @@ export default function Payment() {
             type="button"
             className="btn-primary"
             onClick={handlePay}
-            disabled={loading}
+            disabled={loading || selectedCurrencyRateMissing}
           >
             {loading ? '跳转中…' : '去支付'}
           </button>
