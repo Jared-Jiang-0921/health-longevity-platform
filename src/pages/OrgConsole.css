@@ -1,0 +1,121 @@
+.org-console-page {
+  max-width: 760px;
+}
+
+.org-note {
+  margin-bottom: 1rem !important;
+}
+
+.org-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.org-card h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+}
+
+.org-card label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.org-card input {
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.org-card select {
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.org-error {
+  color: #f87171;
+  margin-top: 0.75rem;
+  margin-bottom: 0;
+}
+
+.org-hint {
+  color: var(--color-primary);
+  margin-top: 0.75rem;
+  margin-bottom: 0;
+}
+
+.org-dl {
+  margin: 0;
+}
+
+.org-dl div {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: 0.5rem 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.org-dl dt {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.org-dl dd {
+  margin: 0;
+  word-break: break-all;
+}
+
+.org-table-wrap {
+  overflow-x: auto;
+}
+
+.org-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+
+.org-table th,
+.org-table td {
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  padding: 0.5rem 0.45rem;
+  white-space: nowrap;
+}
+
+.org-table th {
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.org-actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.org-actions button {
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
+  border-radius: 6px;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+}
+
+.org-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

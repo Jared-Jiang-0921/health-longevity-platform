@@ -15,6 +15,50 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 
+-- 企业组织
+CREATE TABLE IF NOT EXISTS orgs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  domain TEXT NOT NULL UNIQUE,
+  status TEXT NOT NULL DEFAULT 'active',
+  owner_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_orgs_domain ON orgs(domain);
+
+-- 企业成员
+CREATE TABLE IF NOT EXISTS org_members (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id UUID NOT NULL REFERENCES orgs(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  role TEXT NOT NULL DEFAULT 'member',
+  status TEXT NOT NULL DEFAULT 'active',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(org_id, user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_org_members_org_id ON org_members(org_id);
+CREATE INDEX IF NOT EXISTS idx_org_members_user_id ON org_members(user_id);
+
+-- 企业邀请
+CREATE TABLE IF NOT EXISTS org_invites (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id UUID NOT NULL REFERENCES orgs(id) ON DELETE CASCADE,
+  email TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'member',
+  invite_token TEXT NOT NULL UNIQUE,
+  expires_at TIMESTAMPTZ NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_org_invites_org_id ON org_invites(org_id);
+CREATE INDEX IF NOT EXISTS idx_org_invites_email ON org_invites(email);
+
 -- 支付事件日志与幂等记录（provider + event_key 唯一）
 CREATE TABLE IF NOT EXISTS payment_event_logs (
   id BIGSERIAL PRIMARY KEY,

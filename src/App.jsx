@@ -22,6 +22,8 @@ import LegalTerms from './pages/LegalTerms'
 import LegalPrivacy from './pages/LegalPrivacy'
 import LegalDisclaimer from './pages/LegalDisclaimer'
 import Account from './pages/Account'
+import OrgConsole from './pages/OrgConsole'
+import OrgInviteAccept from './pages/OrgInviteAccept'
 
 export default function App() {
   return (
@@ -44,6 +46,8 @@ export default function App() {
         <Route path="/payment/success" element={<PaymentSuccess />} />
         <Route path="/ops/payment-monitor" element={<ProtectedModule><PaymentOpsMonitor /></ProtectedModule>} />
         <Route path="/account" element={<Account />} />
+        <Route path="/org" element={<ProtectedModule><OrgConsole /></ProtectedModule>} />
+        <Route path="/org/invite/accept" element={<ProtectedModule><OrgInviteAccept /></ProtectedModule>} />
         <Route path="/tax" element={<Tax />} />
         <Route path="/terms" element={<LegalTerms />} />
         <Route path="/privacy" element={<LegalPrivacy />} />
