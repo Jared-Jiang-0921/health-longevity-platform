@@ -40,7 +40,7 @@ export default function PaymentOpsMonitor() {
     try {
       const p = provider ? `&provider=${encodeURIComponent(provider)}` : ''
       const [summaryRes, failedRes] = await Promise.all([
-        fetch(`/api/payment-event-logs-summary?hours=${encodeURIComponent(hours)}${p}`, { headers }),
+        fetch(`/api/payment-event-logs?mode=summary&hours=${encodeURIComponent(hours)}${p}`, { headers }),
         fetch(`/api/payment-event-logs?failed_only=1&limit=100${p}`, { headers }),
       ])
       const summaryJson = await toJsonSafe(summaryRes)

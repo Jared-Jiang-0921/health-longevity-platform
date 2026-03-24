@@ -3,7 +3,7 @@
 本文用于日常巡检支付链路健康度，基于以下两个接口：
 
 - `GET /api/payment-event-logs`（明细）
-- `GET /api/payment-event-logs-summary`（汇总）
+- `GET /api/payment-event-logs?mode=summary`（汇总）
 
 ---
 
@@ -36,9 +36,9 @@
 ### 3.1 汇总（默认最近 24 小时）
 
 - 全部通道：
-  - `<base>/api/payment-event-logs-summary?hours=24`
+  - `<base>/api/payment-event-logs?mode=summary&hours=24`
 - 仅 Stripe：
-  - `<base>/api/payment-event-logs-summary?hours=24&provider=stripe`
+  - `<base>/api/payment-event-logs?mode=summary&hours=24&provider=stripe`
 
 ### 3.2 明细（失败优先）
 
@@ -147,7 +147,7 @@
 
 1. `Deployments` 确认状态为 `Ready`
 2. 立即打开：
-   - summary：`/api/payment-event-logs-summary?hours=24`
+   - summary：`/api/payment-event-logs?mode=summary&hours=24`
    - failed：`/api/payment-event-logs?failed_only=1&limit=50`
 3. 若异常，先记录错误码，再通知技术同事按第 6 节处理
 

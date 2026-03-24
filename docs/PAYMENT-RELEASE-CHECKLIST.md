@@ -28,7 +28,7 @@
 
 ## D. 运营接口验收（必须）
 
-- [ ] `GET /api/payment-event-logs-summary?hours=24&provider=stripe` 可返回
+- [ ] `GET /api/payment-event-logs?mode=summary&hours=24&provider=stripe` 可返回
 - [ ] `GET /api/payment-event-logs?failed_only=1&limit=50&provider=stripe` 可返回
 - [ ] 至少能看到本次测试支付相关日志字段：
   - `provider`
