@@ -27,6 +27,10 @@ const CURRENCY_LABELS = {
   AUD: '澳元',
 }
 
+function getProviderDisplayName(provider) {
+  return provider === 'airwallex' ? '空中云汇（骨架联调）' : 'Stripe（生产可用）'
+}
+
 const PLANS = [
   { id: 'standard_monthly', name: '标准会员 · 月度', amount: 999, desc: '1 个月' },
   { id: 'standard_yearly', name: '标准会员 · 年度', amount: 9999, desc: '12 个月，省约 17%' },
@@ -67,7 +71,11 @@ function convertFromBaseMinor(baseMinorAmount, targetCurrency) {
 
 function formatPlanPrice(baseMinorAmount, targetCurrency) {
   const convertedMinor = convertFromBaseMinor(baseMinorAmount, targetCurrency)
-  if (convertedMinor == null) return `${targetCurrency} -`
+  if (convertedMinor == null) {
+    const baseAmount = Number(baseMinorAmount) / minorFactor(PAYMENT_BASE_CURRENCY)
+    const baseDecimals = minorFactor(PAYMENT_BASE_CURRENCY) === 1 ? 0 : 2
+    return `约 ${PAYMENT_BASE_CURRENCY} ${baseAmount.toFixed(baseDecimals)}`
+  }
   const amount = Number(convertedMinor) / minorFactor(targetCurrency)
   const decimals = minorFactor(targetCurrency) === 1 ? 0 : 2
   return `${targetCurrency} ${amount.toFixed(decimals)}`
@@ -143,7 +151,7 @@ export default function Payment() {
     <div className="page-content">
       <h1>在线全球化支付结算</h1>
       <p>当前：{user.name}（{MEMBERSHIP_LEVELS[user.level]?.name || user.level}）</p>
-      <p className="payment-note">当前支付通道：{PAYMENT_PROVIDER === 'airwallex' ? '空中云汇（Airwallex）' : 'Stripe'}</p>
+      <p className="payment-note">当前支付通道：{getProviderDisplayName(PAYMENT_PROVIDER)}</p>
       <p className="payment-note">当前结算币种：{selectedCurrency}</p>
       <p className="payment-note">手动汇率基准：{PAYMENT_BASE_CURRENCY}</p>
       <p className="payment-desc">选择套餐后跳转到对应支付通道完成支付，支付成功后自动升级会员。</p>
@@ -174,8 +182,8 @@ export default function Payment() {
           </select>
         </p>
         {selectedCurrencyRateMissing ? (
-          <p className="payment-error">
-            当前币种 {selectedCurrency} 未配置手动汇率，请调整环境变量 VITE_PAYMENT_MANUAL_RATES / PAYMENT_MANUAL_RATES。
+          <p className="payment-note">
+            当前页面未读取到 {selectedCurrency} 的前端汇率配置，卡片金额将显示基准币种参考价；实际下单金额以支付通道返回为准。
           </p>
         ) : null}
         <div className="plan-grid">
@@ -199,7 +207,7 @@ export default function Payment() {
             type="button"
             className="btn-primary"
             onClick={handlePay}
-            disabled={loading || selectedCurrencyRateMissing}
+            disabled={loading}
           >
             {loading ? '跳转中…' : '去支付'}
           </button>
