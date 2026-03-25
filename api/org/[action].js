@@ -211,6 +211,120 @@ async function handleMembers(req, res, authUser) {
   return res.status(200).json({ ok: true, members })
 }
 
+async function handleMemberRole(req, res, authUser) {
+  const body = parseJson(req, res)
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST')
+    return fail(res, 405, 'METHOD_NOT_ALLOWED', '请求方式不支持')
+  }
+  if (!body) return
+
+  const targetUserId = String(body.user_id || '').trim()
+  const role = String(body.role || '').trim().toLowerCase()
+  if (!targetUserId) return fail(res, 400, 'MEMBER_USER_ID_REQUIRED', '缺少 user_id')
+  if (!['admin', 'member'].includes(role)) return fail(res, 400, 'MEMBER_ROLE_INVALID', '角色仅支持 admin 或 member')
+
+  const operator = await getOperatorOrg(authUser.userId)
+  const denied = ensureOrgManager(res, operator)
+  if (denied) return denied
+
+  const rows = await sql`
+    SELECT role
+    FROM org_members
+    WHERE org_id = ${operator.org_id} AND user_id = ${targetUserId}
+    LIMIT 1
+  `
+  if (!rows.length) return fail(res, 404, 'MEMBER_NOT_FOUND', '成员不存在')
+
+  if (String(rows[0].role || '').toLowerCase() === 'owner') {
+    return fail(res, 403, 'OWNER_ROLE_IMMUTABLE', 'owner 角色不可更改')
+  }
+
+  await sql`
+    UPDATE org_members
+    SET role = ${role}, status = 'active', updated_at = NOW()
+    WHERE org_id = ${operator.org_id} AND user_id = ${targetUserId}
+  `
+
+  return res.status(200).json({ ok: true, user_id: targetUserId, role })
+}
+
+async function handleMemberStatus(req, res, authUser) {
+  const body = parseJson(req, res)
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST')
+    return fail(res, 405, 'METHOD_NOT_ALLOWED', '请求方式不支持')
+  }
+  if (!body) return
+
+  const targetUserId = String(body.user_id || '').trim()
+  const status = String(body.status || '').trim().toLowerCase()
+  if (!targetUserId) return fail(res, 400, 'MEMBER_USER_ID_REQUIRED', '缺少 user_id')
+  if (!['active', 'disabled'].includes(status)) return fail(res, 400, 'MEMBER_STATUS_INVALID', '状态仅支持 active 或 disabled')
+
+  const operator = await getOperatorOrg(authUser.userId)
+  const denied = ensureOrgManager(res, operator)
+  if (denied) return denied
+
+  const rows = await sql`
+    SELECT role
+    FROM org_members
+    WHERE org_id = ${operator.org_id} AND user_id = ${targetUserId}
+    LIMIT 1
+  `
+  if (!rows.length) return fail(res, 404, 'MEMBER_NOT_FOUND', '成员不存在')
+  if (String(rows[0].role || '').toLowerCase() === 'owner' && status === 'disabled') {
+    return fail(res, 403, 'OWNER_STATUS_IMMUTABLE', 'owner 不能被禁用')
+  }
+
+  await sql`
+    UPDATE org_members
+    SET status = ${status}, updated_at = NOW()
+    WHERE org_id = ${operator.org_id} AND user_id = ${targetUserId}
+  `
+
+  return res.status(200).json({ ok: true, user_id: targetUserId, status })
+}
+
+async function handleMemberKick(req, res, authUser) {
+  const body = parseJson(req, res)
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST')
+    return fail(res, 405, 'METHOD_NOT_ALLOWED', '请求方式不支持')
+  }
+  if (!body) return
+
+  const targetUserId = String(body.user_id || '').trim()
+  if (!targetUserId) return fail(res, 400, 'MEMBER_USER_ID_REQUIRED', '缺少 user_id')
+
+  if (String(targetUserId) === String(authUser.userId)) {
+    return fail(res, 403, 'CANNOT_KICK_SELF', '不能踢出自己，请先转让 owner 权限或联系管理员')
+  }
+
+  const operator = await getOperatorOrg(authUser.userId)
+  const denied = ensureOrgManager(res, operator)
+  if (denied) return denied
+
+  const rows = await sql`
+    SELECT role
+    FROM org_members
+    WHERE org_id = ${operator.org_id} AND user_id = ${targetUserId}
+    LIMIT 1
+  `
+  if (!rows.length) return fail(res, 404, 'MEMBER_NOT_FOUND', '成员不存在')
+
+  if (String(rows[0].role || '').toLowerCase() === 'owner') {
+    return fail(res, 403, 'OWNER_ROLE_IMMUTABLE', 'owner 角色不可被踢出')
+  }
+
+  await sql`
+    DELETE FROM org_members
+    WHERE org_id = ${operator.org_id} AND user_id = ${targetUserId}
+  `
+
+  return res.status(200).json({ ok: true })
+}
+
 async function handleInvites(req, res, authUser) {
   if (req.method !== 'GET') {
     res.setHeader('Allow', 'GET')
@@ -302,6 +416,9 @@ export default async function handler(req, res) {
     if (action === 'invite') return handleInvite(req, res, authUser)
     if (action === 'invite-accept') return handleInviteAccept(req, res, authUser)
     if (action === 'members') return handleMembers(req, res, authUser)
+    if (action === 'member-role') return handleMemberRole(req, res, authUser)
+    if (action === 'member-status') return handleMemberStatus(req, res, authUser)
+    if (action === 'member-kick') return handleMemberKick(req, res, authUser)
     if (action === 'invites') return handleInvites(req, res, authUser)
     if (action === 'invite-revoke') return handleInviteRevoke(req, res, authUser)
     if (action === 'invite-resend') return handleInviteResend(req, res, authUser)

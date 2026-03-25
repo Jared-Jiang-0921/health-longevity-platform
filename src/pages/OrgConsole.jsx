@@ -157,6 +157,82 @@ export default function OrgConsole() {
     }
   }
 
+  const changeMemberRole = async (targetUserId, role) => {
+    setError('')
+    setHint('')
+    try {
+      const token = getToken()
+      const res = await fetch('/api/org/member-role', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ user_id: targetUserId, role }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error || data.code || '更新角色失败')
+      setHint('成员角色已更新。')
+      await loadOrgData()
+    } catch (e) {
+      setError(e.message || '更新角色失败')
+    }
+  }
+
+  const setMemberStatus = async (targetUserId, status) => {
+    setError('')
+    setHint('')
+    try {
+      const token = getToken()
+      const res = await fetch('/api/org/member-status', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ user_id: targetUserId, status }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error || data.code || '更新状态失败')
+      setHint('成员状态已更新。')
+      await loadOrgData()
+    } catch (e) {
+      setError(e.message || '更新状态失败')
+    }
+  }
+
+  const kickMember = async (targetUserId) => {
+    if (!targetUserId) return
+    if (String(targetUserId) === String(user?.id)) {
+      setError('')
+      setHint('不能踢出自己。')
+      return
+    }
+
+    const ok = window.confirm('确认踢出该成员？被踢出的成员将无法继续访问本企业。')
+    if (!ok) return
+
+    setError('')
+    setHint('')
+    try {
+      const token = getToken()
+      const res = await fetch('/api/org/member-kick', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ user_id: targetUserId }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error || data.code || '踢出失败')
+      setHint('成员已被踢出企业。')
+      await loadOrgData()
+    } catch (e) {
+      setError(e.message || '踢出失败')
+    }
+  }
+
   if (loading) {
     return (
       <div className="page-content org-console-page">
@@ -235,6 +311,7 @@ export default function OrgConsole() {
                       <th>邮箱</th>
                       <th>角色</th>
                       <th>状态</th>
+                      {canManageInvite ? <th>操作</th> : null}
                     </tr>
                   </thead>
                   <tbody>
@@ -244,9 +321,47 @@ export default function OrgConsole() {
                         <td>{m.email || '—'}</td>
                         <td>{m.role || '—'}</td>
                         <td>{m.status || '—'}</td>
+                        {canManageInvite ? (
+                          <td>
+                            <div className="org-actions">
+                              {m.role !== 'owner' ? (
+                                <>
+                                  {m.role !== 'admin' ? (
+                                    <button type="button" onClick={() => changeMemberRole(m.user_id, 'admin')}>
+                                      设管理员
+                                    </button>
+                                  ) : null}
+                                  {m.role !== 'member' ? (
+                                    <button type="button" onClick={() => changeMemberRole(m.user_id, 'member')}>
+                                      设成员
+                                    </button>
+                                  ) : null}
+                                </>
+                              ) : (
+                                <span style={{ color: 'var(--color-text-muted)' }}>—</span>
+                              )}
+                              {m.user_id !== user.id ? (
+                                m.role !== 'owner' ? (
+                                  <button type="button" onClick={() => kickMember(m.user_id)}>
+                                    踢出
+                                  </button>
+                                ) : null
+                              ) : null}
+                              {m.status === 'active' ? (
+                                <button type="button" onClick={() => setMemberStatus(m.user_id, 'disabled')}>
+                                  禁用
+                                </button>
+                              ) : (
+                                <button type="button" onClick={() => setMemberStatus(m.user_id, 'active')}>
+                                  启用
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        ) : null}
                       </tr>
                     )) : (
-                      <tr><td colSpan={4}>暂无成员数据</td></tr>
+                      <tr><td colSpan={canManageInvite ? 5 : 4}>暂无成员数据</td></tr>
                     )}
                   </tbody>
                 </table>
