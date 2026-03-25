@@ -52,7 +52,7 @@ export default async function handler(req, res) {
     }
     const token = await createToken(String(row.id))
     const user = await getUserById(row.id)
-    return res.status(201).json({ user: { ...user, org: null }, token })
+    return res.status(201).json({ user: { ...user, org: null, orgs: [] }, token })
   } catch (e) {
     console.error('register error', e)
     return res.status(500).json({ error: e.message || '注册失败' })

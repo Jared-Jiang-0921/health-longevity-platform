@@ -1,6 +1,6 @@
 import { sql } from '../../lib/db.js'
 import { verifyPassword, createToken, getUserById } from '../../lib/auth.js'
-import { getOrgContextByUserId } from '../../lib/orgs.js'
+import { getOrgContextsByUserId } from '../../lib/orgs.js'
 
 export default async function handler(req, res) {
   try {
@@ -35,8 +35,9 @@ export default async function handler(req, res) {
 
     const token = await createToken(String(rows[0].id))
     const user = await getUserById(rows[0].id)
-    const org = await getOrgContextByUserId(rows[0].id)
-    return res.status(200).json({ user: { ...user, org }, token })
+    const orgs = await getOrgContextsByUserId(rows[0].id)
+    const org = orgs.length ? orgs[0] : null
+    return res.status(200).json({ user: { ...user, org, orgs }, token })
   } catch (e) {
     console.error('login error', e)
     return res.status(500).json({ error: e.message || '登录失败' })

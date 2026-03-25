@@ -24,18 +24,26 @@ export default function OrgConsole() {
   const [invites, setInvites] = useState([])
   const [listLoading, setListLoading] = useState(false)
 
-  const currentOrg = user?.org
+  const orgs = useMemo(() => {
+    if (Array.isArray(user?.orgs)) return user.orgs
+    if (user?.org) return [user.org]
+    return []
+  }, [user?.org, user?.orgs])
+
+  const [activeOrgId, setActiveOrgId] = useState(() => user?.org?.id || orgs[0]?.id || '')
+  const currentOrg = orgs.find((o) => String(o.id) === String(activeOrgId)) || null
   const canManageInvite = ['owner', 'admin'].includes(String(currentOrg?.role || '').toLowerCase())
 
   const loadOrgData = async () => {
-    if (!currentOrg) return
+    if (!activeOrgId) return
     setListLoading(true)
     try {
       const token = getToken()
       const headers = { Authorization: `Bearer ${token}` }
+      const orgId = encodeURIComponent(activeOrgId)
       const [membersRes, invitesRes] = await Promise.all([
-        fetch('/api/org/members', { headers }),
-        fetch('/api/org/invites', { headers }),
+        fetch(`/api/org/members?org_id=${orgId}`, { headers }),
+        fetch(`/api/org/invites?org_id=${orgId}&pending_only=1`, { headers }),
       ])
       const membersData = await membersRes.json().catch(() => ({}))
       const invitesData = await invitesRes.json().catch(() => ({}))
@@ -51,9 +59,10 @@ export default function OrgConsole() {
   }
 
   useEffect(() => {
-    if (!loading && currentOrg) loadOrgData()
+    if (!loading && !activeOrgId && orgs.length) setActiveOrgId(orgs[0].id)
+    if (!loading && activeOrgId) loadOrgData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, currentOrg?.id])
+  }, [loading, activeOrgId, orgs])
 
   const createOrg = async () => {
     setSubmitting(true)
@@ -87,7 +96,7 @@ export default function OrgConsole() {
     setInviteLink('')
     try {
       const token = getToken()
-      const res = await fetch('/api/org/invite', {
+      const res = await fetch(`/api/org/invite?org_id=${encodeURIComponent(activeOrgId)}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -117,7 +126,7 @@ export default function OrgConsole() {
     setHint('')
     try {
       const token = getToken()
-      const res = await fetch('/api/org/invite-revoke', {
+      const res = await fetch(`/api/org/invite-revoke?org_id=${encodeURIComponent(activeOrgId)}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -139,7 +148,7 @@ export default function OrgConsole() {
     setHint('')
     try {
       const token = getToken()
-      const res = await fetch('/api/org/invite-resend', {
+      const res = await fetch(`/api/org/invite-resend?org_id=${encodeURIComponent(activeOrgId)}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -162,7 +171,7 @@ export default function OrgConsole() {
     setHint('')
     try {
       const token = getToken()
-      const res = await fetch('/api/org/member-role', {
+      const res = await fetch(`/api/org/member-role?org_id=${encodeURIComponent(activeOrgId)}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -184,7 +193,7 @@ export default function OrgConsole() {
     setHint('')
     try {
       const token = getToken()
-      const res = await fetch('/api/org/member-status', {
+      const res = await fetch(`/api/org/member-status?org_id=${encodeURIComponent(activeOrgId)}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -216,7 +225,7 @@ export default function OrgConsole() {
     setHint('')
     try {
       const token = getToken()
-      const res = await fetch('/api/org/member-kick', {
+      const res = await fetch(`/api/org/member-kick?org_id=${encodeURIComponent(activeOrgId)}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -251,6 +260,15 @@ export default function OrgConsole() {
     )
   }
 
+  if (orgs.length && !currentOrg) {
+    return (
+      <div className="page-content org-console-page">
+        <h1>企业管理</h1>
+        <p>加载组织信息中…</p>
+      </div>
+    )
+  }
+
   return (
     <div className="page-content org-console-page">
       <h1>企业管理</h1>
@@ -260,6 +278,18 @@ export default function OrgConsole() {
         <>
           <section className="org-card">
             <h2>当前组织</h2>
+                {orgs.length > 1 ? (
+                  <label>
+                    <span>切换组织</span>
+                    <select value={activeOrgId} onChange={(e) => setActiveOrgId(e.target.value)}>
+                      {orgs.map((o) => (
+                        <option key={o.id} value={o.id}>
+                          {o.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                ) : null}
             <dl className="org-dl">
               <div><dt>组织名称</dt><dd>{currentOrg.name}</dd></div>
               <div><dt>绑定域名</dt><dd>{currentOrg.domain}</dd></div>

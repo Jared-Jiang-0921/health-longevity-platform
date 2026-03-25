@@ -38,7 +38,20 @@ function parseJson(req, res) {
   }
 }
 
-async function getOperatorOrg(userId) {
+async function getOperatorOrg(userId, orgId) {
+  if (orgId) {
+    const rows = await sql`
+      SELECT o.id AS org_id, o.domain, m.role, m.status
+      FROM org_members m
+      JOIN orgs o ON o.id = m.org_id
+      WHERE m.user_id = ${userId}
+        AND o.id = ${orgId}
+      LIMIT 1
+    `
+    if (!rows.length) return null
+    return rows[0]
+  }
+
   const rows = await sql`
     SELECT o.id AS org_id, o.domain, m.role, m.status
     FROM org_members m
@@ -119,7 +132,7 @@ async function handleInvite(req, res, authUser) {
   if (!['member', 'admin'].includes(role)) return fail(res, 400, 'INVITE_ROLE_INVALID', '邀请角色仅支持 member 或 admin')
   if (!origin || !origin.startsWith('http')) return fail(res, 400, 'INVITE_ORIGIN_INVALID', '邀请来源地址无效')
 
-  const operator = await getOperatorOrg(authUser.userId)
+  const operator = await getOperatorOrg(authUser.userId, req.query?.org_id)
   const denied = ensureOrgManager(res, operator)
   if (denied) return denied
 
@@ -197,7 +210,7 @@ async function handleMembers(req, res, authUser) {
     res.setHeader('Allow', 'GET')
     return fail(res, 405, 'METHOD_NOT_ALLOWED', '请求方式不支持')
   }
-  const operator = await getOperatorOrg(authUser.userId)
+  const operator = await getOperatorOrg(authUser.userId, req.query?.org_id)
   if (!operator) return fail(res, 403, 'ORG_REQUIRED', '请先创建或加入企业组织')
   if (operator.status !== 'active') return fail(res, 403, 'ORG_MEMBER_INACTIVE', '当前组织成员状态不可用')
 
@@ -224,7 +237,7 @@ async function handleMemberRole(req, res, authUser) {
   if (!targetUserId) return fail(res, 400, 'MEMBER_USER_ID_REQUIRED', '缺少 user_id')
   if (!['admin', 'member'].includes(role)) return fail(res, 400, 'MEMBER_ROLE_INVALID', '角色仅支持 admin 或 member')
 
-  const operator = await getOperatorOrg(authUser.userId)
+  const operator = await getOperatorOrg(authUser.userId, req.query?.org_id)
   const denied = ensureOrgManager(res, operator)
   if (denied) return denied
 
@@ -262,7 +275,7 @@ async function handleMemberStatus(req, res, authUser) {
   if (!targetUserId) return fail(res, 400, 'MEMBER_USER_ID_REQUIRED', '缺少 user_id')
   if (!['active', 'disabled'].includes(status)) return fail(res, 400, 'MEMBER_STATUS_INVALID', '状态仅支持 active 或 disabled')
 
-  const operator = await getOperatorOrg(authUser.userId)
+  const operator = await getOperatorOrg(authUser.userId, req.query?.org_id)
   const denied = ensureOrgManager(res, operator)
   if (denied) return denied
 
@@ -301,7 +314,7 @@ async function handleMemberKick(req, res, authUser) {
     return fail(res, 403, 'CANNOT_KICK_SELF', '不能踢出自己，请先转让 owner 权限或联系管理员')
   }
 
-  const operator = await getOperatorOrg(authUser.userId)
+  const operator = await getOperatorOrg(authUser.userId, req.query?.org_id)
   const denied = ensureOrgManager(res, operator)
   if (denied) return denied
 
@@ -330,13 +343,26 @@ async function handleInvites(req, res, authUser) {
     res.setHeader('Allow', 'GET')
     return fail(res, 405, 'METHOD_NOT_ALLOWED', '请求方式不支持')
   }
-  const operator = await getOperatorOrg(authUser.userId)
+  const operator = await getOperatorOrg(authUser.userId, req.query?.org_id)
   const denied = ensureOrgManager(res, operator)
   if (denied) return denied
+
+  const pendingOnly = ['1', 'true', 'yes'].includes(String(req.query?.pending_only || req.query?.pendingOnly || '').toLowerCase())
+
+  // 运维巡检：当管理员访问时，自动把已过期的 pending 邀请标记为 expired
+  await sql`
+    UPDATE org_invites
+    SET status = 'expired', updated_at = NOW()
+    WHERE org_id = ${operator.org_id}
+      AND status = 'pending'
+      AND expires_at < NOW()
+  `
+
   const invites = await sql`
     SELECT id, email, role, invite_token, expires_at, status, created_at, updated_at
     FROM org_invites
     WHERE org_id = ${operator.org_id}
+    ${pendingOnly ? sql`AND status = 'pending'` : sql``}
     ORDER BY created_at DESC
     LIMIT 300
   `
@@ -353,7 +379,7 @@ async function handleInviteRevoke(req, res, authUser) {
   const inviteId = String(body.invite_id || '').trim()
   if (!inviteId) return fail(res, 400, 'INVITE_ID_REQUIRED', '缺少 invite_id')
 
-  const operator = await getOperatorOrg(authUser.userId)
+  const operator = await getOperatorOrg(authUser.userId, req.query?.org_id)
   const denied = ensureOrgManager(res, operator)
   if (denied) return denied
   const rows = await sql`
@@ -380,7 +406,7 @@ async function handleInviteResend(req, res, authUser) {
   if (!inviteId) return fail(res, 400, 'INVITE_ID_REQUIRED', '缺少 invite_id')
   if (!origin || !origin.startsWith('http')) return fail(res, 400, 'INVITE_ORIGIN_INVALID', '邀请来源地址无效')
 
-  const operator = await getOperatorOrg(authUser.userId)
+  const operator = await getOperatorOrg(authUser.userId, req.query?.org_id)
   const denied = ensureOrgManager(res, operator)
   if (denied) return denied
 

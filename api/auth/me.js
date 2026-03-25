@@ -1,5 +1,5 @@
 import { verifyToken, getUserById } from '../../lib/auth.js'
-import { getOrgContextByUserId } from '../../lib/orgs.js'
+import { getOrgContextsByUserId } from '../../lib/orgs.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -23,6 +23,7 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: '用户不存在' })
   }
 
-  const org = await getOrgContextByUserId(userId)
-  return res.status(200).json({ user: { ...user, org } })
+  const orgs = await getOrgContextsByUserId(userId)
+  const org = orgs.length ? orgs[0] : null
+  return res.status(200).json({ user: { ...user, org, orgs } })
 }
