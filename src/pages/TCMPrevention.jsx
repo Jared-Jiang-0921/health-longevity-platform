@@ -1,18 +1,25 @@
 import { useState } from 'react'
 import { TCM_HERBS, TCM_PRESCRIPTIONS } from '../data/tcmPrevention'
+import { useLocale } from '../context/LocaleContext'
 import './TCMPrevention.css'
 
 const TAB_HERBS = 'herbs'
 const TAB_PRESCRIPTIONS = 'prescriptions'
 
 export default function TCMPrevention() {
+  const { lang } = useLocale()
+  const t = {
+    zh: { title: '中医药特色 · 治未病', desc: '展示治未病相关中草药单药的药性、功效、适宜人群、注意事项，以及中国传统经典治未病处方与出处。', herbs: '中草药单药', rx: '经典处方' },
+    en: { title: 'TCM Prevention', desc: 'Herbs and classic preventive formulas from Traditional Chinese Medicine.', herbs: 'Herbs', rx: 'Classical Formulas' },
+    ar: { title: 'الطب الصيني الوقائي', desc: 'أعشاب ووصفات وقائية تقليدية من الطب الصيني.', herbs: 'الأعشاب', rx: 'الوصفات الكلاسيكية' },
+  }[lang || 'zh']
   const [activeTab, setActiveTab] = useState(TAB_HERBS)
 
   return (
     <div className="page-tcm-prevention">
       <section className="tcm-header">
-        <h1>中医药特色 · 治未病</h1>
-        <p>展示治未病相关中草药单药的药性、功效、适宜人群、注意事项，以及中国传统经典治未病处方与出处。</p>
+        <h1>{t.title}</h1>
+        <p>{t.desc}</p>
       </section>
 
       <div className="tcm-tabs">
@@ -21,14 +28,14 @@ export default function TCMPrevention() {
           className={activeTab === TAB_HERBS ? 'active' : ''}
           onClick={() => setActiveTab(TAB_HERBS)}
         >
-          中草药单药
+          {t.herbs}
         </button>
         <button
           type="button"
           className={activeTab === TAB_PRESCRIPTIONS ? 'active' : ''}
           onClick={() => setActiveTab(TAB_PRESCRIPTIONS)}
         >
-          经典处方
+          {t.rx}
         </button>
       </div>
 

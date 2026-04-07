@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useLocale } from '../context/LocaleContext'
 import { canAccess, getRequiredLevel, MEMBERSHIP_LEVELS } from '../data/membership'
+import { getMembershipLevelLabel } from '../i18n/terms'
+import { getUi } from '../i18n/ui'
 import { SITE_LEGAL } from '../data/siteLegal'
 import RegisterRequiredModal from '../components/RegisterRequiredModal'
 import './Home.css'
@@ -46,6 +49,13 @@ const modules = [
 ]
 
 export default function Home() {
+  const { lang } = useLocale()
+  const ui = getUi(lang)
+  const t = {
+    zh: { tagline: '长寿知识技能 · 综合长寿方案 · 循证健康产品 · 前沿医学资讯', welcome: '欢迎', modules: '服务模块', guestHint: '点击查看需注册', need: '需', upgrade: '升级会员', andAbove: '及以上' },
+    en: { tagline: 'Longevity skills · integrated solutions · evidence-based products · frontier medical insights', welcome: 'Welcome', modules: 'Modules', guestHint: 'Login required to view', need: 'Requires', upgrade: 'Upgrade', andAbove: '+' },
+    ar: { tagline: 'مهارات طول العمر · حلول متكاملة · منتجات قائمة على الدليل · مستجدات طبية', welcome: 'مرحبًا', modules: 'الوحدات', guestHint: 'يتطلب التسجيل للعرض', need: 'يتطلب', upgrade: 'ترقية', andAbove: 'أو أعلى' },
+  }[lang || 'zh']
   const { user } = useAuth()
   const [showRegisterModal, setShowRegisterModal] = useState(false)
 
@@ -55,26 +65,26 @@ export default function Home() {
         <div className="hero-bg" aria-hidden="true" />
         <div className="hero-content">
           <h1>{SITE_LEGAL.brandName}</h1>
-          <p className="tagline">长寿知识技能 · 综合长寿方案 · 循证健康产品 · 前沿医学资讯</p>
+          <p className="tagline">{t.tagline}</p>
           <div className="hero-auth">
             {user ? (
-              <span className="hero-user">欢迎，{user.name}（{MEMBERSHIP_LEVELS[user.level]?.name}）</span>
+              <span className="hero-user">{t.welcome}，{user.name}（{getMembershipLevelLabel(user.level, lang)}）</span>
             ) : (
               <>
-                <Link to="/login" className="btn-hero btn-login">登录</Link>
-                <Link to="/register" className="btn-hero btn-register">注册</Link>
+                <Link to="/login" className="btn-hero btn-login">{ui.login}</Link>
+                <Link to="/register" className="btn-hero btn-register">{ui.register}</Link>
               </>
             )}
           </div>
         </div>
       </section>
       <section className="modules">
-        <h2>服务模块</h2>
+        <h2>{t.modules}</h2>
         <div className="module-grid">
           {modules.map(({ path, title, desc, image }) => {
             const allowed = canAccess(path, user?.level)
             const requiredLevel = getRequiredLevel(path)
-            const requiredName = requiredLevel ? MEMBERSHIP_LEVELS[requiredLevel]?.name : null
+            const requiredName = requiredLevel ? getMembershipLevelLabel(requiredLevel, lang) : null
 
             if (!user) {
               return (
@@ -90,7 +100,7 @@ export default function Home() {
                   <div className="module-card-body">
                     <h3>{title}</h3>
                     <p>{desc}</p>
-                    <p className="module-guest-hint">点击查看需注册</p>
+                    <p className="module-guest-hint">{t.guestHint}</p>
                   </div>
                 </div>
               )
@@ -112,8 +122,8 @@ export default function Home() {
                 <div className="module-card-body">
                   <h3>{title}</h3>
                   <p>{desc}</p>
-                  <p className="module-lock">需{requiredName}及以上</p>
-                  <Link to="/payment" className="btn-upgrade">升级会员</Link>
+                  <p className="module-lock">{t.need}{requiredName}{t.andAbove}</p>
+                  <Link to="/payment" className="btn-upgrade">{t.upgrade}</Link>
                 </div>
               </div>
             )

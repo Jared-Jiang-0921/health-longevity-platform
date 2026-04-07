@@ -63,6 +63,26 @@ export function AuthProvider({ children }) {
       })
       const data = await parseJsonRes(res)
       if (!res.ok) throw new Error(data.error || '登录失败')
+      if (data.requires2fa && data.preAuthToken) {
+        return { ok: true, requires2fa: true, preAuthToken: data.preAuthToken }
+      }
+      localStorage.setItem(STORAGE_KEY, data.token)
+      setUser(data.user)
+      return { ok: true }
+    } catch (e) {
+      return { ok: false, error: e.message }
+    }
+  }
+
+  const login2fa = async (preAuthToken, code) => {
+    try {
+      const res = await fetch('/api/auth/login-2fa', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ preAuthToken, code }),
+      })
+      const data = await parseJsonRes(res)
+      if (!res.ok) throw new Error(data.error || '验证失败')
       localStorage.setItem(STORAGE_KEY, data.token)
       setUser(data.user)
       return { ok: true }
@@ -107,7 +127,9 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, getToken, refreshUser }}>
+    <AuthContext.Provider
+      value={{ user, loading, login, login2fa, register, logout, getToken, refreshUser }}
+    >
       {children}
     </AuthContext.Provider>
   )

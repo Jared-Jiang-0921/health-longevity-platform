@@ -86,7 +86,36 @@ export default async function handler(req, res) {
       )
     `
     await sql`CREATE INDEX IF NOT EXISTS idx_payment_event_logs_session_id ON payment_event_logs(session_id)`
-    return res.status(200).json({ ok: true, message: 'users/orgs/org_members/org_invites/payment_event_logs tables ready' })
+
+    await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS password_reset_token_hash TEXT`
+    await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS password_reset_expires_at TIMESTAMPTZ`
+    await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS totp_secret TEXT`
+    await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS totp_enabled BOOLEAN NOT NULL DEFAULT false`
+    await sql`
+      CREATE TABLE IF NOT EXISTS health_questionnaires (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        age_range TEXT,
+        sex TEXT,
+        region TEXT,
+        goals TEXT NOT NULL,
+        concerns TEXT NOT NULL,
+        medical_history TEXT,
+        medications TEXT,
+        allergies TEXT,
+        lifestyle TEXT,
+        sleep TEXT,
+        consent_health_data BOOLEAN NOT NULL DEFAULT false,
+        consent_care_plan BOOLEAN NOT NULL DEFAULT false,
+        consent_contact BOOLEAN NOT NULL DEFAULT false,
+        legal_version TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `
+    await sql`CREATE INDEX IF NOT EXISTS idx_health_questionnaires_user_id ON health_questionnaires(user_id, created_at DESC)`
+
+    return res.status(200).json({ ok: true, message: 'users/orgs/org_members/org_invites/payment_event_logs/health_questionnaires tables ready' })
   } catch (e) {
     return res.status(500).json({ error: e.message })
   }

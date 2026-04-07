@@ -1,16 +1,25 @@
 import { Link, useParams } from 'react-router-dom'
 import { getProductById, PRODUCT_CATEGORIES } from '../data/products'
+import { useLocale } from '../context/LocaleContext'
+import { getUi } from '../i18n/ui'
 import './ProductDetail.css'
 
 export default function ProductDetail() {
+  const { lang } = useLocale()
+  const ui = getUi(lang)
+  const t = {
+    zh: { notFound: '未找到该产品', back: '返回产品列表', pay: '去支付' },
+    en: { notFound: 'Product not found', back: 'Back to products', pay: 'Checkout' },
+    ar: { notFound: 'المنتج غير موجود', back: 'العودة للمنتجات', pay: 'الدفع' },
+  }[lang || 'zh']
   const { id } = useParams()
   const product = getProductById(id)
 
   if (!product) {
     return (
       <div className="page-content">
-        <p>未找到该产品</p>
-        <Link to="/products">返回产品列表</Link>
+        <p>{t.notFound || ui.notFound}</p>
+        <Link to="/products">{t.back}</Link>
       </div>
     )
   }
@@ -19,7 +28,7 @@ export default function ProductDetail() {
 
   return (
     <div className="page-product-detail">
-      <Link to="/products" className="back-link">← 返回产品列表</Link>
+      <Link to="/products" className="back-link">← {t.back}</Link>
 
       <div className="product-detail-card">
         <div className="product-detail-header">
@@ -39,7 +48,7 @@ export default function ProductDetail() {
             state={{ product: { id: product.id, title: product.title, price: product.price, currency: product.currency } }}
             className="btn-primary"
           >
-            去支付
+            {t.pay}
           </Link>
         </div>
       </div>

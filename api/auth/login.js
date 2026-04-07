@@ -1,5 +1,10 @@
 import { sql } from '../../lib/db.js'
-import { verifyPassword, createToken, getUserById } from '../../lib/auth.js'
+import {
+  verifyPassword,
+  createToken,
+  getUserById,
+  createPreAuthToken,
+} from '../../lib/auth.js'
 import { getOrgContextsByUserId } from '../../lib/orgs.js'
 
 export default async function handler(req, res) {
@@ -22,7 +27,8 @@ export default async function handler(req, res) {
     }
 
     const rows = await sql`
-      SELECT id, password_hash FROM users WHERE email = ${email.toLowerCase().trim()}
+      SELECT id, password_hash, COALESCE(totp_enabled, false) AS totp_enabled
+      FROM users WHERE email = ${email.toLowerCase().trim()}
     `
     if (!rows.length) {
       return res.status(401).json({ error: '邮箱或密码错误' })
@@ -31,6 +37,11 @@ export default async function handler(req, res) {
     const ok = await verifyPassword(password, rows[0].password_hash)
     if (!ok) {
       return res.status(401).json({ error: '邮箱或密码错误' })
+    }
+
+    if (rows[0].totp_enabled) {
+      const preAuthToken = await createPreAuthToken(String(rows[0].id))
+      return res.status(200).json({ requires2fa: true, preAuthToken })
     }
 
     const token = await createToken(String(rows[0].id))

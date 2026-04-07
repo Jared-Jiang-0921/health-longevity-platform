@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { useLocale } from '../context/LocaleContext'
+import { getUi } from '../i18n/ui'
+import { getMessages } from '../i18n/messages'
 import './PaymentOpsMonitor.css'
 
 function fmtTime(v) {
@@ -16,6 +19,14 @@ function toJsonSafe(res) {
 }
 
 export default function PaymentOpsMonitor() {
+  const { lang } = useLocale()
+  const ui = getUi(lang)
+  const msg = getMessages(lang)
+  const t = {
+    zh: { title: '支付运营巡检', loading: ui.loading, needLogin: '请先登录管理员账号。', note: '只读看板：汇总 + 失败明细（需要管理员权限）。', hours: '时间窗口（小时）', provider: '支付通道', all: '全部', token: '管理员 Token（可选）', tokenPh: '若已登录管理员邮箱可留空', refreshing: ui.refreshing, refresh: '刷新数据', loadFail: '加载失败：', summary: '汇总指标', total: '总数', success: '成功', failed: '失败', idem: '幂等跳过', detail: '失败明细（最近 100 条）', noFail: '暂无失败日志' },
+    en: { title: 'Payment Ops Monitor', loading: ui.loading, needLogin: 'Please login as admin.', note: 'Read-only dashboard: summary + failed logs.', hours: 'Time window (hours)', provider: 'Provider', all: 'All', token: 'Admin token (optional)', tokenPh: 'Leave empty if admin email is logged in', refreshing: ui.refreshing, refresh: ui.refresh, loadFail: 'Load failed: ', summary: 'Summary', total: 'Total', success: 'Success', failed: 'Failed', idem: 'Idempotent skip', detail: 'Failed logs (latest 100)', noFail: 'No failed logs' },
+    ar: { title: 'مراقبة تشغيل الدفع', loading: ui.loading, needLogin: 'يرجى تسجيل الدخول كمسؤول.', note: 'لوحة للقراءة فقط: ملخص + سجلات الفشل.', hours: 'نافذة الوقت (بالساعات)', provider: 'بوابة الدفع', all: 'الكل', token: 'رمز المسؤول (اختياري)', tokenPh: 'اتركه فارغًا إذا دخلت بحساب مسؤول', refreshing: ui.refreshing, refresh: 'تحديث البيانات', loadFail: 'فشل التحميل: ', summary: 'المؤشرات', total: 'الإجمالي', success: 'الناجح', failed: 'الفاشل', idem: 'تخطي التكرار', detail: 'تفاصيل الفشل (آخر 100)', noFail: 'لا توجد سجلات فشل' },
+  }[lang || 'zh']
   const { user, loading: authLoading, getToken } = useAuth()
   const [hours, setHours] = useState(24)
   const [provider, setProvider] = useState('stripe')
@@ -45,16 +56,12 @@ export default function PaymentOpsMonitor() {
       ])
       const summaryJson = await toJsonSafe(summaryRes)
       const failedJson = await toJsonSafe(failedRes)
-      if (!summaryRes.ok) {
-        throw new Error(summaryJson.error || summaryJson.code || '汇总接口请求失败')
-      }
-      if (!failedRes.ok) {
-        throw new Error(failedJson.error || failedJson.code || '失败日志接口请求失败')
-      }
+      if (!summaryRes.ok) throw new Error(summaryJson.error || summaryJson.code || msg.requestFail)
+      if (!failedRes.ok) throw new Error(failedJson.error || failedJson.code || msg.requestFail)
       setSummary(summaryJson)
       setFailedLogs(Array.isArray(failedJson.logs) ? failedJson.logs : [])
     } catch (e) {
-      setError(e.message || '加载失败')
+      setError(e.message || msg.loadFail)
     } finally {
       setLoading(false)
     }
@@ -68,8 +75,8 @@ export default function PaymentOpsMonitor() {
   if (authLoading) {
     return (
       <div className="page-content payment-ops-page">
-        <h1>支付运营巡检</h1>
-        <p>加载中…</p>
+        <h1>{t.title}</h1>
+        <p>{t.loading}</p>
       </div>
     )
   }
@@ -77,20 +84,20 @@ export default function PaymentOpsMonitor() {
   if (!user) {
     return (
       <div className="page-content payment-ops-page">
-        <h1>支付运营巡检</h1>
-        <p>请先登录管理员账号。</p>
+        <h1>{t.title}</h1>
+        <p>{t.needLogin}</p>
       </div>
     )
   }
 
   return (
     <div className="page-content payment-ops-page">
-      <h1>支付运营巡检</h1>
-      <p className="ops-note">只读看板：汇总 + 失败明细（需要管理员权限）。</p>
+      <h1>{t.title}</h1>
+      <p className="ops-note">{t.note}</p>
 
       <div className="ops-toolbar">
         <label>
-          时间窗口（小时）
+          {t.hours}
           <input
             type="number"
             min={1}
@@ -100,43 +107,43 @@ export default function PaymentOpsMonitor() {
           />
         </label>
         <label>
-          支付通道
+          {t.provider}
           <select value={provider} onChange={(e) => setProvider(e.target.value)}>
-            <option value="">全部</option>
+            <option value="">{t.all}</option>
             <option value="stripe">stripe</option>
             <option value="airwallex">airwallex</option>
           </select>
         </label>
         <label className="ops-token">
-          管理员 Token（可选）
+          {t.token}
           <input
             type="password"
             value={adminToken}
             onChange={(e) => setAdminToken(e.target.value)}
-            placeholder="若已登录管理员邮箱可留空"
+            placeholder={t.tokenPh}
           />
         </label>
         <button type="button" className="btn-primary" onClick={loadData} disabled={loading}>
-          {loading ? '刷新中…' : '刷新数据'}
+          {loading ? t.refreshing : t.refresh}
         </button>
       </div>
 
-      {error ? <p className="ops-error">加载失败：{error}</p> : null}
+      {error ? <p className="ops-error">{t.loadFail}{error}</p> : null}
 
       {summary ? (
         <section className="ops-card">
-          <h2>汇总指标</h2>
+          <h2>{t.summary}</h2>
           <div className="ops-kpi-grid">
-            <div><span>总数</span><strong>{summary.total ?? 0}</strong></div>
-            <div><span>成功</span><strong>{summary.success ?? 0}</strong></div>
-            <div><span>失败</span><strong>{summary.failed ?? 0}</strong></div>
-            <div><span>幂等跳过</span><strong>{summary.idempotent_skip ?? 0}</strong></div>
+            <div><span>{t.total}</span><strong>{summary.total ?? 0}</strong></div>
+            <div><span>{t.success}</span><strong>{summary.success ?? 0}</strong></div>
+            <div><span>{t.failed}</span><strong>{summary.failed ?? 0}</strong></div>
+            <div><span>{t.idem}</span><strong>{summary.idempotent_skip ?? 0}</strong></div>
           </div>
         </section>
       ) : null}
 
       <section className="ops-card">
-        <h2>失败明细（最近 100 条）</h2>
+        <h2>{t.detail}</h2>
         <div className="ops-table-wrap">
           <table className="ops-table">
             <thead>
@@ -161,7 +168,7 @@ export default function PaymentOpsMonitor() {
                 </tr>
               )) : (
                 <tr>
-                  <td colSpan={6}>暂无失败日志</td>
+                  <td colSpan={6}>{t.noFail}</td>
                 </tr>
               )}
             </tbody>

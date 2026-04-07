@@ -1,9 +1,18 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PRODUCT_CATEGORIES, PRODUCTS } from '../data/products'
+import { useLocale } from '../context/LocaleContext'
+import { getUi } from '../i18n/ui'
 import './Products.css'
 
 export default function Products() {
+  const { lang } = useLocale()
+  const ui = getUi(lang)
+  const t = {
+    zh: { title: '循证健康产品', desc: '精选循证健康产品与用品，支持跳转至支付结算。' },
+    en: { title: 'Evidence-Based Products', desc: 'Selected evidence-based health products with checkout support.' },
+    ar: { title: 'منتجات مبنية على الدليل', desc: 'منتجات صحية مختارة قائمة على الدليل مع دعم الدفع.' },
+  }[lang || 'zh']
   const [activeCategory, setActiveCategory] = useState('all')
 
   const filtered =
@@ -14,8 +23,8 @@ export default function Products() {
   return (
     <div className="page-products">
       <section className="products-header">
-        <h1>循证健康产品</h1>
-        <p>精选循证健康产品与用品，支持跳转至支付结算。</p>
+        <h1>{t.title}</h1>
+        <p>{t.desc}</p>
       </section>
 
       <section className="categories">
@@ -49,7 +58,7 @@ export default function Products() {
                   <small>/{product.unit}</small>
                 </span>
                 <Link to={`/products/${product.id}`} className="btn-detail">
-                  查看详情
+                  {ui.details}
                 </Link>
               </div>
             </article>

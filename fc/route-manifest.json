@@ -1,0 +1,109 @@
+{
+  "version": 1,
+  "routes": [
+    {
+      "segments": [
+        "airwallex",
+        "create-checkout-session"
+      ],
+      "paramKeys": [],
+      "modulePath": "../api/airwallex/create-checkout-session.js",
+      "sourceFile": "api/airwallex/create-checkout-session.js"
+    },
+    {
+      "segments": [
+        "airwallex",
+        "webhook"
+      ],
+      "paramKeys": [],
+      "modulePath": "../api/airwallex/webhook.js",
+      "sourceFile": "api/airwallex/webhook.js"
+    },
+    {
+      "segments": [
+        "auth",
+        "login"
+      ],
+      "paramKeys": [],
+      "modulePath": "../api/auth/login.js",
+      "sourceFile": "api/auth/login.js"
+    },
+    {
+      "segments": [
+        "auth",
+        "me"
+      ],
+      "paramKeys": [],
+      "modulePath": "../api/auth/me.js",
+      "sourceFile": "api/auth/me.js"
+    },
+    {
+      "segments": [
+        "auth",
+        "register"
+      ],
+      "paramKeys": [],
+      "modulePath": "../api/auth/register.js",
+      "sourceFile": "api/auth/register.js"
+    },
+    {
+      "segments": [
+        "confirm-checkout-session"
+      ],
+      "paramKeys": [],
+      "modulePath": "../api/confirm-checkout-session.js",
+      "sourceFile": "api/confirm-checkout-session.js"
+    },
+    {
+      "segments": [
+        "create-checkout-session"
+      ],
+      "paramKeys": [],
+      "modulePath": "../api/create-checkout-session.js",
+      "sourceFile": "api/create-checkout-session.js"
+    },
+    {
+      "segments": [
+        "create-payment-intent"
+      ],
+      "paramKeys": [],
+      "modulePath": "../api/create-payment-intent.js",
+      "sourceFile": "api/create-payment-intent.js"
+    },
+    {
+      "segments": [
+        "init-db"
+      ],
+      "paramKeys": [],
+      "modulePath": "../api/init-db.js",
+      "sourceFile": "api/init-db.js"
+    },
+    {
+      "segments": [
+        "org",
+        ":action"
+      ],
+      "paramKeys": [
+        "action"
+      ],
+      "modulePath": "../api/org/[action].js",
+      "sourceFile": "api/org/[action].js"
+    },
+    {
+      "segments": [
+        "payment-event-logs"
+      ],
+      "paramKeys": [],
+      "modulePath": "../api/payment-event-logs.js",
+      "sourceFile": "api/payment-event-logs.js"
+    },
+    {
+      "segments": [
+        "stripe-webhook"
+      ],
+      "paramKeys": [],
+      "modulePath": "../api/stripe-webhook.js",
+      "sourceFile": "api/stripe-webhook.js"
+    }
+  ]
+}

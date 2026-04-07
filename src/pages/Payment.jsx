@@ -1,98 +1,40 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useLocale } from '../context/LocaleContext'
 import { MEMBERSHIP_LEVELS } from '../data/membership'
+import { getMembershipLevelLabel } from '../i18n/terms'
+import { CHECKOUT_PLANS } from '../data/checkoutPlans.js'
+import {
+  CURRENCY_LABELS,
+  formatPlanPrice,
+  getDefaultPaymentCurrency,
+  isCurrencyRateMissing,
+  paymentCurrencyOptions,
+} from '../lib/paymentFormat.js'
+import { CHECKOUT_API, getProviderDisplayName, PAYMENT_PROVIDER } from '../lib/checkoutApi.js'
 
-const PAYMENT_PROVIDER = String(import.meta.env.VITE_PAYMENT_PROVIDER || 'stripe').toLowerCase().trim()
-const CHECKOUT_API =
-  import.meta.env.VITE_CHECKOUT_API ||
-  (PAYMENT_PROVIDER === 'airwallex'
-    ? '/api/airwallex/create-checkout-session'
-    : '/api/create-checkout-session')
-const PAYMENT_BASE_CURRENCY = String(import.meta.env.VITE_PAYMENT_BASE_CURRENCY || 'USD').toUpperCase().trim()
-const PAYMENT_CURRENCY = String(import.meta.env.VITE_PAYMENT_CURRENCY || 'USD').toUpperCase().trim()
-const PAYMENT_CURRENCY_OPTIONS = String(import.meta.env.VITE_PAYMENT_CURRENCY_OPTIONS || PAYMENT_CURRENCY)
-  .split(',')
-  .map((v) => v.trim().toUpperCase())
-  .filter((v, i, arr) => /^[A-Z]{3}$/.test(v) && arr.indexOf(v) === i)
-const MANUAL_RATES_RAW = String(import.meta.env.VITE_PAYMENT_MANUAL_RATES || 'USD:1')
-const CURRENCY_LABELS = {
-  USD: '美元',
-  EUR: '欧元',
-  CNY: '人民币',
-  HKD: '港币',
-  SGD: '新加坡元',
-  GBP: '英镑',
-  JPY: '日元',
-  AUD: '澳元',
-}
-
-function getProviderDisplayName(provider) {
-  return provider === 'airwallex' ? '空中云汇（骨架联调）' : 'Stripe（生产可用）'
-}
-
-const PLANS = [
-  { id: 'standard_monthly', name: '标准会员 · 月度', amount: 999, desc: '1 个月' },
-  { id: 'standard_yearly', name: '标准会员 · 年度', amount: 9999, desc: '12 个月，省约 17%' },
-  { id: 'premium_monthly', name: '高级会员 · 月度', amount: 1999, desc: '1 个月' },
-  { id: 'premium_yearly', name: '高级会员 · 年度', amount: 19999, desc: '12 个月，省约 17%' },
-]
-
-const ZERO_DECIMAL_CURRENCIES = new Set(['JPY', 'KRW'])
-
-function minorFactor(currency) {
-  return ZERO_DECIMAL_CURRENCIES.has(String(currency).toUpperCase()) ? 1 : 100
-}
-
-function parseManualRates(raw, baseCurrency) {
-  const map = { [baseCurrency]: 1 }
-  const parts = String(raw || '').split(',')
-  for (const part of parts) {
-    const [k, v] = part.split(':')
-    const code = String(k || '').trim().toUpperCase()
-    const num = Number(String(v || '').trim())
-    if (/^[A-Z]{3}$/.test(code) && Number.isFinite(num) && num > 0) {
-      map[code] = num
-    }
-  }
-  return map
-}
-
-const MANUAL_RATES = parseManualRates(MANUAL_RATES_RAW, PAYMENT_BASE_CURRENCY)
-
-function convertFromBaseMinor(baseMinorAmount, targetCurrency) {
-  const baseRate = MANUAL_RATES[PAYMENT_BASE_CURRENCY] || 1
-  const targetRate = MANUAL_RATES[targetCurrency]
-  if (!targetRate) return null
-  const baseMajor = Number(baseMinorAmount) / minorFactor(PAYMENT_BASE_CURRENCY)
-  const targetMajor = (baseMajor / baseRate) * targetRate
-  return Math.round(targetMajor * minorFactor(targetCurrency))
-}
-
-function formatPlanPrice(baseMinorAmount, targetCurrency) {
-  const convertedMinor = convertFromBaseMinor(baseMinorAmount, targetCurrency)
-  if (convertedMinor == null) {
-    const baseAmount = Number(baseMinorAmount) / minorFactor(PAYMENT_BASE_CURRENCY)
-    const baseDecimals = minorFactor(PAYMENT_BASE_CURRENCY) === 1 ? 0 : 2
-    return `约 ${PAYMENT_BASE_CURRENCY} ${baseAmount.toFixed(baseDecimals)}`
-  }
-  const amount = Number(convertedMinor) / minorFactor(targetCurrency)
-  const decimals = minorFactor(targetCurrency) === 1 ? 0 : 2
-  return `${targetCurrency} ${amount.toFixed(decimals)}`
+const I18N = {
+  zh: { title: '在线全球化支付结算', loading: '加载中…', needLogin: '升级会员需先登录。', login: '登录', register: '注册', current: '当前', pay: '去支付', paying: '跳转中…', note: '选择套餐后跳转到对应支付通道完成支付，支付成功后自动升级会员。', currency: '币种选择：', failed: '若跳转失败，请检查网络与支付环境变量配置（Stripe 或 Airwallex）。', errLogin: '请先登录', errCreate: '无法创建支付会话', errNet: '网络错误：' },
+  en: { title: 'Global Checkout', loading: 'Loading…', needLogin: 'Please login before upgrading.', login: 'Login', register: 'Sign up', current: 'Current', pay: 'Pay Now', paying: 'Redirecting…', note: 'Choose a plan and complete payment in the provider checkout. Membership upgrades automatically after success.', currency: 'Currency:', failed: 'If redirect fails, check network and payment env config (Stripe or Airwallex).', errLogin: 'Please login first', errCreate: 'Failed to create checkout session', errNet: 'Network error: ' },
+  ar: { title: 'الدفع العالمي', loading: 'جار التحميل…', needLogin: 'يرجى تسجيل الدخول قبل ترقية العضوية.', login: 'تسجيل الدخول', register: 'إنشاء حساب', current: 'الحالي', pay: 'الدفع الآن', paying: 'جار التحويل…', note: 'اختر الخطة ثم أكمل الدفع في بوابة المزود. ستتم الترقية تلقائيًا بعد نجاح الدفع.', currency: 'العملة:', failed: 'إذا فشل التحويل، تحقق من الشبكة ومتغيرات بيئة الدفع (Stripe أو Airwallex).', errLogin: 'يرجى تسجيل الدخول أولاً', errCreate: 'تعذر إنشاء جلسة الدفع', errNet: 'خطأ في الشبكة: ' },
 }
 
 export default function Payment() {
+  const { lang } = useLocale()
+  const t = I18N[lang] || I18N.zh
   const { user, loading: authLoading, getToken } = useAuth()
   const [selectedPlan, setSelectedPlan] = useState('standard_monthly')
-  const [selectedCurrency, setSelectedCurrency] = useState(PAYMENT_CURRENCY_OPTIONS[0] || PAYMENT_CURRENCY)
+  const [selectedCurrency, setSelectedCurrency] = useState(getDefaultPaymentCurrency())
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-  const selectedCurrencyRateMissing = !MANUAL_RATES[selectedCurrency]
+  const selectedCurrencyRateMissing = isCurrencyRateMissing(selectedCurrency)
+  const PAYMENT_CURRENCY_OPTIONS = paymentCurrencyOptions()
 
   const handlePay = async () => {
     const token = getToken()
     if (!user || !token) {
-      setError('请先登录')
+      setError(t.errLogin)
       return
     }
 
@@ -116,9 +58,9 @@ export default function Payment() {
         window.location.href = data.url
         return
       }
-      setError(data.error || '无法创建支付会话')
+      setError(data.error || t.errCreate)
     } catch (e) {
-      setError('网络错误：' + (e.message || '请稍后重试'))
+      setError(t.errNet + (e.message || 'please retry'))
     } finally {
       setLoading(false)
     }
@@ -127,8 +69,8 @@ export default function Payment() {
   if (authLoading) {
     return (
       <div className="page-content">
-        <h1>在线全球化支付结算</h1>
-        <p>加载中…</p>
+        <h1>{t.title}</h1>
+        <p>{t.loading}</p>
       </div>
     )
   }
@@ -136,12 +78,12 @@ export default function Payment() {
   if (!user) {
     return (
       <div className="page-content">
-        <h1>在线全球化支付结算</h1>
-        <p>升级会员需先登录。</p>
+        <h1>{t.title}</h1>
+        <p>{t.needLogin}</p>
         <p>
-          <Link to="/login" className="btn-primary">登录</Link>
+          <Link to="/login" className="btn-primary">{t.login}</Link>
           <span className="page-sep"> </span>
-          <Link to="/register" className="btn-secondary">注册</Link>
+          <Link to="/register" className="btn-secondary">{t.register}</Link>
         </p>
       </div>
     )
@@ -149,12 +91,12 @@ export default function Payment() {
 
   return (
     <div className="page-content">
-      <h1>在线全球化支付结算</h1>
-      <p>当前：{user.name}（{MEMBERSHIP_LEVELS[user.level]?.name || user.level}）</p>
+      <h1>{t.title}</h1>
+      <p>{t.current}：{user.name}（{getMembershipLevelLabel(user.level, lang)}）</p>
       <p className="payment-note">当前支付通道：{getProviderDisplayName(PAYMENT_PROVIDER)}</p>
       <p className="payment-note">当前结算币种：{selectedCurrency}</p>
-      <p className="payment-note">手动汇率基准：{PAYMENT_BASE_CURRENCY}</p>
-      <p className="payment-desc">选择套餐后跳转到对应支付通道完成支付，支付成功后自动升级会员。</p>
+      <p className="payment-note">手动汇率基准：{String(import.meta.env.VITE_PAYMENT_BASE_CURRENCY || 'USD').toUpperCase()}</p>
+      <p className="payment-desc">{t.note}</p>
 
       <details className="payment-tier-desc">
         <summary>会员权益说明</summary>
@@ -167,7 +109,7 @@ export default function Payment() {
 
       <section className="payment-section">
         <p className="payment-note">
-          币种选择：
+          {t.currency}
           <select
             value={selectedCurrency}
             onChange={(e) => setSelectedCurrency(e.target.value)}
@@ -187,7 +129,7 @@ export default function Payment() {
           </p>
         ) : null}
         <div className="plan-grid">
-          {PLANS.map((plan) => (
+          {CHECKOUT_PLANS.map((plan) => (
             <label key={plan.id} className={`plan-card ${selectedPlan === plan.id ? 'selected' : ''}`}>
               <input
                 type="radio"
@@ -209,14 +151,22 @@ export default function Payment() {
             onClick={handlePay}
             disabled={loading}
           >
-            {loading ? '跳转中…' : '去支付'}
+            {loading ? t.paying : t.pay}
           </button>
         </div>
         {error && <div className="payment-error">{error}</div>}
       </section>
 
       <p className="payment-note">
-        若跳转失败，请检查网络与支付环境变量配置（Stripe 或 Airwallex）。
+        <Link to="/legal/sale">Terms of Sale</Link>
+        <span className="page-sep"> · </span>
+        <Link to="/privacy">Privacy Policy</Link>
+        <span className="page-sep"> · </span>
+        <Link to="/terms">Terms of Service</Link>
+      </p>
+
+      <p className="payment-note">
+        {t.failed}
       </p>
     </div>
   )

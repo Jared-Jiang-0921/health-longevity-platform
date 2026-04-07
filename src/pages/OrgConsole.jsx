@@ -1,5 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { useLocale } from '../context/LocaleContext'
+import { getOrgRoleLabel } from '../i18n/terms'
+import { getUi } from '../i18n/ui'
+import { getMessages } from '../i18n/messages'
+import { getAdminUi } from '../i18n/adminUi'
 import './OrgConsole.css'
 
 function inferDomain(email) {
@@ -9,6 +14,15 @@ function inferDomain(email) {
 }
 
 export default function OrgConsole() {
+  const { lang } = useLocale()
+  const ui = getUi(lang)
+  const msg = getMessages(lang)
+  const adminUi = getAdminUi(lang)
+  const t = {
+    zh: { loadMemberFail: msg.loadFail, loadInviteFail: msg.loadFail, loadDataFail: msg.loadFail, createFail: msg.requestFail, createOk: '企业创建成功。', inviteFail: msg.requestFail, inviteOk: '已创建邀请：', revokeFail: msg.operationFail, revokeOk: '邀请已撤销。', resendFail: msg.requestFail, resendOk: '已重发邀请：', roleFail: msg.operationFail, roleOk: '成员角色已更新。', statusFail: msg.operationFail, statusOk: '成员状态已更新。', cannotKickSelf: '不能踢出自己。', kickConfirm: '确认踢出该成员？被踢出的成员将无法继续访问本企业。', kickFail: msg.operationFail, kickOk: '成员已被踢出企业。', title: '企业管理', loading: ui.loading, loginFirst: '请先登录后使用。', loadingOrg: '加载组织信息中…', note: 'MVP 第二阶段：支持管理员生成邀请链接，成员按链接加入企业。', current: '当前组织', switchOrg: '切换组织', orgName: '组织名称', domain: '绑定域名', role: '组织角色', status: '组织状态', invite: '邀请成员', memberEmail: '成员邮箱（必须同域：', roleLabel: '角色', generating: ui.refreshing, generate: '生成邀请链接', inviteLink: '邀请链接：', members: '成员列表', name: '姓名', email: '邮箱', action: adminUi.actions, setAdmin: '设管理员', setMember: '设成员', kick: '踢出', disable: adminUi.disable, enable: adminUi.enable, noMembers: '暂无成员数据', invites: '邀请记录', expiresAt: '过期时间', resend: adminUi.resend, revoke: adminUi.revoke, noInvites: '暂无邀请记录', createOrg: '创建企业组织', domainHint: '企业域名（默认当前登录邮箱域名）', creating: ui.refreshing, createBtn: '创建企业' },
+    en: { loadMemberFail: msg.loadFail, loadInviteFail: msg.loadFail, loadDataFail: msg.loadFail, createFail: msg.requestFail, createOk: 'Organization created.', inviteFail: msg.requestFail, inviteOk: 'Invite created: ', revokeFail: msg.operationFail, revokeOk: 'Invite revoked.', resendFail: msg.requestFail, resendOk: 'Invite resent: ', roleFail: msg.operationFail, roleOk: 'Member role updated.', statusFail: msg.operationFail, statusOk: 'Member status updated.', cannotKickSelf: 'Cannot remove yourself.', kickConfirm: 'Remove this member from the organization?', kickFail: msg.operationFail, kickOk: 'Member removed.', title: 'Organization Console', loading: ui.loading, loginFirst: 'Please login first.', loadingOrg: 'Loading organization data…', note: 'MVP phase 2: admins can generate invite links, members join by link.', current: 'Current Organization', switchOrg: 'Switch organization', orgName: 'Organization name', domain: 'Domain', role: 'Role', status: 'Status', invite: 'Invite Members', memberEmail: 'Member email (must match domain: ', roleLabel: 'Role', generating: ui.refreshing, generate: 'Generate invite link', inviteLink: 'Invite link: ', members: 'Members', name: 'Name', email: 'Email', action: adminUi.actions, setAdmin: 'Set admin', setMember: 'Set member', kick: 'Remove', disable: adminUi.disable, enable: adminUi.enable, noMembers: 'No member data', invites: 'Invites', expiresAt: 'Expires at', resend: adminUi.resend, revoke: adminUi.revoke, noInvites: 'No invite records', createOrg: 'Create Organization', domainHint: 'Organization domain (default from your email)', creating: ui.refreshing, createBtn: 'Create organization' },
+    ar: { loadMemberFail: msg.loadFail, loadInviteFail: msg.loadFail, loadDataFail: msg.loadFail, createFail: msg.requestFail, createOk: 'تم إنشاء المؤسسة.', inviteFail: msg.requestFail, inviteOk: 'تم إنشاء الدعوة: ', revokeFail: msg.operationFail, revokeOk: 'تم إلغاء الدعوة.', resendFail: msg.requestFail, resendOk: 'تمت إعادة الدعوة: ', roleFail: msg.operationFail, roleOk: 'تم تحديث دور العضو.', statusFail: msg.operationFail, statusOk: 'تم تحديث الحالة.', cannotKickSelf: 'لا يمكنك إخراج نفسك.', kickConfirm: 'تأكيد إخراج هذا العضو من المؤسسة؟', kickFail: msg.operationFail, kickOk: 'تم إخراج العضو.', title: 'إدارة المؤسسة', loading: ui.loading, loginFirst: 'يرجى تسجيل الدخول أولاً.', loadingOrg: 'جار تحميل بيانات المؤسسة…', note: 'المرحلة الثانية: يمكن للمسؤول إنشاء روابط دعوة وينضم الأعضاء عبر الرابط.', current: 'المؤسسة الحالية', switchOrg: 'تبديل المؤسسة', orgName: 'اسم المؤسسة', domain: 'النطاق', role: 'الدور', status: 'الحالة', invite: 'دعوة أعضاء', memberEmail: 'بريد العضو (يجب أن يطابق النطاق: ', roleLabel: 'الدور', generating: ui.refreshing, generate: 'إنشاء رابط دعوة', inviteLink: 'رابط الدعوة: ', members: 'الأعضاء', name: 'الاسم', email: 'البريد', action: adminUi.actions, setAdmin: 'تعيين مسؤول', setMember: 'تعيين عضو', kick: 'إخراج', disable: adminUi.disable, enable: adminUi.enable, noMembers: 'لا توجد بيانات أعضاء', invites: 'الدعوات', expiresAt: 'تاريخ الانتهاء', resend: adminUi.resend, revoke: adminUi.revoke, noInvites: 'لا توجد دعوات', createOrg: 'إنشاء مؤسسة', domainHint: 'نطاق المؤسسة (افتراضيًا من بريدك)', creating: ui.refreshing, createBtn: 'إنشاء المؤسسة' },
+  }[lang || 'zh']
   const { user, loading, getToken, refreshUser } = useAuth()
   const defaultDomain = useMemo(() => inferDomain(user?.email), [user?.email])
   const [orgName, setOrgName] = useState('')
@@ -47,12 +61,12 @@ export default function OrgConsole() {
       ])
       const membersData = await membersRes.json().catch(() => ({}))
       const invitesData = await invitesRes.json().catch(() => ({}))
-      if (!membersRes.ok) throw new Error(membersData.error || membersData.code || '加载成员失败')
-      if (!invitesRes.ok) throw new Error(invitesData.error || invitesData.code || '加载邀请失败')
+      if (!membersRes.ok) throw new Error(membersData.error || membersData.code || t.loadMemberFail)
+      if (!invitesRes.ok) throw new Error(invitesData.error || invitesData.code || t.loadInviteFail)
       setMembers(Array.isArray(membersData.members) ? membersData.members : [])
       setInvites(Array.isArray(invitesData.invites) ? invitesData.invites : [])
     } catch (e) {
-      setError(e.message || '加载数据失败')
+      setError(e.message || t.loadDataFail)
     } finally {
       setListLoading(false)
     }
@@ -79,11 +93,11 @@ export default function OrgConsole() {
         body: JSON.stringify({ name: orgName, domain }),
       })
       const data = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(data.error || data.code || '创建失败')
+      if (!res.ok) throw new Error(data.error || data.code || t.createFail)
       await refreshUser()
-      setHint('企业创建成功。')
+      setHint(t.createOk)
     } catch (e) {
-      setError(e.message || '创建失败')
+      setError(e.message || t.createFail)
     } finally {
       setSubmitting(false)
     }
@@ -109,13 +123,13 @@ export default function OrgConsole() {
         }),
       })
       const data = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(data.error || data.code || '邀请失败')
-      setHint(`已创建邀请：${data.invite?.email || inviteEmail}`)
+      if (!res.ok) throw new Error(data.error || data.code || t.inviteFail)
+      setHint(`${t.inviteOk}${data.invite?.email || inviteEmail}`)
       setInviteLink(data.invite?.invite_url || '')
       setInviteEmail('')
       await loadOrgData()
     } catch (e) {
-      setError(e.message || '邀请失败')
+      setError(e.message || t.inviteFail)
     } finally {
       setInviteSubmitting(false)
     }
@@ -135,11 +149,11 @@ export default function OrgConsole() {
         body: JSON.stringify({ invite_id: inviteId }),
       })
       const data = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(data.error || data.code || '撤销失败')
-      setHint('邀请已撤销。')
+      if (!res.ok) throw new Error(data.error || data.code || t.revokeFail)
+      setHint(t.revokeOk)
       await loadOrgData()
     } catch (e) {
-      setError(e.message || '撤销失败')
+      setError(e.message || t.revokeFail)
     }
   }
 
@@ -157,12 +171,12 @@ export default function OrgConsole() {
         body: JSON.stringify({ invite_id: inviteId, origin: window.location.origin }),
       })
       const data = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(data.error || data.code || '重发失败')
+      if (!res.ok) throw new Error(data.error || data.code || t.resendFail)
       setInviteLink(data.invite?.invite_url || '')
-      setHint(`已重发邀请：${data.invite?.email || ''}`)
+      setHint(`${t.resendOk}${data.invite?.email || ''}`)
       await loadOrgData()
     } catch (e) {
-      setError(e.message || '重发失败')
+      setError(e.message || t.resendFail)
     }
   }
 
@@ -180,11 +194,11 @@ export default function OrgConsole() {
         body: JSON.stringify({ user_id: targetUserId, role }),
       })
       const data = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(data.error || data.code || '更新角色失败')
-      setHint('成员角色已更新。')
+      if (!res.ok) throw new Error(data.error || data.code || t.roleFail)
+      setHint(t.roleOk)
       await loadOrgData()
     } catch (e) {
-      setError(e.message || '更新角色失败')
+      setError(e.message || t.roleFail)
     }
   }
 
@@ -202,11 +216,11 @@ export default function OrgConsole() {
         body: JSON.stringify({ user_id: targetUserId, status }),
       })
       const data = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(data.error || data.code || '更新状态失败')
-      setHint('成员状态已更新。')
+      if (!res.ok) throw new Error(data.error || data.code || t.statusFail)
+      setHint(t.statusOk)
       await loadOrgData()
     } catch (e) {
-      setError(e.message || '更新状态失败')
+      setError(e.message || t.statusFail)
     }
   }
 
@@ -214,11 +228,11 @@ export default function OrgConsole() {
     if (!targetUserId) return
     if (String(targetUserId) === String(user?.id)) {
       setError('')
-      setHint('不能踢出自己。')
+      setHint(t.cannotKickSelf)
       return
     }
 
-    const ok = window.confirm('确认踢出该成员？被踢出的成员将无法继续访问本企业。')
+    const ok = window.confirm(t.kickConfirm)
     if (!ok) return
 
     setError('')
@@ -234,19 +248,19 @@ export default function OrgConsole() {
         body: JSON.stringify({ user_id: targetUserId }),
       })
       const data = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(data.error || data.code || '踢出失败')
-      setHint('成员已被踢出企业。')
+      if (!res.ok) throw new Error(data.error || data.code || t.kickFail)
+      setHint(t.kickOk)
       await loadOrgData()
     } catch (e) {
-      setError(e.message || '踢出失败')
+      setError(e.message || t.kickFail)
     }
   }
 
   if (loading) {
     return (
       <div className="page-content org-console-page">
-        <h1>企业管理</h1>
-        <p>加载中…</p>
+        <h1>{t.title}</h1>
+        <p>{t.loading}</p>
       </div>
     )
   }
@@ -254,8 +268,8 @@ export default function OrgConsole() {
   if (!user) {
     return (
       <div className="page-content org-console-page">
-        <h1>企业管理</h1>
-        <p>请先登录后使用。</p>
+        <h1>{t.title}</h1>
+        <p>{t.loginFirst}</p>
       </div>
     )
   }
@@ -263,24 +277,24 @@ export default function OrgConsole() {
   if (orgs.length && !currentOrg) {
     return (
       <div className="page-content org-console-page">
-        <h1>企业管理</h1>
-        <p>加载组织信息中…</p>
+        <h1>{t.title}</h1>
+        <p>{t.loadingOrg}</p>
       </div>
     )
   }
 
   return (
     <div className="page-content org-console-page">
-      <h1>企业管理</h1>
-      <p className="org-note">MVP 第二阶段：支持管理员生成邀请链接，成员按链接加入企业。</p>
+      <h1>{t.title}</h1>
+      <p className="org-note">{t.note}</p>
 
       {currentOrg ? (
         <>
           <section className="org-card">
-            <h2>当前组织</h2>
+            <h2>{t.current}</h2>
                 {orgs.length > 1 ? (
                   <label>
-                    <span>切换组织</span>
+                    <span>{t.switchOrg}</span>
                     <select value={activeOrgId} onChange={(e) => setActiveOrgId(e.target.value)}>
                       {orgs.map((o) => (
                         <option key={o.id} value={o.id}>
@@ -291,18 +305,18 @@ export default function OrgConsole() {
                   </label>
                 ) : null}
             <dl className="org-dl">
-              <div><dt>组织名称</dt><dd>{currentOrg.name}</dd></div>
-              <div><dt>绑定域名</dt><dd>{currentOrg.domain}</dd></div>
-              <div><dt>组织角色</dt><dd>{currentOrg.role}</dd></div>
-              <div><dt>组织状态</dt><dd>{currentOrg.status}</dd></div>
+              <div><dt>{t.orgName}</dt><dd>{currentOrg.name}</dd></div>
+              <div><dt>{t.domain}</dt><dd>{currentOrg.domain}</dd></div>
+              <div><dt>{t.role}</dt><dd>{getOrgRoleLabel(currentOrg.role, lang)}</dd></div>
+              <div><dt>{t.status}</dt><dd>{currentOrg.status}</dd></div>
             </dl>
           </section>
 
           {canManageInvite ? (
             <section className="org-card org-invite-card">
-              <h2>邀请成员</h2>
+              <h2>{t.invite}</h2>
               <label>
-                <span>成员邮箱（必须同域：{currentOrg.domain}）</span>
+                <span>{t.memberEmail}{currentOrg.domain}）</span>
                 <input
                   type="email"
                   value={inviteEmail}
@@ -311,37 +325,35 @@ export default function OrgConsole() {
                 />
               </label>
               <label>
-                <span>角色</span>
+                <span>{t.roleLabel}</span>
                 <select value={inviteRole} onChange={(e) => setInviteRole(e.target.value)}>
-                  <option value="member">member（普通成员）</option>
-                  <option value="admin">admin（管理员）</option>
+                  <option value="member">{getOrgRoleLabel('member', lang)}</option>
+                  <option value="admin">{getOrgRoleLabel('admin', lang)}</option>
                 </select>
               </label>
-              <button type="button" className="btn-primary" disabled={inviteSubmitting} onClick={createInvite}>
-                {inviteSubmitting ? '生成中…' : '生成邀请链接'}
-              </button>
+              <button type="button" className="btn-primary" disabled={inviteSubmitting} onClick={createInvite}>{inviteSubmitting ? t.generating : t.generate}</button>
               {inviteLink ? (
                 <p className="org-hint">
-                  邀请链接：<a href={inviteLink} target="_blank" rel="noreferrer">{inviteLink}</a>
+                  {t.inviteLink}<a href={inviteLink} target="_blank" rel="noreferrer">{inviteLink}</a>
                 </p>
               ) : null}
             </section>
           ) : null}
 
           <section className="org-card org-list-card">
-            <h2>成员列表</h2>
+            <h2>{t.members}</h2>
             {listLoading ? (
-              <p className="org-note">加载中…</p>
+              <p className="org-note">{ui.loading}</p>
             ) : (
               <div className="org-table-wrap">
                 <table className="org-table">
                   <thead>
                     <tr>
-                      <th>姓名</th>
-                      <th>邮箱</th>
-                      <th>角色</th>
-                      <th>状态</th>
-                      {canManageInvite ? <th>操作</th> : null}
+                      <th>{t.name}</th>
+                      <th>{t.email}</th>
+                      <th>{t.role}</th>
+                      <th>{t.status}</th>
+                      {canManageInvite ? <th>{t.action}</th> : null}
                     </tr>
                   </thead>
                   <tbody>
@@ -349,7 +361,7 @@ export default function OrgConsole() {
                       <tr key={m.id}>
                         <td>{m.name || '—'}</td>
                         <td>{m.email || '—'}</td>
-                        <td>{m.role || '—'}</td>
+                        <td>{getOrgRoleLabel(m.role, lang)}</td>
                         <td>{m.status || '—'}</td>
                         {canManageInvite ? (
                           <td>
@@ -358,12 +370,12 @@ export default function OrgConsole() {
                                 <>
                                   {m.role !== 'admin' ? (
                                     <button type="button" onClick={() => changeMemberRole(m.user_id, 'admin')}>
-                                      设管理员
+                                      {t.setAdmin}
                                     </button>
                                   ) : null}
                                   {m.role !== 'member' ? (
                                     <button type="button" onClick={() => changeMemberRole(m.user_id, 'member')}>
-                                      设成员
+                                      {t.setMember}
                                     </button>
                                   ) : null}
                                 </>
@@ -373,25 +385,17 @@ export default function OrgConsole() {
                               {m.user_id !== user.id ? (
                                 m.role !== 'owner' ? (
                                   <button type="button" onClick={() => kickMember(m.user_id)}>
-                                    踢出
+                                    {t.kick}
                                   </button>
                                 ) : null
                               ) : null}
-                              {m.status === 'active' ? (
-                                <button type="button" onClick={() => setMemberStatus(m.user_id, 'disabled')}>
-                                  禁用
-                                </button>
-                              ) : (
-                                <button type="button" onClick={() => setMemberStatus(m.user_id, 'active')}>
-                                  启用
-                                </button>
-                              )}
+                              {m.status === 'active' ? (<button type="button" onClick={() => setMemberStatus(m.user_id, 'disabled')}>{t.disable}</button>) : (<button type="button" onClick={() => setMemberStatus(m.user_id, 'active')}>{t.enable}</button>)}
                             </div>
                           </td>
                         ) : null}
                       </tr>
                     )) : (
-                      <tr><td colSpan={canManageInvite ? 5 : 4}>暂无成员数据</td></tr>
+                      <tr><td colSpan={canManageInvite ? 5 : 4}>{t.noMembers}</td></tr>
                     )}
                   </tbody>
                 </table>
@@ -401,26 +405,26 @@ export default function OrgConsole() {
 
           {canManageInvite ? (
             <section className="org-card org-list-card">
-              <h2>邀请记录</h2>
+              <h2>{t.invites}</h2>
               {listLoading ? (
-                <p className="org-note">加载中…</p>
+              <p className="org-note">{ui.loading}</p>
               ) : (
                 <div className="org-table-wrap">
                   <table className="org-table">
                     <thead>
                       <tr>
-                        <th>邮箱</th>
-                        <th>角色</th>
-                        <th>状态</th>
-                        <th>过期时间</th>
-                        <th>操作</th>
+                        <th>{t.email}</th>
+                        <th>{t.role}</th>
+                        <th>{t.status}</th>
+                        <th>{t.expiresAt}</th>
+                        <th>{t.action}</th>
                       </tr>
                     </thead>
                     <tbody>
                       {invites.length ? invites.map((inv) => (
                         <tr key={inv.id}>
                           <td>{inv.email || '—'}</td>
-                          <td>{inv.role || '—'}</td>
+                          <td>{getOrgRoleLabel(inv.role, lang)}</td>
                           <td>{inv.status || '—'}</td>
                           <td>{inv.expires_at ? new Date(inv.expires_at).toLocaleString('zh-CN') : '—'}</td>
                           <td>
@@ -430,20 +434,20 @@ export default function OrgConsole() {
                                 onClick={() => resendInvite(inv.id)}
                                 disabled={inviteSubmitting}
                               >
-                                重发
+                                {t.resend}
                               </button>
                               <button
                                 type="button"
                                 onClick={() => revokeInvite(inv.id)}
                                 disabled={inviteSubmitting || inv.status !== 'pending'}
                               >
-                                撤销
+                                {t.revoke}
                               </button>
                             </div>
                           </td>
                         </tr>
                       )) : (
-                        <tr><td colSpan={5}>暂无邀请记录</td></tr>
+                        <tr><td colSpan={5}>{t.noInvites}</td></tr>
                       )}
                     </tbody>
                   </table>
@@ -454,9 +458,9 @@ export default function OrgConsole() {
         </>
       ) : (
         <section className="org-card">
-          <h2>创建企业组织</h2>
+          <h2>{t.createOrg}</h2>
           <label>
-            <span>组织名称</span>
+            <span>{t.orgName}</span>
             <input
               type="text"
               value={orgName}
@@ -465,7 +469,7 @@ export default function OrgConsole() {
             />
           </label>
           <label>
-            <span>企业域名（默认当前登录邮箱域名）</span>
+            <span>{t.domainHint}</span>
             <input
               type="text"
               value={domain}
@@ -474,7 +478,7 @@ export default function OrgConsole() {
             />
           </label>
           <button type="button" className="btn-primary" disabled={submitting} onClick={createOrg}>
-            {submitting ? '创建中…' : '创建企业'}
+            {submitting ? t.creating : t.createBtn}
           </button>
         </section>
       )}

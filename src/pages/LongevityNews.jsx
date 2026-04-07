@@ -1,12 +1,19 @@
 import { RESEARCH_UPDATES, getMonthLabel } from '../data/longevityNews'
+import { useLocale } from '../context/LocaleContext'
 import './LongevityNews.css'
 
 export default function LongevityNews() {
+  const { lang } = useLocale()
+  const t = {
+    zh: { title: '前沿长寿医学资讯', desc: '国际权威期刊每月更新的高影响因子健康长寿研究资讯，供参考学习。', read: '阅读原文' },
+    en: { title: 'Frontier Longevity News', desc: 'Monthly high-impact longevity research updates from leading journals.', read: 'Read source' },
+    ar: { title: 'مستجدات طب طول العمر', desc: 'تحديثات شهرية عالية التأثير من الدوريات العلمية الرائدة.', read: 'قراءة المصدر' },
+  }[lang || 'zh']
   return (
     <div className="page-longevity-news">
       <section className="news-header">
-        <h1>前沿长寿医学资讯</h1>
-        <p>国际权威期刊每月更新的高影响因子健康长寿研究资讯，供参考学习。</p>
+        <h1>{t.title}</h1>
+        <p>{t.desc}</p>
       </section>
 
       <section className="news-list">
@@ -21,7 +28,7 @@ export default function LongevityNews() {
             <p>{item.summary}</p>
             {item.url && (
               <a href={item.url} className="news-link" target="_blank" rel="noopener noreferrer">
-                阅读原文 →
+                {t.read} →
               </a>
             )}
           </article>

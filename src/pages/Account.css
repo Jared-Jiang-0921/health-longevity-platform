@@ -68,3 +68,80 @@
 .account-muted {
   color: var(--color-text-muted);
 }
+
+.account-totp {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.account-totp-title {
+  font-size: 1.1rem;
+  margin: 0 0 0.75rem;
+}
+
+.account-totp-qr {
+  margin: 1rem 0;
+}
+
+.account-totp-secret {
+  font-size: 0.8rem;
+  word-break: break-all;
+  margin: 0 0 1rem;
+}
+
+.account-totp-label {
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.account-totp-label span {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.35rem;
+}
+
+.account-totp-label input {
+  width: 100%;
+  max-width: 280px;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.account-totp-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.account-totp-btn {
+  padding: 0.45rem 0.9rem;
+  font-size: 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.account-totp-btn.primary {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+.account-totp-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.account-totp-msg {
+  margin-top: 0.75rem;
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+}
