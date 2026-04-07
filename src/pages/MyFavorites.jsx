@@ -4,6 +4,7 @@ import { getCourseById, CATEGORIES } from '../data/courses'
 import { useLocale } from '../context/LocaleContext'
 import { getUi } from '../i18n/ui'
 import { getMembershipLevelLabel } from '../i18n/terms'
+import '../styles/membership-badge.css'
 import './MyFavorites.css'
 
 export default function MyFavorites() {

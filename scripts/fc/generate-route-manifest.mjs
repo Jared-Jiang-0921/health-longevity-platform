@@ -26,10 +26,16 @@ function walk(dir) {
 }
 
 function pathToRoutePattern(relApiPath) {
-  // relApiPath example: auth/login.js, org/[action].js
+  // relApiPath example: auth/login.js, org/[action].js, auth/[...path].js
   const noExt = relApiPath.replace(/\.js$/, '')
   const parts = noExt.split(path.sep).filter(Boolean)
+  let catchAll = false
   const segments = parts.map((p) => {
+    const restM = p.match(/^\[\.\.\.(.+)\]$/)
+    if (restM) {
+      catchAll = true
+      return `:${restM[1]}`
+    }
     const m = p.match(/^\[(.+)\]$/)
     if (m) return `:${m[1]}`
     return p
@@ -44,6 +50,7 @@ function pathToRoutePattern(relApiPath) {
     urlPath: '/api/' + segments.join('/'),
     segments,
     paramKeys,
+    catchAll,
   }
 }
 
@@ -53,7 +60,7 @@ async function main() {
   const routes = []
   for (const absFile of files) {
     const rel = path.relative(apiDir, absFile)
-    const { segments, paramKeys } = pathToRoutePattern(rel)
+    const { segments, paramKeys, catchAll } = pathToRoutePattern(rel)
 
     // backend-entry.mjs 在 fc/ 下，所以 api 文件相对路径是 ../api/...
     const moduleRel = path.join('..', 'api', rel).replace(/\\/g, '/')
@@ -62,6 +69,7 @@ async function main() {
       // 运行时用于 matchRoute 的段落结构
       segments,
       paramKeys,
+      catchAll,
       modulePath: moduleRel,
       sourceFile: path.join('api', rel),
     })

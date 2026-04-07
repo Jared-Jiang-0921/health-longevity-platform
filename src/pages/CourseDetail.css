@@ -43,6 +43,13 @@
   margin: 0 0 0.5rem;
 }
 
+.course-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
 .course-desc {
   color: var(--color-text-muted);
   margin: 0;

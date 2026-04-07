@@ -6,6 +6,7 @@ import { useLocale } from '../context/LocaleContext'
 import { getUi } from '../i18n/ui'
 import { getMembershipLevelLabel } from '../i18n/terms'
 import { hasLevelAccess } from '../data/membership'
+import '../styles/membership-badge.css'
 import './CourseDetail.css'
 
 export default function CourseDetail() {
@@ -65,7 +66,12 @@ export default function CourseDetail() {
           <span className="course-duration">{course.duration}</span>
           <span className="course-level">{course.level}</span>
         </div>
-        <h1>{course.title}</h1>
+        <div className="course-title-row">
+          <h1>{course.title}</h1>
+          <span className={`membership-badge membership-${requiredMembership}`}>
+            {getMembershipLevelLabel(requiredMembership, lang)}
+          </span>
+        </div>
         <p className="course-desc">{course.desc}</p>
       </header>
 

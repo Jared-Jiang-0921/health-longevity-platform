@@ -42,12 +42,32 @@ async function loadManifest() {
   return manifestCache
 }
 
+function matchCatchAll(patternSegs, requestSegs) {
+  if (!patternSegs.length) return null
+  const last = patternSegs[patternSegs.length - 1]
+  if (!last.startsWith(':')) return null
+  const staticPrefix = patternSegs.slice(0, -1)
+  if (requestSegs.length < staticPrefix.length + 1) return null
+  for (let i = 0; i < staticPrefix.length; i += 1) {
+    if (staticPrefix[i] !== requestSegs[i]) return null
+  }
+  const rest = requestSegs.slice(staticPrefix.length)
+  const paramName = last.slice(1)
+  return { [paramName]: rest.join('/') }
+}
+
 function matchRoute(manifest, requestPath) {
   const p = String(requestPath || '').split('?')[0].replace(/\/+$/, '') || '/'
-  const segs = p.split('/').filter(Boolean)
+  let segs = p.split('/').filter(Boolean)
+  if (segs[0] === 'api') segs = segs.slice(1)
 
   for (const r of manifest.routes || []) {
     const routeSegs = r.segments || []
+    if (r.catchAll) {
+      const params = matchCatchAll(routeSegs, segs)
+      if (params) return { route: r, params }
+      continue
+    }
     if (routeSegs.length !== segs.length) continue
 
     const params = {}

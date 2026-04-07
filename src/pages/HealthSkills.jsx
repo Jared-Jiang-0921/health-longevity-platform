@@ -5,6 +5,7 @@ import { useFavorites } from '../hooks/useFavorites'
 import { useLocale } from '../context/LocaleContext'
 import { getUi } from '../i18n/ui'
 import { getMembershipLevelLabel } from '../i18n/terms'
+import '../styles/membership-badge.css'
 import './HealthSkills.css'
 
 export default function HealthSkills() {

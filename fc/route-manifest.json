@@ -3,54 +3,52 @@
   "routes": [
     {
       "segments": [
-        "airwallex",
-        "create-checkout-session"
+        "admin-health-questionnaires"
       ],
       "paramKeys": [],
-      "modulePath": "../api/airwallex/create-checkout-session.js",
-      "sourceFile": "api/airwallex/create-checkout-session.js"
+      "catchAll": false,
+      "modulePath": "../api/admin-health-questionnaires.js",
+      "sourceFile": "api/admin-health-questionnaires.js"
+    },
+    {
+      "segments": [
+        "admin-users"
+      ],
+      "paramKeys": [],
+      "catchAll": false,
+      "modulePath": "../api/admin-users.js",
+      "sourceFile": "api/admin-users.js"
     },
     {
       "segments": [
         "airwallex",
-        "webhook"
+        ":path"
       ],
-      "paramKeys": [],
-      "modulePath": "../api/airwallex/webhook.js",
-      "sourceFile": "api/airwallex/webhook.js"
+      "paramKeys": [
+        "path"
+      ],
+      "catchAll": true,
+      "modulePath": "../api/airwallex/[...path].js",
+      "sourceFile": "api/airwallex/[...path].js"
     },
     {
       "segments": [
         "auth",
-        "login"
+        ":path"
       ],
-      "paramKeys": [],
-      "modulePath": "../api/auth/login.js",
-      "sourceFile": "api/auth/login.js"
-    },
-    {
-      "segments": [
-        "auth",
-        "me"
+      "paramKeys": [
+        "path"
       ],
-      "paramKeys": [],
-      "modulePath": "../api/auth/me.js",
-      "sourceFile": "api/auth/me.js"
-    },
-    {
-      "segments": [
-        "auth",
-        "register"
-      ],
-      "paramKeys": [],
-      "modulePath": "../api/auth/register.js",
-      "sourceFile": "api/auth/register.js"
+      "catchAll": true,
+      "modulePath": "../api/auth/[...path].js",
+      "sourceFile": "api/auth/[...path].js"
     },
     {
       "segments": [
         "confirm-checkout-session"
       ],
       "paramKeys": [],
+      "catchAll": false,
       "modulePath": "../api/confirm-checkout-session.js",
       "sourceFile": "api/confirm-checkout-session.js"
     },
@@ -59,6 +57,7 @@
         "create-checkout-session"
       ],
       "paramKeys": [],
+      "catchAll": false,
       "modulePath": "../api/create-checkout-session.js",
       "sourceFile": "api/create-checkout-session.js"
     },
@@ -67,14 +66,25 @@
         "create-payment-intent"
       ],
       "paramKeys": [],
+      "catchAll": false,
       "modulePath": "../api/create-payment-intent.js",
       "sourceFile": "api/create-payment-intent.js"
+    },
+    {
+      "segments": [
+        "health-questionnaire"
+      ],
+      "paramKeys": [],
+      "catchAll": false,
+      "modulePath": "../api/health-questionnaire.js",
+      "sourceFile": "api/health-questionnaire.js"
     },
     {
       "segments": [
         "init-db"
       ],
       "paramKeys": [],
+      "catchAll": false,
       "modulePath": "../api/init-db.js",
       "sourceFile": "api/init-db.js"
     },
@@ -86,6 +96,7 @@
       "paramKeys": [
         "action"
       ],
+      "catchAll": false,
       "modulePath": "../api/org/[action].js",
       "sourceFile": "api/org/[action].js"
     },
@@ -94,6 +105,7 @@
         "payment-event-logs"
       ],
       "paramKeys": [],
+      "catchAll": false,
       "modulePath": "../api/payment-event-logs.js",
       "sourceFile": "api/payment-event-logs.js"
     },
@@ -102,6 +114,7 @@
         "stripe-webhook"
       ],
       "paramKeys": [],
+      "catchAll": false,
       "modulePath": "../api/stripe-webhook.js",
       "sourceFile": "api/stripe-webhook.js"
     }

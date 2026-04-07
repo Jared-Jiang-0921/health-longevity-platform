@@ -33,18 +33,39 @@ function matchSegments(patternSegs, requestSegs) {
   return params
 }
 
+/** 匹配末尾为 :param 的 catch-all（如 api/auth/[...path].js → ['auth', ':path']） */
+function matchCatchAll(patternSegs, requestSegs) {
+  if (!patternSegs.length) return null
+  const last = patternSegs[patternSegs.length - 1]
+  if (!last.startsWith(':')) return null
+  const staticPrefix = patternSegs.slice(0, -1)
+  if (requestSegs.length < staticPrefix.length + 1) return null
+  for (let i = 0; i < staticPrefix.length; i += 1) {
+    if (staticPrefix[i] !== requestSegs[i]) return null
+  }
+  const rest = requestSegs.slice(staticPrefix.length)
+  const paramName = last.slice(1)
+  return { [paramName]: rest.join('/') }
+}
+
 function routeFromApiFile(relApiPath) {
-  // relApiPath: org/[action].js
+  // relApiPath: org/[action].js 或 auth/[...path].js
   const noExt = relApiPath.replace(/\.js$/, '')
   const parts = noExt.split(path.sep).filter(Boolean)
+  let catchAll = false
   const segments = parts.map((p) => {
+    const restM = p.match(/^\[\.\.\.(.+)\]$/)
+    if (restM) {
+      catchAll = true
+      return `:${restM[1]}`
+    }
     const m = p.match(/^\[(.+)\]$/)
     return m ? `:${m[1]}` : p
   })
 
   const paramKeys = segments.filter((s) => s.startsWith(':')).map((s) => s.slice(1))
 
-  return { segments, paramKeys }
+  return { segments, paramKeys, catchAll }
 }
 
 async function walkJsFiles(dir) {
@@ -65,12 +86,13 @@ async function buildRouteTable(apiDirAbs) {
   const routes = []
   for (const absFile of files) {
     const rel = path.relative(apiDirAbsNorm, absFile)
-    const { segments, paramKeys } = routeFromApiFile(rel)
+    const { segments, paramKeys, catchAll } = routeFromApiFile(rel)
     // 请求路径：/api/<segments...>
     // 所以 pattern segments 不含 api 前缀
     routes.push({
       segments,
       paramKeys,
+      catchAll,
       absFile,
     })
   }
@@ -142,7 +164,9 @@ const server = http.createServer(async (req, res) => {
     let matched = null
     let params = null
     for (const r of routeTable) {
-      params = matchSegments(r.segments, requestSegments)
+      params = r.catchAll
+        ? matchCatchAll(r.segments, requestSegments)
+        : matchSegments(r.segments, requestSegments)
       if (params) {
         matched = r
         break
