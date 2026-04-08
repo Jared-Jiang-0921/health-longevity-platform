@@ -67,6 +67,14 @@ export default function Layout({ children }) {
           <Link to="/" className="logo">
             {SITE_LEGAL.brandName}
           </Link>
+          <label className="header-lang">
+            <span>{t.language}</span>
+            <select value={lang} onChange={(e) => setLang(e.target.value)} aria-label={t.language}>
+              <option value="zh">简体中文</option>
+              <option value="en">English</option>
+              <option value="ar">العربية</option>
+            </select>
+          </label>
           <nav className="nav">
             {visibleNavItems.map(({ path, label }) => {
             const active = location.pathname === path || (path !== '/' && path !== '/favorites' && location.pathname.startsWith(path))
@@ -81,14 +89,6 @@ export default function Layout({ children }) {
             )
             })}
             <span className="nav-auth">
-              <label className="nav-lang">
-                <span>{t.language}</span>
-                <select value={lang} onChange={(e) => setLang(e.target.value)} aria-label={t.language}>
-                  <option value="zh">简体中文</option>
-                  <option value="en">English</option>
-                  <option value="ar">العربية</option>
-                </select>
-              </label>
               {user ? (
                 <>
                   <span className="nav-user">{user.name}（{getMembershipLevelLabel(user.level, lang)}）</span>
@@ -108,6 +108,14 @@ export default function Layout({ children }) {
       <main className="main">{children}</main>
       <footer className="site-footer">
         <div className="footer-inner">
+          <label className="footer-lang">
+            <span>{t.language}</span>
+            <select value={lang} onChange={(e) => setLang(e.target.value)} aria-label={t.language}>
+              <option value="zh">简体中文</option>
+              <option value="en">English</option>
+              <option value="ar">العربية</option>
+            </select>
+          </label>
           <p className="footer-copy">© {SITE_LEGAL.brandName}. {t.footerCopy}</p>
           <nav className="footer-legal" aria-label={t.legalAria}>
             <Link to="/terms">Terms of Service</Link>
