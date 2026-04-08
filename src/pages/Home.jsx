@@ -49,7 +49,7 @@ const modules = [
 ]
 
 export default function Home() {
-  const { lang } = useLocale()
+  const { lang, setLang } = useLocale()
   const ui = getUi(lang)
   const t = {
     zh: { tagline: '长寿知识技能 · 综合长寿方案 · 循证健康产品 · 前沿医学资讯', welcome: '欢迎', modules: '服务模块', guestHint: '点击查看需注册', need: '需', upgrade: '升级会员', andAbove: '及以上' },
@@ -66,6 +66,19 @@ export default function Home() {
         <div className="hero-content">
           <h1>{SITE_LEGAL.brandName}</h1>
           <p className="tagline">{t.tagline}</p>
+          <div className="hero-lang" role="group" aria-label={ui.language}>
+            <span className="hero-lang-label">{ui.language}</span>
+            <select
+              className="hero-lang-select"
+              value={lang}
+              onChange={(e) => setLang(e.target.value)}
+              aria-label={ui.language}
+            >
+              <option value="zh">简体中文</option>
+              <option value="en">English</option>
+              <option value="ar">العربية</option>
+            </select>
+          </div>
           <div className="hero-auth">
             {user ? (
               <span className="hero-user">{t.welcome}，{user.name}（{getMembershipLevelLabel(user.level, lang)}）</span>

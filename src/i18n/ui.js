@@ -16,6 +16,7 @@ const UI = {
     learn: '学习',
     noData: '暂无数据',
     notFound: '未找到',
+    language: '语言',
   },
   en: {
     loading: 'Loading…',
@@ -34,6 +35,7 @@ const UI = {
     learn: 'Learn',
     noData: 'No data',
     notFound: 'Not found',
+    language: 'Language',
   },
   ar: {
     loading: 'جار التحميل…',
@@ -52,6 +54,7 @@ const UI = {
     learn: 'تعلم',
     noData: 'لا توجد بيانات',
     notFound: 'غير موجود',
+    language: 'اللغة',
   },
 }
 
