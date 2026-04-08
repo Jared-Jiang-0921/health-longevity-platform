@@ -62,6 +62,14 @@ export default function Layout({ children }) {
 
   return (
     <>
+      <div className="floating-lang" role="group" aria-label={t.language}>
+        <span>{t.language}</span>
+        <select value={lang} onChange={(e) => setLang(e.target.value)} aria-label={t.language}>
+          <option value="zh">简体中文</option>
+          <option value="en">English</option>
+          <option value="ar">العربية</option>
+        </select>
+      </div>
       <header className="site-header">
         <div className="header-inner">
           <Link to="/" className="logo">
