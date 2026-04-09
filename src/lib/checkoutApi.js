@@ -7,7 +7,7 @@ export const CHECKOUT_API =
     : '/api/create-checkout-session')
 
 export function getProviderDisplayName(provider) {
-  return provider === 'airwallex' ? '空中云汇（骨架联调）' : 'Stripe（生产可用）'
+  return provider === 'airwallex' ? '空中云汇（生产接入）' : 'Stripe（生产可用）'
 }
 
 export { PAYMENT_PROVIDER }
