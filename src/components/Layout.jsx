@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
-import { MEMBERSHIP_LEVELS, canAccess } from '../data/membership'
+import { canAccess } from '../data/membership'
 import { getMembershipLevelLabel } from '../i18n/terms'
 import { SITE_LEGAL } from '../data/siteLegal'
 import CookieConsentBanner from './CookieConsentBanner'
@@ -17,10 +17,10 @@ const navItems = [
   { path: '/translation-opportunities', label: { zh: '转化应用机遇', en: 'Translation Opportunities', ar: 'فرص التطبيق' } },
   { path: '/favorites', label: { zh: '我的收藏', en: 'Favorites', ar: 'المفضلة' } },
   { path: '/payment', label: { zh: '支付结算', en: 'Payment', ar: 'الدفع' } },
-  { path: '/ops/payment-monitor', label: { zh: '支付巡检', en: 'Payment Monitor', ar: 'مراقبة الدفع' }, authOnly: true },
-  { path: '/ops/users', label: { zh: '用户管理', en: 'Users Admin', ar: 'إدارة المستخدمين' }, authOnly: true },
-  { path: '/ops/health-questionnaires', label: { zh: '问卷记录', en: 'Questionnaires', ar: 'سجلات الاستبيان' }, authOnly: true },
-  { path: '/org', label: { zh: '企业管理', en: 'Organization', ar: 'المؤسسة' }, authOnly: true },
+  { path: '/ops/payment-monitor', label: { zh: '支付巡检', en: 'Payment Monitor', ar: 'مراقبة الدفع' }, authOnly: true, siteAdminOnly: true },
+  { path: '/ops/users', label: { zh: '用户管理', en: 'Users Admin', ar: 'إدارة المستخدمين' }, authOnly: true, siteAdminOnly: true },
+  { path: '/ops/health-questionnaires', label: { zh: '问卷记录', en: 'Questionnaires', ar: 'سجلات الاستبيان' }, authOnly: true, siteAdminOnly: true },
+  { path: '/org', label: { zh: '企业管理', en: 'Organization', ar: 'المؤسسة' }, authOnly: true, siteAdminOnly: true },
   { path: '/account', label: { zh: '会员信息', en: 'Account', ar: 'الحساب' }, authOnly: true },
 ]
 
@@ -56,9 +56,11 @@ export default function Layout({ children }) {
   const { user, logout } = useAuth()
   const { lang, setLang } = useLocale()
   const t = I18N[lang] || I18N.zh
-  const visibleNavItems = navItems.filter(
-    (item) => (!item.authOnly || user) && canAccess(item.path, user?.level),
-  )
+  const visibleNavItems = navItems.filter((item) => {
+    if (item.siteAdminOnly && !user?.site_admin) return false
+    if (item.authOnly && !user) return false
+    return canAccess(item.path, user?.level)
+  })
 
   return (
     <>
@@ -75,14 +77,6 @@ export default function Layout({ children }) {
           <Link to="/" className="logo">
             {SITE_LEGAL.brandName}
           </Link>
-          <label className="header-lang">
-            <span>{t.language}</span>
-            <select value={lang} onChange={(e) => setLang(e.target.value)} aria-label={t.language}>
-              <option value="zh">简体中文</option>
-              <option value="en">English</option>
-              <option value="ar">العربية</option>
-            </select>
-          </label>
           <nav className="nav">
             {visibleNavItems.map(({ path, label }) => {
             const active = location.pathname === path || (path !== '/' && path !== '/favorites' && location.pathname.startsWith(path))
@@ -116,14 +110,6 @@ export default function Layout({ children }) {
       <main className="main">{children}</main>
       <footer className="site-footer">
         <div className="footer-inner">
-          <label className="footer-lang">
-            <span>{t.language}</span>
-            <select value={lang} onChange={(e) => setLang(e.target.value)} aria-label={t.language}>
-              <option value="zh">简体中文</option>
-              <option value="en">English</option>
-              <option value="ar">العربية</option>
-            </select>
-          </label>
           <p className="footer-copy">© {SITE_LEGAL.brandName}. {t.footerCopy}</p>
           <nav className="footer-legal" aria-label={t.legalAria}>
             <Link to="/terms">Terms of Service</Link>

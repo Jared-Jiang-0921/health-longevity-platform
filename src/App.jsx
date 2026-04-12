@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout'
 import ProtectedModule from './components/ProtectedModule'
+import SiteAdminOnly from './components/SiteAdminOnly'
 import Home from './pages/Home'
 import HealthSkills from './pages/HealthSkills'
 import CourseDetail from './pages/CourseDetail'
@@ -55,11 +56,11 @@ export default function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/payment" element={<Payment />} />
         <Route path="/payment/success" element={<PaymentSuccess />} />
-        <Route path="/ops/payment-monitor" element={<ProtectedModule><PaymentOpsMonitor /></ProtectedModule>} />
-        <Route path="/ops/users" element={<ProtectedModule><AdminUsers /></ProtectedModule>} />
-        <Route path="/ops/health-questionnaires" element={<ProtectedModule><AdminQuestionnaires /></ProtectedModule>} />
+        <Route path="/ops/payment-monitor" element={<SiteAdminOnly><PaymentOpsMonitor /></SiteAdminOnly>} />
+        <Route path="/ops/users" element={<SiteAdminOnly><AdminUsers /></SiteAdminOnly>} />
+        <Route path="/ops/health-questionnaires" element={<SiteAdminOnly><AdminQuestionnaires /></SiteAdminOnly>} />
         <Route path="/account" element={<Account />} />
-        <Route path="/org" element={<ProtectedModule><OrgConsole /></ProtectedModule>} />
+        <Route path="/org" element={<SiteAdminOnly><OrgConsole /></SiteAdminOnly>} />
         <Route path="/org/invite/accept" element={<ProtectedModule><OrgInviteAccept /></ProtectedModule>} />
         <Route path="/tax" element={<Tax />} />
         <Route path="/terms" element={<LegalTerms />} />
