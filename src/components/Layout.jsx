@@ -64,19 +64,21 @@ export default function Layout({ children }) {
 
   return (
     <>
-      <div className="floating-lang" role="group" aria-label={t.language}>
-        <span>{t.language}</span>
-        <select value={lang} onChange={(e) => setLang(e.target.value)} aria-label={t.language}>
-          <option value="zh">简体中文</option>
-          <option value="en">English</option>
-          <option value="ar">العربية</option>
-        </select>
-      </div>
       <header className="site-header">
         <div className="header-inner">
-          <Link to="/" className="logo">
-            {SITE_LEGAL.brandName}
-          </Link>
+          <div className="header-top">
+            <Link to="/" className="logo">
+              {SITE_LEGAL.brandName}
+            </Link>
+            <div className="header-lang" role="group" aria-label={t.language}>
+              <span className="header-lang-label">{t.language}</span>
+              <select value={lang} onChange={(e) => setLang(e.target.value)} aria-label={t.language}>
+                <option value="zh">简体中文</option>
+                <option value="en">English</option>
+                <option value="ar">العربية</option>
+              </select>
+            </div>
+          </div>
           <nav className="nav">
             {visibleNavItems.map(({ path, label }) => {
             const active = location.pathname === path || (path !== '/' && path !== '/favorites' && location.pathname.startsWith(path))
