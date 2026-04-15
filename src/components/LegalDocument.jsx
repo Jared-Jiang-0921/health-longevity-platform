@@ -1,10 +1,11 @@
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import { useLocale } from '../context/LocaleContext'
 import { LEGAL_META_I18N, normalizeLegalLang } from '../data/legalDocumentsI18n'
 import '../pages/LegalPages.css'
 
-export default function LegalDocument({ doc, basePath }) {
-  const [searchParams] = useSearchParams()
-  const lang = normalizeLegalLang(searchParams.get('lang'))
+export default function LegalDocument({ doc }) {
+  const { lang: currentLang } = useLocale()
+  const lang = normalizeLegalLang(currentLang)
   const bundle = doc[lang] || doc.en
   const meta = LEGAL_META_I18N[lang] || LEGAL_META_I18N.en
   const isRtl = lang === 'ar'
@@ -15,23 +16,6 @@ export default function LegalDocument({ doc, basePath }) {
       dir={isRtl ? 'rtl' : 'ltr'}
       lang={lang === 'zh' ? 'zh-Hans' : lang === 'ar' ? 'ar' : 'en'}
     >
-      <nav className="legal-lang-nav" aria-label="Language">
-        <span className="legal-lang-label">
-          {lang === 'zh' ? '语言' : lang === 'ar' ? 'اللغة' : 'Language'}:
-        </span>
-        <Link to={`${basePath}?lang=en`} className={lang === 'en' ? 'active' : ''}>
-          English
-        </Link>
-        <span className="footer-sep">·</span>
-        <Link to={`${basePath}?lang=zh`} className={lang === 'zh' ? 'active' : ''}>
-          简体中文
-        </Link>
-        <span className="footer-sep">·</span>
-        <Link to={`${basePath}?lang=ar`} className={lang === 'ar' ? 'active' : ''}>
-          العربية
-        </Link>
-      </nav>
-
       <p className="legal-meta">
         {lang === 'zh' ? '最后更新：' : lang === 'ar' ? 'آخر تحديث: ' : 'Last updated: '}
         {meta.lastUpdated}

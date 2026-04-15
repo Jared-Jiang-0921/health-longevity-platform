@@ -12,38 +12,62 @@ import './Home.css'
 const modules = [
   {
     path: '/health-skills',
-    title: '长寿知识技能',
-    desc: '系统化健康知识与技能课程',
+    title: { zh: '长寿知识技能', en: 'Health Skills', ar: 'مهارات طول العمر' },
+    desc: {
+      zh: '系统化健康知识与技能课程',
+      en: 'Structured courses for health and longevity knowledge.',
+      ar: 'دورات منهجية في المعرفة والمهارات الصحية وطول العمر.',
+    },
     image: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&q=80',
   },
   {
     path: '/solutions',
-    title: '综合长寿方案',
-    desc: '个性化健康管理与长寿方案',
+    title: { zh: '综合长寿方案', en: 'Integrated Longevity Solutions', ar: 'حلول متكاملة لطول العمر' },
+    desc: {
+      zh: '个性化健康管理与长寿方案',
+      en: 'Personalized health management and longevity plans.',
+      ar: 'خطط مخصصة لإدارة الصحة وتعزيز طول العمر.',
+    },
     image: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=400&q=80',
   },
   {
     path: '/products',
-    title: '循证健康产品',
-    desc: '精选循证健康产品与用品',
+    title: { zh: '循证健康产品', en: 'Evidence-Based Products', ar: 'منتجات صحية مبنية على الدليل' },
+    desc: {
+      zh: '精选循证健康产品与用品',
+      en: 'Curated evidence-based health products and supplies.',
+      ar: 'منتجات ومستلزمات صحية منتقاة وفق الأدلة العلمية.',
+    },
     image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&q=80',
   },
   {
     path: '/longevity-news',
-    title: '前沿长寿医学资讯',
-    desc: '国际权威期刊高影响因子健康长寿研究月更',
+    title: { zh: '前沿长寿医学资讯', en: 'Longevity Medical Insights', ar: 'مستجدات الطب المتعلق بطول العمر' },
+    desc: {
+      zh: '国际权威期刊高影响因子健康长寿研究月更',
+      en: 'Monthly highlights of high-impact longevity studies.',
+      ar: 'تحديثات شهرية لأبحاث طول العمر من دوريات علمية رفيعة التأثير.',
+    },
     image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&q=80',
   },
   {
     path: '/translation-opportunities',
-    title: '转化应用机遇',
-    desc: '筛选前沿研究可转化项目，助力商业落地，弥合科研与应用鸿沟',
+    title: { zh: '转化应用机遇', en: 'Translation Opportunities', ar: 'فرص التحويل والتطبيق' },
+    desc: {
+      zh: '筛选前沿研究可转化项目，助力商业落地，弥合科研与应用鸿沟',
+      en: 'Identify translational projects to bridge research and real-world application.',
+      ar: 'فرص لمشروعات قابلة للتحويل تسد الفجوة بين البحث والتطبيق العملي.',
+    },
     image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&q=80',
   },
   {
     path: '/tcm-prevention',
-    title: '中医药特色 · 治未病',
-    desc: '中草药单药与经典治未病处方：药性、功效、适宜人群、出处',
+    title: { zh: '中医药特色 · 治未病', en: 'TCM Prevention', ar: 'الوقاية بالطب الصيني التقليدي' },
+    desc: {
+      zh: '中草药单药与经典治未病处方：药性、功效、适宜人群、出处',
+      en: 'Traditional Chinese medicine prevention with herbs, formulas, and use cases.',
+      ar: 'الوقاية بالطب الصيني التقليدي عبر الأعشاب والوصفات والاستخدامات المناسبة.',
+    },
     image: 'https://images.pexels.com/photos/2064359/pexels-photo-2064359.jpeg?auto=compress&cs=tinysrgb&w=400',
   },
 ]
@@ -85,6 +109,8 @@ export default function Home() {
             const allowed = canAccess(path, user?.level)
             const requiredLevel = getRequiredLevel(path)
             const requiredName = requiredLevel ? getMembershipLevelLabel(requiredLevel, lang) : null
+            const moduleTitle = title[lang] || title.zh
+            const moduleDesc = desc[lang] || desc.zh
 
             if (!user) {
               return (
@@ -98,8 +124,8 @@ export default function Home() {
                 >
                   <div className="module-card-image" style={{ backgroundImage: `url(${image})` }} />
                   <div className="module-card-body">
-                    <h3>{title}</h3>
-                    <p>{desc}</p>
+                    <h3>{moduleTitle}</h3>
+                    <p>{moduleDesc}</p>
                     <p className="module-guest-hint">{t.guestHint}</p>
                   </div>
                 </div>
@@ -110,8 +136,8 @@ export default function Home() {
                 <Link key={path} to={path} className="module-card">
                   <div className="module-card-image" style={{ backgroundImage: `url(${image})` }} />
                   <div className="module-card-body">
-                    <h3>{title}</h3>
-                    <p>{desc}</p>
+                    <h3>{moduleTitle}</h3>
+                    <p>{moduleDesc}</p>
                   </div>
                 </Link>
               )
@@ -120,8 +146,8 @@ export default function Home() {
               <div key={path} className="module-card module-card-locked">
                 <div className="module-card-image" style={{ backgroundImage: `url(${image})` }} />
                 <div className="module-card-body">
-                  <h3>{title}</h3>
-                  <p>{desc}</p>
+                  <h3>{moduleTitle}</h3>
+                  <p>{moduleDesc}</p>
                   <p className="module-lock">{t.need}{requiredName}{t.andAbove}</p>
                   <Link to="/payment" className="btn-upgrade">{t.upgrade}</Link>
                 </div>
