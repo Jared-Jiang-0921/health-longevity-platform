@@ -47,10 +47,21 @@ export function AuthProvider({ children }) {
 
   async function parseJsonRes(res) {
     const text = await res.text()
+    const trimmed = text.trim()
+    const status = res.status
+    if (!trimmed) {
+      throw new Error(
+        `服务器返回空响应（HTTP ${status}）。请确认本机 API 进程已运行，且 Nginx 将 /api 反代到 Node（如 127.0.0.1:3000）。可在服务器执行 curl -sS http://127.0.0.1:3000/api/health`,
+      )
+    }
     try {
-      return JSON.parse(text)
+      return JSON.parse(trimmed)
     } catch {
-      throw new Error('服务器返回异常（可能未部署 API 或路径错误）')
+      const looksLikeHtml = trimmed.startsWith('<!') || trimmed.startsWith('<html')
+      const detail = looksLikeHtml
+        ? '当前返回了 HTML 页面（常见于 /api 被当成静态页、未反代、或 502/504 错误页），请检查 Nginx 的 location /api/ 与 healthlongevity-api 服务。'
+        : '响应体不是合法 JSON。'
+      throw new Error(`服务器返回异常（HTTP ${status}）。${detail}`)
     }
   }
 
