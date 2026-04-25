@@ -28,15 +28,16 @@ function getSubcategoryOptions(moduleKey) {
   const map = {
     'health-skills': courseCategories,
     products: productCategories,
-    'longevity-news': ['研究论文', '专家解读', '行业动态', '数据图表'],
-    'tcm-prevention': ['中药单药', '经典方剂', '体质调理', '实践案例'],
-    'translation-opportunities': ['可转化项目', '商业模型', '合作机会', '投研资料'],
-    solutions: ['评估工具', '干预方案', '随访模板', '案例库'],
-    'health-questionnaire': ['问卷模板', '说明文档', '案例解读', '结果报告'],
-    favorites: ['收藏夹导读', '重点资源', '复习清单'],
-    payment: ['会员说明', '支付指引', '账单示例'],
-    account: ['账号安全', '使用指南', '常见问题'],
-    tax: ['税务说明', '政策文档', '申报模板'],
+    // 与页面现有结构/文案尽量一一对应
+    'longevity-news': ['Nature Medicine', 'Cell', 'Lancet Healthy Longevity', 'Science', 'Aging Cell', 'Nature Aging'],
+    'tcm-prevention': ['中草药单药', '经典处方'],
+    'translation-opportunities': ['可转化项目', '商业模型', '合作机会', '投研资料', '政策与合规'],
+    solutions: ['专业健康长寿咨询', '自我健康促进咨询', '内容资源', '健康问卷与评估'],
+    'health-questionnaire': ['基础信息', '健康目标与关注', '病史与用药', '生活方式', '法律同意'],
+    favorites: ['长寿知识技能收藏', '产品收藏', '资讯收藏', '精选推荐'],
+    payment: ['会员套餐', '支付指引', '账单与发票', '退款与售后'],
+    account: ['账号资料', '安全设置', '双因素认证', '登录与设备'],
+    tax: ['税务说明', '税率规则', '申报模板', '地区政策'],
   }
   return map[moduleKey] || ['通用资料', '教程', '案例', '下载文件']
 }
