@@ -117,16 +117,11 @@ export default function ModuleAssetsPanel({ moduleKey }) {
   const subcategoryOptions = useMemo(() => getSubcategoryOptions(moduleKey), [moduleKey])
   const subtopicOptions = useMemo(() => getSubtopicOptions(moduleKey, subcategory), [moduleKey, subcategory])
   const editSubtopicOptions = useMemo(() => getSubtopicOptions(moduleKey, editForm.subcategory), [moduleKey, editForm.subcategory])
-  const groupedItems = useMemo(() => {
-    const buckets = new Map()
-    subcategoryOptions.forEach((opt) => buckets.set(opt, []))
-    items.forEach((item) => {
-      const key = String(item.subcategory || '').trim() || 'general'
-      if (!buckets.has(key)) buckets.set(key, [])
-      buckets.get(key).push(item)
-    })
-    return Array.from(buckets.entries()).filter(([, list]) => list.length)
-  }, [items, subcategoryOptions])
+  const availableSubcategories = useMemo(() => {
+    const normalizedPreset = subcategoryOptions.map((opt) => normalizeSubcategoryValue(moduleKey, opt))
+    const fromItems = items.map((item) => normalizeSubcategoryValue(moduleKey, item.subcategory))
+    return Array.from(new Set([...normalizedPreset, ...fromItems])).filter(Boolean)
+  }, [items, moduleKey, subcategoryOptions])
   const latestItem = items[0] || null
   const routeBinding = useMemo(() => {
     if (moduleKey !== 'health-skills') return null
@@ -329,19 +324,19 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       setActiveSubtopic(routeBinding.subtopic || '')
       return
     }
-    if (groupedItems.length) {
-      const exists = groupedItems.some(([name]) => name === activeSubcategory)
+    if (availableSubcategories.length) {
+      const exists = availableSubcategories.includes(activeSubcategory)
       if (!exists) {
         const latestSubcategory = normalizeSubcategoryValue(moduleKey, latestItem?.subcategory)
-        const preferred = groupedItems.find(([name]) => name === latestSubcategory)?.[0]
-        setActiveSubcategory(preferred || groupedItems[0][0])
+        const preferred = availableSubcategories.includes(latestSubcategory) ? latestSubcategory : ''
+        setActiveSubcategory(preferred || availableSubcategories[0])
         setActiveSubtopic('')
       }
     } else {
       setActiveSubcategory('')
       setActiveSubtopic('')
     }
-  }, [groupedItems, activeSubcategory, latestItem, moduleKey])
+  }, [availableSubcategories, activeSubcategory, latestItem, moduleKey, routeBinding])
 
   useEffect(() => {
     if (routeBinding?.subtopic) {
@@ -526,12 +521,12 @@ export default function ModuleAssetsPanel({ moduleKey }) {
         </p>
       ) : null}
       {!loading && !items.length ? <p className="module-assets-muted">{t.empty}</p> : null}
-      {groupedItems.length ? (
+      {availableSubcategories.length ? (
         <>
           <section className="module-assets-subtabs">
             <p className="module-assets-muted">{t.subcategoryContent}</p>
             <div className="module-assets-subtabs-row">
-              {groupedItems.map(([groupName]) => (
+              {availableSubcategories.map((groupName) => (
                 <button
                   key={groupName}
                   type="button"
