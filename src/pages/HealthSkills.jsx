@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { CATEGORIES, COURSES } from '../data/courses'
 import { useFavorites } from '../hooks/useFavorites'
@@ -23,6 +23,17 @@ export default function HealthSkills() {
     activeCategory === 'all'
       ? COURSES
       : COURSES.filter((c) => c.category === activeCategory)
+
+  useEffect(() => {
+    const selected = CATEGORIES.find((c) => c.id === activeCategory)
+    window.dispatchEvent(new CustomEvent('module-category-change', {
+      detail: {
+        moduleKey: 'health-skills',
+        categoryId: activeCategory,
+        categoryLabel: selected?.label || '',
+      },
+    }))
+  }, [activeCategory])
 
   return (
     <div className="page-health-skills">

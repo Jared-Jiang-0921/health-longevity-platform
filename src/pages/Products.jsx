@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PRODUCT_CATEGORIES, PRODUCTS } from '../data/products'
 import { useLocale } from '../context/LocaleContext'
@@ -19,6 +19,17 @@ export default function Products() {
     activeCategory === 'all'
       ? PRODUCTS
       : PRODUCTS.filter((p) => p.category === activeCategory)
+
+  useEffect(() => {
+    const selected = PRODUCT_CATEGORIES.find((c) => c.id === activeCategory)
+    window.dispatchEvent(new CustomEvent('module-category-change', {
+      detail: {
+        moduleKey: 'products',
+        categoryId: activeCategory,
+        categoryLabel: selected?.label || '',
+      },
+    }))
+  }, [activeCategory])
 
   return (
     <div className="page-products">

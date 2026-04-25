@@ -57,6 +57,21 @@ function normalizeSubcategoryValue(moduleKey, rawValue) {
   return value
 }
 
+function resolveLinkedSubcategory(moduleKey, payload, options) {
+  if (!payload) return ''
+  const rawId = String(payload.categoryId || '').trim()
+  const rawLabel = String(payload.categoryLabel || '').trim()
+  if (rawId === 'all' || rawLabel === '全部') return ''
+
+  const normalizedByLabel = normalizeSubcategoryValue(moduleKey, rawLabel)
+  if (normalizedByLabel && options.includes(normalizedByLabel)) return normalizedByLabel
+
+  const normalizedById = normalizeSubcategoryValue(moduleKey, rawId)
+  if (normalizedById && options.includes(normalizedById)) return normalizedById
+
+  return ''
+}
+
 export default function ModuleAssetsPanel({ moduleKey }) {
   const { user, getToken } = useAuth()
   const { lang } = useLocale()
@@ -74,6 +89,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
   const [editingId, setEditingId] = useState('')
   const [editForm, setEditForm] = useState({ title: '', summary: '', subcategory: 'general', requiredLevel: 'free' })
   const [savedItemId, setSavedItemId] = useState('')
+  const [activeSubcategory, setActiveSubcategory] = useState('')
   const isAdmin = Boolean(user?.site_admin)
   const subcategoryOptions = useMemo(() => getSubcategoryOptions(moduleKey), [moduleKey])
   const groupedItems = useMemo(() => {
@@ -86,6 +102,11 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     })
     return Array.from(buckets.entries()).filter(([, list]) => list.length)
   }, [items, subcategoryOptions])
+  const visibleItems = useMemo(() => {
+    if (!activeSubcategory) return []
+    const hit = groupedItems.find(([name]) => name === activeSubcategory)
+    return hit ? hit[1] : []
+  }, [activeSubcategory, groupedItems])
   const t = useMemo(() => ({
     zh: {
       section: '模块资料',
@@ -112,6 +133,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       uploadFail: '上传失败',
       invalid: '请填写标题并选择文件（支持图片/音频/视频/PDF/Word/Excel/PPT/TXT，<=50MB）',
       uncategorized: '未分类',
+      subcategoryContent: '按亚类查看资料',
     },
     en: {
       section: 'Module Assets',
@@ -138,6 +160,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       uploadFail: 'Upload failed',
       invalid: 'Please provide title and file (image/audio/video/PDF/Word/Excel/PPT/TXT, <=50MB).',
       uncategorized: 'Uncategorized',
+      subcategoryContent: 'Browse by subcategory',
     },
     ar: {
       section: 'ملفات الوحدة',
@@ -164,6 +187,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       uploadFail: 'فشل الرفع',
       invalid: 'يرجى إدخال عنوان واختيار ملف (صور/صوت/فيديو/PDF/Word/Excel/PPT/TXT حتى 50MB).',
       uncategorized: 'غير مصنف',
+      subcategoryContent: 'تصفح حسب التصنيف الفرعي',
     },
   }[lang] || {}), [lang])
 
@@ -196,6 +220,27 @@ export default function ModuleAssetsPanel({ moduleKey }) {
   useEffect(() => {
     setSubcategory(subcategoryOptions[0] || 'general')
   }, [subcategoryOptions])
+
+  useEffect(() => {
+    if (groupedItems.length) {
+      const exists = groupedItems.some(([name]) => name === activeSubcategory)
+      if (!exists) setActiveSubcategory(groupedItems[0][0])
+    } else {
+      setActiveSubcategory('')
+    }
+  }, [groupedItems, activeSubcategory])
+
+  useEffect(() => {
+    function onLinkedCategoryChange(event) {
+      const detail = event?.detail || {}
+      if (detail.moduleKey !== moduleKey) return
+      const next = resolveLinkedSubcategory(moduleKey, detail, subcategoryOptions)
+      if (!next) return
+      setActiveSubcategory(next)
+    }
+    window.addEventListener('module-category-change', onLinkedCategoryChange)
+    return () => window.removeEventListener('module-category-change', onLinkedCategoryChange)
+  }, [moduleKey, subcategoryOptions])
 
   async function onSubmit(e) {
     e.preventDefault()
@@ -305,12 +350,24 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       {!loading && !items.length ? <p className="module-assets-muted">{t.empty}</p> : null}
       {groupedItems.length ? (
         <>
-          {groupedItems.map(([groupName, groupList]) => (
-            <div className="module-assets-group" key={groupName}>
-              <h4 className="module-assets-group-title">{groupName === 'general' ? t.uncategorized : groupName}</h4>
-              <ul className="module-assets-list">
-                {groupList.map((item) => (
-                  <li key={item.id}>
+          <section className="module-assets-subtabs">
+            <p className="module-assets-muted">{t.subcategoryContent}</p>
+            <div className="module-assets-subtabs-row">
+              {groupedItems.map(([groupName]) => (
+                <button
+                  key={groupName}
+                  type="button"
+                  className={`module-assets-subtab ${activeSubcategory === groupName ? 'active' : ''}`}
+                  onClick={() => setActiveSubcategory(groupName)}
+                >
+                  {groupName === 'general' ? t.uncategorized : groupName}
+                </button>
+              ))}
+            </div>
+          </section>
+          <ul className="module-assets-list">
+            {visibleItems.map((item) => (
+              <li key={item.id}>
               <div className="module-assets-head">
                 <strong>{item.title}</strong>
                 <span className="module-assets-size">{formatSize(item.file_size)}</span>
@@ -370,11 +427,9 @@ export default function ModuleAssetsPanel({ moduleKey }) {
                   {hint ? <p className="module-assets-hint">{hint}</p> : null}
                 </form>
               ) : null}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+              </li>
+            ))}
+          </ul>
         </>
       ) : null}
 
