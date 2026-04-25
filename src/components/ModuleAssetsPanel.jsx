@@ -42,6 +42,21 @@ function getSubcategoryOptions(moduleKey) {
   return map[moduleKey] || ['通用资料', '教程', '案例', '下载文件']
 }
 
+function normalizeSubcategoryValue(moduleKey, rawValue) {
+  const value = String(rawValue || '').trim()
+  if (!value) return 'general'
+
+  if (moduleKey === 'health-skills') {
+    const hit = CATEGORIES.find((c) => c.id === value || c.label === value)
+    return hit?.label || value
+  }
+  if (moduleKey === 'products') {
+    const hit = PRODUCT_CATEGORIES.find((c) => c.id === value || c.label === value)
+    return hit?.label || value
+  }
+  return value
+}
+
 export default function ModuleAssetsPanel({ moduleKey }) {
   const { user, getToken } = useAuth()
   const { lang } = useLocale()
@@ -159,7 +174,13 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       const res = await fetch(`/api/module-assets?module=${encodeURIComponent(moduleKey)}`)
       const data = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(data.error || 'load failed')
-      setItems(Array.isArray(data.items) ? data.items : [])
+      const normalized = Array.isArray(data.items)
+        ? data.items.map((item) => ({
+          ...item,
+          subcategory: normalizeSubcategoryValue(moduleKey, item.subcategory),
+        }))
+        : []
+      setItems(normalized)
     } catch (e) {
       setError(e.message || 'load failed')
     } finally {
@@ -234,7 +255,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     setEditForm({
       title: item.title || '',
       summary: item.summary || '',
-      subcategory: item.subcategory || subcategoryOptions[0] || 'general',
+      subcategory: normalizeSubcategoryValue(moduleKey, item.subcategory) || subcategoryOptions[0] || 'general',
       requiredLevel: item.required_level || 'free',
     })
   }
