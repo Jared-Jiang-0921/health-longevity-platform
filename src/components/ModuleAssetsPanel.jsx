@@ -315,7 +315,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       return
     }
     if (!activeSubtopicOptions.includes(activeSubtopic)) {
-      setActiveSubtopic('')
+      setActiveSubtopic(activeSubtopicOptions[0])
     }
   }, [activeSubtopicOptions, activeSubtopic])
 
