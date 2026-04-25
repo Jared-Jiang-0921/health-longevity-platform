@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
-import { CATEGORIES } from '../data/courses'
+import { CATEGORIES, COURSES } from '../data/courses'
 import { PRODUCT_CATEGORIES } from '../data/products'
 import './ModuleAssetsPanel.css'
 
@@ -72,6 +72,19 @@ function resolveLinkedSubcategory(moduleKey, payload, options) {
   return ''
 }
 
+function getSubtopicOptions(moduleKey, subcategoryLabel) {
+  const label = String(subcategoryLabel || '').trim()
+  if (!label) return []
+  if (moduleKey === 'health-skills') {
+    const category = CATEGORIES.find((c) => c.label === label || c.id === label)
+    if (!category) return []
+    return COURSES
+      .filter((course) => course.category === category.id)
+      .map((course) => course.title)
+  }
+  return []
+}
+
 export default function ModuleAssetsPanel({ moduleKey }) {
   const { user, getToken } = useAuth()
   const { lang } = useLocale()
@@ -82,16 +95,19 @@ export default function ModuleAssetsPanel({ moduleKey }) {
   const [title, setTitle] = useState('')
   const [summary, setSummary] = useState('')
   const [subcategory, setSubcategory] = useState('general')
+  const [subtopic, setSubtopic] = useState('')
   const [requiredLevel, setRequiredLevel] = useState('free')
   const [file, setFile] = useState(null)
   const [error, setError] = useState('')
   const [hint, setHint] = useState('')
   const [editingId, setEditingId] = useState('')
-  const [editForm, setEditForm] = useState({ title: '', summary: '', subcategory: 'general', requiredLevel: 'free' })
+  const [editForm, setEditForm] = useState({ title: '', summary: '', subcategory: 'general', subtopic: '', requiredLevel: 'free' })
   const [savedItemId, setSavedItemId] = useState('')
   const [activeSubcategory, setActiveSubcategory] = useState('')
   const isAdmin = Boolean(user?.site_admin)
   const subcategoryOptions = useMemo(() => getSubcategoryOptions(moduleKey), [moduleKey])
+  const subtopicOptions = useMemo(() => getSubtopicOptions(moduleKey, subcategory), [moduleKey, subcategory])
+  const editSubtopicOptions = useMemo(() => getSubtopicOptions(moduleKey, editForm.subcategory), [moduleKey, editForm.subcategory])
   const groupedItems = useMemo(() => {
     const buckets = new Map()
     subcategoryOptions.forEach((opt) => buckets.set(opt, []))
@@ -116,6 +132,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       title: '标题',
       summary: '摘要（可选）',
       subcategory: '亚类（例如：基础知识 / 课程 / 案例）',
+      subtopic: '二级维度（例如：长寿基础知识入门）',
       requiredLevel: '可见会员等级',
       choose: '选择文件',
       upload: '上传',
@@ -143,6 +160,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       title: 'Title',
       summary: 'Summary (optional)',
       subcategory: 'Subcategory (e.g. basics/course/cases)',
+      subtopic: 'Subtopic (e.g. Longevity Basics Intro)',
       requiredLevel: 'Required member level',
       choose: 'Choose file',
       upload: 'Upload',
@@ -170,6 +188,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       title: 'العنوان',
       summary: 'الملخص (اختياري)',
       subcategory: 'تصنيف فرعي (مثل أساسيات/دورات/حالات)',
+      subtopic: 'تصنيف أدق (مثل مقدمة أساسيات طول العمر)',
       requiredLevel: 'الحد الأدنى للعضوية',
       choose: 'اختر ملفًا',
       upload: 'رفع',
@@ -222,6 +241,26 @@ export default function ModuleAssetsPanel({ moduleKey }) {
   }, [subcategoryOptions])
 
   useEffect(() => {
+    if (!subtopicOptions.length) {
+      setSubtopic('')
+      return
+    }
+    const exists = subtopicOptions.includes(subtopic)
+    if (!exists) setSubtopic(subtopicOptions[0])
+  }, [subtopicOptions, subtopic])
+
+  useEffect(() => {
+    if (!editingId) return
+    if (!editSubtopicOptions.length) {
+      setEditForm((v) => ({ ...v, subtopic: '' }))
+      return
+    }
+    if (!editSubtopicOptions.includes(editForm.subtopic)) {
+      setEditForm((v) => ({ ...v, subtopic: editSubtopicOptions[0] }))
+    }
+  }, [editingId, editSubtopicOptions, editForm.subtopic])
+
+  useEffect(() => {
     if (groupedItems.length) {
       const exists = groupedItems.some(([name]) => name === activeSubcategory)
       if (!exists) setActiveSubcategory(groupedItems[0][0])
@@ -270,6 +309,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
           title: title.trim(),
           summary: summary.trim(),
           subcategory: subcategory.trim() || 'general',
+          subtopic: subtopic.trim(),
           requiredLevel,
           fileName: file.name,
           mimeType: file.type || 'application/octet-stream',
@@ -281,6 +321,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       setTitle('')
       setSummary('')
       setSubcategory(subcategoryOptions[0] || 'general')
+      setSubtopic('')
       setRequiredLevel('free')
       setFile(null)
       setHint(t.uploadOk)
@@ -301,6 +342,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       title: item.title || '',
       summary: item.summary || '',
       subcategory: normalizeSubcategoryValue(moduleKey, item.subcategory) || subcategoryOptions[0] || 'general',
+      subtopic: item.subtopic || '',
       requiredLevel: item.required_level || 'free',
     })
   }
@@ -328,6 +370,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
           title: editForm.title.trim(),
           summary: editForm.summary.trim(),
           subcategory: editForm.subcategory,
+          subtopic: editForm.subtopic,
           requiredLevel: editForm.requiredLevel,
         }),
       })
@@ -378,7 +421,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
                 </p>
               ) : null}
               <p className="module-assets-meta">
-                [{item.subcategory || 'general'}] · {t.levelTag?.[item.required_level] || item.required_level}
+                [{item.subcategory || 'general'}{item.subtopic ? ` / ${item.subtopic}` : ''}] · {t.levelTag?.[item.required_level] || item.required_level}
               </p>
               {isAdmin && savedItemId === item.id ? <p className="module-assets-hint">{t.saveOk}</p> : null}
               {item.summary ? <p className="module-assets-muted">{item.summary}</p> : null}
@@ -405,6 +448,19 @@ export default function ModuleAssetsPanel({ moduleKey }) {
                     <span>{t.subcategory}</span>
                     <select value={editForm.subcategory} onChange={(e) => setEditForm((v) => ({ ...v, subcategory: e.target.value }))}>
                       {subcategoryOptions.map((opt) => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label>
+                    <span>{t.subtopic}</span>
+                    <select
+                      value={editForm.subtopic}
+                      onChange={(e) => setEditForm((v) => ({ ...v, subtopic: e.target.value }))}
+                      disabled={!editSubtopicOptions.length}
+                    >
+                      {!editSubtopicOptions.length ? <option value="">-</option> : null}
+                      {editSubtopicOptions.map((opt) => (
                         <option key={opt} value={opt}>{opt}</option>
                       ))}
                     </select>
@@ -448,6 +504,15 @@ export default function ModuleAssetsPanel({ moduleKey }) {
             <span>{t.subcategory}</span>
             <select value={subcategory} onChange={(e) => setSubcategory(e.target.value)}>
               {subcategoryOptions.map((opt) => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            <span>{t.subtopic}</span>
+            <select value={subtopic} onChange={(e) => setSubtopic(e.target.value)} disabled={!subtopicOptions.length}>
+              {!subtopicOptions.length ? <option value="">-</option> : null}
+              {subtopicOptions.map((opt) => (
                 <option key={opt} value={opt}>{opt}</option>
               ))}
             </select>

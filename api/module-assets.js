@@ -46,6 +46,7 @@ async function ensureSchema() {
       id UUID PRIMARY KEY,
       module_key VARCHAR(64) NOT NULL,
       subcategory VARCHAR(80) NOT NULL DEFAULT 'general',
+      subtopic VARCHAR(120) NOT NULL DEFAULT '',
       required_level VARCHAR(20) NOT NULL DEFAULT 'free',
       title VARCHAR(200) NOT NULL,
       summary TEXT,
@@ -59,6 +60,7 @@ async function ensureSchema() {
     )
   `
   await sql`ALTER TABLE module_assets ADD COLUMN IF NOT EXISTS subcategory VARCHAR(80) NOT NULL DEFAULT 'general'`
+  await sql`ALTER TABLE module_assets ADD COLUMN IF NOT EXISTS subtopic VARCHAR(120) NOT NULL DEFAULT ''`
   await sql`ALTER TABLE module_assets ADD COLUMN IF NOT EXISTS required_level VARCHAR(20) NOT NULL DEFAULT 'free'`
   await sql`ALTER TABLE module_assets ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()`
 }
@@ -128,7 +130,7 @@ async function handleList(req, res) {
   if (!moduleKey) return res.status(400).json({ error: '缺少 module 参数' })
   const viewer = await getViewer(req)
   const rows = await sql`
-    SELECT id, module_key, subcategory, required_level, title, summary, file_name, mime_type, file_size, uploader, created_at
+    SELECT id, module_key, subcategory, subtopic, required_level, title, summary, file_name, mime_type, file_size, uploader, created_at
     FROM module_assets
     WHERE module_key = ${moduleKey}
     ORDER BY created_at DESC
@@ -148,6 +150,7 @@ async function handleUpload(req, res) {
 
   const moduleKey = normalizeModuleKey(body.module)
   const subcategory = String(body.subcategory || 'general').trim().slice(0, 80) || 'general'
+  const subtopic = String(body.subtopic || '').trim().slice(0, 120)
   const requiredLevel = normalizeLevel(body.requiredLevel || 'free')
   const title = String(body.title || '').trim().slice(0, 200)
   const summary = String(body.summary || '').trim().slice(0, 4000)
@@ -171,9 +174,9 @@ async function handleUpload(req, res) {
   await fs.writeFile(path.join(STORAGE_DIR, storedName), fileBuffer)
 
   const rows = await sql`
-    INSERT INTO module_assets (id, module_key, subcategory, required_level, title, summary, file_name, stored_name, mime_type, file_size, uploader)
-    VALUES (${id}, ${moduleKey}, ${subcategory}, ${requiredLevel}, ${title}, ${summary || null}, ${fileName}, ${storedName}, ${mimeType}, ${fileBuffer.length}, ${String(auth.admin || '') || null})
-    RETURNING id, module_key, subcategory, required_level, title, summary, file_name, mime_type, file_size, uploader, created_at
+    INSERT INTO module_assets (id, module_key, subcategory, subtopic, required_level, title, summary, file_name, stored_name, mime_type, file_size, uploader)
+    VALUES (${id}, ${moduleKey}, ${subcategory}, ${subtopic}, ${requiredLevel}, ${title}, ${summary || null}, ${fileName}, ${storedName}, ${mimeType}, ${fileBuffer.length}, ${String(auth.admin || '') || null})
+    RETURNING id, module_key, subcategory, subtopic, required_level, title, summary, file_name, mime_type, file_size, uploader, created_at
   `
   return res.status(201).json({ ok: true, item: rows[0] })
 }
@@ -191,6 +194,7 @@ async function handleUpdate(req, res) {
   const title = String(body.title || '').trim().slice(0, 200)
   const summary = String(body.summary || '').trim().slice(0, 4000)
   const subcategory = String(body.subcategory || 'general').trim().slice(0, 80) || 'general'
+  const subtopic = String(body.subtopic || '').trim().slice(0, 120)
   const requiredLevel = normalizeLevel(body.requiredLevel || 'free')
   if (!title) return res.status(400).json({ error: '标题不能为空' })
 
@@ -199,10 +203,11 @@ async function handleUpdate(req, res) {
     SET title = ${title},
         summary = ${summary || null},
         subcategory = ${subcategory},
+        subtopic = ${subtopic},
         required_level = ${requiredLevel},
         updated_at = NOW()
     WHERE id = ${id}
-    RETURNING id, module_key, subcategory, required_level, title, summary, file_name, mime_type, file_size, uploader, created_at, updated_at
+    RETURNING id, module_key, subcategory, subtopic, required_level, title, summary, file_name, mime_type, file_size, uploader, created_at, updated_at
   `
   if (!rows.length) return res.status(404).json({ error: '资源不存在' })
   return res.status(200).json({ ok: true, item: rows[0] })
