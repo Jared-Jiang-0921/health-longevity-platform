@@ -179,6 +179,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       subcategoryContent: '按亚类查看资料',
       subtopicContent: '再选择二层分类后显示材料',
       emptySubtopic: '请选择二层分类查看对应资料',
+      debugMapping: '当前映射',
     },
     en: {
       section: 'Module Assets',
@@ -215,6 +216,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       subcategoryContent: 'Browse by subcategory',
       subtopicContent: 'Select a second-level category to view materials',
       emptySubtopic: 'Please select a second-level category',
+      debugMapping: 'Current Mapping',
     },
     ar: {
       section: 'ملفات الوحدة',
@@ -251,6 +253,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       subcategoryContent: 'تصفح حسب التصنيف الفرعي',
       subtopicContent: 'اختر تصنيفًا فرعيًا أدق لعرض المواد',
       emptySubtopic: 'يرجى اختيار التصنيف الأدق',
+      debugMapping: 'التعيين الحالي',
     },
   }[lang] || {}), [lang])
 
@@ -486,6 +489,12 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     <section className="module-assets-panel">
       <h3>{t.section}</h3>
       {loading ? <p className="module-assets-muted">{t.loading}</p> : null}
+      {isAdmin ? (
+        <p className="module-assets-debug">
+          <strong>{t.debugMapping}:</strong> module=`{moduleKey}` / subcategory=`{activeSubcategory || '-'}`
+          {' '} / subtopic=`{activeSubtopic || '-'}`
+        </p>
+      ) : null}
       {!loading && !items.length ? <p className="module-assets-muted">{t.empty}</p> : null}
       {groupedItems.length ? (
         <>
