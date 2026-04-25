@@ -4,7 +4,7 @@ import { randomUUID } from 'node:crypto'
 import { sql } from '../lib/db.js'
 import { authorizeSiteAdmin } from '../lib/siteAdminAuth.js'
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024
+const MAX_FILE_SIZE = 100 * 1024 * 1024
 const STORAGE_DIR = path.join(process.cwd(), 'storage', 'translation-pdfs')
 
 function parseJson(req, res) {
@@ -49,7 +49,7 @@ async function handleUpload(req, res) {
 
   const fileBuffer = Buffer.from(contentBase64, 'base64')
   if (!fileBuffer.length) return res.status(400).json({ error: 'PDF 内容为空' })
-  if (fileBuffer.length > MAX_FILE_SIZE) return res.status(400).json({ error: 'PDF 文件过大，请控制在 10MB 以内' })
+  if (fileBuffer.length > MAX_FILE_SIZE) return res.status(400).json({ error: 'PDF 文件过大，请控制在 100MB 以内' })
   // PDF magic bytes: 25 50 44 46 (%PDF)
   if (!(fileBuffer[0] === 0x25 && fileBuffer[1] === 0x50 && fileBuffer[2] === 0x44 && fileBuffer[3] === 0x46)) {
     return res.status(400).json({ error: '仅支持 PDF 文件' })
