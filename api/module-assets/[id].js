@@ -43,12 +43,32 @@ async function getViewer(req) {
 
 export default async function handler(req, res) {
   try {
-    if (req.method !== 'GET') {
-      res.setHeader('Allow', 'GET')
-      return res.status(405).json({ error: 'Method not allowed' })
-    }
     const id = getId(req)
     if (!id) return res.status(400).json({ error: '缺少资源 ID' })
+
+    if (req.method === 'DELETE') {
+      const auth = await authorizeSiteAdmin(req)
+      if (!auth.ok) return res.status(auth.status).json({ code: auth.code, error: auth.error })
+      const deleted = await sql`
+        DELETE FROM module_assets
+        WHERE id = ${id}
+        RETURNING id, stored_name
+      `
+      if (!deleted.length) return res.status(404).json({ error: '资源不存在' })
+      const storedName = String(deleted[0].stored_name || '')
+      if (storedName) {
+        const abs = path.join(process.cwd(), 'storage', 'module-assets', storedName)
+        await fs.unlink(abs).catch((e) => {
+          if (e?.code !== 'ENOENT') throw e
+        })
+      }
+      return res.status(200).json({ ok: true, id })
+    }
+
+    if (req.method !== 'GET') {
+      res.setHeader('Allow', 'GET, DELETE')
+      return res.status(405).json({ error: 'Method not allowed' })
+    }
 
     const rows = await sql`
       SELECT file_name, stored_name, mime_type, required_level

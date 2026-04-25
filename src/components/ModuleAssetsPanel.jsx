@@ -93,6 +93,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [savingEdit, setSavingEdit] = useState(false)
+  const [deletingId, setDeletingId] = useState('')
   const [title, setTitle] = useState('')
   const [summary, setSummary] = useState('')
   const [subcategory, setSubcategory] = useState('general')
@@ -161,7 +162,12 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       save: '保存',
       saving: '保存中…',
       cancel: '取消',
+      remove: '删除',
+      removing: '删除中…',
+      removeConfirm: '确定删除该资料吗？删除后不可恢复。',
       saveOk: '保存成功',
+      removeOk: '删除成功',
+      removeFail: '删除失败',
       saveFail: '保存失败',
       videoRestricted: '视频资源仅管理员可下载',
       levelTag: { free: '普通会员', standard: '标准会员', premium: '高级会员' },
@@ -192,7 +198,12 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       save: 'Save',
       saving: 'Saving…',
       cancel: 'Cancel',
+      remove: 'Delete',
+      removing: 'Deleting…',
+      removeConfirm: 'Delete this material? This action cannot be undone.',
       saveOk: 'Saved',
+      removeOk: 'Deleted',
+      removeFail: 'Delete failed',
       saveFail: 'Save failed',
       videoRestricted: 'Video files are restricted to admins.',
       levelTag: { free: 'Free', standard: 'Standard', premium: 'Premium' },
@@ -223,7 +234,12 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       save: 'حفظ',
       saving: 'جارٍ الحفظ…',
       cancel: 'إلغاء',
+      remove: 'حذف',
+      removing: 'جارٍ الحذف…',
+      removeConfirm: 'هل تريد حذف هذه المادة؟ لا يمكن التراجع عن هذا الإجراء.',
       saveOk: 'تم الحفظ',
+      removeOk: 'تم الحذف',
+      removeFail: 'فشل الحذف',
       saveFail: 'فشل الحفظ',
       videoRestricted: 'ملفات الفيديو متاحة للتنزيل للمسؤول فقط.',
       levelTag: { free: 'مجاني', standard: 'قياسي', premium: 'متميز' },
@@ -433,6 +449,32 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     }
   }
 
+  async function removeItem(id) {
+    if (!id || !isAdmin) return
+    if (!window.confirm(t.removeConfirm)) return
+    setError('')
+    setHint('')
+    setDeletingId(id)
+    try {
+      const token = getToken()
+      const res = await fetch(`/api/module-assets/${id}`, {
+        method: 'DELETE',
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error || t.removeFail)
+      if (editingId === id) setEditingId('')
+      setHint(t.removeOk)
+      await loadItems()
+    } catch (e) {
+      setError(e.message || t.removeFail)
+    } finally {
+      setDeletingId('')
+    }
+  }
+
   return (
     <section className="module-assets-panel">
       <h3>{t.section}</h3>
@@ -477,18 +519,32 @@ export default function ModuleAssetsPanel({ moduleKey }) {
           {!isAdmin && !activeSubtopic ? <p className="module-assets-muted">{t.emptySubtopic}</p> : null}
           <ul className="module-assets-list">
             {visibleItems.map((item) => (
-              <li key={item.id}>
+              <li key={item.id} className="module-assets-card">
               <div className="module-assets-head">
-                <strong>{item.title}</strong>
-                <span className="module-assets-size">{formatSize(item.file_size)}</span>
+                <strong className="module-assets-title">{item.title}</strong>
+                <span className="module-assets-size module-assets-pill">{formatSize(item.file_size)}</span>
               </div>
               {isAdmin ? (
                 <p className="module-assets-actions">
                   <button type="button" className="btn-linkish" onClick={() => startEdit(item)}>{t.edit}</button>
+                  <button
+                    type="button"
+                    className="btn-linkish btn-linkish-danger"
+                    onClick={() => removeItem(item.id)}
+                    disabled={deletingId === item.id}
+                  >
+                    {deletingId === item.id ? t.removing : t.remove}
+                  </button>
                 </p>
               ) : null}
               <p className="module-assets-meta">
-                [{item.subcategory || 'general'} / {item.subtopic || '未细分'}] · {t.levelTag?.[item.required_level] || item.required_level}
+                <span className="module-assets-pill">{
+                  item.subcategory || 'general'
+                }</span>
+                <span className="module-assets-pill">{
+                  item.subtopic || '未细分'
+                }</span>
+                <span className="module-assets-pill module-assets-pill-level">{t.levelTag?.[item.required_level] || item.required_level}</span>
               </p>
               {isAdmin && savedItemId === item.id ? <p className="module-assets-hint">{t.saveOk}</p> : null}
               {item.summary ? <p className="module-assets-muted">{item.summary}</p> : null}
@@ -498,7 +554,9 @@ export default function ModuleAssetsPanel({ moduleKey }) {
                 isAdmin ? <video controls src={`/api/module-assets/${item.id}`} className="module-assets-media" /> : <p className="module-assets-muted">{t.videoRestricted}</p>
               ) : null}
               {!isVideo(item.mime_type) || isAdmin ? (
-                <a href={`/api/module-assets/${item.id}`} target="_blank" rel="noreferrer">{t.open}</a>
+                <p className="module-assets-actions">
+                  <a className="module-assets-open-link" href={`/api/module-assets/${item.id}`} target="_blank" rel="noreferrer">{t.open}</a>
+                </p>
               ) : null}
               {isAdmin && editingId === item.id ? (
                 <form className="module-assets-upload module-assets-edit-inline" onSubmit={(e) => { e.preventDefault(); saveEdit() }}>
