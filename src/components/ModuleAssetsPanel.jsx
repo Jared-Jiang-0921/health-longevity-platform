@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
+import { CATEGORIES } from '../data/courses'
+import { PRODUCT_CATEGORIES } from '../data/products'
 import './ModuleAssetsPanel.css'
 
 function formatSize(bytes) {
@@ -20,6 +22,25 @@ function isVideo(mime) {
   return String(mime || '').startsWith('video/')
 }
 
+function getSubcategoryOptions(moduleKey) {
+  const courseCategories = CATEGORIES.filter((c) => c.id !== 'all').map((c) => c.label)
+  const productCategories = PRODUCT_CATEGORIES.filter((c) => c.id !== 'all').map((c) => c.label)
+  const map = {
+    'health-skills': courseCategories,
+    products: productCategories,
+    'longevity-news': ['研究论文', '专家解读', '行业动态', '数据图表'],
+    'tcm-prevention': ['中药单药', '经典方剂', '体质调理', '实践案例'],
+    'translation-opportunities': ['可转化项目', '商业模型', '合作机会', '投研资料'],
+    solutions: ['评估工具', '干预方案', '随访模板', '案例库'],
+    'health-questionnaire': ['问卷模板', '说明文档', '案例解读', '结果报告'],
+    favorites: ['收藏夹导读', '重点资源', '复习清单'],
+    payment: ['会员说明', '支付指引', '账单示例'],
+    account: ['账号安全', '使用指南', '常见问题'],
+    tax: ['税务说明', '政策文档', '申报模板'],
+  }
+  return map[moduleKey] || ['通用资料', '教程', '案例', '下载文件']
+}
+
 export default function ModuleAssetsPanel({ moduleKey }) {
   const { user, getToken } = useAuth()
   const { lang } = useLocale()
@@ -34,6 +55,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
   const [error, setError] = useState('')
   const [hint, setHint] = useState('')
   const isAdmin = Boolean(user?.site_admin)
+  const subcategoryOptions = useMemo(() => getSubcategoryOptions(moduleKey), [moduleKey])
   const t = useMemo(() => ({
     zh: {
       section: '模块资料',
@@ -114,6 +136,10 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [moduleKey])
 
+  useEffect(() => {
+    setSubcategory(subcategoryOptions[0] || 'general')
+  }, [subcategoryOptions])
+
   async function onSubmit(e) {
     e.preventDefault()
     setError('')
@@ -152,7 +178,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       if (!res.ok) throw new Error(data.error || t.uploadFail)
       setTitle('')
       setSummary('')
-      setSubcategory('general')
+      setSubcategory(subcategoryOptions[0] || 'general')
       setRequiredLevel('free')
       setFile(null)
       setHint(t.uploadOk)
@@ -207,7 +233,11 @@ export default function ModuleAssetsPanel({ moduleKey }) {
           </label>
           <label>
             <span>{t.subcategory}</span>
-            <input value={subcategory} onChange={(e) => setSubcategory(e.target.value)} placeholder="general" />
+            <select value={subcategory} onChange={(e) => setSubcategory(e.target.value)}>
+              {subcategoryOptions.map((opt) => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
           </label>
           <label>
             <span>{t.requiredLevel}</span>
