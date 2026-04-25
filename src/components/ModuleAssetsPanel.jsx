@@ -23,7 +23,7 @@ function isVideo(mime) {
 }
 
 function getSubcategoryOptions(moduleKey) {
-  const courseCategories = CATEGORIES.filter((c) => c.id !== 'all').map((c) => c.label)
+  const courseCategories = ['长寿基础知识', ...CATEGORIES.filter((c) => c.id !== 'all').map((c) => c.label)]
   const productCategories = PRODUCT_CATEGORIES.filter((c) => c.id !== 'all').map((c) => c.label)
   const map = {
     'health-skills': courseCategories,
