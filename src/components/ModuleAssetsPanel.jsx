@@ -48,6 +48,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
+  const [savingEdit, setSavingEdit] = useState(false)
   const [title, setTitle] = useState('')
   const [summary, setSummary] = useState('')
   const [subcategory, setSubcategory] = useState('general')
@@ -57,6 +58,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
   const [hint, setHint] = useState('')
   const [editingId, setEditingId] = useState('')
   const [editForm, setEditForm] = useState({ title: '', summary: '', subcategory: 'general', requiredLevel: 'free' })
+  const [savedItemId, setSavedItemId] = useState('')
   const isAdmin = Boolean(user?.site_admin)
   const subcategoryOptions = useMemo(() => getSubcategoryOptions(moduleKey), [moduleKey])
   const t = useMemo(() => ({
@@ -75,6 +77,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       open: '打开/下载',
       edit: '编辑',
       save: '保存',
+      saving: '保存中…',
       cancel: '取消',
       saveOk: '保存成功',
       saveFail: '保存失败',
@@ -99,6 +102,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       open: 'Open / Download',
       edit: 'Edit',
       save: 'Save',
+      saving: 'Saving…',
       cancel: 'Cancel',
       saveOk: 'Saved',
       saveFail: 'Save failed',
@@ -123,6 +127,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       open: 'فتح / تنزيل',
       edit: 'تعديل',
       save: 'حفظ',
+      saving: 'جارٍ الحفظ…',
       cancel: 'إلغاء',
       saveOk: 'تم الحفظ',
       saveFail: 'فشل الحفظ',
@@ -211,6 +216,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
   function startEdit(item) {
     setError('')
     setHint('')
+    setSavedItemId('')
     setEditingId(item.id)
     setEditForm({
       title: item.title || '',
@@ -224,10 +230,12 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     if (!editingId) return
     setError('')
     setHint('')
+    setSavedItemId('')
     if (!editForm.title.trim()) {
       setError(t.invalid)
       return
     }
+    setSavingEdit(true)
     try {
       const token = getToken()
       const res = await fetch('/api/module-assets', {
@@ -247,10 +255,12 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       const data = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(data.error || t.saveFail)
       setHint(t.saveOk)
-      setEditingId('')
+      setSavedItemId(editingId)
       await loadItems()
     } catch (e) {
       setError(e.message || t.saveFail)
+    } finally {
+      setSavingEdit(false)
     }
   }
 
@@ -275,6 +285,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
               <p className="module-assets-meta">
                 [{item.subcategory || 'general'}] · {t.levelTag?.[item.required_level] || item.required_level}
               </p>
+              {isAdmin && savedItemId === item.id ? <p className="module-assets-hint">{t.saveOk}</p> : null}
               {item.summary ? <p className="module-assets-muted">{item.summary}</p> : null}
               {isImage(item.mime_type) ? <img src={`/api/module-assets/${item.id}`} alt={item.title} className="module-assets-image" /> : null}
               {isAudio(item.mime_type) ? <audio controls src={`/api/module-assets/${item.id}`} className="module-assets-media" /> : null}
@@ -312,9 +323,13 @@ export default function ModuleAssetsPanel({ moduleKey }) {
                     </select>
                   </label>
                   <p className="module-assets-actions">
-                    <button type="submit" className="btn-primary">{t.save}</button>
+                    <button type="submit" className="btn-primary" disabled={savingEdit}>
+                      {savingEdit ? t.saving : t.save}
+                    </button>
                     <button type="button" className="btn-secondary" onClick={() => setEditingId('')}>{t.cancel}</button>
                   </p>
+                  {error ? <p className="module-assets-error">{error}</p> : null}
+                  {hint ? <p className="module-assets-hint">{hint}</p> : null}
                 </form>
               ) : null}
             </li>

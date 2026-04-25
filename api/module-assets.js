@@ -40,6 +40,29 @@ const ALLOWED_MIME = new Set([
 ])
 const LEVEL_ORDER = ['free', 'standard', 'premium']
 
+async function ensureSchema() {
+  await sql`
+    CREATE TABLE IF NOT EXISTS module_assets (
+      id UUID PRIMARY KEY,
+      module_key VARCHAR(64) NOT NULL,
+      subcategory VARCHAR(80) NOT NULL DEFAULT 'general',
+      required_level VARCHAR(20) NOT NULL DEFAULT 'free',
+      title VARCHAR(200) NOT NULL,
+      summary TEXT,
+      file_name VARCHAR(160) NOT NULL,
+      stored_name VARCHAR(180) NOT NULL,
+      mime_type VARCHAR(120) NOT NULL,
+      file_size BIGINT NOT NULL,
+      uploader VARCHAR(200),
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `
+  await sql`ALTER TABLE module_assets ADD COLUMN IF NOT EXISTS subcategory VARCHAR(80) NOT NULL DEFAULT 'general'`
+  await sql`ALTER TABLE module_assets ADD COLUMN IF NOT EXISTS required_level VARCHAR(20) NOT NULL DEFAULT 'free'`
+  await sql`ALTER TABLE module_assets ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()`
+}
+
 function parseJson(req, res) {
   try {
     return typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {}
@@ -100,6 +123,7 @@ async function getViewer(req) {
 }
 
 async function handleList(req, res) {
+  await ensureSchema()
   const moduleKey = normalizeModuleKey(req.query?.module)
   if (!moduleKey) return res.status(400).json({ error: '缺少 module 参数' })
   const viewer = await getViewer(req)
@@ -115,6 +139,7 @@ async function handleList(req, res) {
 }
 
 async function handleUpload(req, res) {
+  await ensureSchema()
   const auth = await authorizeSiteAdmin(req)
   if (!auth.ok) return res.status(auth.status).json({ code: auth.code, error: auth.error })
 
