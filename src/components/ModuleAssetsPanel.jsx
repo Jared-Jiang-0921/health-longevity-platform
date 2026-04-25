@@ -82,6 +82,7 @@ function getSubtopicOptions(moduleKey, subcategoryLabel) {
       .filter((course) => course.category === category.id)
       .map((course) => course.title)
   }
+  if (moduleKey === 'products') return ['产品详情资料']
   return []
 }
 
@@ -104,6 +105,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
   const [editForm, setEditForm] = useState({ title: '', summary: '', subcategory: 'general', subtopic: '', requiredLevel: 'free' })
   const [savedItemId, setSavedItemId] = useState('')
   const [activeSubcategory, setActiveSubcategory] = useState('')
+  const [activeSubtopic, setActiveSubtopic] = useState('')
   const isAdmin = Boolean(user?.site_admin)
   const subcategoryOptions = useMemo(() => getSubcategoryOptions(moduleKey), [moduleKey])
   const subtopicOptions = useMemo(() => getSubtopicOptions(moduleKey, subcategory), [moduleKey, subcategory])
@@ -119,10 +121,21 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     return Array.from(buckets.entries()).filter(([, list]) => list.length)
   }, [items, subcategoryOptions])
   const visibleItems = useMemo(() => {
+    if (!activeSubcategory || !activeSubtopic) return []
+    return items.filter((item) => {
+      const sub = String(item.subcategory || '').trim() || 'general'
+      const topic = String(item.subtopic || '').trim() || '未细分'
+      return sub === activeSubcategory && topic === activeSubtopic
+    })
+  }, [activeSubcategory, activeSubtopic, items])
+  const activeSubtopicOptions = useMemo(() => {
     if (!activeSubcategory) return []
-    const hit = groupedItems.find(([name]) => name === activeSubcategory)
-    return hit ? hit[1] : []
-  }, [activeSubcategory, groupedItems])
+    const fromPreset = getSubtopicOptions(moduleKey, activeSubcategory)
+    const fromItems = items
+      .filter((item) => String(item.subcategory || '').trim() === activeSubcategory)
+      .map((item) => String(item.subtopic || '').trim() || '未细分')
+    return Array.from(new Set([...fromPreset, ...fromItems]))
+  }, [moduleKey, activeSubcategory, items])
   const t = useMemo(() => ({
     zh: {
       section: '模块资料',
@@ -151,6 +164,8 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       invalid: '请填写标题并选择文件（支持图片/音频/视频/PDF/Word/Excel/PPT/TXT，<=50MB）',
       uncategorized: '未分类',
       subcategoryContent: '按亚类查看资料',
+      subtopicContent: '再选择二层分类后显示材料',
+      emptySubtopic: '请选择二层分类查看对应资料',
     },
     en: {
       section: 'Module Assets',
@@ -179,6 +194,8 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       invalid: 'Please provide title and file (image/audio/video/PDF/Word/Excel/PPT/TXT, <=50MB).',
       uncategorized: 'Uncategorized',
       subcategoryContent: 'Browse by subcategory',
+      subtopicContent: 'Select a second-level category to view materials',
+      emptySubtopic: 'Please select a second-level category',
     },
     ar: {
       section: 'ملفات الوحدة',
@@ -207,6 +224,8 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       invalid: 'يرجى إدخال عنوان واختيار ملف (صور/صوت/فيديو/PDF/Word/Excel/PPT/TXT حتى 50MB).',
       uncategorized: 'غير مصنف',
       subcategoryContent: 'تصفح حسب التصنيف الفرعي',
+      subtopicContent: 'اختر تصنيفًا فرعيًا أدق لعرض المواد',
+      emptySubtopic: 'يرجى اختيار التصنيف الأدق',
     },
   }[lang] || {}), [lang])
 
@@ -263,11 +282,25 @@ export default function ModuleAssetsPanel({ moduleKey }) {
   useEffect(() => {
     if (groupedItems.length) {
       const exists = groupedItems.some(([name]) => name === activeSubcategory)
-      if (!exists) setActiveSubcategory(groupedItems[0][0])
+      if (!exists) {
+        setActiveSubcategory(groupedItems[0][0])
+        setActiveSubtopic('')
+      }
     } else {
       setActiveSubcategory('')
+      setActiveSubtopic('')
     }
   }, [groupedItems, activeSubcategory])
+
+  useEffect(() => {
+    if (!activeSubtopicOptions.length) {
+      setActiveSubtopic('')
+      return
+    }
+    if (!activeSubtopicOptions.includes(activeSubtopic)) {
+      setActiveSubtopic('')
+    }
+  }, [activeSubtopicOptions, activeSubtopic])
 
   useEffect(() => {
     function onLinkedCategoryChange(event) {
@@ -276,6 +309,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       const next = resolveLinkedSubcategory(moduleKey, detail, subcategoryOptions)
       if (!next) return
       setActiveSubcategory(next)
+      setActiveSubtopic('')
     }
     window.addEventListener('module-category-change', onLinkedCategoryChange)
     return () => window.removeEventListener('module-category-change', onLinkedCategoryChange)
@@ -401,13 +435,32 @@ export default function ModuleAssetsPanel({ moduleKey }) {
                   key={groupName}
                   type="button"
                   className={`module-assets-subtab ${activeSubcategory === groupName ? 'active' : ''}`}
-                  onClick={() => setActiveSubcategory(groupName)}
+                  onClick={() => {
+                    setActiveSubcategory(groupName)
+                    setActiveSubtopic('')
+                  }}
                 >
                   {groupName === 'general' ? t.uncategorized : groupName}
                 </button>
               ))}
             </div>
           </section>
+          <section className="module-assets-subtabs">
+            <p className="module-assets-muted">{t.subtopicContent}</p>
+            <div className="module-assets-subtabs-row">
+              {activeSubtopicOptions.map((topic) => (
+                <button
+                  key={topic}
+                  type="button"
+                  className={`module-assets-subtab ${activeSubtopic === topic ? 'active' : ''}`}
+                  onClick={() => setActiveSubtopic(topic)}
+                >
+                  {topic}
+                </button>
+              ))}
+            </div>
+          </section>
+          {!activeSubtopic ? <p className="module-assets-muted">{t.emptySubtopic}</p> : null}
           <ul className="module-assets-list">
             {visibleItems.map((item) => (
               <li key={item.id}>
@@ -421,7 +474,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
                 </p>
               ) : null}
               <p className="module-assets-meta">
-                [{item.subcategory || 'general'}{item.subtopic ? ` / ${item.subtopic}` : ''}] · {t.levelTag?.[item.required_level] || item.required_level}
+                [{item.subcategory || 'general'} / {item.subtopic || '未细分'}] · {t.levelTag?.[item.required_level] || item.required_level}
               </p>
               {isAdmin && savedItemId === item.id ? <p className="module-assets-hint">{t.saveOk}</p> : null}
               {item.summary ? <p className="module-assets-muted">{item.summary}</p> : null}
