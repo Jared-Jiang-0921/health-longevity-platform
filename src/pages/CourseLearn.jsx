@@ -19,27 +19,15 @@ export default function CourseLearn() {
   const { id } = useParams()
   const course = getCourseById(id)
   const { user } = useAuth()
-  const modules = course?.modules || []
+  const isAdmin = Boolean(user?.site_admin)
+  const [modules, setModules] = useState(course?.modules || [])
+  const [modulesLoading, setModulesLoading] = useState(false)
+  const [modulesSaving, setModulesSaving] = useState(false)
+  const [modulesError, setModulesError] = useState('')
+  const [editingModuleIdx, setEditingModuleIdx] = useState(-1)
+  const [editDraft, setEditDraft] = useState({ title: '', duration: '', content: '', videoUrl: '', embedUrl: '' })
   const [activeIndex, setActiveIndex] = useState(0)
-  const activeModule = modules[activeIndex]
-
-  if (!course) {
-    return (
-      <div className="page-content">
-        <p>{t.nf}</p>
-        <Link to="/health-skills">{t.backList}</Link>
-      </div>
-    )
-  }
-
-  if (modules.length === 0) {
-    return (
-      <div className="page-content">
-        <p>{ui.noData}</p>
-        <Link to={`/health-skills/${id}`}>{t.backDetail}</Link>
-      </div>
-    )
-  }
+  const activeModule = modules[Math.min(activeIndex, Math.max(modules.length - 1, 0))]
 
   const requiredMembership = course.requiredMembership || 'free'
   const allowed = hasLevelAccess(user?.level, requiredMembership)
@@ -56,6 +44,101 @@ export default function CourseLearn() {
       },
     }))
   }, [course])
+
+  useEffect(() => {
+    if (!course?.id) return
+    let cancelled = false
+    async function loadModules() {
+      setModulesLoading(true)
+      setModulesError('')
+      try {
+        const res = await fetch(`/api/course-modules?courseId=${course.id}`)
+        const data = await res.json().catch(() => ({}))
+        if (!res.ok) throw new Error(data.error || 'load failed')
+        if (!cancelled) {
+          const next = Array.isArray(data.modules) ? data.modules : []
+          setModules(next)
+          setActiveIndex((v) => Math.min(v, Math.max(next.length - 1, 0)))
+        }
+      } catch (e) {
+        if (!cancelled) setModulesError(e.message || 'load failed')
+      } finally {
+        if (!cancelled) setModulesLoading(false)
+      }
+    }
+    loadModules()
+    return () => { cancelled = true }
+  }, [course?.id])
+
+  async function saveModules(nextModules) {
+    if (!isAdmin || !course?.id) return
+    setModulesSaving(true)
+    setModulesError('')
+    try {
+      const token = localStorage.getItem('hlp_token')
+      const res = await fetch('/api/course-modules', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ courseId: course.id, modules: nextModules }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error || 'save failed')
+      const normalized = Array.isArray(data.modules) ? data.modules : nextModules
+      setModules(normalized)
+      setEditingModuleIdx(-1)
+      setActiveIndex((v) => Math.min(v, Math.max(normalized.length - 1, 0)))
+    } catch (e) {
+      setModulesError(e.message || 'save failed')
+    } finally {
+      setModulesSaving(false)
+    }
+  }
+
+  function startEditModule(idx) {
+    const mod = modules[idx]
+    if (!mod) return
+    setEditingModuleIdx(idx)
+    setEditDraft({
+      title: mod.title || '',
+      duration: mod.duration || '',
+      content: mod.content || '',
+      videoUrl: mod.videoUrl || '',
+      embedUrl: mod.embedUrl || '',
+    })
+  }
+
+  async function submitEditModule() {
+    if (editingModuleIdx < 0) return
+    const next = modules.map((m, i) => (i === editingModuleIdx ? {
+      ...m,
+      title: editDraft.title,
+      duration: editDraft.duration,
+      content: editDraft.content,
+      videoUrl: editDraft.videoUrl,
+      embedUrl: editDraft.embedUrl,
+    } : m))
+    await saveModules(next)
+  }
+
+  async function removeModule(idx) {
+    if (!isAdmin) return
+    const confirmed = window.confirm(lang === 'en' ? 'Delete this built-in module?' : lang === 'ar' ? 'حذف هذه الوحدة؟' : '确定删除该原有资料吗？')
+    if (!confirmed) return
+    const next = modules.filter((_, i) => i !== idx)
+    await saveModules(next)
+  }
+
+  if (!course) {
+    return (
+      <div className="page-content">
+        <p>{t.nf}</p>
+        <Link to="/health-skills">{t.backList}</Link>
+      </div>
+    )
+  }
   if (!allowed) {
     const requiredLabel = getMembershipLevelLabel(requiredMembership, lang)
     return (
@@ -76,6 +159,15 @@ export default function CourseLearn() {
     )
   }
 
+  if (!modulesLoading && modules.length === 0) {
+    return (
+      <div className="page-content">
+        <p>{ui.noData}</p>
+        <Link to={`/health-skills/${id}`}>{t.backDetail}</Link>
+      </div>
+    )
+  }
+
   return (
     <div className="page-course-learn">
       <div className="learn-header">
@@ -86,6 +178,8 @@ export default function CourseLearn() {
       <div className="learn-layout">
         <aside className="learn-sidebar">
           <h3>{t.modules}</h3>
+          {modulesLoading ? <p className="video-missing">{lang === 'en' ? 'Loading modules...' : lang === 'ar' ? 'جارٍ تحميل الوحدات...' : '加载模块中…'}</p> : null}
+          {modulesError ? <p className="video-missing">{modulesError}</p> : null}
           <ul className="module-list">
             {modules.map((mod, idx) => (
               <li key={idx}>
@@ -98,6 +192,16 @@ export default function CourseLearn() {
                   <span className="module-title">{mod.title}</span>
                   {mod.duration && <span className="module-duration">{mod.duration}</span>}
                 </button>
+                {isAdmin ? (
+                  <div className="module-admin-actions">
+                    <button type="button" onClick={() => startEditModule(idx)}>
+                      {lang === 'en' ? 'Edit' : lang === 'ar' ? 'تعديل' : '编辑'}
+                    </button>
+                    <button type="button" onClick={() => removeModule(idx)} disabled={modulesSaving}>
+                      {lang === 'en' ? 'Delete' : lang === 'ar' ? 'حذف' : '删除'}
+                    </button>
+                  </div>
+                ) : null}
               </li>
             ))}
           </ul>
@@ -142,6 +246,26 @@ export default function CourseLearn() {
           )}
         </main>
       </div>
+      {isAdmin && editingModuleIdx >= 0 ? (
+        <section className="learn-document module-edit-panel">
+          <h2>{lang === 'en' ? 'Edit Built-in Material' : lang === 'ar' ? 'تعديل مادة مدمجة' : '编辑原有资料'}</h2>
+          <div className="module-edit-grid">
+            <input value={editDraft.title} onChange={(e) => setEditDraft((v) => ({ ...v, title: e.target.value }))} placeholder={lang === 'en' ? 'Title' : lang === 'ar' ? 'العنوان' : '标题'} />
+            <input value={editDraft.duration} onChange={(e) => setEditDraft((v) => ({ ...v, duration: e.target.value }))} placeholder={lang === 'en' ? 'Duration' : lang === 'ar' ? 'المدة' : '时长'} />
+            <textarea rows={4} value={editDraft.content} onChange={(e) => setEditDraft((v) => ({ ...v, content: e.target.value }))} placeholder={lang === 'en' ? 'Document content' : lang === 'ar' ? 'محتوى المستند' : '文档内容'} />
+            <input value={editDraft.videoUrl} onChange={(e) => setEditDraft((v) => ({ ...v, videoUrl: e.target.value }))} placeholder="videoUrl" />
+            <input value={editDraft.embedUrl} onChange={(e) => setEditDraft((v) => ({ ...v, embedUrl: e.target.value }))} placeholder="embedUrl" />
+            <div>
+              <button type="button" className="btn-primary" onClick={submitEditModule} disabled={modulesSaving}>
+                {modulesSaving ? (lang === 'en' ? 'Saving...' : lang === 'ar' ? 'جارٍ الحفظ...' : '保存中…') : (lang === 'en' ? 'Save' : lang === 'ar' ? 'حفظ' : '保存')}
+              </button>
+              <button type="button" className="btn-favorite" style={{ marginLeft: 8 }} onClick={() => setEditingModuleIdx(-1)}>
+                {lang === 'en' ? 'Cancel' : lang === 'ar' ? 'إلغاء' : '取消'}
+              </button>
+            </div>
+          </div>
+        </section>
+      ) : null}
     </div>
   )
 }
