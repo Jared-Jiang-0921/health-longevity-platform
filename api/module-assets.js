@@ -3,6 +3,8 @@ import path from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { sql } from '../lib/db.js'
 import { authorizeSiteAdmin } from '../lib/siteAdminAuth.js'
+import { verifyToken, getUserById } from '../lib/auth.js'
+import { parseSiteAdminEmails } from '../lib/siteAdminEmails.js'
 
 const STORAGE_DIR = path.join(process.cwd(), 'storage', 'module-assets')
 const MAX_FILE_SIZE = 50 * 1024 * 1024
@@ -36,6 +38,7 @@ const ALLOWED_MIME = new Set([
   'video/quicktime',
   'video/webm',
 ])
+const LEVEL_ORDER = ['free', 'standard', 'premium']
 
 function parseJson(req, res) {
   try {
@@ -67,17 +70,48 @@ function getExt(name) {
   return parts.length > 1 ? parts.pop() : ''
 }
 
+function normalizeLevel(raw) {
+  const s = String(raw || '').toLowerCase().trim()
+  return LEVEL_ORDER.includes(s) ? s : 'free'
+}
+
+function canView(required, current) {
+  const reqIdx = LEVEL_ORDER.indexOf(normalizeLevel(required))
+  const curIdx = LEVEL_ORDER.indexOf(normalizeLevel(current))
+  return curIdx >= reqIdx
+}
+
+async function getViewer(req) {
+  const requestAdminToken = String(req.headers['x-site-admin-token'] || '').trim()
+  const configAdminToken = String(process.env.SITE_ADMIN_TOKEN || '').trim()
+  if (configAdminToken && requestAdminToken && requestAdminToken === configAdminToken) {
+    return { isAdmin: true, level: 'premium' }
+  }
+  const auth = req.headers.authorization
+  const jwt = auth?.startsWith('Bearer ') ? auth.slice(7) : null
+  if (!jwt) return { isAdmin: false, level: 'free' }
+  const userId = await verifyToken(jwt)
+  if (!userId) return { isAdmin: false, level: 'free' }
+  const user = await getUserById(userId)
+  if (!user) return { isAdmin: false, level: 'free' }
+  const allow = parseSiteAdminEmails()
+  const isAdmin = allow.includes(String(user.email || '').toLowerCase().trim())
+  return { isAdmin, level: user.level || 'free' }
+}
+
 async function handleList(req, res) {
   const moduleKey = normalizeModuleKey(req.query?.module)
   if (!moduleKey) return res.status(400).json({ error: '缺少 module 参数' })
+  const viewer = await getViewer(req)
   const rows = await sql`
-    SELECT id, module_key, title, summary, file_name, mime_type, file_size, uploader, created_at
+    SELECT id, module_key, subcategory, required_level, title, summary, file_name, mime_type, file_size, uploader, created_at
     FROM module_assets
     WHERE module_key = ${moduleKey}
     ORDER BY created_at DESC
     LIMIT 300
   `
-  return res.status(200).json({ ok: true, items: rows })
+  const visible = viewer.isAdmin ? rows : rows.filter((row) => canView(row.required_level, viewer.level))
+  return res.status(200).json({ ok: true, items: visible })
 }
 
 async function handleUpload(req, res) {
@@ -88,6 +122,8 @@ async function handleUpload(req, res) {
   if (!body) return
 
   const moduleKey = normalizeModuleKey(body.module)
+  const subcategory = String(body.subcategory || 'general').trim().slice(0, 80) || 'general'
+  const requiredLevel = normalizeLevel(body.requiredLevel || 'free')
   const title = String(body.title || '').trim().slice(0, 200)
   const summary = String(body.summary || '').trim().slice(0, 4000)
   const fileName = sanitizeFileName(body.fileName)
@@ -110,9 +146,9 @@ async function handleUpload(req, res) {
   await fs.writeFile(path.join(STORAGE_DIR, storedName), fileBuffer)
 
   const rows = await sql`
-    INSERT INTO module_assets (id, module_key, title, summary, file_name, stored_name, mime_type, file_size, uploader)
-    VALUES (${id}, ${moduleKey}, ${title}, ${summary || null}, ${fileName}, ${storedName}, ${mimeType}, ${fileBuffer.length}, ${String(auth.admin || '') || null})
-    RETURNING id, module_key, title, summary, file_name, mime_type, file_size, uploader, created_at
+    INSERT INTO module_assets (id, module_key, subcategory, required_level, title, summary, file_name, stored_name, mime_type, file_size, uploader)
+    VALUES (${id}, ${moduleKey}, ${subcategory}, ${requiredLevel}, ${title}, ${summary || null}, ${fileName}, ${storedName}, ${mimeType}, ${fileBuffer.length}, ${String(auth.admin || '') || null})
+    RETURNING id, module_key, subcategory, required_level, title, summary, file_name, mime_type, file_size, uploader, created_at
   `
   return res.status(201).json({ ok: true, item: rows[0] })
 }

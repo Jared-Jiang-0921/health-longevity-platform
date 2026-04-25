@@ -115,6 +115,14 @@ function augmentRes(res) {
   res.send = (content) => {
     if (res.writableEnded) return res
     if (!res.getHeader('Content-Type')) res.setHeader('Content-Type', 'text/plain; charset=utf-8')
+    if (Buffer.isBuffer(content)) {
+      res.end(content)
+      return res
+    }
+    if (content instanceof Uint8Array) {
+      res.end(Buffer.from(content))
+      return res
+    }
     res.end(typeof content === 'string' ? content : JSON.stringify(content ?? {}))
     return res
   }

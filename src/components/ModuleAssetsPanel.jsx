@@ -28,6 +28,8 @@ export default function ModuleAssetsPanel({ moduleKey }) {
   const [submitting, setSubmitting] = useState(false)
   const [title, setTitle] = useState('')
   const [summary, setSummary] = useState('')
+  const [subcategory, setSubcategory] = useState('general')
+  const [requiredLevel, setRequiredLevel] = useState('free')
   const [file, setFile] = useState(null)
   const [error, setError] = useState('')
   const [hint, setHint] = useState('')
@@ -40,10 +42,14 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       uploadTitle: '管理员上传',
       title: '标题',
       summary: '摘要（可选）',
+      subcategory: '亚类（例如：基础知识 / 课程 / 案例）',
+      requiredLevel: '可见会员等级',
       choose: '选择文件',
       upload: '上传',
       uploading: '上传中…',
       open: '打开/下载',
+      videoRestricted: '视频资源仅管理员可下载',
+      levelTag: { free: '普通会员', standard: '标准会员', premium: '高级会员' },
       uploadOk: '上传成功',
       uploadFail: '上传失败',
       invalid: '请填写标题并选择文件（支持图片/音频/视频/PDF/Word/Excel/PPT/TXT，<=50MB）',
@@ -55,10 +61,14 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       uploadTitle: 'Admin Upload',
       title: 'Title',
       summary: 'Summary (optional)',
+      subcategory: 'Subcategory (e.g. basics/course/cases)',
+      requiredLevel: 'Required member level',
       choose: 'Choose file',
       upload: 'Upload',
       uploading: 'Uploading…',
       open: 'Open / Download',
+      videoRestricted: 'Video files are restricted to admins.',
+      levelTag: { free: 'Free', standard: 'Standard', premium: 'Premium' },
       uploadOk: 'Upload successful',
       uploadFail: 'Upload failed',
       invalid: 'Please provide title and file (image/audio/video/PDF/Word/Excel/PPT/TXT, <=50MB).',
@@ -70,10 +80,14 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       uploadTitle: 'رفع المسؤول',
       title: 'العنوان',
       summary: 'الملخص (اختياري)',
+      subcategory: 'تصنيف فرعي (مثل أساسيات/دورات/حالات)',
+      requiredLevel: 'الحد الأدنى للعضوية',
       choose: 'اختر ملفًا',
       upload: 'رفع',
       uploading: 'جارٍ الرفع…',
       open: 'فتح / تنزيل',
+      videoRestricted: 'ملفات الفيديو متاحة للتنزيل للمسؤول فقط.',
+      levelTag: { free: 'مجاني', standard: 'قياسي', premium: 'متميز' },
       uploadOk: 'تم الرفع بنجاح',
       uploadFail: 'فشل الرفع',
       invalid: 'يرجى إدخال عنوان واختيار ملف (صور/صوت/فيديو/PDF/Word/Excel/PPT/TXT حتى 50MB).',
@@ -127,6 +141,8 @@ export default function ModuleAssetsPanel({ moduleKey }) {
           module: moduleKey,
           title: title.trim(),
           summary: summary.trim(),
+          subcategory: subcategory.trim() || 'general',
+          requiredLevel,
           fileName: file.name,
           mimeType: file.type || 'application/octet-stream',
           contentBase64,
@@ -136,6 +152,8 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       if (!res.ok) throw new Error(data.error || t.uploadFail)
       setTitle('')
       setSummary('')
+      setSubcategory('general')
+      setRequiredLevel('free')
       setFile(null)
       setHint(t.uploadOk)
       await loadItems()
@@ -159,11 +177,18 @@ export default function ModuleAssetsPanel({ moduleKey }) {
                 <strong>{item.title}</strong>
                 <span className="module-assets-size">{formatSize(item.file_size)}</span>
               </div>
+              <p className="module-assets-meta">
+                [{item.subcategory || 'general'}] · {t.levelTag?.[item.required_level] || item.required_level}
+              </p>
               {item.summary ? <p className="module-assets-muted">{item.summary}</p> : null}
               {isImage(item.mime_type) ? <img src={`/api/module-assets/${item.id}`} alt={item.title} className="module-assets-image" /> : null}
               {isAudio(item.mime_type) ? <audio controls src={`/api/module-assets/${item.id}`} className="module-assets-media" /> : null}
-              {isVideo(item.mime_type) ? <video controls src={`/api/module-assets/${item.id}`} className="module-assets-media" /> : null}
-              <a href={`/api/module-assets/${item.id}`} target="_blank" rel="noreferrer">{t.open}</a>
+              {isVideo(item.mime_type) ? (
+                isAdmin ? <video controls src={`/api/module-assets/${item.id}`} className="module-assets-media" /> : <p className="module-assets-muted">{t.videoRestricted}</p>
+              ) : null}
+              {!isVideo(item.mime_type) || isAdmin ? (
+                <a href={`/api/module-assets/${item.id}`} target="_blank" rel="noreferrer">{t.open}</a>
+              ) : null}
             </li>
           ))}
         </ul>
@@ -179,6 +204,18 @@ export default function ModuleAssetsPanel({ moduleKey }) {
           <label>
             <span>{t.summary}</span>
             <textarea rows={3} value={summary} onChange={(e) => setSummary(e.target.value)} />
+          </label>
+          <label>
+            <span>{t.subcategory}</span>
+            <input value={subcategory} onChange={(e) => setSubcategory(e.target.value)} placeholder="general" />
+          </label>
+          <label>
+            <span>{t.requiredLevel}</span>
+            <select value={requiredLevel} onChange={(e) => setRequiredLevel(e.target.value)}>
+              <option value="free">{t.levelTag?.free || 'free'}</option>
+              <option value="standard">{t.levelTag?.standard || 'standard'}</option>
+              <option value="premium">{t.levelTag?.premium || 'premium'}</option>
+            </select>
           </label>
           <label>
             <span>{t.choose}</span>
