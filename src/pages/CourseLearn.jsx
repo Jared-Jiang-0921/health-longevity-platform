@@ -18,16 +18,26 @@ export default function CourseLearn() {
   }[lang || 'zh']
   const { id } = useParams()
   const course = getCourseById(id)
-  const { user } = useAuth()
+  const { user, getToken } = useAuth()
   const isAdmin = Boolean(user?.site_admin)
   const [modules, setModules] = useState(course?.modules || [])
   const [modulesLoading, setModulesLoading] = useState(false)
   const [modulesSaving, setModulesSaving] = useState(false)
   const [modulesError, setModulesError] = useState('')
+  const [modulesHint, setModulesHint] = useState('')
   const [editingModuleIdx, setEditingModuleIdx] = useState(-1)
   const [editDraft, setEditDraft] = useState({ title: '', duration: '', content: '', videoUrl: '', embedUrl: '' })
   const [activeIndex, setActiveIndex] = useState(0)
   const activeModule = modules[Math.min(activeIndex, Math.max(modules.length - 1, 0))]
+
+  if (!course) {
+    return (
+      <div className="page-content">
+        <p>{t.nf}</p>
+        <Link to="/health-skills">{t.backList}</Link>
+      </div>
+    )
+  }
 
   const requiredMembership = course.requiredMembership || 'free'
   const allowed = hasLevelAccess(user?.level, requiredMembership)
@@ -74,8 +84,9 @@ export default function CourseLearn() {
     if (!isAdmin || !course?.id) return
     setModulesSaving(true)
     setModulesError('')
+    setModulesHint('')
     try {
-      const token = localStorage.getItem('hlp_token')
+      const token = getToken()
       const res = await fetch('/api/course-modules', {
         method: 'PATCH',
         headers: {
@@ -90,6 +101,7 @@ export default function CourseLearn() {
       setModules(normalized)
       setEditingModuleIdx(-1)
       setActiveIndex((v) => Math.min(v, Math.max(normalized.length - 1, 0)))
+      setModulesHint(lang === 'en' ? 'Saved' : lang === 'ar' ? 'تم الحفظ' : '保存成功')
     } catch (e) {
       setModulesError(e.message || 'save failed')
     } finally {
@@ -131,14 +143,6 @@ export default function CourseLearn() {
     await saveModules(next)
   }
 
-  if (!course) {
-    return (
-      <div className="page-content">
-        <p>{t.nf}</p>
-        <Link to="/health-skills">{t.backList}</Link>
-      </div>
-    )
-  }
   if (!allowed) {
     const requiredLabel = getMembershipLevelLabel(requiredMembership, lang)
     return (
@@ -180,6 +184,7 @@ export default function CourseLearn() {
           <h3>{t.modules}</h3>
           {modulesLoading ? <p className="video-missing">{lang === 'en' ? 'Loading modules...' : lang === 'ar' ? 'جارٍ تحميل الوحدات...' : '加载模块中…'}</p> : null}
           {modulesError ? <p className="video-missing">{modulesError}</p> : null}
+          {modulesHint ? <p className="video-duration">{modulesHint}</p> : null}
           <ul className="module-list">
             {modules.map((mod, idx) => (
               <li key={idx}>
