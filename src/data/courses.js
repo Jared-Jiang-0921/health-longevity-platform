@@ -23,6 +23,10 @@ export const CATEGORIES = [
 
 // 课程模块：type: 'video' | 'document'；video 优先 videoUrl（MP4 直链），否则 embedUrl（嵌入页）
 const courseModules = {
+  13: [
+    { type: 'document', title: '长寿科学导论', content: '从遗传、生活方式与环境三个层面理解长寿机制，建立系统化认知框架。' },
+    { type: 'video', title: '健康长寿三大支柱', duration: '09:00', videoUrl: DEMO_MP4 },
+  ],
   1: [
     {
       type: 'video',
@@ -62,6 +66,7 @@ const courseModules = {
 export const COURSES = [
   // requiredMembership: 'free' | 'standard' | 'premium'
   // 不填默认按 free 处理。把目标课程改为 premium，即可限制为高级会员可学习。
+  { id: 13, title: '长寿基础知识入门', category: 'basics', duration: '1 周', level: '初级', desc: '建立长寿科学的核心认知框架，适合新用户快速入门。', content: '课程覆盖长寿核心概念、风险因素、可执行的日常策略与阶段性评估方法。', modules: courseModules[13] },
   { id: 1, title: '科学饮食与长寿', category: 'nutrition', duration: '4 周', level: '初级', desc: '掌握营养素搭配、抗炎饮食与长寿膳食模式。', content: '本课程涵盖宏量营养素与微量营养素、地中海饮食与蓝区饮食模式、抗炎食物选择及实操餐单设计。', modules: courseModules[1] },
   { id: 2, title: '间歇性断食入门', category: 'nutrition', duration: '2 周', level: '初级', desc: '了解断食机制、实操方法与注意事项。', content: '介绍 16:8、5:2 等断食方式，断食期间代谢变化，以及适合人群与禁忌症。', modules: courseModules[2] },
   { id: 3, title: '力量训练基础', category: 'exercise', duration: '6 周', level: '初级', desc: '从零开始的抗阻训练，提升肌力与代谢。', content: '基础动作示范、训练计划编排、渐进超负荷原则及安全注意事项。', modules: courseModules[3] },

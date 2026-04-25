@@ -15,6 +15,15 @@
   padding-left: 1rem;
 }
 
+.module-assets-group {
+  margin-bottom: 1rem;
+}
+
+.module-assets-group-title {
+  margin: 0.35rem 0 0.5rem;
+  font-size: 0.98rem;
+}
+
 .module-assets-list li {
   margin-bottom: 1rem;
 }

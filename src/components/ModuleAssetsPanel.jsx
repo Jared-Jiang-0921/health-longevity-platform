@@ -61,6 +61,16 @@ export default function ModuleAssetsPanel({ moduleKey }) {
   const [savedItemId, setSavedItemId] = useState('')
   const isAdmin = Boolean(user?.site_admin)
   const subcategoryOptions = useMemo(() => getSubcategoryOptions(moduleKey), [moduleKey])
+  const groupedItems = useMemo(() => {
+    const buckets = new Map()
+    subcategoryOptions.forEach((opt) => buckets.set(opt, []))
+    items.forEach((item) => {
+      const key = String(item.subcategory || '').trim() || 'general'
+      if (!buckets.has(key)) buckets.set(key, [])
+      buckets.get(key).push(item)
+    })
+    return Array.from(buckets.entries()).filter(([, list]) => list.length)
+  }, [items, subcategoryOptions])
   const t = useMemo(() => ({
     zh: {
       section: '模块资料',
@@ -86,6 +96,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       uploadOk: '上传成功',
       uploadFail: '上传失败',
       invalid: '请填写标题并选择文件（支持图片/音频/视频/PDF/Word/Excel/PPT/TXT，<=50MB）',
+      uncategorized: '未分类',
     },
     en: {
       section: 'Module Assets',
@@ -111,6 +122,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       uploadOk: 'Upload successful',
       uploadFail: 'Upload failed',
       invalid: 'Please provide title and file (image/audio/video/PDF/Word/Excel/PPT/TXT, <=50MB).',
+      uncategorized: 'Uncategorized',
     },
     ar: {
       section: 'ملفات الوحدة',
@@ -136,6 +148,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       uploadOk: 'تم الرفع بنجاح',
       uploadFail: 'فشل الرفع',
       invalid: 'يرجى إدخال عنوان واختيار ملف (صور/صوت/فيديو/PDF/Word/Excel/PPT/TXT حتى 50MB).',
+      uncategorized: 'غير مصنف',
     },
   }[lang] || {}), [lang])
 
@@ -269,10 +282,14 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       <h3>{t.section}</h3>
       {loading ? <p className="module-assets-muted">{t.loading}</p> : null}
       {!loading && !items.length ? <p className="module-assets-muted">{t.empty}</p> : null}
-      {items.length ? (
-        <ul className="module-assets-list">
-          {items.map((item) => (
-            <li key={item.id}>
+      {groupedItems.length ? (
+        <>
+          {groupedItems.map(([groupName, groupList]) => (
+            <div className="module-assets-group" key={groupName}>
+              <h4 className="module-assets-group-title">{groupName === 'general' ? t.uncategorized : groupName}</h4>
+              <ul className="module-assets-list">
+                {groupList.map((item) => (
+                  <li key={item.id}>
               <div className="module-assets-head">
                 <strong>{item.title}</strong>
                 <span className="module-assets-size">{formatSize(item.file_size)}</span>
@@ -332,9 +349,12 @@ export default function ModuleAssetsPanel({ moduleKey }) {
                   {hint ? <p className="module-assets-hint">{hint}</p> : null}
                 </form>
               ) : null}
-            </li>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))}
-        </ul>
+        </>
       ) : null}
 
       {isAdmin ? (
