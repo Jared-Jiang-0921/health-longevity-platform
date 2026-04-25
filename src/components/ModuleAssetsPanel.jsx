@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { matchPath, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
 import { CATEGORIES, COURSES, getCourseById } from '../data/courses'
-import { PRODUCT_CATEGORIES } from '../data/products'
+import { PRODUCT_CATEGORIES, getProductById } from '../data/products'
 import './ModuleAssetsPanel.css'
 
 function formatSize(bytes) {
@@ -77,6 +77,29 @@ function resolveLinkedSubtopic(payload) {
   return String(payload?.subtopicLabel || '').trim()
 }
 
+/** 与列表过滤、上传落库展示一致 */
+function normalizeSubtopicValue(raw) {
+  const s = String(raw || '').trim()
+  return s || '待归类'
+}
+
+function normalizeAssetItem(moduleKey, item) {
+  if (!item || typeof item !== 'object') return item
+  return {
+    ...item,
+    subcategory: normalizeSubcategoryValue(moduleKey, item.subcategory),
+    subtopic: normalizeSubtopicValue(item.subtopic),
+  }
+}
+
+function resolveSubmitSubtopic(moduleKey, subcategoryValue, rawSubtopic) {
+  const options = getSubtopicOptions(moduleKey, subcategoryValue)
+  const normalized = normalizeSubtopicValue(rawSubtopic)
+  if (!options.length) return normalized
+  // 有预设细分类时，空值或不匹配都落到第一个合法项，避免进入“待归类”导致用户在目标细分类看不到
+  return options.includes(normalized) ? normalized : options[0]
+}
+
 function getSubtopicOptions(moduleKey, subcategoryLabel) {
   const label = String(subcategoryLabel || '').trim()
   if (!label) return []
@@ -113,6 +136,9 @@ export default function ModuleAssetsPanel({ moduleKey }) {
   const [savedItemId, setSavedItemId] = useState('')
   const [activeSubcategory, setActiveSubcategory] = useState('')
   const [activeSubtopic, setActiveSubtopic] = useState('')
+  /** 上传成功后锁定亚类/细分类，避免 loadItems 后 routeBinding 把视图刷回当前路由课程 */
+  const [pinnedSelection, setPinnedSelection] = useState(null)
+  const lastRouteBindingKeyRef = useRef('')
   const isAdmin = Boolean(user?.site_admin)
   const subcategoryOptions = useMemo(() => getSubcategoryOptions(moduleKey), [moduleKey])
   const subtopicOptions = useMemo(() => getSubtopicOptions(moduleKey, subcategory), [moduleKey, subcategory])
@@ -124,34 +150,47 @@ export default function ModuleAssetsPanel({ moduleKey }) {
   }, [items, moduleKey, subcategoryOptions])
   const latestItem = items[0] || null
   const routeBinding = useMemo(() => {
-    if (moduleKey !== 'health-skills') return null
-    const detailMatch = matchPath('/health-skills/:id', location.pathname)
-    const learnMatch = matchPath('/health-skills/:id/learn', location.pathname)
-    const id = detailMatch?.params?.id || learnMatch?.params?.id
-    if (!id) return null
-    const course = getCourseById(id)
-    if (!course) return null
-    const category = CATEGORIES.find((c) => c.id === course.category)
-    return {
-      subcategory: category?.label || '',
-      subtopic: course.title || '',
+    if (moduleKey === 'health-skills') {
+      const detailMatch = matchPath('/health-skills/:id', location.pathname)
+      const learnMatch = matchPath('/health-skills/:id/learn', location.pathname)
+      const id = detailMatch?.params?.id || learnMatch?.params?.id
+      if (!id) return null
+      const course = getCourseById(id)
+      if (!course) return null
+      const category = CATEGORIES.find((c) => c.id === course.category)
+      return {
+        subcategory: category?.label || '',
+        subtopic: course.title || '',
+      }
     }
+    if (moduleKey === 'products') {
+      const m = matchPath('/products/:id', location.pathname)
+      if (!m?.params?.id) return null
+      const product = getProductById(m.params.id)
+      if (!product) return null
+      const category = PRODUCT_CATEGORIES.find((c) => c.id === product.category)
+      return {
+        subcategory: category?.label || '',
+        subtopic: '产品详情资料',
+      }
+    }
+    return null
   }, [moduleKey, location.pathname])
   const visibleItems = useMemo(() => {
     if (!activeSubcategory) return []
     if (!activeSubtopic) return []
     return items.filter((item) => {
-      const sub = String(item.subcategory || '').trim() || 'general'
-      const topic = String(item.subtopic || '').trim() || '待归类'
+      const sub = normalizeSubcategoryValue(moduleKey, item.subcategory)
+      const topic = normalizeSubtopicValue(item.subtopic)
       return sub === activeSubcategory && topic === activeSubtopic
     })
-  }, [activeSubcategory, activeSubtopic, items])
+  }, [activeSubcategory, activeSubtopic, items, moduleKey])
   const activeSubtopicOptions = useMemo(() => {
     if (!activeSubcategory) return []
     const fromPreset = getSubtopicOptions(moduleKey, activeSubcategory)
     const fromItems = items
-      .filter((item) => String(item.subcategory || '').trim() === activeSubcategory)
-      .map((item) => String(item.subtopic || '').trim() || '待归类')
+      .filter((item) => normalizeSubcategoryValue(moduleKey, item.subcategory) === activeSubcategory)
+      .map((item) => normalizeSubtopicValue(item.subtopic))
     return Array.from(new Set([...fromItems, ...fromPreset]))
   }, [moduleKey, activeSubcategory, items])
   const t = useMemo(() => ({
@@ -281,14 +320,17 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     setLoading(true)
     setError('')
     try {
-      const res = await fetch(`/api/module-assets?module=${encodeURIComponent(moduleKey)}`)
+      const token = getToken()
+      const res = await fetch(`/api/module-assets?module=${encodeURIComponent(moduleKey)}&ts=${Date.now()}`, {
+        cache: 'no-store',
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(data.error || 'load failed')
       const normalized = Array.isArray(data.items)
-        ? data.items.map((item) => ({
-          ...item,
-          subcategory: normalizeSubcategoryValue(moduleKey, item.subcategory),
-        }))
+        ? data.items.map((item) => normalizeAssetItem(moduleKey, item))
         : []
       setItems(normalized)
     } catch (e) {
@@ -299,9 +341,14 @@ export default function ModuleAssetsPanel({ moduleKey }) {
   }
 
   useEffect(() => {
+    setPinnedSelection(null)
     loadItems()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [moduleKey])
+
+  useEffect(() => {
+    setPinnedSelection(null)
+  }, [location.pathname])
 
   useEffect(() => {
     setSubcategory(subcategoryOptions[0] || 'general')
@@ -328,9 +375,13 @@ export default function ModuleAssetsPanel({ moduleKey }) {
   }, [editingId, editSubtopicOptions, editForm.subtopic])
 
   useEffect(() => {
-    if (routeBinding?.subcategory) {
-      setActiveSubcategory(routeBinding.subcategory)
-      setActiveSubtopic(routeBinding.subtopic || '')
+    if (pinnedSelection) {
+      if (activeSubcategory !== pinnedSelection.subcategory) {
+        setActiveSubcategory(pinnedSelection.subcategory)
+      }
+      if (activeSubtopic !== pinnedSelection.subtopic) {
+        setActiveSubtopic(pinnedSelection.subtopic)
+      }
       return
     }
     if (availableSubcategories.length) {
@@ -345,28 +396,31 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       setActiveSubcategory('')
       setActiveSubtopic('')
     }
-  }, [availableSubcategories, activeSubcategory, latestItem, moduleKey, routeBinding])
+  }, [availableSubcategories, activeSubcategory, latestItem, moduleKey, pinnedSelection])
 
   useEffect(() => {
-    if (routeBinding?.subtopic) {
-      if (!activeSubtopicOptions.length) return
-      if (activeSubtopicOptions.includes(routeBinding.subtopic)) {
-        if (activeSubtopic !== routeBinding.subtopic) setActiveSubtopic(routeBinding.subtopic)
-      } else if (!activeSubtopicOptions.includes(activeSubtopic)) {
-        setActiveSubtopic(activeSubtopicOptions[0])
-      }
-      return
-    }
+    const routeKey = `${moduleKey}:${location.pathname}`
+    const isNewRoute = lastRouteBindingKeyRef.current !== routeKey
+    if (!isNewRoute) return
+    lastRouteBindingKeyRef.current = routeKey
+    if (!routeBinding?.subcategory) return
+    if (pinnedSelection) return
+    setActiveSubcategory(routeBinding.subcategory)
+    setActiveSubtopic(normalizeSubtopicValue(routeBinding.subtopic))
+  }, [moduleKey, location.pathname, pinnedSelection, routeBinding])
+
+  useEffect(() => {
+    if (pinnedSelection) return
     if (!activeSubtopicOptions.length) {
       setActiveSubtopic('')
       return
     }
     if (!activeSubtopicOptions.includes(activeSubtopic)) {
-      const latestSubtopic = String(latestItem?.subtopic || '').trim() || '待归类'
+      const latestSubtopic = normalizeSubtopicValue(latestItem?.subtopic)
       const preferred = activeSubtopicOptions.includes(latestSubtopic) ? latestSubtopic : activeSubtopicOptions[0]
       setActiveSubtopic(preferred)
     }
-  }, [activeSubtopicOptions, activeSubtopic, latestItem])
+  }, [activeSubtopicOptions, activeSubtopic, latestItem, pinnedSelection])
 
   useEffect(() => {
     function onLinkedCategoryChange(event) {
@@ -374,9 +428,10 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       if (detail.moduleKey !== moduleKey) return
       const next = resolveLinkedSubcategory(moduleKey, detail, subcategoryOptions)
       if (!next) return
+      setPinnedSelection(null)
       setActiveSubcategory(next)
       const linkedSubtopic = resolveLinkedSubtopic(detail)
-      setActiveSubtopic(linkedSubtopic || '')
+      setActiveSubtopic(normalizeSubtopicValue(linkedSubtopic))
     }
     window.addEventListener('module-category-change', onLinkedCategoryChange)
     return () => window.removeEventListener('module-category-change', onLinkedCategoryChange)
@@ -401,6 +456,8 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     }
     setSubmitting(true)
     try {
+      const submittedSubcategory = normalizeSubcategoryValue(moduleKey, subcategory.trim() || 'general')
+      const submittedSubtopic = resolveSubmitSubtopic(moduleKey, submittedSubcategory, subtopic)
       const buffer = await file.arrayBuffer()
       const bytes = new Uint8Array(buffer)
       let binary = ''
@@ -417,8 +474,8 @@ export default function ModuleAssetsPanel({ moduleKey }) {
           module: moduleKey,
           title: title.trim(),
           summary: summary.trim(),
-          subcategory: subcategory.trim() || 'general',
-          subtopic: subtopic.trim(),
+          subcategory: submittedSubcategory,
+          subtopic: submittedSubtopic,
           requiredLevel,
           fileName: file.name,
           mimeType: file.type || 'application/octet-stream',
@@ -427,11 +484,16 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(data.error || t.uploadFail)
+      if (data?.item?.id) {
+        const uploadedItem = normalizeAssetItem(moduleKey, data.item)
+        setItems((prev) => [uploadedItem, ...prev.filter((it) => it.id !== uploadedItem.id)])
+      }
       setTitle('')
       setSummary('')
       setSubcategory(subcategoryOptions[0] || 'general')
-      const uploadedSubcategory = subcategory.trim() || 'general'
-      const uploadedSubtopic = subtopic.trim() || '待归类'
+      const uploadedSubcategory = normalizeSubcategoryValue(moduleKey, data?.item?.subcategory || submittedSubcategory)
+      const uploadedSubtopic = normalizeSubtopicValue(data?.item?.subtopic || submittedSubtopic)
+      setPinnedSelection({ subcategory: uploadedSubcategory, subtopic: uploadedSubtopic })
       setActiveSubcategory(uploadedSubcategory)
       setActiveSubtopic(uploadedSubtopic)
       setSubtopic('')
@@ -472,6 +534,8 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     }
     setSavingEdit(true)
     try {
+      const savedSc = normalizeSubcategoryValue(moduleKey, editForm.subcategory)
+      const savedSt = resolveSubmitSubtopic(moduleKey, savedSc, editForm.subtopic)
       const token = getToken()
       const res = await fetch('/api/module-assets', {
         method: 'PATCH',
@@ -484,13 +548,22 @@ export default function ModuleAssetsPanel({ moduleKey }) {
           title: editForm.title.trim(),
           fileName: editForm.fileName.trim(),
           summary: editForm.summary.trim(),
-          subcategory: editForm.subcategory,
-          subtopic: editForm.subtopic,
+          subcategory: savedSc,
+          subtopic: savedSt,
           requiredLevel: editForm.requiredLevel,
         }),
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(data.error || t.saveFail)
+      if (data?.item?.id) {
+        const updatedItem = normalizeAssetItem(moduleKey, data.item)
+        setItems((prev) => prev.map((it) => (it.id === updatedItem.id ? updatedItem : it)))
+      }
+      const finalSc = normalizeSubcategoryValue(moduleKey, data?.item?.subcategory || savedSc)
+      const finalSt = normalizeSubtopicValue(data?.item?.subtopic || savedSt)
+      setPinnedSelection({ subcategory: finalSc, subtopic: finalSt })
+      setActiveSubcategory(finalSc)
+      setActiveSubtopic(finalSt)
       setHint(t.saveOk)
       setSavedItemId(editingId)
       await loadItems()
@@ -537,6 +610,12 @@ export default function ModuleAssetsPanel({ moduleKey }) {
           {' '} / subtopic=`{activeSubtopic || '-'}`
         </p>
       ) : null}
+      {isAdmin ? (
+        <p className="module-assets-debug">
+          items={items.length} / matched={visibleItems.length}
+          {items[0] ? ` / latest=${items[0].subcategory || '-'} > ${items[0].subtopic || '-'}` : ''}
+        </p>
+      ) : null}
       {!loading && !items.length ? <p className="module-assets-muted">{t.empty}</p> : null}
       {availableSubcategories.length ? (
         <>
@@ -549,6 +628,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
                   type="button"
                   className={`module-assets-subtab ${activeSubcategory === groupName ? 'active' : ''}`}
                   onClick={() => {
+                    setPinnedSelection(null)
                     setActiveSubcategory(groupName)
                     setActiveSubtopic('')
                   }}
@@ -566,7 +646,10 @@ export default function ModuleAssetsPanel({ moduleKey }) {
                   key={topic}
                   type="button"
                   className={`module-assets-subtab ${activeSubtopic === topic ? 'active' : ''}`}
-                  onClick={() => setActiveSubtopic(topic)}
+                  onClick={() => {
+                    setPinnedSelection(null)
+                    setActiveSubtopic(topic)
+                  }}
                 >
                   {topic}
                 </button>

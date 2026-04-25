@@ -97,7 +97,17 @@ function getExt(name) {
 
 function normalizeLevel(raw) {
   const s = String(raw || '').toLowerCase().trim()
-  return LEVEL_ORDER.includes(s) ? s : 'free'
+  const aliases = {
+    '普通会员': 'free',
+    '免费会员': 'free',
+    free: 'free',
+    '标准会员': 'standard',
+    standard: 'standard',
+    '高级会员': 'premium',
+    premium: 'premium',
+  }
+  const normalized = aliases[s] || s
+  return LEVEL_ORDER.includes(normalized) ? normalized : 'free'
 }
 
 function canView(required, current) {
@@ -107,6 +117,10 @@ function canView(required, current) {
 }
 
 async function getViewer(req) {
+  // 与上传/编辑/删除保持一致：如果满足整站管理员鉴权，则直接视为管理员查看全量资料
+  const adminAuth = await authorizeSiteAdmin(req)
+  if (adminAuth.ok) return { isAdmin: true, level: 'premium' }
+
   const requestAdminToken = String(req.headers['x-site-admin-token'] || '').trim()
   const configAdminToken = String(process.env.SITE_ADMIN_TOKEN || '').trim()
   if (configAdminToken && requestAdminToken && requestAdminToken === configAdminToken) {
