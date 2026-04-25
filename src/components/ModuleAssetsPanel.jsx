@@ -121,13 +121,19 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     return Array.from(buckets.entries()).filter(([, list]) => list.length)
   }, [items, subcategoryOptions])
   const visibleItems = useMemo(() => {
-    if (!activeSubcategory || !activeSubtopic) return []
-    return items.filter((item) => {
+    if (!activeSubcategory) return []
+    const subcategoryMatched = items.filter((item) => {
       const sub = String(item.subcategory || '').trim() || 'general'
-      const topic = String(item.subtopic || '').trim() || '未细分'
-      return sub === activeSubcategory && topic === activeSubtopic
+      return sub === activeSubcategory
     })
-  }, [activeSubcategory, activeSubtopic, items])
+    // 管理员默认可见当前一级分类下全部内容；选择二层后再精确筛选
+    if (isAdmin && !activeSubtopic) return subcategoryMatched
+    if (!activeSubtopic) return []
+    return subcategoryMatched.filter((item) => {
+      const topic = String(item.subtopic || '').trim() || '未细分'
+      return topic === activeSubtopic
+    })
+  }, [activeSubcategory, activeSubtopic, items, isAdmin])
   const activeSubtopicOptions = useMemo(() => {
     if (!activeSubcategory) return []
     const fromPreset = getSubtopicOptions(moduleKey, activeSubcategory)
@@ -166,6 +172,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       subcategoryContent: '按亚类查看资料',
       subtopicContent: '再选择二层分类后显示材料',
       emptySubtopic: '请选择二层分类查看对应资料',
+      adminAllVisible: '管理员：当前显示该一级分类下全部资料；选择二层可继续筛选。',
     },
     en: {
       section: 'Module Assets',
@@ -196,6 +203,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       subcategoryContent: 'Browse by subcategory',
       subtopicContent: 'Select a second-level category to view materials',
       emptySubtopic: 'Please select a second-level category',
+      adminAllVisible: 'Admin: all materials in this subcategory are shown; select a subtopic to filter.',
     },
     ar: {
       section: 'ملفات الوحدة',
@@ -226,6 +234,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       subcategoryContent: 'تصفح حسب التصنيف الفرعي',
       subtopicContent: 'اختر تصنيفًا فرعيًا أدق لعرض المواد',
       emptySubtopic: 'يرجى اختيار التصنيف الأدق',
+      adminAllVisible: 'للمسؤول: يتم عرض كل مواد هذا التصنيف الفرعي؛ اختر تصنيفًا أدق للتصفية.',
     },
   }[lang] || {}), [lang])
 
@@ -355,6 +364,10 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       setTitle('')
       setSummary('')
       setSubcategory(subcategoryOptions[0] || 'general')
+      const uploadedSubcategory = subcategory.trim() || 'general'
+      const uploadedSubtopic = subtopic.trim() || '未细分'
+      setActiveSubcategory(uploadedSubcategory)
+      setActiveSubtopic(uploadedSubtopic)
       setSubtopic('')
       setRequiredLevel('free')
       setFile(null)
@@ -460,7 +473,8 @@ export default function ModuleAssetsPanel({ moduleKey }) {
               ))}
             </div>
           </section>
-          {!activeSubtopic ? <p className="module-assets-muted">{t.emptySubtopic}</p> : null}
+          {isAdmin && !activeSubtopic ? <p className="module-assets-muted">{t.adminAllVisible}</p> : null}
+          {!isAdmin && !activeSubtopic ? <p className="module-assets-muted">{t.emptySubtopic}</p> : null}
           <ul className="module-assets-list">
             {visibleItems.map((item) => (
               <li key={item.id}>
