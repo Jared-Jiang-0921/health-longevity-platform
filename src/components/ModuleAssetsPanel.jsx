@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
+import { matchPath, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
-import { CATEGORIES, COURSES } from '../data/courses'
+import { CATEGORIES, COURSES, getCourseById } from '../data/courses'
 import { PRODUCT_CATEGORIES } from '../data/products'
 import './ModuleAssetsPanel.css'
 
@@ -93,6 +94,7 @@ function getSubtopicOptions(moduleKey, subcategoryLabel) {
 export default function ModuleAssetsPanel({ moduleKey }) {
   const { user, getToken } = useAuth()
   const { lang } = useLocale()
+  const location = useLocation()
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -126,6 +128,20 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     return Array.from(buckets.entries()).filter(([, list]) => list.length)
   }, [items, subcategoryOptions])
   const latestItem = items[0] || null
+  const routeBinding = useMemo(() => {
+    if (moduleKey !== 'health-skills') return null
+    const detailMatch = matchPath('/health-skills/:id', location.pathname)
+    const learnMatch = matchPath('/health-skills/:id/learn', location.pathname)
+    const id = detailMatch?.params?.id || learnMatch?.params?.id
+    if (!id) return null
+    const course = getCourseById(id)
+    if (!course) return null
+    const category = CATEGORIES.find((c) => c.id === course.category)
+    return {
+      subcategory: category?.label || '',
+      subtopic: course.title || '',
+    }
+  }, [moduleKey, location.pathname])
   const visibleItems = useMemo(() => {
     if (!activeSubcategory) return []
     if (!activeSubtopic) return []
@@ -308,6 +324,11 @@ export default function ModuleAssetsPanel({ moduleKey }) {
   }, [editingId, editSubtopicOptions, editForm.subtopic])
 
   useEffect(() => {
+    if (routeBinding?.subcategory) {
+      setActiveSubcategory(routeBinding.subcategory)
+      setActiveSubtopic(routeBinding.subtopic || '')
+      return
+    }
     if (groupedItems.length) {
       const exists = groupedItems.some(([name]) => name === activeSubcategory)
       if (!exists) {
@@ -323,6 +344,15 @@ export default function ModuleAssetsPanel({ moduleKey }) {
   }, [groupedItems, activeSubcategory, latestItem, moduleKey])
 
   useEffect(() => {
+    if (routeBinding?.subtopic) {
+      if (!activeSubtopicOptions.length) return
+      if (activeSubtopicOptions.includes(routeBinding.subtopic)) {
+        if (activeSubtopic !== routeBinding.subtopic) setActiveSubtopic(routeBinding.subtopic)
+      } else if (!activeSubtopicOptions.includes(activeSubtopic)) {
+        setActiveSubtopic(activeSubtopicOptions[0])
+      }
+      return
+    }
     if (!activeSubtopicOptions.length) {
       setActiveSubtopic('')
       return
