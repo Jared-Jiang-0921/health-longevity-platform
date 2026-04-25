@@ -103,7 +103,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
   const [error, setError] = useState('')
   const [hint, setHint] = useState('')
   const [editingId, setEditingId] = useState('')
-  const [editForm, setEditForm] = useState({ title: '', summary: '', subcategory: 'general', subtopic: '', requiredLevel: 'free' })
+  const [editForm, setEditForm] = useState({ title: '', fileName: '', summary: '', subcategory: 'general', subtopic: '', requiredLevel: 'free' })
   const [savedItemId, setSavedItemId] = useState('')
   const [activeSubcategory, setActiveSubcategory] = useState('')
   const [activeSubtopic, setActiveSubtopic] = useState('')
@@ -126,7 +126,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     if (!activeSubtopic) return []
     return items.filter((item) => {
       const sub = String(item.subcategory || '').trim() || 'general'
-      const topic = String(item.subtopic || '').trim() || '未细分'
+      const topic = String(item.subtopic || '').trim() || '待归类'
       return sub === activeSubcategory && topic === activeSubtopic
     })
   }, [activeSubcategory, activeSubtopic, items])
@@ -135,7 +135,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     const fromPreset = getSubtopicOptions(moduleKey, activeSubcategory)
     const fromItems = items
       .filter((item) => String(item.subcategory || '').trim() === activeSubcategory)
-      .map((item) => String(item.subtopic || '').trim() || '未细分')
+      .map((item) => String(item.subtopic || '').trim() || '待归类')
     return Array.from(new Set([...fromPreset, ...fromItems]))
   }, [moduleKey, activeSubcategory, items])
   const t = useMemo(() => ({
@@ -145,6 +145,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       loading: '加载中…',
       uploadTitle: '管理员上传',
       title: '标题',
+      fileName: '资料名称',
       summary: '摘要（可选）',
       subcategory: '亚类（例如：基础知识 / 课程 / 案例）',
       subtopic: '二级维度（例如：长寿基础知识入门）',
@@ -180,6 +181,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       loading: 'Loading…',
       uploadTitle: 'Admin Upload',
       title: 'Title',
+      fileName: 'File Name',
       summary: 'Summary (optional)',
       subcategory: 'Subcategory (e.g. basics/course/cases)',
       subtopic: 'Subtopic (e.g. Longevity Basics Intro)',
@@ -215,6 +217,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       loading: 'جارٍ التحميل…',
       uploadTitle: 'رفع المسؤول',
       title: 'العنوان',
+      fileName: 'اسم المادة',
       summary: 'الملخص (اختياري)',
       subcategory: 'تصنيف فرعي (مثل أساسيات/دورات/حالات)',
       subtopic: 'تصنيف أدق (مثل مقدمة أساسيات طول العمر)',
@@ -373,7 +376,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       setSummary('')
       setSubcategory(subcategoryOptions[0] || 'general')
       const uploadedSubcategory = subcategory.trim() || 'general'
-      const uploadedSubtopic = subtopic.trim() || '未细分'
+      const uploadedSubtopic = subtopic.trim() || '待归类'
       setActiveSubcategory(uploadedSubcategory)
       setActiveSubtopic(uploadedSubtopic)
       setSubtopic('')
@@ -395,6 +398,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     setEditingId(item.id)
     setEditForm({
       title: item.title || '',
+      fileName: item.file_name || '',
       summary: item.summary || '',
       subcategory: normalizeSubcategoryValue(moduleKey, item.subcategory) || subcategoryOptions[0] || 'general',
       subtopic: item.subtopic || '',
@@ -423,6 +427,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
         body: JSON.stringify({
           id: editingId,
           title: editForm.title.trim(),
+          fileName: editForm.fileName.trim(),
           summary: editForm.summary.trim(),
           subcategory: editForm.subcategory,
           subtopic: editForm.subtopic,
@@ -533,7 +538,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
                   item.subcategory || 'general'
                 }</span>
                 <span className="module-assets-pill">{
-                  item.subtopic || '未细分'
+                  item.subtopic || '待归类'
                 }</span>
                 <span className="module-assets-pill module-assets-pill-level">{t.levelTag?.[item.required_level] || item.required_level}</span>
               </p>
@@ -555,6 +560,10 @@ export default function ModuleAssetsPanel({ moduleKey }) {
                   <label>
                     <span>{t.title}</span>
                     <input value={editForm.title} onChange={(e) => setEditForm((v) => ({ ...v, title: e.target.value }))} />
+                  </label>
+                  <label>
+                    <span>{t.fileName}</span>
+                    <input value={editForm.fileName} onChange={(e) => setEditForm((v) => ({ ...v, fileName: e.target.value }))} />
                   </label>
                   <label>
                     <span>{t.summary}</span>

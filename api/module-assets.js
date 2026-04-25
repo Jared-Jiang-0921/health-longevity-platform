@@ -195,8 +195,11 @@ async function handleUpdate(req, res) {
   const summary = String(body.summary || '').trim().slice(0, 4000)
   const subcategory = String(body.subcategory || 'general').trim().slice(0, 80) || 'general'
   const subtopic = String(body.subtopic || '').trim().slice(0, 120)
+  const fileNameRaw = String(body.fileName || '').trim()
+  const fileName = sanitizeFileName(fileNameRaw)
   const requiredLevel = normalizeLevel(body.requiredLevel || 'free')
   if (!title) return res.status(400).json({ error: '标题不能为空' })
+  if (!fileNameRaw) return res.status(400).json({ error: '资料名称不能为空' })
 
   const rows = await sql`
     UPDATE module_assets
@@ -204,6 +207,7 @@ async function handleUpdate(req, res) {
         summary = ${summary || null},
         subcategory = ${subcategory},
         subtopic = ${subtopic},
+        file_name = ${fileName},
         required_level = ${requiredLevel},
         updated_at = NOW()
     WHERE id = ${id}
