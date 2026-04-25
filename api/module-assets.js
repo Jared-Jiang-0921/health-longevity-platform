@@ -7,7 +7,7 @@ import { verifyToken, getUserById } from '../lib/auth.js'
 import { parseSiteAdminEmails } from '../lib/siteAdminEmails.js'
 
 const STORAGE_DIR = path.join(process.cwd(), 'storage', 'module-assets')
-const MAX_FILE_SIZE = 50 * 1024 * 1024
+const MAX_FILE_SIZE = 100 * 1024 * 1024
 
 const ALLOWED_EXT = new Set([
   'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt',
@@ -166,7 +166,7 @@ async function handleUpload(req, res) {
 
   const fileBuffer = Buffer.from(contentBase64, 'base64')
   if (!fileBuffer.length) return res.status(400).json({ error: '上传文件为空' })
-  if (fileBuffer.length > MAX_FILE_SIZE) return res.status(400).json({ error: '文件超过 50MB 限制' })
+  if (fileBuffer.length > MAX_FILE_SIZE) return res.status(400).json({ error: '文件超过 100MB 限制' })
 
   await fs.mkdir(STORAGE_DIR, { recursive: true })
   const id = randomUUID()

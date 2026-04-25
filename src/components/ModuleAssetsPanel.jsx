@@ -185,7 +185,10 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       levelTag: { free: '普通会员', standard: '标准会员', premium: '高级会员' },
       uploadOk: '上传成功',
       uploadFail: '上传失败',
-      invalid: '请填写标题并选择文件（支持图片/音频/视频/PDF/Word/Excel/PPT/TXT，<=50MB）',
+      invalid: '请填写标题并选择文件',
+      titleRequired: '请填写标题',
+      fileRequired: '请选择文件',
+      fileTooLarge: '文件超过 100MB，请压缩后再上传',
       uncategorized: '未分类',
       subcategoryContent: '按亚类查看资料',
       subtopicContent: '再选择二层分类后显示材料',
@@ -222,7 +225,10 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       levelTag: { free: 'Free', standard: 'Standard', premium: 'Premium' },
       uploadOk: 'Upload successful',
       uploadFail: 'Upload failed',
-      invalid: 'Please provide title and file (image/audio/video/PDF/Word/Excel/PPT/TXT, <=50MB).',
+      invalid: 'Please provide title and file.',
+      titleRequired: 'Please provide a title.',
+      fileRequired: 'Please choose a file.',
+      fileTooLarge: 'File exceeds 100MB, please compress and retry.',
       uncategorized: 'Uncategorized',
       subcategoryContent: 'Browse by subcategory',
       subtopicContent: 'Select a second-level category to view materials',
@@ -259,7 +265,10 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       levelTag: { free: 'مجاني', standard: 'قياسي', premium: 'متميز' },
       uploadOk: 'تم الرفع بنجاح',
       uploadFail: 'فشل الرفع',
-      invalid: 'يرجى إدخال عنوان واختيار ملف (صور/صوت/فيديو/PDF/Word/Excel/PPT/TXT حتى 50MB).',
+      invalid: 'يرجى إدخال عنوان واختيار ملف.',
+      titleRequired: 'يرجى إدخال العنوان.',
+      fileRequired: 'يرجى اختيار ملف.',
+      fileTooLarge: 'حجم الملف يتجاوز 100MB، يرجى ضغطه ثم إعادة الرفع.',
       uncategorized: 'غير مصنف',
       subcategoryContent: 'تصفح حسب التصنيف الفرعي',
       subtopicContent: 'اختر تصنيفًا فرعيًا أدق لعرض المواد',
@@ -378,8 +387,16 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     setError('')
     setHint('')
     if (!isAdmin) return
-    if (!title.trim() || !file || file.size > 50 * 1024 * 1024) {
-      setError(t.invalid)
+    if (!title.trim()) {
+      setError(t.titleRequired || t.invalid)
+      return
+    }
+    if (!file) {
+      setError(t.fileRequired || t.invalid)
+      return
+    }
+    if (file.size > 100 * 1024 * 1024) {
+      setError(t.fileTooLarge || t.invalid)
       return
     }
     setSubmitting(true)
