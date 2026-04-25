@@ -284,43 +284,42 @@ export default function ModuleAssetsPanel({ moduleKey }) {
               {!isVideo(item.mime_type) || isAdmin ? (
                 <a href={`/api/module-assets/${item.id}`} target="_blank" rel="noreferrer">{t.open}</a>
               ) : null}
+              {isAdmin && editingId === item.id ? (
+                <form className="module-assets-upload module-assets-edit-inline" onSubmit={(e) => { e.preventDefault(); saveEdit() }}>
+                  <h4>{t.edit}</h4>
+                  <label>
+                    <span>{t.title}</span>
+                    <input value={editForm.title} onChange={(e) => setEditForm((v) => ({ ...v, title: e.target.value }))} />
+                  </label>
+                  <label>
+                    <span>{t.summary}</span>
+                    <textarea rows={3} value={editForm.summary} onChange={(e) => setEditForm((v) => ({ ...v, summary: e.target.value }))} />
+                  </label>
+                  <label>
+                    <span>{t.subcategory}</span>
+                    <select value={editForm.subcategory} onChange={(e) => setEditForm((v) => ({ ...v, subcategory: e.target.value }))}>
+                      {subcategoryOptions.map((opt) => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label>
+                    <span>{t.requiredLevel}</span>
+                    <select value={editForm.requiredLevel} onChange={(e) => setEditForm((v) => ({ ...v, requiredLevel: e.target.value }))}>
+                      <option value="free">{t.levelTag?.free || 'free'}</option>
+                      <option value="standard">{t.levelTag?.standard || 'standard'}</option>
+                      <option value="premium">{t.levelTag?.premium || 'premium'}</option>
+                    </select>
+                  </label>
+                  <p className="module-assets-actions">
+                    <button type="submit" className="btn-primary">{t.save}</button>
+                    <button type="button" className="btn-secondary" onClick={() => setEditingId('')}>{t.cancel}</button>
+                  </p>
+                </form>
+              ) : null}
             </li>
           ))}
         </ul>
-      ) : null}
-
-      {isAdmin && editingId ? (
-        <form className="module-assets-upload" onSubmit={(e) => { e.preventDefault(); saveEdit() }}>
-          <h4>{t.edit}</h4>
-          <label>
-            <span>{t.title}</span>
-            <input value={editForm.title} onChange={(e) => setEditForm((v) => ({ ...v, title: e.target.value }))} />
-          </label>
-          <label>
-            <span>{t.summary}</span>
-            <textarea rows={3} value={editForm.summary} onChange={(e) => setEditForm((v) => ({ ...v, summary: e.target.value }))} />
-          </label>
-          <label>
-            <span>{t.subcategory}</span>
-            <select value={editForm.subcategory} onChange={(e) => setEditForm((v) => ({ ...v, subcategory: e.target.value }))}>
-              {subcategoryOptions.map((opt) => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
-            </select>
-          </label>
-          <label>
-            <span>{t.requiredLevel}</span>
-            <select value={editForm.requiredLevel} onChange={(e) => setEditForm((v) => ({ ...v, requiredLevel: e.target.value }))}>
-              <option value="free">{t.levelTag?.free || 'free'}</option>
-              <option value="standard">{t.levelTag?.standard || 'standard'}</option>
-              <option value="premium">{t.levelTag?.premium || 'premium'}</option>
-            </select>
-          </label>
-          <p className="module-assets-actions">
-            <button type="submit" className="btn-primary">{t.save}</button>
-            <button type="button" className="btn-secondary" onClick={() => setEditingId('')}>{t.cancel}</button>
-          </p>
-        </form>
       ) : null}
 
       {isAdmin ? (
