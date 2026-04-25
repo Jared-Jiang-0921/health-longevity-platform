@@ -121,6 +121,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     })
     return Array.from(buckets.entries()).filter(([, list]) => list.length)
   }, [items, subcategoryOptions])
+  const latestItem = items[0] || null
   const visibleItems = useMemo(() => {
     if (!activeSubcategory) return []
     if (!activeSubtopic) return []
@@ -136,7 +137,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     const fromItems = items
       .filter((item) => String(item.subcategory || '').trim() === activeSubcategory)
       .map((item) => String(item.subtopic || '').trim() || '待归类')
-    return Array.from(new Set([...fromPreset, ...fromItems]))
+    return Array.from(new Set([...fromItems, ...fromPreset]))
   }, [moduleKey, activeSubcategory, items])
   const t = useMemo(() => ({
     zh: {
@@ -303,14 +304,16 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     if (groupedItems.length) {
       const exists = groupedItems.some(([name]) => name === activeSubcategory)
       if (!exists) {
-        setActiveSubcategory(groupedItems[0][0])
+        const latestSubcategory = normalizeSubcategoryValue(moduleKey, latestItem?.subcategory)
+        const preferred = groupedItems.find(([name]) => name === latestSubcategory)?.[0]
+        setActiveSubcategory(preferred || groupedItems[0][0])
         setActiveSubtopic('')
       }
     } else {
       setActiveSubcategory('')
       setActiveSubtopic('')
     }
-  }, [groupedItems, activeSubcategory])
+  }, [groupedItems, activeSubcategory, latestItem, moduleKey])
 
   useEffect(() => {
     if (!activeSubtopicOptions.length) {
@@ -318,9 +321,11 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       return
     }
     if (!activeSubtopicOptions.includes(activeSubtopic)) {
-      setActiveSubtopic(activeSubtopicOptions[0])
+      const latestSubtopic = String(latestItem?.subtopic || '').trim() || '待归类'
+      const preferred = activeSubtopicOptions.includes(latestSubtopic) ? latestSubtopic : activeSubtopicOptions[0]
+      setActiveSubtopic(preferred)
     }
-  }, [activeSubtopicOptions, activeSubtopic])
+  }, [activeSubtopicOptions, activeSubtopic, latestItem])
 
   useEffect(() => {
     function onLinkedCategoryChange(event) {
