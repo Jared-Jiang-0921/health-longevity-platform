@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { getCourseById, CATEGORIES } from '../data/courses'
 import { useFavorites } from '../hooks/useFavorites'
@@ -35,6 +36,19 @@ export default function CourseDetail() {
   const favorite = isFavorite(course.id)
   const requiredMembership = course.requiredMembership || 'free'
   const allowed = hasLevelAccess(user?.level, requiredMembership)
+
+  useEffect(() => {
+    if (!course) return
+    const selected = CATEGORIES.find((c) => c.id === course.category)
+    window.dispatchEvent(new CustomEvent('module-category-change', {
+      detail: {
+        moduleKey: 'health-skills',
+        categoryId: course.category,
+        categoryLabel: selected?.label || '',
+        subtopicLabel: course.title,
+      },
+    }))
+  }, [course])
 
   if (!allowed) {
     const requiredLabel = getMembershipLevelLabel(requiredMembership, lang)

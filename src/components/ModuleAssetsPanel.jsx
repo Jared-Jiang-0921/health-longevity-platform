@@ -72,6 +72,10 @@ function resolveLinkedSubcategory(moduleKey, payload, options) {
   return ''
 }
 
+function resolveLinkedSubtopic(payload) {
+  return String(payload?.subtopicLabel || '').trim()
+}
+
 function getSubtopicOptions(moduleKey, subcategoryLabel) {
   const label = String(subcategoryLabel || '').trim()
   if (!label) return []
@@ -334,7 +338,8 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       const next = resolveLinkedSubcategory(moduleKey, detail, subcategoryOptions)
       if (!next) return
       setActiveSubcategory(next)
-      setActiveSubtopic('')
+      const linkedSubtopic = resolveLinkedSubtopic(detail)
+      setActiveSubtopic(linkedSubtopic || '')
     }
     window.addEventListener('module-category-change', onLinkedCategoryChange)
     return () => window.removeEventListener('module-category-change', onLinkedCategoryChange)
