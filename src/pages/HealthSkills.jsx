@@ -16,13 +16,10 @@ export default function HealthSkills() {
     en: { title: 'Health Skills', desc: 'Structured health knowledge and skill courses with multilingual learning.', cancel: 'Remove favorite', fav: 'Favorite' },
     ar: { title: 'مهارات الصحة', desc: 'دورات منهجية للمعرفة والمهارات الصحية مع دعم متعدد اللغات.', cancel: 'إزالة من المفضلة', fav: 'إضافة للمفضلة' },
   }[lang || 'zh']
-  const [activeCategory, setActiveCategory] = useState('all')
+  const [activeCategory, setActiveCategory] = useState(CATEGORIES[0]?.id || 'basics')
   const { isFavorite, toggle } = useFavorites()
 
-  const filtered =
-    activeCategory === 'all'
-      ? COURSES
-      : COURSES.filter((c) => c.category === activeCategory)
+  const filtered = COURSES.filter((c) => c.category === activeCategory)
 
   useEffect(() => {
     const selected = CATEGORIES.find((c) => c.id === activeCategory)

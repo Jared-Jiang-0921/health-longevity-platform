@@ -13,12 +13,9 @@ export default function Products() {
     en: { title: 'Evidence-Based Products', desc: 'Selected evidence-based health products with checkout support.' },
     ar: { title: 'منتجات مبنية على الدليل', desc: 'منتجات صحية مختارة قائمة على الدليل مع دعم الدفع.' },
   }[lang || 'zh']
-  const [activeCategory, setActiveCategory] = useState('all')
+  const [activeCategory, setActiveCategory] = useState(PRODUCT_CATEGORIES[0]?.id || 'supplement')
 
-  const filtered =
-    activeCategory === 'all'
-      ? PRODUCTS
-      : PRODUCTS.filter((p) => p.category === activeCategory)
+  const filtered = PRODUCTS.filter((p) => p.category === activeCategory)
 
   useEffect(() => {
     const selected = PRODUCT_CATEGORIES.find((c) => c.id === activeCategory)

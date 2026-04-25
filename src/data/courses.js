@@ -11,7 +11,6 @@ const DEMO_MP4 =
   'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4'
 
 export const CATEGORIES = [
-  { id: 'all', label: '全部' },
   { id: 'basics', label: '长寿基础知识' },
   { id: 'nutrition', label: '营养与饮食' },
   { id: 'exercise', label: '运动与体能' },

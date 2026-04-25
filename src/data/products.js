@@ -1,5 +1,4 @@
 export const PRODUCT_CATEGORIES = [
-  { id: 'all', label: '全部' },
   { id: 'supplement', label: '营养补充剂' },
   { id: 'equipment', label: '健康设备' },
   { id: 'food', label: '健康食品' },
