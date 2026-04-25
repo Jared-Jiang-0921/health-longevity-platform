@@ -153,11 +153,42 @@ async function handleUpload(req, res) {
   return res.status(201).json({ ok: true, item: rows[0] })
 }
 
+async function handleUpdate(req, res) {
+  await ensureSchema()
+  const auth = await authorizeSiteAdmin(req)
+  if (!auth.ok) return res.status(auth.status).json({ code: auth.code, error: auth.error })
+
+  const body = parseJson(req, res)
+  if (!body) return
+  const id = String(body.id || '').trim()
+  if (!id) return res.status(400).json({ error: '缺少资源 id' })
+
+  const title = String(body.title || '').trim().slice(0, 200)
+  const summary = String(body.summary || '').trim().slice(0, 4000)
+  const subcategory = String(body.subcategory || 'general').trim().slice(0, 80) || 'general'
+  const requiredLevel = normalizeLevel(body.requiredLevel || 'free')
+  if (!title) return res.status(400).json({ error: '标题不能为空' })
+
+  const rows = await sql`
+    UPDATE module_assets
+    SET title = ${title},
+        summary = ${summary || null},
+        subcategory = ${subcategory},
+        required_level = ${requiredLevel},
+        updated_at = NOW()
+    WHERE id = ${id}
+    RETURNING id, module_key, subcategory, required_level, title, summary, file_name, mime_type, file_size, uploader, created_at, updated_at
+  `
+  if (!rows.length) return res.status(404).json({ error: '资源不存在' })
+  return res.status(200).json({ ok: true, item: rows[0] })
+}
+
 export default async function handler(req, res) {
   try {
     if (req.method === 'GET') return handleList(req, res)
     if (req.method === 'POST') return handleUpload(req, res)
-    res.setHeader('Allow', 'GET, POST')
+    if (req.method === 'PATCH') return handleUpdate(req, res)
+    res.setHeader('Allow', 'GET, POST, PATCH')
     return res.status(405).json({ error: 'Method not allowed' })
   } catch (e) {
     console.error('module-assets api error', e)

@@ -55,6 +55,8 @@ export default function ModuleAssetsPanel({ moduleKey }) {
   const [file, setFile] = useState(null)
   const [error, setError] = useState('')
   const [hint, setHint] = useState('')
+  const [editingId, setEditingId] = useState('')
+  const [editForm, setEditForm] = useState({ title: '', summary: '', subcategory: 'general', requiredLevel: 'free' })
   const isAdmin = Boolean(user?.site_admin)
   const subcategoryOptions = useMemo(() => getSubcategoryOptions(moduleKey), [moduleKey])
   const t = useMemo(() => ({
@@ -71,6 +73,11 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       upload: '上传',
       uploading: '上传中…',
       open: '打开/下载',
+      edit: '编辑',
+      save: '保存',
+      cancel: '取消',
+      saveOk: '保存成功',
+      saveFail: '保存失败',
       videoRestricted: '视频资源仅管理员可下载',
       levelTag: { free: '普通会员', standard: '标准会员', premium: '高级会员' },
       uploadOk: '上传成功',
@@ -90,6 +97,11 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       upload: 'Upload',
       uploading: 'Uploading…',
       open: 'Open / Download',
+      edit: 'Edit',
+      save: 'Save',
+      cancel: 'Cancel',
+      saveOk: 'Saved',
+      saveFail: 'Save failed',
       videoRestricted: 'Video files are restricted to admins.',
       levelTag: { free: 'Free', standard: 'Standard', premium: 'Premium' },
       uploadOk: 'Upload successful',
@@ -109,6 +121,11 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       upload: 'رفع',
       uploading: 'جارٍ الرفع…',
       open: 'فتح / تنزيل',
+      edit: 'تعديل',
+      save: 'حفظ',
+      cancel: 'إلغاء',
+      saveOk: 'تم الحفظ',
+      saveFail: 'فشل الحفظ',
       videoRestricted: 'ملفات الفيديو متاحة للتنزيل للمسؤول فقط.',
       levelTag: { free: 'مجاني', standard: 'قياسي', premium: 'متميز' },
       uploadOk: 'تم الرفع بنجاح',
@@ -191,6 +208,52 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     }
   }
 
+  function startEdit(item) {
+    setError('')
+    setHint('')
+    setEditingId(item.id)
+    setEditForm({
+      title: item.title || '',
+      summary: item.summary || '',
+      subcategory: item.subcategory || subcategoryOptions[0] || 'general',
+      requiredLevel: item.required_level || 'free',
+    })
+  }
+
+  async function saveEdit() {
+    if (!editingId) return
+    setError('')
+    setHint('')
+    if (!editForm.title.trim()) {
+      setError(t.invalid)
+      return
+    }
+    try {
+      const token = getToken()
+      const res = await fetch('/api/module-assets', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          id: editingId,
+          title: editForm.title.trim(),
+          summary: editForm.summary.trim(),
+          subcategory: editForm.subcategory,
+          requiredLevel: editForm.requiredLevel,
+        }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error || t.saveFail)
+      setHint(t.saveOk)
+      setEditingId('')
+      await loadItems()
+    } catch (e) {
+      setError(e.message || t.saveFail)
+    }
+  }
+
   return (
     <section className="module-assets-panel">
       <h3>{t.section}</h3>
@@ -204,6 +267,11 @@ export default function ModuleAssetsPanel({ moduleKey }) {
                 <strong>{item.title}</strong>
                 <span className="module-assets-size">{formatSize(item.file_size)}</span>
               </div>
+              {isAdmin ? (
+                <p className="module-assets-actions">
+                  <button type="button" className="btn-linkish" onClick={() => startEdit(item)}>{t.edit}</button>
+                </p>
+              ) : null}
               <p className="module-assets-meta">
                 [{item.subcategory || 'general'}] · {t.levelTag?.[item.required_level] || item.required_level}
               </p>
@@ -219,6 +287,40 @@ export default function ModuleAssetsPanel({ moduleKey }) {
             </li>
           ))}
         </ul>
+      ) : null}
+
+      {isAdmin && editingId ? (
+        <form className="module-assets-upload" onSubmit={(e) => { e.preventDefault(); saveEdit() }}>
+          <h4>{t.edit}</h4>
+          <label>
+            <span>{t.title}</span>
+            <input value={editForm.title} onChange={(e) => setEditForm((v) => ({ ...v, title: e.target.value }))} />
+          </label>
+          <label>
+            <span>{t.summary}</span>
+            <textarea rows={3} value={editForm.summary} onChange={(e) => setEditForm((v) => ({ ...v, summary: e.target.value }))} />
+          </label>
+          <label>
+            <span>{t.subcategory}</span>
+            <select value={editForm.subcategory} onChange={(e) => setEditForm((v) => ({ ...v, subcategory: e.target.value }))}>
+              {subcategoryOptions.map((opt) => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            <span>{t.requiredLevel}</span>
+            <select value={editForm.requiredLevel} onChange={(e) => setEditForm((v) => ({ ...v, requiredLevel: e.target.value }))}>
+              <option value="free">{t.levelTag?.free || 'free'}</option>
+              <option value="standard">{t.levelTag?.standard || 'standard'}</option>
+              <option value="premium">{t.levelTag?.premium || 'premium'}</option>
+            </select>
+          </label>
+          <p className="module-assets-actions">
+            <button type="submit" className="btn-primary">{t.save}</button>
+            <button type="button" className="btn-secondary" onClick={() => setEditingId('')}>{t.cancel}</button>
+          </p>
+        </form>
       ) : null}
 
       {isAdmin ? (

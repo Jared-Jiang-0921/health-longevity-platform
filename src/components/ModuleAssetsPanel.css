@@ -37,6 +37,22 @@
   font-size: 0.82rem;
 }
 
+.module-assets-actions {
+  margin: 0.3rem 0;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.module-assets-actions .btn-linkish {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.86rem;
+}
+
 .module-assets-image,
 .module-assets-media {
   display: block;
