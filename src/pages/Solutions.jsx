@@ -115,11 +115,16 @@ function ConsultCard({ title, description, url, envHint, requiredLevel, user, co
           <Link to="/payment" className="consult-card-btn consult-btn-upgrade">{t.upgrade}</Link>
         </div>
       ) : ready ? (
-        <>
+        <form
+          className="consult-open-form"
+          onSubmit={(e) => {
+            e.preventDefault()
+            openConsult()
+          }}
+        >
           <button
-            type="button"
-            className="consult-card-btn"
-            onClick={openConsult}
+            type="submit"
+            className="consult-card-btn consult-card-btn-block"
           >
             {query.trim() ? t.enterAndQuery : t.enter}
           </button>
@@ -131,7 +136,7 @@ function ConsultCard({ title, description, url, envHint, requiredLevel, user, co
           >
             {t.openDirectly}
           </a>
-        </>
+        </form>
       ) : (
         <p className="consult-card-missing">
           {p.configureEnvVar(envHint)}
