@@ -18,8 +18,15 @@ export function getExternalDisplayName(user) {
 export function appendExternalEntryParams(url, user, options = {}) {
   if (!url?.trim()) return ''
   const base = url.trim()
-  const sep = base.includes('?') ? '&' : '?'
-  const params = new URLSearchParams()
+  const isAbsolute = /^https?:\/\//i.test(base)
+  const fallbackOrigin = typeof window !== 'undefined' && window.location?.origin ? window.location.origin : 'http://localhost'
+  let u
+  try {
+    u = new URL(base, fallbackOrigin)
+  } catch {
+    return base
+  }
+  const params = u.searchParams
   const levelNorm = normalizeLevel(user?.level)
   const levelRank = { free: 0, standard: 1, premium: 2 }
   params.set('source', 'healthlongevityplatform')
@@ -30,12 +37,31 @@ export function appendExternalEntryParams(url, user, options = {}) {
   if (options.consultEntry) {
     params.set('hl_channel', 'consult')
     params.set('hl_consult_entry', options.consultEntry)
-    // 兼容咨询端常见路由参数：mode=general/professional
+    // 兼容咨询端常见路由参数
     params.set('mode', options.consultEntry)
+    params.set('consult_mode', options.consultEntry)
+    params.set('entry', options.consultEntry)
+    // 若 URL 是咨询入口，强制规范到对应路径，避免 professional 仍落到 general
+    const path = (u.pathname || '').replace(/\/+$/, '')
+    if (
+      path === '/consult'
+      || path === '/consult/general'
+      || path === '/consult/professional'
+    ) {
+      u.pathname = `/consult/${options.consultEntry}`
+    }
   } else if (options.channel === 'content') {
     params.set('hl_channel', 'content')
   } else if (options.channel === 'consult') {
     params.set('hl_channel', 'consult')
+  }
+  const langRaw = String(options.lang || '').trim().toLowerCase()
+  if (langRaw) {
+    const langMap = { zh: 'zh-CN', en: 'en', ar: 'ar' }
+    const lang = langMap[langRaw] || langRaw
+    params.set('lang', lang)
+    params.set('hl_lang', lang)
+    params.set('locale', lang)
   }
   const query = String(options.query || '').trim()
   if (query) {
@@ -58,5 +84,6 @@ export function appendExternalEntryParams(url, user, options = {}) {
     params.set('hl_origin', window.location.hostname)
   }
   params.set('hl_ts', String(Date.now()))
-  return `${base}${sep}${params.toString()}`
+  if (isAbsolute) return u.toString()
+  return `${u.pathname}${u.search}${u.hash}`
 }

@@ -16,6 +16,7 @@ const CONTENT_ENTRY_URL = getContentEntryUrl()
 
 const I18N = {
   zh: {
+    langKey: 'zh',
     title: '综合长寿方案',
     loading: '正在验证会员身份，请稍候…',
     intakeTitle: '先完善健康问卷',
@@ -32,6 +33,7 @@ const I18N = {
     upgrade: '升级会员',
   },
   en: {
+    langKey: 'en',
     title: 'Integrated Longevity Solutions',
     loading: 'Verifying membership…',
     intakeTitle: 'Complete Health Questionnaire First',
@@ -48,6 +50,7 @@ const I18N = {
     upgrade: 'Upgrade',
   },
   ar: {
+    langKey: 'ar',
     title: 'حلول طول العمر المتكاملة',
     loading: 'جار التحقق من العضوية…',
     intakeTitle: 'أكمل الاستبيان الصحي أولاً',
@@ -71,8 +74,8 @@ function ConsultCard({ title, description, url, envHint, requiredLevel, user, co
   const ready = Boolean(url?.trim())
   const allowed = hasLevelAccess(user?.level, requiredLevel)
   const href = useMemo(
-    () => appendExternalEntryParams(url, user, { consultEntry, query }),
-    [url, user, consultEntry, query],
+    () => appendExternalEntryParams(url, user, { consultEntry, query, lang: t.langKey }),
+    [url, user, consultEntry, query, t.langKey],
   )
   const openConsult = useCallback((e) => {
     if (e?.preventDefault) e.preventDefault()
@@ -190,7 +193,7 @@ export default function Solutions() {
             </p>
             <a
               className="consult-card-btn"
-              href={appendExternalEntryParams(CONTENT_ENTRY_URL, user, { channel: 'content' })}
+              href={appendExternalEntryParams(CONTENT_ENTRY_URL, user, { channel: 'content', lang: t.langKey })}
               target="_blank"
               rel="noopener noreferrer"
             >
