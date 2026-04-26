@@ -30,6 +30,8 @@ export function appendExternalEntryParams(url, user, options = {}) {
   if (options.consultEntry) {
     params.set('hl_channel', 'consult')
     params.set('hl_consult_entry', options.consultEntry)
+    // 兼容咨询端常见路由参数：mode=general/professional
+    params.set('mode', options.consultEntry)
   } else if (options.channel === 'content') {
     params.set('hl_channel', 'content')
   } else if (options.channel === 'consult') {
