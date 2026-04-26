@@ -74,7 +74,8 @@ function ConsultCard({ title, description, url, envHint, requiredLevel, user, co
     () => appendExternalEntryParams(url, user, { consultEntry, query }),
     [url, user, consultEntry, query],
   )
-  const openConsult = useCallback(() => {
+  const openConsult = useCallback((e) => {
+    if (e?.preventDefault) e.preventDefault()
     setOpenError('')
     if (!href) {
       setOpenError(t.linkInvalid || '咨询链接无效，请联系管理员检查配置。')
@@ -106,7 +107,7 @@ function ConsultCard({ title, description, url, envHint, requiredLevel, user, co
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t.queryPlaceholder}
-          disabled={!allowed || !ready}
+          disabled={!allowed}
         />
       </label>
       {!allowed ? (
@@ -115,19 +116,16 @@ function ConsultCard({ title, description, url, envHint, requiredLevel, user, co
           <Link to="/payment" className="consult-card-btn consult-btn-upgrade">{t.upgrade}</Link>
         </div>
       ) : ready ? (
-        <form
-          className="consult-open-form"
-          onSubmit={(e) => {
-            e.preventDefault()
-            openConsult()
-          }}
-        >
-          <button
-            type="submit"
+        <>
+          <a
             className="consult-card-btn consult-card-btn-block"
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={openConsult}
           >
             {query.trim() ? t.enterAndQuery : t.enter}
-          </button>
+          </a>
           <a
             className="consult-open-direct"
             href={href}
@@ -136,7 +134,7 @@ function ConsultCard({ title, description, url, envHint, requiredLevel, user, co
           >
             {t.openDirectly}
           </a>
-        </form>
+        </>
       ) : (
         <p className="consult-card-missing">
           {p.configureEnvVar(envHint)}
