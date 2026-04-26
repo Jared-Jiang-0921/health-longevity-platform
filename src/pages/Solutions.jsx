@@ -27,6 +27,7 @@ const I18N = {
     queryPlaceholder: '例如：高级会员如何制定长寿饮食方案？',
     enter: '进入咨询',
     enterAndQuery: '进入并查询',
+    openDirectly: '若未自动跳转，请点此直接打开咨询页',
     linkInvalid: '咨询链接无效，请联系管理员检查配置',
     upgrade: '升级会员',
   },
@@ -42,6 +43,7 @@ const I18N = {
     queryPlaceholder: 'e.g. How to design a longevity diet plan?',
     enter: 'Enter Consultation',
     enterAndQuery: 'Enter & Query',
+    openDirectly: 'If auto-open fails, click here to open directly',
     linkInvalid: 'Consultation URL is invalid. Please contact admin.',
     upgrade: 'Upgrade',
   },
@@ -57,6 +59,7 @@ const I18N = {
     queryPlaceholder: 'مثال: كيف أضع خطة غذائية لطول العمر؟',
     enter: 'دخول الاستشارة',
     enterAndQuery: 'ادخل وابحث',
+    openDirectly: 'إذا لم يتم الفتح تلقائيًا، اضغط هنا للفتح مباشرة',
     linkInvalid: 'رابط الاستشارة غير صالح، يرجى التواصل مع المسؤول',
     upgrade: 'ترقية العضوية',
   },
@@ -79,7 +82,14 @@ function ConsultCard({ title, description, url, envHint, requiredLevel, user, co
     }
     try {
       const popup = window.open(href, '_blank', 'noopener,noreferrer')
-      if (!popup) window.location.assign(href)
+      // 某些浏览器可能返回 Window 对象但实际阻止打开，这里做延迟兜底跳转
+      if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+        window.location.assign(href)
+        return
+      }
+      setTimeout(() => {
+        if (popup.closed) window.location.assign(href)
+      }, 300)
     } catch {
       window.location.assign(href)
     }
@@ -105,13 +115,23 @@ function ConsultCard({ title, description, url, envHint, requiredLevel, user, co
           <Link to="/payment" className="consult-card-btn consult-btn-upgrade">{t.upgrade}</Link>
         </div>
       ) : ready ? (
-        <button
-          type="button"
-          className="consult-card-btn"
-          onClick={openConsult}
-        >
-          {query.trim() ? t.enterAndQuery : t.enter}
-        </button>
+        <>
+          <button
+            type="button"
+            className="consult-card-btn"
+            onClick={openConsult}
+          >
+            {query.trim() ? t.enterAndQuery : t.enter}
+          </button>
+          <a
+            className="consult-open-direct"
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {t.openDirectly}
+          </a>
+        </>
       ) : (
         <p className="consult-card-missing">
           {p.configureEnvVar(envHint)}

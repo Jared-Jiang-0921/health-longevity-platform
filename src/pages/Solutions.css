@@ -77,6 +77,14 @@
   background: var(--color-primary-hover);
 }
 
+.consult-open-direct {
+  display: inline-block;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  text-decoration: underline;
+  margin-top: -0.2rem;
+}
+
 .consult-card-missing {
   margin: 0;
   font-size: 0.8rem;
