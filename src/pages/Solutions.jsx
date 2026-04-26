@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
@@ -23,7 +23,10 @@ const I18N = {
     intakeLegal: '查看健康数据说明',
     contentTitle: '内容资源',
     contentBtn: '进入内容',
+    queryLabel: '咨询问题（可选）',
+    queryPlaceholder: '例如：高级会员如何制定长寿饮食方案？',
     enter: '进入咨询',
+    enterAndQuery: '进入并查询',
     upgrade: '升级会员',
   },
   en: {
@@ -34,7 +37,10 @@ const I18N = {
     intakeLegal: 'View Health Data Notice',
     contentTitle: 'Content Resources',
     contentBtn: 'Open Content',
+    queryLabel: 'Question (optional)',
+    queryPlaceholder: 'e.g. How to design a longevity diet plan?',
     enter: 'Enter Consultation',
+    enterAndQuery: 'Enter & Query',
     upgrade: 'Upgrade',
   },
   ar: {
@@ -45,19 +51,37 @@ const I18N = {
     intakeLegal: 'عرض إشعار البيانات الصحية',
     contentTitle: 'موارد المحتوى',
     contentBtn: 'دخول المحتوى',
+    queryLabel: 'سؤال الاستشارة (اختياري)',
+    queryPlaceholder: 'مثال: كيف أضع خطة غذائية لطول العمر؟',
     enter: 'دخول الاستشارة',
+    enterAndQuery: 'ادخل وابحث',
     upgrade: 'ترقية العضوية',
   },
 }
 
 function ConsultCard({ title, description, url, envHint, requiredLevel, user, consultEntry, t, p }) {
+  const [query, setQuery] = useState('')
   const ready = Boolean(url?.trim())
   const allowed = hasLevelAccess(user?.level, requiredLevel)
+  const href = useMemo(
+    () => appendExternalEntryParams(url, user, { consultEntry, query }),
+    [url, user, consultEntry, query],
+  )
 
   return (
     <article className={`consult-card ${!allowed ? 'consult-card-locked' : ''}`}>
       <h2>{title}</h2>
       <p className="consult-card-desc">{description}</p>
+      <label className="consult-query">
+        <span>{t.queryLabel}</span>
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={t.queryPlaceholder}
+          disabled={!allowed || !ready}
+        />
+      </label>
       {!allowed ? (
         <div className="consult-card-lock">
           <p className="consult-lock-msg">{p.requiresLevel(MEMBERSHIP_LEVELS[requiredLevel]?.name || requiredLevel)}</p>
@@ -66,11 +90,11 @@ function ConsultCard({ title, description, url, envHint, requiredLevel, user, co
       ) : ready ? (
         <a
           className="consult-card-btn"
-          href={appendExternalEntryParams(url, user, { consultEntry })}
+          href={href}
           target="_blank"
           rel="noopener noreferrer"
         >
-          {t.enter}
+          {query.trim() ? t.enterAndQuery : t.enter}
         </a>
       ) : (
         <p className="consult-card-missing">

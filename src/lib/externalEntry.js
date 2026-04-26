@@ -35,6 +35,12 @@ export function appendExternalEntryParams(url, user, options = {}) {
   } else if (options.channel === 'consult') {
     params.set('hl_channel', 'consult')
   }
+  const query = String(options.query || '').trim()
+  if (query) {
+    // 兼容不同咨询端实现：常见读取 q，也保留平台前缀参数
+    params.set('q', query)
+    params.set('hl_query', query)
+  }
 
   if (user?.email) params.set('email', user.email)
   if (user?.id) params.set('user_id', String(user.id))
