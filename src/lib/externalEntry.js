@@ -41,15 +41,6 @@ export function appendExternalEntryParams(url, user, options = {}) {
     params.set('mode', options.consultEntry)
     params.set('consult_mode', options.consultEntry)
     params.set('entry', options.consultEntry)
-    // 若 URL 是咨询入口，强制规范到对应路径，避免 professional 仍落到 general
-    const path = (u.pathname || '').replace(/\/+$/, '')
-    if (
-      path === '/consult'
-      || path === '/consult/general'
-      || path === '/consult/professional'
-    ) {
-      u.pathname = `/consult/${options.consultEntry}`
-    }
   } else if (options.channel === 'content') {
     params.set('hl_channel', 'content')
   } else if (options.channel === 'consult') {
