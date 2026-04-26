@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
@@ -27,6 +27,7 @@ const I18N = {
     queryPlaceholder: '例如：高级会员如何制定长寿饮食方案？',
     enter: '进入咨询',
     enterAndQuery: '进入并查询',
+    linkInvalid: '咨询链接无效，请联系管理员检查配置',
     upgrade: '升级会员',
   },
   en: {
@@ -41,6 +42,7 @@ const I18N = {
     queryPlaceholder: 'e.g. How to design a longevity diet plan?',
     enter: 'Enter Consultation',
     enterAndQuery: 'Enter & Query',
+    linkInvalid: 'Consultation URL is invalid. Please contact admin.',
     upgrade: 'Upgrade',
   },
   ar: {
@@ -55,18 +57,33 @@ const I18N = {
     queryPlaceholder: 'مثال: كيف أضع خطة غذائية لطول العمر؟',
     enter: 'دخول الاستشارة',
     enterAndQuery: 'ادخل وابحث',
+    linkInvalid: 'رابط الاستشارة غير صالح، يرجى التواصل مع المسؤول',
     upgrade: 'ترقية العضوية',
   },
 }
 
 function ConsultCard({ title, description, url, envHint, requiredLevel, user, consultEntry, t, p }) {
   const [query, setQuery] = useState('')
+  const [openError, setOpenError] = useState('')
   const ready = Boolean(url?.trim())
   const allowed = hasLevelAccess(user?.level, requiredLevel)
   const href = useMemo(
     () => appendExternalEntryParams(url, user, { consultEntry, query }),
     [url, user, consultEntry, query],
   )
+  const openConsult = useCallback(() => {
+    setOpenError('')
+    if (!href) {
+      setOpenError(t.linkInvalid || '咨询链接无效，请联系管理员检查配置。')
+      return
+    }
+    try {
+      const popup = window.open(href, '_blank', 'noopener,noreferrer')
+      if (!popup) window.location.assign(href)
+    } catch {
+      window.location.assign(href)
+    }
+  }, [href, t.linkInvalid])
 
   return (
     <article className={`consult-card ${!allowed ? 'consult-card-locked' : ''}`}>
@@ -88,19 +105,19 @@ function ConsultCard({ title, description, url, envHint, requiredLevel, user, co
           <Link to="/payment" className="consult-card-btn consult-btn-upgrade">{t.upgrade}</Link>
         </div>
       ) : ready ? (
-        <a
+        <button
+          type="button"
           className="consult-card-btn"
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
+          onClick={openConsult}
         >
           {query.trim() ? t.enterAndQuery : t.enter}
-        </a>
+        </button>
       ) : (
         <p className="consult-card-missing">
           {p.configureEnvVar(envHint)}
         </p>
       )}
+      {openError ? <p className="consult-card-missing">{openError}</p> : null}
     </article>
   )
 }

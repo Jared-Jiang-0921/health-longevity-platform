@@ -69,6 +69,8 @@
   font-size: 0.9rem;
   text-decoration: none;
   width: fit-content;
+  border: 0;
+  cursor: pointer;
 }
 
 .consult-card-btn:hover {
