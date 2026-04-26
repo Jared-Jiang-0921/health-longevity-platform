@@ -35,12 +35,26 @@ export function appendExternalEntryParams(url, user, options = {}) {
   params.set('hl_level', String(levelRank[levelNorm] ?? 0))
 
   if (options.consultEntry) {
+    const entryRaw = String(options.consultEntry || '').trim().toLowerCase()
+    const entry = entryRaw === 'professional' ? 'professional' : 'general'
     params.set('hl_channel', 'consult')
-    params.set('hl_consult_entry', options.consultEntry)
+    params.set('hl_consult_entry', entry)
     // 兼容咨询端常见路由参数
-    params.set('mode', options.consultEntry)
-    params.set('consult_mode', options.consultEntry)
-    params.set('entry', options.consultEntry)
+    params.set('mode', entry)
+    params.set('consult_mode', entry)
+    params.set('entry', entry)
+    params.set('consultation_mode', entry)
+    params.set('role', entry)
+    params.set('hl_mode', entry)
+    if (entry === 'professional') {
+      params.set('persona', 'professional_advisor')
+      params.set('advisor_mode', '1')
+      params.set('expert', '1')
+    } else {
+      params.set('persona', 'general_wellness')
+      params.set('advisor_mode', '0')
+      params.set('expert', '0')
+    }
   } else if (options.channel === 'content') {
     params.set('hl_channel', 'content')
   } else if (options.channel === 'consult') {
@@ -48,11 +62,17 @@ export function appendExternalEntryParams(url, user, options = {}) {
   }
   const langRaw = String(options.lang || '').trim().toLowerCase()
   if (langRaw) {
-    const langMap = { zh: 'zh-CN', en: 'en', ar: 'ar' }
-    const lang = langMap[langRaw] || langRaw
-    params.set('lang', lang)
-    params.set('hl_lang', lang)
-    params.set('locale', lang)
+    const langMap = {
+      zh: { short: 'zh', locale: 'zh-CN' },
+      en: { short: 'en', locale: 'en-US' },
+      ar: { short: 'ar', locale: 'ar' },
+    }
+    const mapped = langMap[langRaw] || { short: langRaw, locale: langRaw }
+    params.set('lang', mapped.short)
+    params.set('hl_lang', mapped.short)
+    params.set('language', mapped.short)
+    params.set('locale', mapped.locale)
+    params.set('ui_locale', mapped.locale)
   }
   const query = String(options.query || '').trim()
   if (query) {
