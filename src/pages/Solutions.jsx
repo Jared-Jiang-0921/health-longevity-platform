@@ -29,6 +29,7 @@ const I18N = {
     enter: '进入咨询',
     enterAndQuery: '进入并查询',
     openDirectly: '若未自动跳转，请点此直接打开咨询页',
+    popupBlocked: '浏览器拦截了新标签页，请点击下方链接打开咨询页',
     linkInvalid: '咨询链接无效，请联系管理员检查配置',
     upgrade: '升级会员',
   },
@@ -46,6 +47,7 @@ const I18N = {
     enter: 'Enter Consultation',
     enterAndQuery: 'Enter & Query',
     openDirectly: 'If auto-open fails, click here to open directly',
+    popupBlocked: 'Popup was blocked. Please use the direct link below.',
     linkInvalid: 'Consultation URL is invalid. Please contact admin.',
     upgrade: 'Upgrade',
   },
@@ -63,6 +65,7 @@ const I18N = {
     enter: 'دخول الاستشارة',
     enterAndQuery: 'ادخل وابحث',
     openDirectly: 'إذا لم يتم الفتح تلقائيًا، اضغط هنا للفتح مباشرة',
+    popupBlocked: 'تم حظر فتح تبويب جديد، يرجى استخدام الرابط المباشر أدناه',
     linkInvalid: 'رابط الاستشارة غير صالح، يرجى التواصل مع المسؤول',
     upgrade: 'ترقية العضوية',
   },
@@ -86,18 +89,14 @@ function ConsultCard({ title, description, url, envHint, requiredLevel, user, co
     }
     try {
       const popup = window.open(href, '_blank', 'noopener,noreferrer')
-      // 某些浏览器可能返回 Window 对象但实际阻止打开，这里做延迟兜底跳转
       if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-        window.location.assign(href)
+        setOpenError(t.popupBlocked || '浏览器拦截了新标签页，请点击下方链接打开咨询页。')
         return
       }
-      setTimeout(() => {
-        if (popup.closed) window.location.assign(href)
-      }, 300)
     } catch {
-      window.location.assign(href)
+      setOpenError(t.popupBlocked || '浏览器拦截了新标签页，请点击下方链接打开咨询页。')
     }
-  }, [href, t.linkInvalid])
+  }, [href, t.linkInvalid, t.popupBlocked])
 
   return (
     <article className={`consult-card ${!allowed ? 'consult-card-locked' : ''}`}>
@@ -120,15 +119,13 @@ function ConsultCard({ title, description, url, envHint, requiredLevel, user, co
         </div>
       ) : ready ? (
         <>
-          <a
+          <button
+            type="button"
             className="consult-card-btn consult-card-btn-block"
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
             onClick={openConsult}
           >
             {query.trim() ? t.enterAndQuery : t.enter}
-          </a>
+          </button>
           <a
             className="consult-open-direct"
             href={href}

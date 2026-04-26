@@ -55,6 +55,11 @@ export function appendExternalEntryParams(url, user, options = {}) {
       params.set('advisor_mode', '0')
       params.set('expert', '0')
     }
+    // 部分咨询站对 /consult/general|professional 返回 404，统一收敛到 /consult 再靠 mode 分流
+    const path = (u.pathname || '').replace(/\/+$/, '')
+    if (path === '/consult/general' || path === '/consult/professional') {
+      u.pathname = '/consult'
+    }
   } else if (options.channel === 'content') {
     params.set('hl_channel', 'content')
   } else if (options.channel === 'consult') {
