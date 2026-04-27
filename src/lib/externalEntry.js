@@ -55,9 +55,11 @@ export function appendExternalEntryParams(url, user, options = {}) {
       params.set('advisor_mode', '0')
       params.set('expert', '0')
     }
-    // 部分咨询站对 /consult/general|professional 返回 404，统一收敛到 /consult 再靠 mode 分流
+    // 仅对 longevityconsult.vip 收敛路径；manus.space 保留原路径以支持显式分端
     const path = (u.pathname || '').replace(/\/+$/, '')
-    if (path === '/consult/general' || path === '/consult/professional') {
+    const host = String(u.hostname || '').toLowerCase()
+    const shouldNormalizeConsultPath = host === 'longevityconsult.vip' || host.endsWith('.longevityconsult.vip')
+    if (shouldNormalizeConsultPath && (path === '/consult/general' || path === '/consult/professional')) {
       u.pathname = '/consult'
     }
   } else if (options.channel === 'content') {
