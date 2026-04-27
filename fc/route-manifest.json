@@ -54,6 +54,24 @@
     },
     {
       "segments": [
+        "consult-sso-ticket"
+      ],
+      "paramKeys": [],
+      "catchAll": false,
+      "modulePath": "../api/consult-sso-ticket.js",
+      "sourceFile": "api/consult-sso-ticket.js"
+    },
+    {
+      "segments": [
+        "course-modules"
+      ],
+      "paramKeys": [],
+      "catchAll": false,
+      "modulePath": "../api/course-modules.js",
+      "sourceFile": "api/course-modules.js"
+    },
+    {
+      "segments": [
         "create-checkout-session"
       ],
       "paramKeys": [],
@@ -81,12 +99,42 @@
     },
     {
       "segments": [
+        "health"
+      ],
+      "paramKeys": [],
+      "catchAll": false,
+      "modulePath": "../api/health.js",
+      "sourceFile": "api/health.js"
+    },
+    {
+      "segments": [
         "init-db"
       ],
       "paramKeys": [],
       "catchAll": false,
       "modulePath": "../api/init-db.js",
       "sourceFile": "api/init-db.js"
+    },
+    {
+      "segments": [
+        "module-assets",
+        ":id"
+      ],
+      "paramKeys": [
+        "id"
+      ],
+      "catchAll": false,
+      "modulePath": "../api/module-assets/[id].js",
+      "sourceFile": "api/module-assets/[id].js"
+    },
+    {
+      "segments": [
+        "module-assets"
+      ],
+      "paramKeys": [],
+      "catchAll": false,
+      "modulePath": "../api/module-assets.js",
+      "sourceFile": "api/module-assets.js"
     },
     {
       "segments": [
@@ -117,6 +165,27 @@
       "catchAll": false,
       "modulePath": "../api/stripe-webhook.js",
       "sourceFile": "api/stripe-webhook.js"
+    },
+    {
+      "segments": [
+        "translation-pdfs",
+        ":id"
+      ],
+      "paramKeys": [
+        "id"
+      ],
+      "catchAll": false,
+      "modulePath": "../api/translation-pdfs/[id].js",
+      "sourceFile": "api/translation-pdfs/[id].js"
+    },
+    {
+      "segments": [
+        "translation-pdfs"
+      ],
+      "paramKeys": [],
+      "catchAll": false,
+      "modulePath": "../api/translation-pdfs.js",
+      "sourceFile": "api/translation-pdfs.js"
     }
   ]
 }
