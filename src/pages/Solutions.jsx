@@ -71,7 +71,7 @@ const I18N = {
   },
 }
 
-function ConsultCard({ title, description, url, envHint, requiredLevel, user, consultEntry, t, p }) {
+function ConsultCard({ title, description, url, envHint, requiredLevel, user, consultEntry, t, p, buildConsultHref }) {
   const [query, setQuery] = useState('')
   const [openError, setOpenError] = useState('')
   const ready = Boolean(url?.trim())
@@ -80,23 +80,28 @@ function ConsultCard({ title, description, url, envHint, requiredLevel, user, co
     () => appendExternalEntryParams(url, user, { consultEntry, query, lang: t.langKey }),
     [url, user, consultEntry, query, t.langKey],
   )
-  const openConsult = useCallback((e) => {
+  const [opening, setOpening] = useState(false)
+  const openConsult = useCallback(async (e) => {
     if (e?.preventDefault) e.preventDefault()
     setOpenError('')
     if (!href) {
       setOpenError(t.linkInvalid || '咨询链接无效，请联系管理员检查配置。')
       return
     }
+    setOpening(true)
     try {
-      const popup = window.open(href, '_blank', 'noopener,noreferrer')
+      const finalHref = await buildConsultHref(href, consultEntry)
+      const popup = window.open(finalHref, '_blank', 'noopener,noreferrer')
       if (!popup || popup.closed || typeof popup.closed === 'undefined') {
         setOpenError(t.popupBlocked || '浏览器拦截了新标签页，请点击下方链接打开咨询页。')
         return
       }
     } catch {
       setOpenError(t.popupBlocked || '浏览器拦截了新标签页，请点击下方链接打开咨询页。')
+    } finally {
+      setOpening(false)
     }
-  }, [href, t.linkInvalid, t.popupBlocked])
+  }, [href, t.linkInvalid, t.popupBlocked, buildConsultHref, consultEntry])
 
   return (
     <article className={`consult-card ${!allowed ? 'consult-card-locked' : ''}`}>
@@ -123,8 +128,9 @@ function ConsultCard({ title, description, url, envHint, requiredLevel, user, co
             type="button"
             className="consult-card-btn consult-card-btn-block"
             onClick={openConsult}
+            disabled={opening}
           >
-            {query.trim() ? t.enterAndQuery : t.enter}
+            {opening ? (t.opening || t.enter) : (query.trim() ? t.enterAndQuery : t.enter)}
           </button>
           <a
             className="consult-open-direct"
@@ -149,7 +155,32 @@ export default function Solutions() {
   const { lang } = useLocale()
   const t = I18N[lang] || I18N.zh
   const p = getPatterns(lang)
-  const { user, loading, refreshUser } = useAuth()
+  const { user, loading, refreshUser, getToken } = useAuth()
+
+  const buildConsultHref = useCallback(async (baseHref, entry) => {
+    const token = getToken?.()
+    if (!token || !baseHref) return baseHref
+    try {
+      const res = await fetch('/api/consult-sso-ticket', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ entry, lang }),
+      })
+      if (!res.ok) return baseHref
+      const data = await res.json().catch(() => ({}))
+      const ssoToken = String(data?.token || '').trim()
+      if (!ssoToken) return baseHref
+      const u = new URL(baseHref, window.location.origin)
+      u.searchParams.set('sso_token', ssoToken)
+      u.searchParams.set('sso_issuer', 'healthlongevity')
+      return /^https?:\/\//i.test(baseHref) ? u.toString() : `${u.pathname}${u.search}${u.hash}`
+    } catch {
+      return baseHref
+    }
+  }, [getToken, lang])
 
   useEffect(() => {
     refreshUser()
@@ -204,22 +235,24 @@ export default function Solutions() {
             description="面向专业人士，侧重专业知识和技能，涵盖临床医学、基础医学、功能医学、保健医学、运动医学、营养学等。"
             url={CONSULT_PRO_URL}
             envHint="VITE_CONSULT_PROFESSIONAL_URL（或 VITE_MANUS_PROFESSIONAL_URL）"
-            requiredLevel="premium"
+            requiredLevel="standard"
             user={user}
             consultEntry="professional"
             t={t}
             p={p}
+            buildConsultHref={buildConsultHref}
           />
           <ConsultCard
             title="自我健康促进咨询"
             description="面向普通人群，侧重免疫与免疫力、激素与内分泌平衡、神经与情绪心理、睡眠、营养饮食、科学运动等日常生活关注领域。"
             url={CONSULT_GENERAL_URL}
             envHint="VITE_CONSULT_GENERAL_URL 或 VITE_MANUS_SELF_URL（可与专业同址；未填时沿用专业 URL）"
-            requiredLevel="standard"
+            requiredLevel="free"
             user={user}
             consultEntry="general"
             t={t}
             p={p}
+            buildConsultHref={buildConsultHref}
           />
         </div>
       </>
