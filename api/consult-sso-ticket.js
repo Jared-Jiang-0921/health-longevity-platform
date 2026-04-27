@@ -49,6 +49,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: '请求数据格式不正确' })
   }
   const entry = normalizeEntry(body.entry)
+  const consultType = entry === 'professional' ? 'professional advisor' : 'general wellness'
   const lang = normalizeLang(body.lang)
   const now = Math.floor(Date.now() / 1000)
   const token = await new jose.SignJWT({
@@ -57,6 +58,9 @@ export default async function handler(req, res) {
     name: String(user.name || ''),
     level: String(user.level || 'free'),
     entry,
+    consult_type: consultType,
+    advisor_type: consultType,
+    persona: entry === 'professional' ? 'professional_advisor' : 'general_wellness',
     lang,
   })
     .setIssuer('healthlongevity')

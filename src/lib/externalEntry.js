@@ -37,6 +37,7 @@ export function appendExternalEntryParams(url, user, options = {}) {
   if (options.consultEntry) {
     const entryRaw = String(options.consultEntry || '').trim().toLowerCase()
     const entry = entryRaw === 'professional' ? 'professional' : 'general'
+    const advisorType = entry === 'professional' ? 'professional advisor' : 'general wellness'
     params.set('hl_channel', 'consult')
     params.set('hl_consult_entry', entry)
     // 兼容咨询端常见路由参数
@@ -46,6 +47,11 @@ export function appendExternalEntryParams(url, user, options = {}) {
     params.set('consultation_mode', entry)
     params.set('role', entry)
     params.set('hl_mode', entry)
+    // 明确业务语义：专业咨询 => professional advisor；通用咨询 => general wellness
+    params.set('advisor_type', advisorType)
+    params.set('consult_type', advisorType)
+    params.set('hl_consult_type', advisorType)
+    params.set('persona_label', advisorType)
     if (entry === 'professional') {
       params.set('persona', 'professional_advisor')
       params.set('advisor_mode', '1')
