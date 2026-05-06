@@ -10,11 +10,11 @@ import './Layout.css'
 const navItems = [
   { path: '/', label: { zh: '首页', en: 'Home', ar: 'الرئيسية' } },
   { path: '/health-skills', label: { zh: '长寿知识技能', en: 'Health Skills', ar: 'مهارات الصحة' } },
-  { path: '/solutions', label: { zh: '综合长寿方案', en: 'Solutions', ar: 'الحلول' } },
-  { path: '/products', label: { zh: '循证健康产品', en: 'Evidence-Based Products', ar: 'منتجات مبنية على الدليل' } },
-  { path: '/longevity-news', label: { zh: '前沿长寿医学资讯', en: 'Longevity News', ar: 'أخبار طول العمر' } },
-  { path: '/tcm-prevention', label: { zh: '治未病', en: 'TCM Prevention', ar: 'الطب الوقائي' } },
-  { path: '/translation-opportunities', label: { zh: '转化应用机遇', en: 'Translation Opportunities', ar: 'فرص التطبيق' } },
+  { path: '/solutions', label: { zh: 'AI长寿方案师', en: 'AI Longevity Coach', ar: 'مدرب طول العمر بالذكاء الاصطناعي' } },
+  { path: '/products', label: { zh: '长寿产品证据库', en: 'Evidence Library', ar: 'مكتبة أدلة المنتجات' } },
+  { path: '/longevity-news', label: { zh: '前沿医学资讯', en: 'Medical Insights', ar: 'مستجدات طبية' } },
+  { path: '/tcm-prevention', label: { zh: '中医治未病', en: 'Preventive TCM', ar: 'الوقاية الصينية' } },
+  { path: '/translation-opportunities', label: { zh: '转化应用机遇', en: 'Commercialization', ar: 'فرص التطبيق' } },
   { path: '/favorites', label: { zh: '我的收藏', en: 'Favorites', ar: 'المفضلة' } },
   { path: '/payment', label: { zh: '支付结算', en: 'Payment', ar: 'الدفع' } },
   { path: '/ops/payment-monitor', label: { zh: '支付巡检', en: 'Payment Monitor', ar: 'مراقبة الدفع' }, authOnly: true, siteAdminOnly: true },
@@ -31,7 +31,7 @@ const I18N = {
     logout: '退出',
     language: '语言',
     legalAria: '法律条款',
-    footerCopy: '长寿知识 · 综合方案 · 循证产品.',
+    footerCopy: '长寿知识 · AI长寿方案师 · 长寿产品证据库.',
   },
   en: {
     login: 'Login',
@@ -39,7 +39,7 @@ const I18N = {
     logout: 'Logout',
     language: 'Language',
     legalAria: 'Legal',
-    footerCopy: 'Longevity knowledge · integrated solutions · evidence-based products.',
+    footerCopy: 'Longevity knowledge · AI Longevity Coach · product evidence library.',
   },
   ar: {
     login: 'تسجيل الدخول',
@@ -47,7 +47,7 @@ const I18N = {
     logout: 'تسجيل الخروج',
     language: 'اللغة',
     legalAria: 'قانوني',
-    footerCopy: 'معرفة طول العمر · حلول متكاملة · منتجات قائمة على الدليل.',
+    footerCopy: 'معرفة طول العمر · مدرب طول العمر بالذكاء الاصطناعي · مكتبة أدلة المنتجات.',
   },
 }
 

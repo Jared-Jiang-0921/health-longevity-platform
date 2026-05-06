@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { getCourseById, CATEGORIES } from '../data/courses'
+import { getHealthSkillsContentApproach } from '../data/healthSkillsContentApproach'
 import { useFavorites } from '../hooks/useFavorites'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
@@ -33,6 +34,7 @@ export default function CourseDetail() {
   }
 
   const category = CATEGORIES.find((c) => c.id === course.category)
+  const methodologyLine = getHealthSkillsContentApproach(lang)
   const favorite = isFavorite(course.id)
   const requiredMembership = course.requiredMembership || 'free'
   const allowed = hasLevelAccess(user?.level, requiredMembership)
@@ -87,6 +89,7 @@ export default function CourseDetail() {
           </span>
         </div>
         <p className="course-desc">{course.desc}</p>
+        <p className="course-methodology">{methodologyLine}</p>
       </header>
 
       <section className="course-detail-content">

@@ -16,6 +16,113 @@
   margin: 0;
 }
 
+.products-lead {
+  margin: 0 0 1rem;
+  line-height: 1.65;
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+}
+
+.products-role-disclaimer {
+  margin: 0 0 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  border: 1px solid rgba(234, 179, 8, 0.45);
+  background: rgba(234, 179, 8, 0.1);
+}
+
+.products-role-disclaimer p {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.55;
+  color: var(--color-text);
+}
+
+.products-reg-block {
+  margin-bottom: 1rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.products-reg-heading {
+  margin: 0 0 0.45rem;
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.products-reg-block p {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+.products-section-heading {
+  margin: 1.25rem 0 0.5rem;
+  font-size: 1.05rem;
+  color: var(--color-text);
+}
+
+.products-types-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+.products-table-wrap {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.products-scoring-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.products-scoring-table th,
+.products-scoring-table td {
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.products-scoring-table th {
+  background: rgba(34, 197, 94, 0.08);
+  font-weight: 600;
+}
+
+.products-scoring-table tr:last-child td {
+  border-bottom: none;
+}
+
+.products-scoring-table td:first-child {
+  font-weight: 500;
+  width: 7.5rem;
+  color: var(--color-text);
+}
+
+@media (max-width: 520px) {
+  .products-scoring-table td:first-child {
+    width: 6rem;
+  }
+}
+
+.products-list-note {
+  margin: 1.25rem 0 0;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
 .categories {
   margin-bottom: 1.5rem;
 }

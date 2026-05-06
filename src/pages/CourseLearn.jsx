@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { getCourseById, CATEGORIES } from '../data/courses'
+import { getHealthSkillsContentApproach } from '../data/healthSkillsContentApproach'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
 import { getUi } from '../i18n/ui'
@@ -41,6 +42,7 @@ export default function CourseLearn() {
 
   const requiredMembership = course.requiredMembership || 'free'
   const allowed = hasLevelAccess(user?.level, requiredMembership)
+  const methodologyLine = getHealthSkillsContentApproach(lang)
 
   useEffect(() => {
     if (!course) return
@@ -177,6 +179,7 @@ export default function CourseLearn() {
       <div className="learn-header">
         <Link to={`/health-skills/${id}`} className="back-link">← {t.back}</Link>
         <h1>{course.title}</h1>
+        <p className="learn-methodology">{methodologyLine}</p>
       </div>
 
       <div className="learn-layout">

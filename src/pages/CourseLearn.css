@@ -22,6 +22,14 @@
   margin: 0;
 }
 
+.learn-methodology {
+  margin: 0.65rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  max-width: 52rem;
+}
+
 .learn-layout {
   display: grid;
   grid-template-columns: 240px 1fr;

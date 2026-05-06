@@ -1,19 +1,56 @@
 import { RESEARCH_UPDATES, getMonthLabel } from '../data/longevityNews'
+import { getLongevityNewsModuleCopy } from '../data/longevityNewsModuleI18n'
 import { useLocale } from '../context/LocaleContext'
 import './LongevityNews.css'
 
 export default function LongevityNews() {
   const { lang } = useLocale()
+  const mod = getLongevityNewsModuleCopy(lang)
   const t = {
-    zh: { title: '前沿长寿医学资讯', desc: '国际权威期刊每月更新的高影响因子健康长寿研究资讯，供参考学习。', read: '阅读原文' },
-    en: { title: 'Frontier Longevity News', desc: 'Monthly high-impact longevity research updates from leading journals.', read: 'Read source' },
-    ar: { title: 'مستجدات طب طول العمر', desc: 'تحديثات شهرية عالية التأثير من الدوريات العلمية الرائدة.', read: 'قراءة المصدر' },
+    zh: { read: '阅读原文' },
+    en: { read: 'Read source' },
+    ar: { read: 'قراءة المصدر' },
   }[lang || 'zh']
+
   return (
     <div className="page-longevity-news">
       <section className="news-header">
-        <h1>{t.title}</h1>
-        <p>{t.desc}</p>
+        <h1>{mod.title}</h1>
+        <p className="news-lead">{mod.lead}</p>
+
+        <aside className="news-caveat" role="note">
+          <h2 className="news-caveat-title">{mod.caveatTitle}</h2>
+          <p className="news-caveat-phrase">{mod.caveatPhrase}</p>
+        </aside>
+
+        <section className="news-sources" aria-labelledby="news-sources-heading">
+          <h2 id="news-sources-heading" className="news-section-heading">{mod.sourcesTitle}</h2>
+          <p className="news-sources-body">{mod.sourcesBody}</p>
+        </section>
+
+        <section className="news-columns" aria-labelledby="news-columns-heading">
+          <h2 id="news-columns-heading" className="news-section-heading">{mod.columnsTitle}</h2>
+          <div className="news-table-wrap">
+            <table className="news-columns-table">
+              <thead>
+                <tr>
+                  <th scope="col">{mod.colColumn}</th>
+                  <th scope="col">{mod.colContent}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {mod.columnRows.map((row) => (
+                  <tr key={row.column}>
+                    <td>{row.column}</td>
+                    <td>{row.content}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <p className="news-list-intro">{mod.listIntro}</p>
       </section>
 
       <section className="news-list">
@@ -22,7 +59,7 @@ export default function LongevityNews() {
             <div className="news-meta">
               <span className="news-journal">{item.journal}</span>
               <span className="news-if">IF {item.impactFactor}</span>
-              <span className="news-month">{getMonthLabel(item.month)}</span>
+              <span className="news-month">{getMonthLabel(item.month, lang)}</span>
             </div>
             <h3>{item.title}</h3>
             <p>{item.summary}</p>

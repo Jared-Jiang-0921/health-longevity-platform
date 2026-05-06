@@ -11,7 +11,7 @@
  */
 export const SITE_LEGAL = {
   /** 对外品牌名，与 Logo 一致 */
-  brandName: 'Health Longevity Platform',
+  brandName: '长健星图 Longevity Atlas',
   /**
    * 法律上的运营/责任主体名称；未注册公司时可保留占位
    * 例：「[拟注册主体名称]（筹备中）」或「某某（自然人运营，主体待定）」

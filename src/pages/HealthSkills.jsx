@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { CATEGORIES, COURSES } from '../data/courses'
+import { getHealthSkillsContentApproach } from '../data/healthSkillsContentApproach'
 import { useFavorites } from '../hooks/useFavorites'
 import { useLocale } from '../context/LocaleContext'
 import { getUi } from '../i18n/ui'
@@ -16,6 +17,7 @@ export default function HealthSkills() {
     en: { title: 'Health Skills', desc: 'Structured health knowledge and skill courses with multilingual learning.', cancel: 'Remove favorite', fav: 'Favorite' },
     ar: { title: 'مهارات الصحة', desc: 'دورات منهجية للمعرفة والمهارات الصحية مع دعم متعدد اللغات.', cancel: 'إزالة من المفضلة', fav: 'إضافة للمفضلة' },
   }[lang || 'zh']
+  const methodologyLine = getHealthSkillsContentApproach(lang)
   const [activeCategory, setActiveCategory] = useState(CATEGORIES[0]?.id || 'basics')
   const { isFavorite, toggle } = useFavorites()
 
@@ -37,6 +39,7 @@ export default function HealthSkills() {
       <section className="health-skills-header">
         <h1>{t.title}</h1>
         <p>{t.desc}</p>
+        <p className="health-skills-methodology">{methodologyLine}</p>
       </section>
 
       <section className="categories">

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PRODUCT_CATEGORIES, PRODUCTS } from '../data/products'
+import { getProductsEvidenceCopy } from '../data/productsEvidenceLibraryI18n'
 import { useLocale } from '../context/LocaleContext'
 import { getUi } from '../i18n/ui'
 import './Products.css'
@@ -8,11 +9,7 @@ import './Products.css'
 export default function Products() {
   const { lang } = useLocale()
   const ui = getUi(lang)
-  const t = {
-    zh: { title: '循证健康产品', desc: '精选循证健康产品与用品，支持跳转至支付结算。' },
-    en: { title: 'Evidence-Based Products', desc: 'Selected evidence-based health products with checkout support.' },
-    ar: { title: 'منتجات مبنية على الدليل', desc: 'منتجات صحية مختارة قائمة على الدليل مع دعم الدفع.' },
-  }[lang || 'zh']
+  const ev = getProductsEvidenceCopy(lang)
   const [activeCategory, setActiveCategory] = useState(PRODUCT_CATEGORIES[0]?.id || 'supplement')
 
   const filtered = PRODUCTS.filter((p) => p.category === activeCategory)
@@ -31,8 +28,52 @@ export default function Products() {
   return (
     <div className="page-products">
       <section className="products-header">
-        <h1>{t.title}</h1>
-        <p>{t.desc}</p>
+        <h1>{ev.title}</h1>
+        <p className="products-lead">{ev.lead}</p>
+        <aside className="products-role-disclaimer" role="note">
+          <p>{ev.roleDisclaimer}</p>
+        </aside>
+        <section className="products-reg-block" aria-labelledby="products-cn-reg">
+          <h2 id="products-cn-reg" className="products-reg-heading">{ev.cnRegTitle}</h2>
+          <p>{ev.cnRegBody}</p>
+        </section>
+        <section className="products-reg-block" aria-labelledby="products-intl-reg">
+          <h2 id="products-intl-reg" className="products-reg-heading">{ev.intlTitle}</h2>
+          <p>{ev.intlBody}</p>
+        </section>
+
+        <section className="products-types" aria-labelledby="products-types-heading">
+          <h2 id="products-types-heading" className="products-section-heading">{ev.productTypesTitle}</h2>
+          <ul className="products-types-list">
+            {ev.productTypes.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="products-scoring" aria-labelledby="products-scoring-heading">
+          <h2 id="products-scoring-heading" className="products-section-heading">{ev.scoringTitle}</h2>
+          <div className="products-table-wrap">
+            <table className="products-scoring-table">
+              <thead>
+                <tr>
+                  <th scope="col">{ev.colDimension}</th>
+                  <th scope="col">{ev.colExplain}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ev.scoringRows.map((row) => (
+                  <tr key={row.dimension}>
+                    <td>{row.dimension}</td>
+                    <td>{row.explain}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <p className="products-list-note">{ev.listFooterNote}</p>
       </section>
 
       <section className="categories">

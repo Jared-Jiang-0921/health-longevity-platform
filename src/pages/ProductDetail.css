@@ -1,5 +1,32 @@
 .page-product-detail {
-  max-width: 560px;
+  max-width: 640px;
+}
+
+.product-detail-notice {
+  margin-bottom: 1.25rem;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+}
+
+.product-detail-notice p {
+  margin: 0 0 0.55rem;
+}
+
+.product-detail-notice p:last-child {
+  margin-bottom: 0;
+}
+
+.product-detail-notice-strong {
+  font-weight: 600;
+  color: var(--color-text);
+  border-left: 3px solid rgba(234, 179, 8, 0.85);
+  padding-left: 0.65rem;
+  margin-bottom: 0.65rem !important;
 }
 
 .back-link {

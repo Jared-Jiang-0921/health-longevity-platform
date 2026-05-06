@@ -59,8 +59,14 @@ export const RESEARCH_UPDATES = [
   },
 ]
 
-export function getMonthLabel(monthStr) {
+const ZH_MONTHS = ['', '一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月']
+const EN_MONTHS = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const AR_MONTHS = ['', 'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
+
+export function getMonthLabel(monthStr, lang = 'zh') {
   const [y, m] = monthStr.split('-')
-  const months = ['', '一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月']
-  return `${y}年${months[Number(m)]}`
+  const n = Number(m)
+  if (lang === 'en') return `${EN_MONTHS[n] || m} ${y}`
+  if (lang === 'ar') return `${AR_MONTHS[n] || m} ${y}`
+  return `${y}年${ZH_MONTHS[n] || m}`
 }

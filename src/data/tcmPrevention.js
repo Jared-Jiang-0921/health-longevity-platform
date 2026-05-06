@@ -1,5 +1,6 @@
 /**
- * 治未病相关中草药单药：药性、功效、适宜人群、注意事项
+ * 治未病模块资料：中草药单药（药性、功效、适宜人群、注意事项）与经典处方。
+ * 页面级定位、栏目规划与多语文案见 src/data/tcmPreventionModuleI18n.js
  */
 export const TCM_HERBS = [
   {

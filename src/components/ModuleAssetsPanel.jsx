@@ -32,7 +32,7 @@ function getSubcategoryOptions(moduleKey) {
     // 与页面现有结构/文案尽量一一对应
     'longevity-news': ['Nature Medicine', 'Cell', 'Lancet Healthy Longevity', 'Science', 'Aging Cell', 'Nature Aging'],
     'tcm-prevention': ['中草药单药', '经典处方'],
-    'translation-opportunities': ['可转化项目', '商业模型', '合作机会', '投研资料', '政策与合规'],
+    'translation-opportunities': ['长寿产业趋势', '技术转化雷达', '商业模式拆解', '产品机会库', '创业风险提示'],
     solutions: ['专业健康长寿咨询', '自我健康促进咨询', '内容资源', '健康问卷与评估'],
     'health-questionnaire': ['基础信息', '健康目标与关注', '病史与用药', '生活方式', '法律同意'],
     favorites: ['长寿知识技能收藏', '产品收藏', '资讯收藏', '精选推荐'],

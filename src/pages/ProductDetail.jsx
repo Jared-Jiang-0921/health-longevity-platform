@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
 import { getProductById, PRODUCT_CATEGORIES } from '../data/products'
+import { getProductsEvidenceCopy } from '../data/productsEvidenceLibraryI18n'
 import { useLocale } from '../context/LocaleContext'
 import { getUi } from '../i18n/ui'
 import './ProductDetail.css'
@@ -7,10 +8,11 @@ import './ProductDetail.css'
 export default function ProductDetail() {
   const { lang } = useLocale()
   const ui = getUi(lang)
+  const ev = getProductsEvidenceCopy(lang)
   const t = {
-    zh: { notFound: '未找到该产品', back: '返回产品列表', pay: '去支付' },
-    en: { notFound: 'Product not found', back: 'Back to products', pay: 'Checkout' },
-    ar: { notFound: 'المنتج غير موجود', back: 'العودة للمنتجات', pay: 'الدفع' },
+    zh: { notFound: '未找到该产品', back: '返回长寿产品证据库', pay: '去支付' },
+    en: { notFound: 'Product not found', back: 'Back to evidence library', pay: 'Checkout' },
+    ar: { notFound: 'المنتج غير موجود', back: 'العودة إلى مكتبة الأدلة', pay: 'الدفع' },
   }[lang || 'zh']
   const { id } = useParams()
   const product = getProductById(id)
@@ -29,6 +31,12 @@ export default function ProductDetail() {
   return (
     <div className="page-product-detail">
       <Link to="/products" className="back-link">← {t.back}</Link>
+
+      <aside className="product-detail-notice" role="note">
+        <p className="product-detail-notice-strong">{ev.roleDisclaimer}</p>
+        <p><strong>{ev.cnRegTitle}：</strong>{ev.cnRegBody}</p>
+        <p><strong>{ev.intlTitle}：</strong>{ev.intlBody}</p>
+      </aside>
 
       <div className="product-detail-card">
         <div className="product-detail-header">

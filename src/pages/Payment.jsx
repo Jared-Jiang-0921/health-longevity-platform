@@ -101,9 +101,9 @@ export default function Payment() {
       <details className="payment-tier-desc">
         <summary>会员权益说明</summary>
         <ul>
-          <li><strong>普通会员</strong>（注册即得）：长寿知识技能部分免费、循证健康产品大部分、前沿长寿医学资讯大部分、转化应用机遇部分免费；可打开「综合长寿方案」页面，但<strong>两个咨询入口均需升级会员</strong>。</li>
-          <li><strong>标准会员</strong>：在普通会员基础上增加长寿知识技能大部分、转化应用机遇全部、治未病全部；综合长寿方案中<strong>仅可进入「自我健康促进咨询」</strong>，专业健康长寿咨询需高级会员。</li>
-          <li><strong>高级会员</strong>：所有模块与内容；综合长寿方案中<strong>两个咨询均可进入</strong>。</li>
+          <li><strong>普通会员</strong>（注册即得）：长寿知识技能部分免费、长寿产品证据库大部分、前沿医学资讯大部分、转化应用机遇部分免费；可打开「AI长寿方案师」页面，但<strong>两个咨询入口均需升级会员</strong>。</li>
+          <li><strong>标准会员</strong>：在普通会员基础上增加长寿知识技能大部分、转化应用机遇全部、治未病全部；AI长寿方案师中<strong>仅可进入「自我健康促进咨询」</strong>，专业健康长寿咨询需高级会员。</li>
+          <li><strong>高级会员</strong>：所有模块与内容；AI长寿方案师中<strong>两个咨询均可进入</strong>。</li>
         </ul>
       </details>
 
