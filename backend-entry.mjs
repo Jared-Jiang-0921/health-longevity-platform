@@ -1,4 +1,4 @@
-// Function Compute 入口：为了兼容 FC 的 Handler 配置格式（FileName.MethodName），
-// 这里把真正逻辑放在 `fc/backend-entry.mjs`，并在根目录做转发导出。
+// 阿里云函数计算入口（仅导出 handler，不会在 ECS 上监听端口）。
+// ECS / 自建服务器请用 pm2 启动：server/api-server.mjs（不要将此文件当作 HTTP 入口）。
 export { handler } from './fc/backend-entry.mjs'
 

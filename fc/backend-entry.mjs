@@ -1,7 +1,15 @@
 import fs from 'node:fs/promises'
+import fsSync from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { EventEmitter } from 'node:events'
+import { config as loadEnv } from 'dotenv'
+
+const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+const envProdPath = path.join(projectRoot, '.env.prod')
+if (fsSync.existsSync(envProdPath)) {
+  loadEnv({ path: envProdPath, override: true })
+}
 
 let manifestCache = null
 let moduleCache = new Map()
