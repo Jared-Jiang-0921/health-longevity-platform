@@ -2,12 +2,15 @@ import http from 'node:http'
 import fs from 'node:fs/promises'
 import fsSync from 'node:fs'
 import path from 'node:path'
-import { pathToFileURL } from 'node:url'
+import { pathToFileURL, fileURLToPath } from 'node:url'
 import { config as loadEnv } from 'dotenv'
 
-const envProdPath = path.join(process.cwd(), '.env.prod')
+// 相对本文件定位项目根（避免 pm2 / systemd 下 cwd 不是仓库目录时读不到 .env.prod）
+const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+const envProdPath = path.join(projectRoot, '.env.prod')
 if (fsSync.existsSync(envProdPath)) {
-  loadEnv({ path: envProdPath })
+  // override: true — pm2 / shell 里若已有同名空变量，dotenv 默认不会覆盖，会导致 STRIPE_SECRET_KEY 仍为假值
+  loadEnv({ path: envProdPath, override: true })
 }
 
 function toStringBody(buf) {
