@@ -36,7 +36,7 @@ export default async function handler(req, res) {
       return fail(400, 'MISSING_SESSION_ID', '缺少 session_id')
     }
 
-    const secret = process.env.STRIPE_SECRET_KEY
+    const secret = String(process.env.STRIPE_SECRET_KEY || '').trim()
     if (!secret) {
       return fail(500, 'PAYMENT_CONFIG_MISSING', '支付配置缺失，请联系管理员')
     }

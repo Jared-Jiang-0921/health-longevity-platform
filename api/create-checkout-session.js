@@ -72,7 +72,7 @@ export default async function handler(req, res) {
     return fail(401, 'AUTH_EXPIRED', '登录已过期')
   }
 
-  const secret = process.env.STRIPE_SECRET_KEY
+  const secret = String(process.env.STRIPE_SECRET_KEY || '').trim()
   if (!secret) {
     return fail(500, 'PAYMENT_CONFIG_MISSING', '支付配置缺失，请联系管理员')
   }

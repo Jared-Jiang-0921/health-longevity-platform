@@ -28,8 +28,8 @@ export default async function handler(req, res) {
     return fail(405, 'METHOD_NOT_ALLOWED', '请求方式不支持')
   }
 
-  const secret = process.env.STRIPE_SECRET_KEY
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+  const secret = String(process.env.STRIPE_SECRET_KEY || '').trim()
+  const webhookSecret = String(process.env.STRIPE_WEBHOOK_SECRET || '').trim()
   if (!secret || !webhookSecret) {
     return fail(500, 'PAYMENT_CONFIG_MISSING', '支付配置缺失，请联系管理员')
   }

@@ -13,6 +13,11 @@ if (fsSync.existsSync(envProdPath)) {
   loadEnv({ path: envProdPath, override: true })
 }
 
+const _stripeSk = String(process.env.STRIPE_SECRET_KEY || '').trim()
+console.log(
+  `[api-server] env loaded from ${envProdPath}; STRIPE_SECRET_KEY ${ _stripeSk ? `ok (len=${_stripeSk.length})` : 'MISSING' }`,
+)
+
 function toStringBody(buf) {
   if (!buf || !buf.length) return ''
   return buf.toString('utf8')
@@ -230,7 +235,7 @@ const server = http.createServer(async (req, res) => {
 })
 
 server.listen(PORT, () => {
-  console.log(`[api-server] listening on :${PORT}`)
+  console.log(`[api-server] listening on :${PORT} pid=${process.pid}`)
   console.log(`[api-server] routes loaded: ${routeTable.length}`)
 })
 

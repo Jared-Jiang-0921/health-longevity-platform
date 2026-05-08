@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const secret = process.env.STRIPE_SECRET_KEY
+  const secret = String(process.env.STRIPE_SECRET_KEY || '').trim()
   if (!secret) {
     return res.status(500).json({ error: 'Server missing STRIPE_SECRET_KEY' })
   }
