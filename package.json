@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "dotenv": "^16.4.5",
     "@neondatabase/serverless": "^0.10.0",
     "@stripe/react-stripe-js": "^2.4.0",
     "@stripe/stripe-js": "^4.2.0",

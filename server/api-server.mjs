@@ -1,7 +1,14 @@
 import http from 'node:http'
 import fs from 'node:fs/promises'
+import fsSync from 'node:fs'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
+import { config as loadEnv } from 'dotenv'
+
+const envProdPath = path.join(process.cwd(), '.env.prod')
+if (fsSync.existsSync(envProdPath)) {
+  loadEnv({ path: envProdPath })
+}
 
 function toStringBody(buf) {
   if (!buf || !buf.length) return ''
