@@ -1,20 +1,16 @@
 /**
- * 长寿产品证据库 — 管理员上架商品（图片、介绍、产地、价格等）
- * GET /api/product-catalog — 列表；GET /api/product-catalog?id=uuid — 单条
- * POST /api/product-catalog — 新建（整站管理员）
- * PATCH /api/product-catalog — 更新
- * DELETE /api/product-catalog?id=uuid — 删除
+ * 长寿产品证据库 — 商品目录（多图、SKU、中英文；全员可读，仅管理员可写）
  */
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { sql } from '../lib/db.js'
 import { authorizeSiteAdmin } from '../lib/siteAdminAuth.js'
-import { verifyToken, getUserById } from '../lib/auth.js'
-import { parseSiteAdminEmails } from '../lib/siteAdminEmails.js'
 
 const STORAGE_DIR = path.join(process.cwd(), 'storage', 'product-catalog')
 const IMAGE_MAX_BYTES = 12 * 1024 * 1024
+const MAX_GALLERY = 12
+const MAX_SKUS = 24
 const ALLOWED_IMG_EXT = new Set(['png', 'jpg', 'jpeg', 'webp', 'gif'])
 const ALLOWED_IMG_MIME = new Set([
   'image/png',
@@ -23,7 +19,6 @@ const ALLOWED_IMG_MIME = new Set([
   'image/gif',
 ])
 
-const LEVEL_ORDER = ['free', 'standard', 'premium']
 const CATEGORY_IDS = new Set(['supplement', 'equipment', 'food', 'care'])
 
 async function ensureSchema() {
@@ -45,6 +40,44 @@ async function ensureSchema() {
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `
+  await sql`ALTER TABLE product_catalog ADD COLUMN IF NOT EXISTS title_zh VARCHAR(200)`
+  await sql`ALTER TABLE product_catalog ADD COLUMN IF NOT EXISTS title_en VARCHAR(200)`
+  await sql`ALTER TABLE product_catalog ADD COLUMN IF NOT EXISTS description_zh TEXT`
+  await sql`ALTER TABLE product_catalog ADD COLUMN IF NOT EXISTS description_en TEXT`
+  await sql`ALTER TABLE product_catalog ADD COLUMN IF NOT EXISTS origin_zh VARCHAR(240)`
+  await sql`ALTER TABLE product_catalog ADD COLUMN IF NOT EXISTS origin_en VARCHAR(240)`
+  await sql`ALTER TABLE product_catalog ADD COLUMN IF NOT EXISTS gallery_json JSONB NOT NULL DEFAULT '[]'::jsonb`
+  await sql`ALTER TABLE product_catalog ADD COLUMN IF NOT EXISTS skus_json JSONB NOT NULL DEFAULT '[]'::jsonb`
+
+  await sql`
+    UPDATE product_catalog SET title_zh = COALESCE(NULLIF(TRIM(title_zh), ''), title)
+    WHERE title_zh IS NULL OR TRIM(title_zh) = ''
+  `
+  await sql`
+    UPDATE product_catalog SET description_zh = COALESCE(description_zh, description)
+    WHERE description_zh IS NULL AND description IS NOT NULL
+  `
+  await sql`
+    UPDATE product_catalog SET origin_zh = COALESCE(origin_zh, origin)
+    WHERE origin_zh IS NULL AND origin IS NOT NULL
+  `
+
+  const legacyRows = await sql`
+    SELECT id, image_stored_name, image_mime, image_file_name, gallery_json
+    FROM product_catalog
+    WHERE image_stored_name IS NOT NULL AND TRIM(image_stored_name) <> ''
+  `
+  for (const row of legacyRows) {
+    if (normalizeGalleryRow(row).length) continue
+    const g = [
+      {
+        stored_name: row.image_stored_name,
+        mime: row.image_mime || 'image/jpeg',
+        file_name: row.image_file_name || 'image',
+      },
+    ]
+    await sql`UPDATE product_catalog SET gallery_json = ${JSON.stringify(g)}::jsonb WHERE id = ${row.id}`
+  }
 }
 
 function parseJson(req, res) {
@@ -54,49 +87,6 @@ function parseJson(req, res) {
     res.status(400).json({ error: '请求数据格式不正确' })
     return null
   }
-}
-
-function normalizeLevel(raw) {
-  const s = String(raw || '').toLowerCase().trim()
-  const aliases = {
-    普通会员: 'free',
-    免费会员: 'free',
-    free: 'free',
-    标准会员: 'standard',
-    standard: 'standard',
-    高级会员: 'premium',
-    premium: 'premium',
-  }
-  const v = aliases[s] || s
-  return LEVEL_ORDER.includes(v) ? v : 'free'
-}
-
-function canView(required, current) {
-  const reqIdx = LEVEL_ORDER.indexOf(normalizeLevel(required))
-  const curIdx = LEVEL_ORDER.indexOf(normalizeLevel(current))
-  return curIdx >= reqIdx
-}
-
-async function getViewer(req) {
-  const adminAuth = await authorizeSiteAdmin(req)
-  if (adminAuth.ok) return { isAdmin: true, level: 'premium' }
-
-  const requestAdminToken = String(req.headers['x-site-admin-token'] || '').trim()
-  const configAdminToken = String(process.env.SITE_ADMIN_TOKEN || '').trim()
-  if (configAdminToken && requestAdminToken && requestAdminToken === configAdminToken) {
-    return { isAdmin: true, level: 'premium' }
-  }
-
-  const auth = req.headers.authorization
-  const jwt = auth?.startsWith('Bearer ') ? auth.slice(7) : null
-  if (!jwt) return { isAdmin: false, level: 'free' }
-  const userId = await verifyToken(jwt)
-  if (!userId) return { isAdmin: false, level: 'free' }
-  const user = await getUserById(userId)
-  if (!user) return { isAdmin: false, level: 'free' }
-  const allow = parseSiteAdminEmails()
-  const isAdmin = allow.includes(String(user.email || '').toLowerCase().trim())
-  return { isAdmin, level: user.level || 'free' }
 }
 
 function sanitizeFileName(fileName) {
@@ -112,18 +102,72 @@ function getExt(name) {
   return parts.length > 1 ? parts.pop() : ''
 }
 
+/** @param {any} raw */
+function normalizeGalleryRow(raw) {
+  let g = raw?.gallery_json ?? raw?.gallery
+  if (typeof g === 'string') {
+    try {
+      g = JSON.parse(g)
+    } catch {
+      g = []
+    }
+  }
+  if (!Array.isArray(g)) return []
+  return g
+    .filter((x) => x && typeof x.stored_name === 'string' && x.stored_name.trim())
+    .map((x) => ({
+      stored_name: String(x.stored_name).trim(),
+      mime: String(x.mime || 'image/jpeg').trim(),
+      file_name: String(x.file_name || 'image').trim(),
+    }))
+}
+
+/** @param {any} raw */
+function normalizeSkusRow(raw) {
+  let s = raw?.skus_json ?? raw?.skus
+  if (typeof s === 'string') {
+    try {
+      s = JSON.parse(s)
+    } catch {
+      s = []
+    }
+  }
+  if (!Array.isArray(s)) return []
+  return s
+    .slice(0, MAX_SKUS)
+    .map((x) => ({
+      code: String(x?.code || '').trim().slice(0, 80),
+      spec_zh: String(x?.spec_zh || x?.specZh || '').trim().slice(0, 240),
+      spec_en: String(x?.spec_en || x?.specEn || '').trim().slice(0, 240),
+      price:
+        x?.price != null && Number.isFinite(Number(x.price))
+          ? Number(x.price)
+          : null,
+      currency: String(x?.currency || '').trim().slice(0, 10).toUpperCase() || null,
+    }))
+    .filter((x) => x.code || x.spec_zh || x.spec_en)
+}
+
 function rowToItem(row) {
+  const gallery = normalizeGalleryRow(row)
+  const skus = normalizeSkusRow(row)
+  const titleZh = String(row.title_zh || row.title || '').trim()
+  const titleEn = String(row.title_en || '').trim()
   return {
     id: row.id,
     category: row.category,
-    title: row.title,
-    description: row.description,
-    origin: row.origin,
+    title_zh: titleZh,
+    title_en: titleEn,
+    description_zh: row.description_zh ?? row.description ?? '',
+    description_en: row.description_en ?? '',
+    origin_zh: row.origin_zh ?? row.origin ?? '',
+    origin_en: row.origin_en ?? '',
     price_amount: row.price_amount != null ? String(row.price_amount) : '0',
     currency: row.currency,
     unit: row.unit,
-    required_level: row.required_level,
-    has_image: Boolean(row.image_stored_name),
+    gallery_count: gallery.length,
+    skus,
+    has_image: gallery.length > 0,
     created_at: row.created_at,
     updated_at: row.updated_at,
   }
@@ -131,47 +175,77 @@ function rowToItem(row) {
 
 async function handleGetOne(req, res, id) {
   await ensureSchema()
-  const viewer = await getViewer(req)
-  const rows = await sql`
-    SELECT id, category, title, description, origin, price_amount, currency, unit,
-           image_stored_name, image_mime, image_file_name, required_level, created_at, updated_at
-    FROM product_catalog
-    WHERE id = ${id}
-    LIMIT 1
-  `
+  const rows = await sql`SELECT * FROM product_catalog WHERE id = ${id} LIMIT 1`
   if (!rows.length) return res.status(404).json({ code: 'NOT_FOUND', error: '商品不存在' })
-  const row = rows[0]
-  if (!viewer.isAdmin && !canView(row.required_level, viewer.level)) {
-    return res.status(403).json({ code: 'FORBIDDEN', error: '当前会员等级不可查看该商品' })
-  }
   return res.status(200).json({ ok: true, item: rowToItem(rows[0]) })
 }
 
 async function handleList(req, res) {
   await ensureSchema()
-  const viewer = await getViewer(req)
   const category = String(req.query?.category || '').trim().toLowerCase()
   let rows
   if (category && CATEGORY_IDS.has(category)) {
     rows = await sql`
-      SELECT id, category, title, description, origin, price_amount, currency, unit,
-             image_stored_name, image_mime, image_file_name, required_level, created_at, updated_at
-      FROM product_catalog
+      SELECT * FROM product_catalog
       WHERE category = ${category}
       ORDER BY created_at DESC
       LIMIT 200
     `
   } else {
     rows = await sql`
-      SELECT id, category, title, description, origin, price_amount, currency, unit,
-             image_stored_name, image_mime, image_file_name, required_level, created_at, updated_at
-      FROM product_catalog
+      SELECT * FROM product_catalog
       ORDER BY created_at DESC
       LIMIT 300
     `
   }
-  const visible = viewer.isAdmin ? rows : rows.filter((row) => canView(row.required_level, viewer.level))
-  return res.status(200).json({ ok: true, items: visible.map(rowToItem) })
+  return res.status(200).json({ ok: true, items: rows.map(rowToItem) })
+}
+
+/**
+ * @param {{ base64: string, fileName: string, mimeType: string }} img
+ * @param {string} productId
+ */
+async function writeGalleryImage(img, productId) {
+  const fileName = sanitizeFileName(img.fileName || 'pic.jpg')
+  const mime = String(img.mimeType || '').trim().toLowerCase()
+  if (!ALLOWED_IMG_MIME.has(mime)) throw new Error('不支持的图片类型')
+  const ext = getExt(fileName)
+  if (!ALLOWED_IMG_EXT.has(ext)) throw new Error('不支持的图片扩展名')
+  const buf = Buffer.from(String(img.base64 || '').trim(), 'base64')
+  if (!buf.length) throw new Error('图片为空')
+  if (buf.length > IMAGE_MAX_BYTES) throw new Error('单张图片过大')
+  await fs.mkdir(STORAGE_DIR, { recursive: true })
+  const storedName = `${productId}_${randomUUID()}.${ext}`
+  await fs.writeFile(path.join(STORAGE_DIR, storedName), buf)
+  return { stored_name: storedName, mime, file_name: fileName }
+}
+
+/** @param {string[]} storedNames */
+async function unlinkStored(storedNames) {
+  for (const name of storedNames) {
+    if (!name) continue
+    await fs.unlink(path.join(STORAGE_DIR, name)).catch((e) => {
+      if (e?.code !== 'ENOENT') throw e
+    })
+  }
+}
+
+function normalizeSkuPayload(body) {
+  const raw = body.skus ?? body.skuList
+  if (!Array.isArray(raw)) return []
+  return raw
+    .slice(0, MAX_SKUS)
+    .map((x) => ({
+      code: String(x?.code || '').trim().slice(0, 80),
+      spec_zh: String(x?.spec_zh || x?.specZh || '').trim().slice(0, 240),
+      spec_en: String(x?.spec_en || x?.specEn || '').trim().slice(0, 240),
+      price:
+        x?.price != null && x?.price !== ''
+          ? Number(x.price)
+          : null,
+      currency: String(x?.currency || '').trim().slice(0, 10).toUpperCase() || null,
+    }))
+    .filter((x) => x.code || x.spec_zh || x.spec_en)
 }
 
 async function handlePost(req, res) {
@@ -186,46 +260,72 @@ async function handlePost(req, res) {
   if (!CATEGORY_IDS.has(category)) {
     return res.status(400).json({ error: '无效的类目（须为 supplement / equipment / food / care）' })
   }
-  const title = String(body.title || '').trim().slice(0, 200)
-  const description = String(body.description || '').trim().slice(0, 8000)
-  const origin = String(body.origin || '').trim().slice(0, 240)
+
+  const titleZh = String(body.titleZh ?? body.title_zh ?? body.title || '').trim().slice(0, 200)
+  const titleEn = String(body.titleEn ?? body.title_en || '').trim().slice(0, 200)
+  const descriptionZh = String(body.descriptionZh ?? body.description_zh ?? body.description || '').trim().slice(0, 8000)
+  const descriptionEn = String(body.descriptionEn ?? body.description_en || '').trim().slice(0, 8000)
+  const originZh = String(body.originZh ?? body.origin_zh ?? body.origin || '').trim().slice(0, 240)
+  const originEn = String(body.originEn ?? body.origin_en || '').trim().slice(0, 240)
   const unit = String(body.unit || '件').trim().slice(0, 40) || '件'
   const currency = String(body.currency || 'CNY').trim().slice(0, 10).toUpperCase() || 'CNY'
   const priceRaw = body.price != null ? Number(body.price) : NaN
-  if (!title) return res.status(400).json({ error: '标题不能为空' })
-  if (!Number.isFinite(priceRaw) || priceRaw < 0) return res.status(400).json({ error: '价格无效' })
 
-  const requiredLevel = normalizeLevel(body.requiredLevel || 'free')
-  const imageFileName = sanitizeFileName(body.imageFileName || 'product.jpg')
-  const imageMime = String(body.imageMimeType || '').trim().toLowerCase()
-  const imageBase64 = String(body.imageBase64 || '').trim()
-  if (!imageBase64 || !imageMime || !ALLOWED_IMG_MIME.has(imageMime)) {
-    return res.status(400).json({ error: '请上传合法的商品图片（png / jpeg / webp / gif）' })
-  }
-  const ext = getExt(imageFileName)
-  if (!ALLOWED_IMG_EXT.has(ext)) return res.status(400).json({ error: '图片扩展名不支持' })
+  if (!titleZh) return res.status(400).json({ error: '中文标题不能为空' })
+  if (!Number.isFinite(priceRaw) || priceRaw < 0) return res.status(400).json({ error: '基础价格无效' })
 
-  const buf = Buffer.from(imageBase64, 'base64')
-  if (!buf.length) return res.status(400).json({ error: '图片为空' })
-  if (buf.length > IMAGE_MAX_BYTES) return res.status(400).json({ error: `图片超过 ${IMAGE_MAX_BYTES / 1024 / 1024}MB 限制` })
+  const galleryInputs = Array.isArray(body.galleryImages) ? body.galleryImages : []
+  const legacySingle =
+    body.imageBase64 || body.image_base64
+      ? [
+          {
+            base64: String(body.imageBase64 || body.image_base64 || '').trim(),
+            fileName: body.imageFileName || body.image_file_name || 'product.jpg',
+            mimeType: body.imageMimeType || body.image_mime_type || 'image/jpeg',
+          },
+        ]
+      : []
 
-  await fs.mkdir(STORAGE_DIR, { recursive: true })
+  const toProcess = galleryInputs.length ? galleryInputs : legacySingle
+  if (!toProcess.length) return res.status(400).json({ error: '请至少上传一张商品图片' })
+  if (toProcess.length > MAX_GALLERY) return res.status(400).json({ error: `图片最多 ${MAX_GALLERY} 张` })
+
   const id = randomUUID()
-  const storedName = `${id}.${ext}`
+  const gallery = []
+  for (const raw of toProcess) {
+    const img = {
+      base64: String(raw.base64 || raw.contentBase64 || '').trim(),
+      fileName: raw.fileName || raw.file_name || 'pic.jpg',
+      mimeType: raw.mimeType || raw.mime_type || 'image/jpeg',
+    }
+    gallery.push(await writeGalleryImage(img, id))
+  }
 
-  await fs.writeFile(path.join(STORAGE_DIR, storedName), buf)
+  const skus = normalizeSkuPayload(body)
 
   const rows = await sql`
     INSERT INTO product_catalog (
-      id, category, title, description, origin, price_amount, currency, unit,
-      image_stored_name, image_mime, image_file_name, required_level
+      id, category,
+      title, title_zh, title_en,
+      description, description_zh, description_en,
+      origin, origin_zh, origin_en,
+      price_amount, currency, unit,
+      gallery_json, skus_json,
+      image_stored_name, image_mime, image_file_name,
+      required_level
     ) VALUES (
-      ${id}, ${category}, ${title}, ${description || null}, ${origin || null},
+      ${id}, ${category},
+      ${titleZh}, ${titleZh}, ${titleEn || null},
+      ${descriptionZh || null}, ${descriptionZh || null}, ${descriptionEn || null},
+      ${originZh || null}, ${originZh || null}, ${originEn || null},
       ${priceRaw}, ${currency}, ${unit},
-      ${storedName}, ${imageMime}, ${imageFileName}, ${requiredLevel}
+      ${JSON.stringify(gallery)}::jsonb, ${JSON.stringify(skus)}::jsonb,
+      ${gallery[0]?.stored_name || null},
+      ${gallery[0]?.mime || null},
+      ${gallery[0]?.file_name || null},
+      ${'free'}
     )
-    RETURNING id, category, title, description, origin, price_amount, currency, unit,
-              image_stored_name, image_mime, image_file_name, required_level, created_at, updated_at
+    RETURNING *
   `
   return res.status(201).json({ ok: true, item: rowToItem(rows[0]) })
 }
@@ -242,65 +342,69 @@ async function handlePatch(req, res) {
 
   const existing = await sql`SELECT * FROM product_catalog WHERE id = ${id} LIMIT 1`
   if (!existing.length) return res.status(404).json({ error: '商品不存在' })
+  const ex = existing[0]
 
-  const category = String(body.category || existing[0].category || '').trim().toLowerCase()
+  const category = String(body.category || ex.category || '').trim().toLowerCase()
   if (!CATEGORY_IDS.has(category)) return res.status(400).json({ error: '无效的类目' })
-  const title = String(body.title || '').trim().slice(0, 200)
-  const description = String(body.description ?? existing[0].description ?? '').trim().slice(0, 8000)
-  const origin = String(body.origin ?? existing[0].origin ?? '').trim().slice(0, 240)
-  const unit = String(body.unit || existing[0].unit || '件').trim().slice(0, 40) || '件'
-  const currency = String(body.currency || existing[0].currency || 'CNY').trim().slice(0, 10).toUpperCase()
-  const priceRaw = body.price != null ? Number(body.price) : Number(existing[0].price_amount)
-  if (!title) return res.status(400).json({ error: '标题不能为空' })
-  if (!Number.isFinite(priceRaw) || priceRaw < 0) return res.status(400).json({ error: '价格无效' })
-  const requiredLevel = normalizeLevel(body.requiredLevel || existing[0].required_level || 'free')
 
-  let imageStored = existing[0].image_stored_name
-  let imageMime = existing[0].image_mime
-  let imageFileName = existing[0].image_file_name
+  const titleZh = String(body.titleZh ?? body.title_zh ?? body.title ?? ex.title_zh ?? ex.title || '').trim().slice(0, 200)
+  const titleEn = String(body.titleEn ?? body.title_en ?? ex.title_en ?? '').trim().slice(0, 200)
+  const descriptionZh = String(body.descriptionZh ?? body.description_zh ?? body.description ?? ex.description_zh ?? ex.description ?? '').trim().slice(0, 8000)
+  const descriptionEn = String(body.descriptionEn ?? body.description_en ?? ex.description_en ?? '').trim().slice(0, 8000)
+  const originZh = String(body.originZh ?? body.origin_zh ?? body.origin ?? ex.origin_zh ?? ex.origin ?? '').trim().slice(0, 240)
+  const originEn = String(body.originEn ?? body.origin_en ?? ex.origin_en ?? '').trim().slice(0, 240)
+  const unit = String(body.unit || ex.unit || '件').trim().slice(0, 40) || '件'
+  const currency = String(body.currency || ex.currency || 'CNY').trim().slice(0, 10).toUpperCase()
+  const priceRaw = body.price != null ? Number(body.price) : Number(ex.price_amount)
 
-  const imageBase64 = String(body.imageBase64 || '').trim()
-  if (imageBase64) {
-    const fn = sanitizeFileName(body.imageFileName || 'product.jpg')
-    const mime = String(body.imageMimeType || '').trim().toLowerCase()
-    if (!ALLOWED_IMG_MIME.has(mime)) return res.status(400).json({ error: '图片类型不支持' })
-    const ext = getExt(fn)
-    if (!ALLOWED_IMG_EXT.has(ext)) return res.status(400).json({ error: '图片扩展名不支持' })
-    const buf = Buffer.from(imageBase64, 'base64')
-    if (!buf.length) return res.status(400).json({ error: '图片为空' })
-    if (buf.length > IMAGE_MAX_BYTES) return res.status(400).json({ error: '图片过大' })
+  if (!titleZh) return res.status(400).json({ error: '中文标题不能为空' })
+  if (!Number.isFinite(priceRaw) || priceRaw < 0) return res.status(400).json({ error: '基础价格无效' })
 
-    await fs.mkdir(STORAGE_DIR, { recursive: true })
-    const oldStored = existing[0].image_stored_name
-    const newStored = `${id}.${ext}`
-    await fs.writeFile(path.join(STORAGE_DIR, newStored), buf)
-    if (oldStored && oldStored !== newStored) {
-      await fs.unlink(path.join(STORAGE_DIR, oldStored)).catch((e) => {
-        if (e?.code !== 'ENOENT') throw e
-      })
+  let gallery = normalizeGalleryRow(ex)
+  const galleryInputs = Array.isArray(body.galleryImages) ? body.galleryImages : null
+  if (galleryInputs && galleryInputs.length) {
+    if (galleryInputs.length > MAX_GALLERY) return res.status(400).json({ error: `图片最多 ${MAX_GALLERY} 张` })
+    const oldNames = gallery.map((g) => g.stored_name)
+    const next = []
+    for (const raw of galleryInputs) {
+      const img = {
+        base64: String(raw.base64 || raw.contentBase64 || '').trim(),
+        fileName: raw.fileName || raw.file_name || 'pic.jpg',
+        mimeType: raw.mimeType || raw.mime_type || 'image/jpeg',
+      }
+      next.push(await writeGalleryImage(img, id))
     }
-    imageStored = newStored
-    imageMime = mime
-    imageFileName = fn
+    await unlinkStored(oldNames)
+    gallery = next
   }
+
+  const skus =
+    body.skus !== undefined || body.skuList !== undefined ? normalizeSkuPayload(body) : normalizeSkusRow(ex)
 
   const rows = await sql`
     UPDATE product_catalog SET
       category = ${category},
-      title = ${title},
-      description = ${description || null},
-      origin = ${origin || null},
+      title = ${titleZh},
+      title_zh = ${titleZh},
+      title_en = ${titleEn || null},
+      description = ${descriptionZh || null},
+      description_zh = ${descriptionZh || null},
+      description_en = ${descriptionEn || null},
+      origin = ${originZh || null},
+      origin_zh = ${originZh || null},
+      origin_en = ${originEn || null},
       price_amount = ${priceRaw},
       currency = ${currency},
       unit = ${unit},
-      image_stored_name = ${imageStored},
-      image_mime = ${imageMime},
-      image_file_name = ${imageFileName},
-      required_level = ${requiredLevel},
+      gallery_json = ${JSON.stringify(gallery)}::jsonb,
+      skus_json = ${JSON.stringify(skus)}::jsonb,
+      image_stored_name = ${gallery[0]?.stored_name || null},
+      image_mime = ${gallery[0]?.mime || null},
+      image_file_name = ${gallery[0]?.file_name || null},
+      required_level = ${'free'},
       updated_at = NOW()
     WHERE id = ${id}
-    RETURNING id, category, title, description, origin, price_amount, currency, unit,
-              image_stored_name, image_mime, image_file_name, required_level, created_at, updated_at
+    RETURNING *
   `
   return res.status(200).json({ ok: true, item: rowToItem(rows[0]) })
 }
@@ -313,17 +417,19 @@ async function handleDelete(req, res) {
   const id = String(req.query?.id || '').trim()
   if (!id) return res.status(400).json({ error: '缺少 id' })
 
-  const deleted = await sql`
-    DELETE FROM product_catalog WHERE id = ${id}
-    RETURNING image_stored_name
-  `
+  const deleted = await sql`SELECT gallery_json, image_stored_name FROM product_catalog WHERE id = ${id}`
   if (!deleted.length) return res.status(404).json({ error: '商品不存在' })
-  const stored = String(deleted[0].image_stored_name || '')
-  if (stored) {
-    await fs.unlink(path.join(STORAGE_DIR, stored)).catch((e) => {
-      if (e?.code !== 'ENOENT') throw e
-    })
+
+  await sql`DELETE FROM product_catalog WHERE id = ${id}`
+
+  const row = deleted[0]
+  const names = new Set()
+  for (const g of normalizeGalleryRow(row)) {
+    names.add(g.stored_name)
   }
+  if (row.image_stored_name) names.add(row.image_stored_name)
+  await unlinkStored([...names])
+
   return res.status(200).json({ ok: true, id })
 }
 

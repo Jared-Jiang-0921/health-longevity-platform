@@ -5,6 +5,7 @@ import { getProductsEvidenceCopy } from '../data/productsEvidenceLibraryI18n'
 import { useLocale } from '../context/LocaleContext'
 import { useAuth } from '../context/AuthContext'
 import { getUi } from '../i18n/ui'
+import { pickCatalogLocale } from '../lib/productCatalogLocale'
 import ProductCatalogImage from '../components/ProductCatalogImage'
 import './Products.css'
 
@@ -21,17 +22,21 @@ export default function Products() {
   const { getToken } = useAuth()
   const ui = getUi(lang)
   const ev = getProductsEvidenceCopy(lang)
+  const originLabel = { zh: '产地', en: 'Origin', ar: 'المنشأ' }[lang] || '产地'
+
   const [activeCategory, setActiveCategory] = useState(PRODUCT_CATEGORIES[0]?.id || 'supplement')
   const [catalogItems, setCatalogItems] = useState([])
 
   useEffect(() => {
-    const token = getToken?.()
     let cancelled = false
     ;(async () => {
       try {
+        const headers = {}
+        const token = getToken?.()
+        if (token) headers.Authorization = `Bearer ${token}`
         const res = await fetch(`/api/product-catalog?ts=${Date.now()}`, {
           cache: 'no-store',
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
+          headers,
         })
         const data = await res.json().catch(() => ({}))
         if (cancelled || !res.ok) return
@@ -48,26 +53,33 @@ export default function Products() {
   const mergedForCategory = useMemo(() => {
     const fromDb = catalogItems
       .filter((row) => row.category === activeCategory)
-      .map((row) => ({
-        id: row.id,
-        title: row.title,
-        category: row.category,
-        price: Number(row.price_amount),
-        currency: row.currency || 'CNY',
-        desc: row.description || '',
-        unit: row.unit || '件',
-        origin: row.origin || '',
-        catalog: true,
-        has_image: Boolean(row.has_image),
-      }))
+      .map((row) => {
+        const loc = pickCatalogLocale(row, lang)
+        return {
+          id: row.id,
+          title: loc.title,
+          category: row.category,
+          price: Number(row.price_amount),
+          currency: row.currency || 'CNY',
+          desc: loc.desc,
+          unit: row.unit || '件',
+          origin: loc.origin,
+          catalog: true,
+          gallery_count: row.gallery_count || 0,
+          skus: row.skus || [],
+        }
+      })
     const staticList = PRODUCTS.filter((p) => p.category === activeCategory).map((p) => ({
       ...p,
-      catalog: false,
+      title: p.title,
+      desc: p.desc,
       origin: '',
-      has_image: false,
+      catalog: false,
+      gallery_count: 0,
+      skus: [],
     }))
     return [...fromDb, ...staticList]
-  }, [catalogItems, activeCategory])
+  }, [catalogItems, activeCategory, lang])
 
   useEffect(() => {
     const selected = PRODUCT_CATEGORIES.find((c) => c.id === activeCategory)
@@ -152,8 +164,8 @@ export default function Products() {
               <div className="product-card-visual">
                 <ProductCatalogImage
                   productId={product.catalog ? product.id : ''}
-                  hasImage={Boolean(product.catalog && product.has_image)}
-                  getToken={getToken}
+                  galleryCount={product.gallery_count}
+                  slot={0}
                   className="product-card-img"
                   alt={product.title}
                 />
@@ -165,8 +177,11 @@ export default function Products() {
                 </span>
                 <h3>{product.title}</h3>
                 <p>{product.desc}</p>
+                {product.skus?.length ? (
+                  <p className="product-sku-hint">{product.skus.length} SKU</p>
+                ) : null}
                 {product.origin ? (
-                  <p className="product-origin"><span className="product-origin-label">产地</span>{product.origin}</p>
+                  <p className="product-origin"><span className="product-origin-label">{originLabel}</span>{product.origin}</p>
                 ) : null}
               </div>
               <div className="product-footer">

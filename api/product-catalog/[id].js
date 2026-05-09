@@ -1,47 +1,41 @@
 /**
- * GET /api/product-catalog/:id — 返回商品主图二进制（需登录且会员等级足够）
+ * GET /api/product-catalog/:id?slot=0 — 返回图库中指定槽位图片（公开，无需登录）
  */
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { sql } from '../../lib/db.js'
-import { authorizeSiteAdmin } from '../../lib/siteAdminAuth.js'
-import { verifyToken, getUserById } from '../../lib/auth.js'
-import { parseSiteAdminEmails } from '../../lib/siteAdminEmails.js'
 
 const STORAGE_DIR = path.join(process.cwd(), 'storage', 'product-catalog')
-const LEVEL_ORDER = ['free', 'standard', 'premium']
 
-function normalizeLevel(raw) {
-  const s = String(raw || '').toLowerCase().trim()
-  return LEVEL_ORDER.includes(s) ? s : 'free'
-}
-
-function canView(required, current) {
-  const reqIdx = LEVEL_ORDER.indexOf(normalizeLevel(required))
-  const curIdx = LEVEL_ORDER.indexOf(normalizeLevel(current))
-  return curIdx >= reqIdx
-}
-
-async function getViewer(req) {
-  const adminAuth = await authorizeSiteAdmin(req)
-  if (adminAuth.ok) return { isAdmin: true, level: 'premium' }
-
-  const requestAdminToken = String(req.headers['x-site-admin-token'] || '').trim()
-  const configAdminToken = String(process.env.SITE_ADMIN_TOKEN || '').trim()
-  if (configAdminToken && requestAdminToken && requestAdminToken === configAdminToken) {
-    return { isAdmin: true, level: 'premium' }
+/** @param {any} raw */
+function normalizeGallery(raw) {
+  let g = raw?.gallery_json
+  if (typeof g === 'string') {
+    try {
+      g = JSON.parse(g)
+    } catch {
+      g = []
+    }
   }
-
-  const auth = req.headers.authorization
-  const jwt = auth?.startsWith('Bearer ') ? auth.slice(7) : null
-  if (!jwt) return { isAdmin: false, level: 'free' }
-  const userId = await verifyToken(jwt)
-  if (!userId) return { isAdmin: false, level: 'free' }
-  const user = await getUserById(userId)
-  if (!user) return { isAdmin: false, level: 'free' }
-  const allow = parseSiteAdminEmails()
-  const isAdmin = allow.includes(String(user.email || '').toLowerCase().trim())
-  return { isAdmin, level: user.level || 'free' }
+  if (!Array.isArray(g)) g = []
+  const out = g
+    .filter((x) => x && typeof x.stored_name === 'string' && x.stored_name.trim())
+    .map((x) => ({
+      stored_name: String(x.stored_name).trim(),
+      mime: String(x.mime || 'image/jpeg').trim(),
+      file_name: String(x.file_name || 'image').trim(),
+    }))
+  if (out.length) return out
+  if (raw?.image_stored_name) {
+    return [
+      {
+        stored_name: String(raw.image_stored_name).trim(),
+        mime: String(raw.image_mime || 'image/jpeg'),
+        file_name: String(raw.image_file_name || 'product'),
+      },
+    ]
+  }
+  return []
 }
 
 export default async function handler(req, res) {
@@ -54,28 +48,23 @@ export default async function handler(req, res) {
     const id = String(req.query?.id || '').trim()
     if (!id) return res.status(400).json({ error: '缺少商品 id' })
 
-    const rows = await sql`
-      SELECT image_stored_name, image_mime, image_file_name, required_level
-      FROM product_catalog
-      WHERE id = ${id}
-      LIMIT 1
-    `
+    let slot = parseInt(String(req.query?.slot ?? '0'), 10)
+    if (Number.isNaN(slot) || slot < 0) slot = 0
+
+    const rows = await sql`SELECT gallery_json, image_stored_name, image_mime, image_file_name FROM product_catalog WHERE id = ${id} LIMIT 1`
     if (!rows.length) return res.status(404).json({ error: '商品不存在' })
-    const row = rows[0]
-    if (!row.image_stored_name) return res.status(404).json({ error: '暂无商品图片' })
 
-    const viewer = await getViewer(req)
-    if (!viewer.isAdmin && !canView(row.required_level, viewer.level)) {
-      return res.status(403).json({ code: 'FORBIDDEN', error: '当前会员等级不可查看该资源' })
-    }
+    const gallery = normalizeGallery(rows[0])
+    const entry = gallery[slot]
+    if (!entry) return res.status(404).json({ error: '该槽位无图片' })
 
-    const abs = path.join(STORAGE_DIR, String(row.image_stored_name))
+    const abs = path.join(STORAGE_DIR, String(entry.stored_name))
     const buf = await fs.readFile(abs)
-    const mime = row.image_mime || 'image/jpeg'
-    const disp = String(row.image_file_name || 'product').replace(/[^\w.\-\u4e00-\u9fa5]/g, '_')
+    const mime = entry.mime || 'image/jpeg'
+    const disp = String(entry.file_name || 'product').replace(/[^\w.\-\u4e00-\u9fa5]/g, '_')
     res.setHeader('Content-Type', mime)
     res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(disp)}"`)
-    res.setHeader('Cache-Control', 'private, max-age=3600')
+    res.setHeader('Cache-Control', 'public, max-age=86400')
     return res.status(200).send(buf)
   } catch (e) {
     if (e?.code === 'ENOENT') return res.status(404).json({ error: '图片文件不存在' })

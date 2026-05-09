@@ -204,6 +204,13 @@
   opacity: 0.85;
 }
 
+.product-sku-hint {
+  margin-top: 0.35rem !important;
+  font-size: 0.78rem !important;
+  color: var(--color-primary) !important;
+  opacity: 0.9;
+}
+
 .product-card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);

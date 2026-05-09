@@ -5,7 +5,8 @@ import { getProductsEvidenceCopy } from '../data/productsEvidenceLibraryI18n'
 import { useLocale } from '../context/LocaleContext'
 import { useAuth } from '../context/AuthContext'
 import { getUi } from '../i18n/ui'
-import ProductCatalogImage from '../components/ProductCatalogImage'
+import { pickCatalogLocale, pickSkuLocale } from '../lib/productCatalogLocale'
+import ProductCatalogGallery from '../components/ProductCatalogGallery'
 import './ProductDetail.css'
 
 function formatPriceSymbol(currency) {
@@ -22,36 +23,65 @@ export default function ProductDetail() {
   const { getToken } = useAuth()
   const ev = getProductsEvidenceCopy(lang)
   const t = {
-    zh: { notFound: '未找到该产品', back: '返回长寿产品证据库', pay: '去支付', origin: '产地' },
-    en: { notFound: 'Product not found', back: 'Back to evidence library', pay: 'Checkout', origin: 'Origin' },
-    ar: { notFound: 'المنتج غير موجود', back: 'العودة إلى مكتبة الأدلة', pay: 'الدفع', origin: 'المنشأ' },
+    zh: {
+      notFound: '未找到该产品',
+      back: '返回长寿产品证据库',
+      pay: '去支付',
+      origin: '产地',
+      sku: '规格与 SKU',
+      code: '编码',
+      spec: '规格',
+      price: '价格',
+    },
+    en: {
+      notFound: 'Product not found',
+      back: 'Back to evidence library',
+      pay: 'Checkout',
+      origin: 'Origin',
+      sku: 'SKUs',
+      code: 'Code',
+      spec: 'Spec',
+      price: 'Price',
+    },
+    ar: {
+      notFound: 'المنتج غير موجود',
+      back: 'العودة إلى مكتبة الأدلة',
+      pay: 'الدفع',
+      origin: 'المنشأ',
+      sku: 'المواصفات',
+      code: 'الرمز',
+      spec: 'المواصفات',
+      price: 'السعر',
+    },
   }[lang || 'zh']
   const { id } = useParams()
   const staticProduct = getProductById(id)
-  const [catalogProduct, setCatalogProduct] = useState(null)
+  const [catalogRow, setCatalogRow] = useState(null)
   const [catalogLoading, setCatalogLoading] = useState(() => Boolean(id && isCatalogProductId(id)))
 
   useEffect(() => {
     if (!id || !isCatalogProductId(id)) {
-      setCatalogProduct(null)
+      setCatalogRow(null)
       setCatalogLoading(false)
       return undefined
     }
     let cancelled = false
     setCatalogLoading(true)
+    const headers = {}
     const token = getToken?.()
+    if (token) headers.Authorization = `Bearer ${token}`
     ;(async () => {
       try {
         const res = await fetch(`/api/product-catalog?id=${encodeURIComponent(id)}&ts=${Date.now()}`, {
           cache: 'no-store',
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
+          headers,
         })
         const data = await res.json().catch(() => ({}))
         if (cancelled) return
-        if (res.ok && data.item) setCatalogProduct(data.item)
-        else setCatalogProduct(null)
+        if (res.ok && data.item) setCatalogRow(data.item)
+        else setCatalogRow(null)
       } catch {
-        if (!cancelled) setCatalogProduct(null)
+        if (!cancelled) setCatalogRow(null)
       } finally {
         if (!cancelled) setCatalogLoading(false)
       }
@@ -61,32 +91,39 @@ export default function ProductDetail() {
     }
   }, [id, getToken])
 
-  const product = catalogProduct
-    ? {
-        id: catalogProduct.id,
-        title: catalogProduct.title,
-        category: catalogProduct.category,
-        price: Number(catalogProduct.price_amount),
-        currency: catalogProduct.currency || 'CNY',
-        desc: catalogProduct.description || '',
-        unit: catalogProduct.unit || '件',
-        origin: catalogProduct.origin || '',
-        catalog: true,
-        has_image: Boolean(catalogProduct.has_image),
-      }
+  const product = catalogRow
+    ? (() => {
+        const loc = pickCatalogLocale(catalogRow, lang)
+        return {
+          id: catalogRow.id,
+          title: loc.title,
+          category: catalogRow.category,
+          price: Number(catalogRow.price_amount),
+          currency: catalogRow.currency || 'CNY',
+          desc: loc.desc,
+          unit: catalogRow.unit || '件',
+          origin: loc.origin,
+          catalog: true,
+          gallery_count: catalogRow.gallery_count || 0,
+          skus: catalogRow.skus || [],
+        }
+      })()
     : staticProduct
       ? {
           ...staticProduct,
+          title: staticProduct.title,
+          desc: staticProduct.desc,
           origin: '',
           catalog: false,
-          has_image: false,
+          gallery_count: 0,
+          skus: [],
         }
       : null
 
   if (catalogLoading && !product) {
     return (
       <div className="page-content">
-        <p>{ui.loading || '…'}</p>
+        <p>{ui.loading}</p>
       </div>
     )
   }
@@ -113,15 +150,14 @@ export default function ProductDetail() {
       </aside>
 
       <div className="product-detail-card">
-        <div className="product-detail-visual">
-          <ProductCatalogImage
-            productId={product.catalog ? product.id : ''}
-            hasImage={Boolean(product.catalog && product.has_image)}
-            getToken={getToken}
-            className="product-detail-img"
-            alt={product.title}
+        {product.catalog && product.gallery_count > 0 ? (
+          <ProductCatalogGallery
+            productId={product.id}
+            galleryCount={product.gallery_count}
+            altBase={product.title}
           />
-        </div>
+        ) : null}
+
         <div className="product-detail-header">
           <span className="product-category-tag">{category?.label}</span>
           {product.catalog ? <span className="product-badge-managed product-detail-badge">上架商品</span> : null}
@@ -132,9 +168,42 @@ export default function ProductDetail() {
           ) : null}
         </div>
 
+        {product.skus?.length ? (
+          <div className="product-detail-skus">
+            <h2 className="product-detail-skus-title">{t.sku}</h2>
+            <div className="product-detail-table-wrap">
+              <table className="product-detail-sku-table">
+                <thead>
+                  <tr>
+                    <th>{t.code}</th>
+                    <th>{t.spec}</th>
+                    <th>{t.price}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {product.skus.map((sku, i) => (
+                    <tr key={`${sku.code}-${i}`}>
+                      <td>{sku.code || '—'}</td>
+                      <td>{pickSkuLocale(sku, lang) || '—'}</td>
+                      <td>
+                        {sku.price != null && Number.isFinite(Number(sku.price))
+                          ? `${formatPriceSymbol(sku.currency || product.currency)}${sku.price}`
+                          : (lang === 'zh' ? '同基础价' : 'Base')}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ) : null}
+
         <div className="product-detail-price">
           <span className="price">{formatPriceSymbol(product.currency)}{product.price}</span>
           <span className="unit">/{product.unit}</span>
+          {product.skus?.length ? (
+            <span className="product-detail-base-note">{lang === 'zh' ? '（基础标价；SKU 可能有单独定价）' : '(Base price; SKU may override)'}</span>
+          ) : null}
         </div>
 
         <div className="product-detail-actions">
