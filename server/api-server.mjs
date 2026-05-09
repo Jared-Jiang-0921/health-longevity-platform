@@ -254,6 +254,7 @@ const server = http.createServer(async (req, res) => {
     await fn(req, res)
   } catch (e) {
     if (res.writableEnded) return
+    console.error('[api-server] unhandled', req.method, req.url, e?.stack || e)
     res.statusCode = 500
     res.end(JSON.stringify({ code: 'API_SERVER_FAILED', error: e?.message || 'Internal Server Error' }))
   }
@@ -269,5 +270,7 @@ server.listen(PORT, () => {
   console.log(`[api-server] api dir: ${apiDirAbs}`)
   console.log(`[api-server] routes loaded: ${routeTable.length}`)
   console.log(`[api-server] route /api/product-catalog: ${hasProductCatalog ? 'ok' : 'MISSING'}`)
+  const pcHandler = routeTable.find((r) => !r.catchAll && r.segments.join('/') === 'product-catalog')
+  if (pcHandler) console.log(`[api-server] product-catalog absFile: ${pcHandler.absFile}`)
 })
 
