@@ -261,12 +261,12 @@ async function handlePost(req, res) {
     return res.status(400).json({ error: '无效的类目（须为 supplement / equipment / food / care）' })
   }
 
-  const titleZh = String((body.titleZh ?? body.title_zh ?? body.title) || '').trim().slice(0, 200)
-  const titleEn = String((body.titleEn ?? body.title_en) || '').trim().slice(0, 200)
-  const descriptionZh = String((body.descriptionZh ?? body.description_zh ?? body.description) || '').trim().slice(0, 8000)
-  const descriptionEn = String((body.descriptionEn ?? body.description_en) || '').trim().slice(0, 8000)
-  const originZh = String((body.originZh ?? body.origin_zh ?? body.origin) || '').trim().slice(0, 240)
-  const originEn = String((body.originEn ?? body.origin_en) || '').trim().slice(0, 240)
+  const titleZh = String(body.titleZh ?? body.title_zh ?? body.title ?? '').trim().slice(0, 200)
+  const titleEn = String(body.titleEn ?? body.title_en ?? '').trim().slice(0, 200)
+  const descriptionZh = String(body.descriptionZh ?? body.description_zh ?? body.description ?? '').trim().slice(0, 8000)
+  const descriptionEn = String(body.descriptionEn ?? body.description_en ?? '').trim().slice(0, 8000)
+  const originZh = String(body.originZh ?? body.origin_zh ?? body.origin ?? '').trim().slice(0, 240)
+  const originEn = String(body.originEn ?? body.origin_en ?? '').trim().slice(0, 240)
   const unit = String(body.unit || '件').trim().slice(0, 40) || '件'
   const currency = String(body.currency || 'CNY').trim().slice(0, 10).toUpperCase() || 'CNY'
   const priceRaw = body.price != null ? Number(body.price) : NaN
@@ -347,7 +347,7 @@ async function handlePatch(req, res) {
   const category = String(body.category || ex.category || '').trim().toLowerCase()
   if (!CATEGORY_IDS.has(category)) return res.status(400).json({ error: '无效的类目' })
 
-  const titleZh = String((body.titleZh ?? body.title_zh ?? body.title ?? ex.title_zh ?? ex.title) || '').trim().slice(0, 200)
+  const titleZh = String(body.titleZh ?? body.title_zh ?? body.title ?? ex.title_zh ?? ex.title ?? '').trim().slice(0, 200)
   const titleEn = String(body.titleEn ?? body.title_en ?? ex.title_en ?? '').trim().slice(0, 200)
   const descriptionZh = String(body.descriptionZh ?? body.description_zh ?? body.description ?? ex.description_zh ?? ex.description ?? '').trim().slice(0, 8000)
   const descriptionEn = String(body.descriptionEn ?? body.description_en ?? ex.description_en ?? '').trim().slice(0, 8000)
