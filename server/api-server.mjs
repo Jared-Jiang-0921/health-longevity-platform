@@ -155,7 +155,8 @@ async function readBodyBuffer(req) {
 
 const PORT = Number(process.env.PORT || 3000)
 
-const apiDirAbs = path.join(process.cwd(), 'api')
+// 与上方 projectRoot / .env 一致：勿依赖 process.cwd()（pm2、systemd 下 cwd 常非仓库根目录）
+const apiDirAbs = path.join(projectRoot, 'api')
 const routeTable = await buildRouteTable(apiDirAbs)
 
 const moduleCache = new Map()
@@ -236,6 +237,7 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log(`[api-server] listening on :${PORT} pid=${process.pid}`)
+  console.log(`[api-server] api dir: ${apiDirAbs}`)
   console.log(`[api-server] routes loaded: ${routeTable.length}`)
 })
 
