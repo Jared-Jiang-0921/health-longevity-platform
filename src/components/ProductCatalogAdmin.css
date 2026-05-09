@@ -1,0 +1,141 @@
+.product-catalog-admin {
+  margin-bottom: 1.75rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid rgba(46, 204, 113, 0.35);
+  border-radius: 12px;
+  background: rgba(15, 40, 28, 0.45);
+}
+
+.product-catalog-admin-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+}
+
+.product-catalog-admin-note {
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+  opacity: 0.88;
+  line-height: 1.5;
+}
+
+.product-catalog-admin-muted {
+  opacity: 0.75;
+  font-size: 0.9rem;
+}
+
+.product-catalog-admin-error {
+  color: #ff6b6b;
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+}
+
+.product-catalog-admin-hint {
+  color: #69db7c;
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+}
+
+.product-catalog-admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.product-catalog-admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.65rem 1rem;
+}
+
+.product-catalog-admin-grid label,
+.product-catalog-admin-full {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+}
+
+.product-catalog-admin-grid input,
+.product-catalog-admin-grid select,
+.product-catalog-admin-full textarea {
+  padding: 0.45rem 0.55rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.25);
+  color: inherit;
+}
+
+.product-catalog-admin-span2 {
+  grid-column: span 2;
+}
+
+@media (max-width: 640px) {
+  .product-catalog-admin-span2 {
+    grid-column: span 1;
+  }
+}
+
+.product-catalog-admin-list-wrap {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.product-catalog-admin-list-wrap h5 {
+  margin: 0 0 0.65rem;
+  font-size: 0.95rem;
+}
+
+.product-catalog-admin-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.product-catalog-admin-row {
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.product-catalog-admin-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.5rem;
+  align-items: center;
+}
+
+.product-catalog-admin-meta strong {
+  flex: 1 1 100%;
+  margin-bottom: 0.15rem;
+}
+
+.product-catalog-admin-pill {
+  font-size: 0.72rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(46, 204, 113, 0.15);
+  border: 1px solid rgba(46, 204, 113, 0.35);
+}
+
+.product-catalog-admin-actions {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.product-catalog-admin-danger {
+  border-color: rgba(255, 107, 107, 0.5);
+  color: #ffb3b3;
+}
+
+.product-catalog-admin-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}

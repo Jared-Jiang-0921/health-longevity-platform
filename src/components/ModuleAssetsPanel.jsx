@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
 import { CATEGORIES, COURSES, getCourseById } from '../data/courses'
 import { PRODUCT_CATEGORIES, getProductById } from '../data/products'
+import ProductCatalogAdmin from './ProductCatalogAdmin'
 import './ModuleAssetsPanel.css'
 
 function formatSize(bytes) {
@@ -756,6 +757,10 @@ export default function ModuleAssetsPanel({ moduleKey }) {
             ))}
           </ul>
         </>
+      ) : null}
+
+      {isAdmin && moduleKey === 'products' ? (
+        <ProductCatalogAdmin getToken={getToken} />
       ) : null}
 
       {isAdmin ? (

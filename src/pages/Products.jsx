@@ -1,18 +1,73 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PRODUCT_CATEGORIES, PRODUCTS } from '../data/products'
 import { getProductsEvidenceCopy } from '../data/productsEvidenceLibraryI18n'
 import { useLocale } from '../context/LocaleContext'
+import { useAuth } from '../context/AuthContext'
 import { getUi } from '../i18n/ui'
+import ProductCatalogImage from '../components/ProductCatalogImage'
 import './Products.css'
+
+function formatPriceSymbol(currency) {
+  const c = String(currency || 'CNY').toUpperCase()
+  if (c === 'CNY') return '¥'
+  if (c === 'USD') return '$'
+  if (c === 'EUR') return '€'
+  return `${c} `
+}
 
 export default function Products() {
   const { lang } = useLocale()
+  const { getToken } = useAuth()
   const ui = getUi(lang)
   const ev = getProductsEvidenceCopy(lang)
   const [activeCategory, setActiveCategory] = useState(PRODUCT_CATEGORIES[0]?.id || 'supplement')
+  const [catalogItems, setCatalogItems] = useState([])
 
-  const filtered = PRODUCTS.filter((p) => p.category === activeCategory)
+  useEffect(() => {
+    const token = getToken?.()
+    let cancelled = false
+    ;(async () => {
+      try {
+        const res = await fetch(`/api/product-catalog?ts=${Date.now()}`, {
+          cache: 'no-store',
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        })
+        const data = await res.json().catch(() => ({}))
+        if (cancelled || !res.ok) return
+        setCatalogItems(Array.isArray(data.items) ? data.items : [])
+      } catch {
+        if (!cancelled) setCatalogItems([])
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [getToken])
+
+  const mergedForCategory = useMemo(() => {
+    const fromDb = catalogItems
+      .filter((row) => row.category === activeCategory)
+      .map((row) => ({
+        id: row.id,
+        title: row.title,
+        category: row.category,
+        price: Number(row.price_amount),
+        currency: row.currency || 'CNY',
+        desc: row.description || '',
+        unit: row.unit || '件',
+        origin: row.origin || '',
+        catalog: true,
+        has_image: Boolean(row.has_image),
+      }))
+    const staticList = PRODUCTS.filter((p) => p.category === activeCategory).map((p) => ({
+      ...p,
+      catalog: false,
+      origin: '',
+      has_image: false,
+    }))
+    return [...fromDb, ...staticList]
+  }, [catalogItems, activeCategory])
 
   useEffect(() => {
     const selected = PRODUCT_CATEGORIES.find((c) => c.id === activeCategory)
@@ -92,18 +147,31 @@ export default function Products() {
 
       <section className="product-list">
         <div className="product-grid">
-          {filtered.map((product) => (
-            <article key={product.id} className="product-card">
+          {mergedForCategory.map((product) => (
+            <article key={String(product.id)} className="product-card">
+              <div className="product-card-visual">
+                <ProductCatalogImage
+                  productId={product.catalog ? product.id : ''}
+                  hasImage={Boolean(product.catalog && product.has_image)}
+                  getToken={getToken}
+                  className="product-card-img"
+                  alt={product.title}
+                />
+              </div>
               <div className="product-info">
                 <span className="product-category">
                   {PRODUCT_CATEGORIES.find((c) => c.id === product.category)?.label}
+                  {product.catalog ? <span className="product-badge-managed"> 上架</span> : null}
                 </span>
                 <h3>{product.title}</h3>
                 <p>{product.desc}</p>
+                {product.origin ? (
+                  <p className="product-origin"><span className="product-origin-label">产地</span>{product.origin}</p>
+                ) : null}
               </div>
               <div className="product-footer">
                 <span className="product-price">
-                  ¥{product.price}
+                  {formatPriceSymbol(product.currency)}{product.price}
                   <small>/{product.unit}</small>
                 </span>
                 <Link to={`/products/${product.id}`} className="btn-detail">

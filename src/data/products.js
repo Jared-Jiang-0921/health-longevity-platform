@@ -20,6 +20,15 @@ export const PRODUCTS = [
   { id: 12, title: '助眠精油', category: 'care', price: 78, currency: 'CNY', desc: '薰衣草等天然成分，辅助放松入睡。', unit: '瓶' },
 ]
 
+/** 上架商品使用 UUID，与静态示例数字 id 区分 */
+export function isCatalogProductId(id) {
+  const s = String(id || '').trim()
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(s)
+}
+
 export function getProductById(id) {
-  return PRODUCTS.find((p) => p.id === Number(id))
+  if (id == null || id === '') return undefined
+  const num = Number(id)
+  if (!Number.isNaN(num)) return PRODUCTS.find((p) => p.id === num)
+  return undefined
 }
