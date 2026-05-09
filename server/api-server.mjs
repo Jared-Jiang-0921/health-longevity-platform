@@ -88,8 +88,15 @@ async function walkJsFiles(dir) {
   const out = []
   for (const ent of entries) {
     const full = path.join(dir, ent.name)
-    if (ent.isDirectory()) out.push(...(await walkJsFiles(full)))
-    else if (ent.isFile() && ent.name.endsWith('.js')) out.push(full)
+    let st
+    try {
+      st = await fs.stat(full)
+    } catch {
+      continue
+    }
+    // 跟随 symlink：Dirent.isFile()/isDirectory() 对「指向文件的 symlink」常为 false，会漏扫路由文件
+    if (st.isDirectory()) out.push(...(await walkJsFiles(full)))
+    else if (st.isFile() && ent.name.endsWith('.js')) out.push(full)
   }
   return out
 }
@@ -158,6 +165,23 @@ const PORT = Number(process.env.PORT || 3000)
 // 与上方 projectRoot / .env 一致：勿依赖 process.cwd()（pm2、systemd 下 cwd 常非仓库根目录）
 const apiDirAbs = path.join(projectRoot, 'api')
 const routeTable = await buildRouteTable(apiDirAbs)
+
+/** 个别环境下 walk 未收录关键路由时兜底注册（避免 /api 列表不全导致 ROUTE_NOT_FOUND） */
+;(function ensureApiRouteFromFile(relFromApi /* 相对 api/，如 product-catalog.js */) {
+  const absFile = path.normalize(path.join(apiDirAbs, relFromApi))
+  if (!fsSync.existsSync(absFile) || !fsSync.statSync(absFile).isFile()) return
+  const relNative = path.relative(apiDirAbs, absFile)
+  const { segments, paramKeys, catchAll } = routeFromApiFile(relNative)
+  const dup = routeTable.some(
+    (r) =>
+      r.catchAll === catchAll &&
+      r.segments.length === segments.length &&
+      r.segments.every((s, i) => s === segments[i]),
+  )
+  if (dup) return
+  routeTable.push({ segments, paramKeys, catchAll, absFile })
+  console.warn(`[api-server] ensured route /api/${segments.join('/')} (${relFromApi})`)
+})('product-catalog.js')
 
 const moduleCache = new Map()
 
@@ -236,8 +260,14 @@ const server = http.createServer(async (req, res) => {
 })
 
 server.listen(PORT, () => {
+  const serverFile = fileURLToPath(import.meta.url)
+  const hasProductCatalog = routeTable.some(
+    (r) => !r.catchAll && r.segments.join('/') === 'product-catalog',
+  )
   console.log(`[api-server] listening on :${PORT} pid=${process.pid}`)
+  console.log(`[api-server] server file: ${serverFile}`)
   console.log(`[api-server] api dir: ${apiDirAbs}`)
   console.log(`[api-server] routes loaded: ${routeTable.length}`)
+  console.log(`[api-server] route /api/product-catalog: ${hasProductCatalog ? 'ok' : 'MISSING'}`)
 })
 

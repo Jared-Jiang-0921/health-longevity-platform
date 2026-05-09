@@ -159,6 +159,27 @@
     },
     {
       "segments": [
+        "product-catalog",
+        ":id"
+      ],
+      "paramKeys": [
+        "id"
+      ],
+      "catchAll": false,
+      "modulePath": "../api/product-catalog/[id].js",
+      "sourceFile": "api/product-catalog/[id].js"
+    },
+    {
+      "segments": [
+        "product-catalog"
+      ],
+      "paramKeys": [],
+      "catchAll": false,
+      "modulePath": "../api/product-catalog.js",
+      "sourceFile": "api/product-catalog.js"
+    },
+    {
+      "segments": [
         "stripe-webhook"
       ],
       "paramKeys": [],
