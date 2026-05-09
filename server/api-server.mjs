@@ -260,6 +260,11 @@ const server = http.createServer(async (req, res) => {
   }
 })
 
+server.on('error', (err) => {
+  console.error('[api-server] server.listen error:', err?.code || err?.message, err)
+  process.exit(1)
+})
+
 server.listen(PORT, () => {
   const serverFile = fileURLToPath(import.meta.url)
   const hasProductCatalog = routeTable.some(
