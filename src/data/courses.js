@@ -17,6 +17,7 @@ export const CATEGORIES = [
   { id: 'sleep', label: '睡眠与恢复' },
   { id: 'stress', label: '压力管理' },
   { id: 'chronic', label: '慢性病预防' },
+  { id: 'immunity', label: '免疫健康' },
   { id: 'mental', label: '心理健康' },
 ]
 
@@ -60,6 +61,24 @@ const courseModules = {
   10: [{ type: 'document', title: '骨骼健康', content: '钙与维生素 D、负重运动、避免烟酒。' }],
   11: [{ type: 'video', title: '记忆策略', duration: '14:00', videoUrl: DEMO_MP4 }, { type: 'document', title: '认知刺激', content: '学习新技能、社交、阅读等可增强认知储备。' }],
   12: [{ type: 'document', title: '情绪 ABC 模型', content: 'A 事件 → B 信念 → C 情绪。改变 B 可调节 C。' }, { type: 'video', title: '心理韧性练习', duration: '11:00', videoUrl: DEMO_MP4 }],
+  14: [
+    {
+      type: 'document',
+      title: '免疫系统概览',
+      content:
+        '先天免疫与适应性免疫协同：皮肤黏膜屏障、吞噬细胞、抗体与免疫记忆。规律作息与均衡营养有助于维持免疫稳态；个体免疫状态需由医生评估。',
+    },
+    { type: 'video', title: '作息、营养与免疫', duration: '12:00', videoUrl: DEMO_MP4 },
+  ],
+  15: [
+    {
+      type: 'document',
+      title: '常见感染与日常防护',
+      content:
+        '手卫生、呼吸道礼仪、食品安全与旅行健康要点。出现持续高热、呼吸困难、意识改变等应及时就医；本内容为科普，不替代诊疗。',
+    },
+    { type: 'video', title: '疫苗知识入门', duration: '10:00', videoUrl: DEMO_MP4 },
+  ],
 }
 
 export const COURSES = [
@@ -76,6 +95,28 @@ export const COURSES = [
   { id: 8, title: '精力管理与时间规划', category: 'stress', duration: '2 周', level: '初级', desc: '高效作息与能量分配策略。', content: '精力曲线识别、番茄工作法、深度工作与休息节奏。', modules: courseModules[8] },
   { id: 9, title: '心血管健康与预防', category: 'chronic', duration: '5 周', level: '中级', desc: '血压、血脂、血糖的监测与干预。', content: '心血管风险因素、生活方式干预、监测指标解读及就医指征。', modules: courseModules[9] },
   { id: 10, title: '骨骼与关节保养', category: 'chronic', duration: '4 周', level: '初级', desc: '骨质疏松预防与关节功能维护。', content: '钙与维生素 D、负重运动、关节活动度训练与损伤预防。', modules: courseModules[10] },
+  {
+    id: 14,
+    title: '免疫系统与健康防线',
+    category: 'immunity',
+    duration: '3 周',
+    level: '初级',
+    desc: '了解免疫机制、生活方式与感染防护要点。',
+    content:
+      '涵盖免疫基础、营养与睡眠对免疫的影响、日常防护与就医指征；内容面向大众科普，不替代个体化医疗建议。',
+    modules: courseModules[14],
+  },
+  {
+    id: 15,
+    title: '疫苗与季节性健康',
+    category: 'immunity',
+    duration: '2 周',
+    level: '初级',
+    desc: '疫苗科普、常见误区与季节性自我照护。',
+    content:
+      '介绍疫苗如何帮助建立免疫记忆、常见疫苗种类与接种前应咨询专业人员的原则，以及流感季等自我照护要点。',
+    modules: courseModules[15],
+  },
   { id: 11, title: '认知健康与脑力训练', category: 'mental', duration: '6 周', level: '中级', desc: '记忆力、专注力与认知储备提升。', content: '认知储备理论、记忆策略、注意力训练及认知刺激活动。', modules: courseModules[11] },
   { id: 12, title: '情绪与心理韧性', category: 'mental', duration: '4 周', level: '初级', desc: '情绪识别、调节与社会联结。', content: '情绪ABC模型、认知重构、社会支持与心理韧性培养。', modules: courseModules[12] },
 ]
