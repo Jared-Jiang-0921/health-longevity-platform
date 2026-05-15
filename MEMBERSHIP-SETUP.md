@@ -70,3 +70,21 @@ https://你的域名.vercel.app/api/init-db
 | premium_yearly | 高级 | 12 月 | $199.99 |
 
 可按需修改 `lib/plans.js` 中的金额与文案。
+
+---
+
+## 七、Stripe 收单 + 万里汇（Airwallex）收款
+
+**收单**：继续用本站已有 **Stripe Checkout**（`VITE_PAYMENT_PROVIDER=stripe` 或默认），用户刷卡/钱包付款由 Stripe 处理，无需改为万里汇收单页。
+
+**收款（资金落到万里汇）**：在 [Stripe Dashboard → 设置 → 银行账户与提现](https://dashboard.stripe.com/settings/payouts) 中，将 **提现银行账户** 配置为 **万里汇（Airwallex）全球账户提供的收款银行信息**（以万里汇后台展示的 VA 为准）。Stripe 结算周期内余额会自动或按规则提现到该账户，**不依赖**下方 HTTP 桥。
+
+**可选：与万里汇系统对账 / 二次联动**（代码已支持，默认关闭）：
+
+| 环境变量 | 说明 |
+|----------|------|
+| `STRIPE_AIRWALLEX_BRIDGE_ENABLED` | 设为 `1` 或 `true` 时启用 |
+| `STRIPE_AIRWALLEX_NOTIFY_URL` | `https://...` 接收 POST JSON 的地址（自建中台、n8n、或你们封装 Airwallex API 的服务） |
+| `STRIPE_AIRWALLEX_NOTIFY_SECRET` | 可选；若配置，请求头带 `Authorization: Bearer <secret>` |
+
+成功写入会员后，服务端会向该 URL POST 一条载荷，包含 `stripe_session_id`、`amount_total`、`currency`、`plan`、`user_id`、`payment_intent` 等。接收方应按 `stripe_session_id` **幂等**处理。支付巡检表 `payment_event_logs` 中会出现 `airwallex_bridge_ok` 或 `airwallex_bridge_failed`（`event_key` 形如 `stripe_airwallex_notify:<session_id>`）。桥接失败**不会**回滚 Stripe Webhook 的 200 响应，以免影响 Stripe 重试策略。

@@ -92,6 +92,11 @@
 - 含义：支付完成但会员写入失败
 - 处理：检查数据库连接、`users` 表可写性、SQL 报错日志
 
+### C-附. `AIRWALLEX_BRIDGE_FAILED`（仅当启用 `STRIPE_AIRWALLEX_BRIDGE_ENABLED`）
+
+- 含义：`STRIPE_AIRWALLEX_NOTIFY_URL` 返回非 2xx 或超时；日志状态多为 `airwallex_bridge_failed`
+- 处理：检查中台 URL、网络、Bearer 密钥；Stripe 与会员主链路已成功则不影响收款
+
 ### D. `SESSION_USER_MISMATCH`
 
 - 含义：支付会话归属与当前登录用户不一致
