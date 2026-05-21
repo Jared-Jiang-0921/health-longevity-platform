@@ -6,7 +6,9 @@ import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
 import { getUi } from '../i18n/ui'
 import { getMembershipLevelLabel } from '../i18n/terms'
-import { hasLevelAccess } from '../data/membership'
+import { hasLevelAccess, shouldShowMembershipBadge } from '../data/membership'
+import ContentLockNotice from '../components/ContentLockNotice'
+import '../styles/membership-badge.css'
 import './CourseLearn.css'
 
 export default function CourseLearn() {
@@ -40,8 +42,9 @@ export default function CourseLearn() {
     )
   }
 
-  const requiredMembership = course.requiredMembership || 'free'
-  const allowed = hasLevelAccess(user?.level, requiredMembership)
+  const requiredMembership = course.requiredMembership
+  const allowed = hasLevelAccess(user?.level, requiredMembership, { isGuest: !user })
+  const showBadge = shouldShowMembershipBadge(requiredMembership)
   const methodologyLine = getHealthSkillsContentApproach(lang)
 
   useEffect(() => {
@@ -146,20 +149,15 @@ export default function CourseLearn() {
   }
 
   if (!allowed) {
-    const requiredLabel = getMembershipLevelLabel(requiredMembership, lang)
     return (
-      <div className="page-content">
+      <div className="page-content page-course-learn">
         <h1>{course.title}</h1>
-        <p>{lang === 'en' ? `This course requires ${requiredLabel}.` : lang === 'ar' ? `هذه الدورة تتطلب ${requiredLabel}.` : `该课程需${requiredLabel}。`}</p>
-        {!user ? (
-          <p>
-            <Link to="/login">{lang === 'en' ? 'Login' : lang === 'ar' ? 'تسجيل الدخول' : '登录'}</Link>
-            <span className="page-sep"> </span>
-            <Link to="/register">{lang === 'en' ? 'Sign up' : lang === 'ar' ? 'إنشاء حساب' : '注册'}</Link>
-          </p>
-        ) : (
-          <p><Link to="/payment">{lang === 'en' ? 'Upgrade Membership' : lang === 'ar' ? 'ترقية العضوية' : '升级会员'}</Link></p>
-        )}
+        {showBadge ? (
+          <span className={`membership-badge membership-${requiredMembership}`}>
+            {getMembershipLevelLabel(requiredMembership, lang)}
+          </span>
+        ) : null}
+        <ContentLockNotice requiredLevel={requiredMembership} user={user} />
         <p><Link to={`/health-skills/${id}`}>{t.backDetail}</Link></p>
       </div>
     )

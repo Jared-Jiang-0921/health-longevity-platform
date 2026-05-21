@@ -1,13 +1,12 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
-import { canAccess, getRequiredLevel } from '../data/membership'
 import { getMembershipLevelLabel } from '../i18n/terms'
 import { getUi } from '../i18n/ui'
 import { SITE_LEGAL } from '../data/siteLegal'
-import RegisterRequiredModal from '../components/RegisterRequiredModal'
 import './Home.css'
+
+const LOGO_SRC = '/images/logo-longevity-atlas.png'
 
 const modules = [
   {
@@ -18,7 +17,7 @@ const modules = [
       en: 'Cards, checklists, evidence levels, audience fit, and risk notes—in one structured path.',
       ar: 'بطاقات وقوائم وأدلة وجمهور وتنبيهات مخاطر في مسار منهجي واحد.',
     },
-    image: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&q=80',
+    image: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=640&q=80',
   },
   {
     path: '/solutions',
@@ -28,7 +27,7 @@ const modules = [
       en: 'Profiles, risks, guidance, lab context, action plans, and care prompts (education only—not medical care).',
       ar: 'صورة صحية ومخاطر وإرشادات وتفسير تقارير وخطط وتنبيهات رعاية (تعليمي فقط).',
     },
-    image: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=400&q=80',
+    image: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=640&q=80',
   },
   {
     path: '/products',
@@ -38,7 +37,7 @@ const modules = [
       en: 'Evidence & regulatory context, purchase support; health-food labeling rules in CN; not treatment packaging.',
       ar: 'أدلة وسياق تنظيمي ودعم شراء؛ قواعد تسمية الأغذية الصحية؛ لا تُعرض كعلاج.',
     },
-    image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&q=80',
+    image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=640&q=80',
   },
   {
     path: '/longevity-news',
@@ -48,7 +47,7 @@ const modules = [
       en: 'Journal & guideline digests, explainers, trial tracking; cautious wording—not proof of efficacy.',
       ar: 'ملخصات دوريات وإرشادات وتفسيرات وتجارب؛ صياغة حذرة دون equating بالفعالية المثبتة.',
     },
-    image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&q=80',
+    image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=640&q=80',
   },
   {
     path: '/translation-opportunities',
@@ -58,7 +57,7 @@ const modules = [
       en: 'For founders, investors, firms, researchers—trends, radar, models, opportunity bank, risks; room for reports & community.',
       ar: 'لرواد الأعمال والمستثمرين والشركات والباحثين—اتجاهات ورادار ونماذج ومخاطر؛ مجال للتقارير والمجتمعات.',
     },
-    image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&q=80',
+    image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=640&q=80',
   },
   {
     path: '/tcm-prevention',
@@ -68,7 +67,7 @@ const modules = [
       en: 'TCM 治未病 plus preventive & lifestyle medicine—constitution, seasons, diet, mind–body, movement, East–West bridge (herbs & formulas growing).',
       ar: 'وقاية صينية + طب وقائي حديث؛ أنماط وفصول وتغذية وضغط وحركة وجسر شرقي-غربي.',
     },
-    image: 'https://images.pexels.com/photos/2064359/pexels-photo-2064359.jpeg?auto=compress&cs=tinysrgb&w=400',
+    image: 'https://images.pexels.com/photos/2064359/pexels-photo-2064359.jpeg?auto=compress&cs=tinysrgb&w=640',
   },
 ]
 
@@ -78,119 +77,116 @@ export default function Home() {
   const t = {
     zh: {
       heroIntro:
-        '长健星图，是一个以循证医学和AI智能为核心的健康长寿解决方案平台，帮助每个人更科学、更低门槛地理解健康、管理风险、延长健康寿命。',
+        '以循证医学和 AI 智能为核心的健康长寿解决方案平台，帮助每个人更科学、更低门槛地理解健康、管理风险、延长健康寿命。',
       tagline: '长寿知识技能 · AI长寿方案师 · 长寿产品证据库 · 前沿医学资讯',
       welcome: '欢迎',
       modules: '服务模块',
-      guestHint: '点击查看需注册',
-      need: '需',
-      upgrade: '升级会员',
-      andAbove: '及以上',
+      explore: '进入模块',
     },
     en: {
       heroIntro:
-        'Changjian Xingtu is a healthy longevity platform built on evidence-based medicine and AI—helping everyone understand health, manage risk, and extend healthspan with more science and lower barriers.',
+        'An evidence-based longevity platform powered by AI—helping everyone understand health, manage risk, and extend healthspan with more science and lower barriers.',
       tagline: 'Longevity skills · AI Longevity Coach · product evidence library · frontier medical insights',
       welcome: 'Welcome',
       modules: 'Modules',
-      guestHint: 'Login required to view',
-      need: 'Requires',
-      upgrade: 'Upgrade',
-      andAbove: '+',
+      explore: 'Explore',
     },
     ar: {
       heroIntro:
-        'تشانغجيان شينغتو منصة لحلول الصحة وطول العمر قائمة على الطب المبني على الأدلة والذكاء الاصطناعي، تساعد الجميع على فهم الصحة وإدارة المخاطر وتمديد العمر الصحي بشكل أكثر علمية وبعوائق أقل.',
+        'منصة لحلول الصحة وطول العمر قائمة على الطب المبني على الأدلة والذكاء الاصطناعي، تساعد الجميع على فهم الصحة وإدارة المخاطر وتمديد العمر الصحي.',
       tagline: 'مهارات طول العمر · مدرب طول العمر بالذكاء الاصطناعي · مكتبة أدلة المنتجات · مستجدات طبية',
       welcome: 'مرحبًا',
       modules: 'الوحدات',
-      guestHint: 'يتطلب التسجيل للعرض',
-      need: 'يتطلب',
-      upgrade: 'ترقية',
-      andAbove: 'أو أعلى',
+      explore: 'استكشف',
     },
   }[lang || 'zh']
   const { user } = useAuth()
-  const [showRegisterModal, setShowRegisterModal] = useState(false)
+  const taglinePills = t.tagline.split('·').map((s) => s.trim()).filter(Boolean)
 
   return (
     <div className="page-home">
-      <section className="hero">
+      <section className="hero" aria-labelledby="home-hero-title">
         <div className="hero-bg" aria-hidden="true" />
+        <div className="hero-glow" aria-hidden="true" />
         <div className="hero-content">
-          <h1>{SITE_LEGAL.brandName}</h1>
-          <div className="hero-intro-block">
+          <div className="hero-glass">
+            <div className="hero-brand">
+              <div className="hero-logo-wrap">
+                <img
+                  src={LOGO_SRC}
+                  alt="Longevity Atlas 恒悦生国际"
+                  className="hero-logo"
+                  width={420}
+                  height={120}
+                  decoding="async"
+                />
+              </div>
+              <h1 id="home-hero-title" className="hero-title-sr">
+                {SITE_LEGAL.brandName}
+              </h1>
+            </div>
             <p className="hero-intro">{t.heroIntro}</p>
-          </div>
-          <p className="tagline">{t.tagline}</p>
-          <div className="hero-auth">
-            {user ? (
-              <span className="hero-user">{t.welcome}，{user.name}（{getMembershipLevelLabel(user.level, lang)}）</span>
-            ) : (
-              <>
-                <Link to="/login" className="btn-hero btn-login">{ui.login}</Link>
-                <Link to="/register" className="btn-hero btn-register">{ui.register}</Link>
-              </>
-            )}
+            {taglinePills.length ? (
+              <ul className="hero-pills" aria-label={t.tagline}>
+                {taglinePills.map((pill) => (
+                  <li key={pill}>{pill}</li>
+                ))}
+              </ul>
+            ) : null}
+            <div className="hero-auth">
+              {user ? (
+                <span className="hero-user">
+                  {t.welcome}，{user.name}（{getMembershipLevelLabel(user.level, lang)}）
+                </span>
+              ) : (
+                <>
+                  <Link to="/login" className="btn-hero btn-login">{ui.login}</Link>
+                  <Link to="/register" className="btn-hero btn-register">{ui.register}</Link>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </section>
+
       <section className="modules">
-        <h2>{t.modules}</h2>
+        <header className="modules-header">
+          <h2>{t.modules}</h2>
+          <p className="modules-lead">
+            {lang === 'zh'
+              ? '六大模块覆盖知识、AI 方案、产品证据、资讯与转化机遇'
+              : lang === 'ar'
+                ? 'ست وحدات تغطي المعرفة والذكاء الاصطناعي والأدلة والأخبار والفرص'
+                : 'Six modules for knowledge, AI coaching, evidence, news, and opportunities'}
+          </p>
+        </header>
         <div className="module-grid">
-          {modules.map(({ path, title, desc, image }) => {
-            const allowed = canAccess(path, user?.level)
-            const requiredLevel = getRequiredLevel(path)
-            const requiredName = requiredLevel ? getMembershipLevelLabel(requiredLevel, lang) : null
+          {modules.map(({ path, title, desc, image }, index) => {
             const moduleTitle = title[lang] || title.zh
             const moduleDesc = desc[lang] || desc.zh
-
-            if (!user) {
-              return (
-                <div
-                  key={path}
-                  className="module-card module-card-guest"
-                  onClick={() => setShowRegisterModal(true)}
-                  onKeyDown={(e) => e.key === 'Enter' && setShowRegisterModal(true)}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <div className="module-card-image" style={{ backgroundImage: `url(${image})` }} />
-                  <div className="module-card-body">
-                    <h3>{moduleTitle}</h3>
-                    <p>{moduleDesc}</p>
-                    <p className="module-guest-hint">{t.guestHint}</p>
-                  </div>
-                </div>
-              )
-            }
-            if (allowed) {
-              return (
-                <Link key={path} to={path} className="module-card">
-                  <div className="module-card-image" style={{ backgroundImage: `url(${image})` }} />
-                  <div className="module-card-body">
-                    <h3>{moduleTitle}</h3>
-                    <p>{moduleDesc}</p>
-                  </div>
-                </Link>
-              )
-            }
             return (
-              <div key={path} className="module-card module-card-locked">
-                <div className="module-card-image" style={{ backgroundImage: `url(${image})` }} />
+              <Link
+                key={path}
+                to={path}
+                className="module-card"
+                style={{ '--card-index': index }}
+              >
+                <div className="module-card-visual">
+                  <img src={image} alt="" loading="lazy" decoding="async" className="module-card-img" />
+                  <span className="module-card-shade" aria-hidden="true" />
+                  <span className="module-card-index" aria-hidden="true">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                </div>
                 <div className="module-card-body">
                   <h3>{moduleTitle}</h3>
-                  <p>{moduleDesc}</p>
-                  <p className="module-lock">{t.need}{requiredName}{t.andAbove}</p>
-                  <Link to="/payment" className="btn-upgrade">{t.upgrade}</Link>
+                  <p className="module-card-desc">{moduleDesc}</p>
+                  <span className="module-card-cta">{t.explore} →</span>
                 </div>
-              </div>
+              </Link>
             )
           })}
         </div>
-      {showRegisterModal && (
-        <RegisterRequiredModal onClose={() => setShowRegisterModal(false)} />
-      )}
       </section>
     </div>
   )

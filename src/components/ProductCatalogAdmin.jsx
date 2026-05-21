@@ -18,6 +18,18 @@ function fileToBase64(file) {
 
 const emptySku = () => ({ code: '', spec_zh: '', spec_en: '', price: '', currency: '' })
 
+const LEVEL_OPTIONS = [
+  { value: 'public', label: '公开（游客可看正文）' },
+  { value: 'standard', label: '标准会员' },
+  { value: 'premium', label: '高级会员' },
+]
+
+function adminLevelValue(raw) {
+  const s = String(raw || '').trim().toLowerCase()
+  if (s === 'standard' || s === 'premium') return s
+  return 'public'
+}
+
 export default function ProductCatalogAdmin({ getToken }) {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
@@ -35,6 +47,7 @@ export default function ProductCatalogAdmin({ getToken }) {
   const [price, setPrice] = useState('')
   const [currency, setCurrency] = useState('CNY')
   const [unit, setUnit] = useState('瓶')
+  const [requiredLevel, setRequiredLevel] = useState('public')
   const [galleryFiles, setGalleryFiles] = useState([])
   const [skus, setSkus] = useState([emptySku()])
 
@@ -134,6 +147,7 @@ export default function ProductCatalogAdmin({ getToken }) {
           unit: unit.trim() || '件',
           galleryImages,
           skus: normalizeSkusPayload(skus),
+          requiredLevel,
         }),
       })
       const data = await res.json().catch(() => ({}))
@@ -149,6 +163,7 @@ export default function ProductCatalogAdmin({ getToken }) {
       setUnit('瓶')
       setGalleryFiles([])
       setSkus([emptySku()])
+      setRequiredLevel('public')
       await loadItems()
     } catch (err) {
       setError(err.message || '上架失败')
@@ -178,6 +193,7 @@ export default function ProductCatalogAdmin({ getToken }) {
         price: s.price != null ? String(s.price) : '',
         currency: s.currency || '',
       })) : [emptySku()],
+      requiredLevel: adminLevelValue(it.required_level),
     })
     setError('')
     setHint('')
@@ -214,6 +230,7 @@ export default function ProductCatalogAdmin({ getToken }) {
         currency: editForm.currency.trim() || 'CNY',
         unit: editForm.unit.trim() || '件',
         skus: normalizeSkusPayload(editForm.skus),
+        requiredLevel: editForm.requiredLevel,
       }
       if (editGalleryFiles.length) {
         payload.galleryImages = await filesToGalleryPayload(editGalleryFiles)
@@ -260,7 +277,7 @@ export default function ProductCatalogAdmin({ getToken }) {
     <section className="product-catalog-admin">
       <h4 className="product-catalog-admin-title">长寿产品证据库 · 商品上架</h4>
       <p className="product-catalog-admin-note">
-        支持<strong>多图</strong>、<strong>中英文标题/介绍/产地</strong>、<strong>规格 SKU</strong>（可选单价覆盖）。本模块商品对<strong>所有人可见</strong>（无需会员分级）。证据 PDF 仍用下方「模块资料」上传。
+        支持<strong>多图</strong>、<strong>中英文标题/介绍/产地</strong>、<strong>规格 SKU</strong>（可选单价覆盖）。未标注等级时<strong>游客可看正文</strong>；可选标准/高级会员专属。证据 PDF 仍用下方「模块资料」上传。
       </p>
 
       {loading ? <p className="product-catalog-admin-muted">加载中…</p> : null}
@@ -296,6 +313,14 @@ export default function ProductCatalogAdmin({ getToken }) {
           <label>
             <span>单位</span>
             <input value={unit} onChange={(e) => setUnit(e.target.value)} placeholder="瓶 / 盒" />
+          </label>
+          <label>
+            <span>可见会员等级</span>
+            <select value={requiredLevel} onChange={(e) => setRequiredLevel(e.target.value)}>
+              {LEVEL_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
           </label>
         </div>
         <label className="product-catalog-admin-full">
@@ -414,6 +439,17 @@ export default function ProductCatalogAdmin({ getToken }) {
                     <label>
                       <span>单位</span>
                       <input value={editForm.unit} onChange={(e) => setEditForm((f) => ({ ...f, unit: e.target.value }))} />
+                    </label>
+                    <label>
+                      <span>可见会员等级</span>
+                      <select
+                        value={editForm.requiredLevel}
+                        onChange={(e) => setEditForm((f) => ({ ...f, requiredLevel: e.target.value }))}
+                      >
+                        {LEVEL_OPTIONS.map((o) => (
+                          <option key={o.value} value={o.value}>{o.label}</option>
+                        ))}
+                      </select>
                     </label>
                   </div>
                   <label className="product-catalog-admin-full">

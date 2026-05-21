@@ -7,7 +7,8 @@ import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
 import { getUi } from '../i18n/ui'
 import { getMembershipLevelLabel } from '../i18n/terms'
-import { hasLevelAccess } from '../data/membership'
+import { hasLevelAccess, shouldShowMembershipBadge } from '../data/membership'
+import ContentLockNotice from '../components/ContentLockNotice'
 import '../styles/membership-badge.css'
 import './CourseDetail.css'
 
@@ -36,8 +37,9 @@ export default function CourseDetail() {
   const category = CATEGORIES.find((c) => c.id === course.category)
   const methodologyLine = getHealthSkillsContentApproach(lang)
   const favorite = isFavorite(course.id)
-  const requiredMembership = course.requiredMembership || 'free'
-  const allowed = hasLevelAccess(user?.level, requiredMembership)
+  const requiredMembership = course.requiredMembership
+  const allowed = hasLevelAccess(user?.level, requiredMembership, { isGuest: !user })
+  const showBadge = shouldShowMembershipBadge(requiredMembership)
 
   useEffect(() => {
     if (!course) return
@@ -53,20 +55,19 @@ export default function CourseDetail() {
   }, [course])
 
   if (!allowed) {
-    const requiredLabel = getMembershipLevelLabel(requiredMembership, lang)
     return (
-      <div className="page-content">
-        <h1>{course.title}</h1>
-        <p>{lang === 'en' ? `This course requires ${requiredLabel}.` : lang === 'ar' ? `هذه الدورة تتطلب ${requiredLabel}.` : `该课程需${requiredLabel}。`}</p>
-        {!user ? (
-          <p>
-            <Link to="/login">{lang === 'en' ? 'Login' : lang === 'ar' ? 'تسجيل الدخول' : '登录'}</Link>
-            <span className="page-sep"> </span>
-            <Link to="/register">{lang === 'en' ? 'Sign up' : lang === 'ar' ? 'إنشاء حساب' : '注册'}</Link>
-          </p>
-        ) : (
-          <p><Link to="/payment">{lang === 'en' ? 'Upgrade Membership' : lang === 'ar' ? 'ترقية العضوية' : '升级会员'}</Link></p>
-        )}
+      <div className="page-content page-course-detail">
+        <Link to="/health-skills" className="back-link">← {t.back}</Link>
+        <header className="course-detail-header">
+          <h1>{course.title}</h1>
+          {showBadge ? (
+            <span className={`membership-badge membership-${requiredMembership}`}>
+              {getMembershipLevelLabel(requiredMembership, lang)}
+            </span>
+          ) : null}
+          <p className="course-desc">{course.desc}</p>
+        </header>
+        <ContentLockNotice requiredLevel={requiredMembership} user={user} />
         <p><Link to="/health-skills">{t.back}</Link></p>
       </div>
     )
@@ -84,9 +85,11 @@ export default function CourseDetail() {
         </div>
         <div className="course-title-row">
           <h1>{course.title}</h1>
-          <span className={`membership-badge membership-${requiredMembership}`}>
-            {getMembershipLevelLabel(requiredMembership, lang)}
-          </span>
+          {showBadge ? (
+            <span className={`membership-badge membership-${requiredMembership}`}>
+              {getMembershipLevelLabel(requiredMembership, lang)}
+            </span>
+          ) : null}
         </div>
         <p className="course-desc">{course.desc}</p>
         <p className="course-methodology">{methodologyLine}</p>

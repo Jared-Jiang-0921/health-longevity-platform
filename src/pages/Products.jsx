@@ -4,7 +4,10 @@ import { PRODUCT_CATEGORIES, PRODUCTS } from '../data/products'
 import { getProductsEvidenceCopy } from '../data/productsEvidenceLibraryI18n'
 import { useLocale } from '../context/LocaleContext'
 import { useAuth } from '../context/AuthContext'
+import { shouldShowMembershipBadge } from '../data/membership'
+import { getMembershipLevelLabel } from '../i18n/terms'
 import { getUi } from '../i18n/ui'
+import '../styles/membership-badge.css'
 import { pickCatalogLocale } from '../lib/productCatalogLocale'
 import ProductCatalogImage from '../components/ProductCatalogImage'
 import './Products.css'
@@ -67,6 +70,9 @@ export default function Products() {
           catalog: true,
           gallery_count: row.gallery_count || 0,
           skus: row.skus || [],
+          can_view: row.can_view !== false,
+          required_level: row.required_level,
+          content_level: row.content_level,
         }
       })
     const staticList = PRODUCTS.filter((p) => p.category === activeCategory).map((p) => ({
@@ -159,42 +165,64 @@ export default function Products() {
 
       <section className="product-list">
         <div className="product-grid">
-          {mergedForCategory.map((product) => (
+          {mergedForCategory.map((product) => {
+            const canView = product.can_view !== false
+            const showBadge = shouldShowMembershipBadge(product.required_level)
+            const badgeLevel = product.content_level || product.required_level
+            return (
             <article key={String(product.id)} className="product-card">
               <div className="product-card-visual">
-                <ProductCatalogImage
-                  productId={product.catalog ? product.id : ''}
-                  galleryCount={product.gallery_count}
-                  slot={0}
-                  className="product-card-img"
-                  alt={product.title}
-                />
+                {canView ? (
+                  <ProductCatalogImage
+                    productId={product.catalog ? product.id : ''}
+                    galleryCount={product.gallery_count}
+                    slot={0}
+                    className="product-card-img"
+                    alt={product.title}
+                  />
+                ) : (
+                  <div className="product-card-img product-card-img-locked" aria-hidden="true" />
+                )}
               </div>
               <div className="product-info">
                 <span className="product-category">
                   {PRODUCT_CATEGORIES.find((c) => c.id === product.category)?.label}
                   {product.catalog ? <span className="product-badge-managed"> 上架</span> : null}
+                  {showBadge ? (
+                    <span className={`membership-badge membership-${badgeLevel}`}>
+                      {getMembershipLevelLabel(badgeLevel, lang)}
+                    </span>
+                  ) : null}
                 </span>
                 <h3>{product.title}</h3>
-                <p>{product.desc}</p>
-                {product.skus?.length ? (
-                  <p className="product-sku-hint">{product.skus.length} SKU</p>
-                ) : null}
-                {product.origin ? (
-                  <p className="product-origin"><span className="product-origin-label">{originLabel}</span>{product.origin}</p>
+                {canView ? (
+                  <>
+                    <p>{product.desc}</p>
+                    {product.skus?.length ? (
+                      <p className="product-sku-hint">{product.skus.length} SKU</p>
+                    ) : null}
+                    {product.origin ? (
+                      <p className="product-origin"><span className="product-origin-label">{originLabel}</span>{product.origin}</p>
+                    ) : null}
+                  </>
                 ) : null}
               </div>
               <div className="product-footer">
-                <span className="product-price">
-                  {formatPriceSymbol(product.currency)}{product.price}
-                  <small>/{product.unit}</small>
-                </span>
+                {canView ? (
+                  <span className="product-price">
+                    {formatPriceSymbol(product.currency)}{product.price}
+                    <small>/{product.unit}</small>
+                  </span>
+                ) : (
+                  <span className="product-price product-price-locked">—</span>
+                )}
                 <Link to={`/products/${product.id}`} className="btn-detail">
                   {ui.details}
                 </Link>
               </div>
             </article>
-          ))}
+            )
+          })}
         </div>
       </section>
     </div>

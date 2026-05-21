@@ -6,6 +6,7 @@ import { useFavorites } from '../hooks/useFavorites'
 import { useLocale } from '../context/LocaleContext'
 import { getUi } from '../i18n/ui'
 import { getMembershipLevelLabel } from '../i18n/terms'
+import { shouldShowMembershipBadge } from '../data/membership'
 import '../styles/membership-badge.css'
 import './HealthSkills.css'
 
@@ -60,7 +61,8 @@ export default function HealthSkills() {
         <div className="course-grid">
           {filtered.map((course) => {
             const favorite = isFavorite(course.id)
-            const requiredMembership = course.requiredMembership || 'free'
+            const requiredMembership = course.requiredMembership
+            const showBadge = shouldShowMembershipBadge(requiredMembership)
             return (
               <article key={course.id} className="course-card">
                 <div className="course-meta">
@@ -79,9 +81,11 @@ export default function HealthSkills() {
                 <h3>{course.title}</h3>
                 <p>{course.desc}</p>
                 <div className="course-footer">
-                  <span className={`membership-badge membership-${requiredMembership}`}>
-                    {getMembershipLevelLabel(requiredMembership, lang)}
-                  </span>
+                  {showBadge ? (
+                    <span className={`membership-badge membership-${requiredMembership}`}>
+                      {getMembershipLevelLabel(requiredMembership, lang)}
+                    </span>
+                  ) : null}
                   <span className="course-level">{course.level}</span>
                   <Link to={`/health-skills/${course.id}`} className="btn-learn">
                     {ui.learn}

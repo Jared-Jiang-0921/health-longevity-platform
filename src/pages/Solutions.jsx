@@ -156,7 +156,7 @@ function ConsultCard({ title, description, url, envHint, requiredLevel, user, co
   const [query, setQuery] = useState('')
   const [openError, setOpenError] = useState('')
   const ready = Boolean(url?.trim())
-  const allowed = hasLevelAccess(user?.level, requiredLevel)
+  const allowed = hasLevelAccess(user?.level, requiredLevel, { isGuest: !user })
   const href = useMemo(
     () => appendExternalEntryParams(url, user, { consultEntry, query, lang: t.langKey }),
     [url, user, consultEntry, query, t.langKey],

@@ -7,6 +7,8 @@ import { SITE_LEGAL } from '../data/siteLegal'
 import CookieConsentBanner from './CookieConsentBanner'
 import './Layout.css'
 
+const LOGO_SRC = '/images/logo-longevity-atlas.png'
+
 const navItems = [
   { path: '/', label: { zh: '首页', en: 'Home', ar: 'الرئيسية' } },
   { path: '/health-skills', label: { zh: '长寿知识技能', en: 'Health Skills', ar: 'مهارات الصحة' } },
@@ -67,8 +69,18 @@ export default function Layout({ children }) {
       <header className="site-header">
         <div className="header-inner">
           <div className="header-top">
-            <Link to="/" className="logo">
-              {SITE_LEGAL.brandName}
+            <Link to="/" className="logo" aria-label={SITE_LEGAL.brandName}>
+              <span className="logo-wrap">
+                <img
+                  src={LOGO_SRC}
+                  alt=""
+                  className="logo-img"
+                  width={200}
+                  height={48}
+                  decoding="async"
+                />
+              </span>
+              <span className="logo-sr">{SITE_LEGAL.brandName}</span>
             </Link>
             <div className="header-lang" role="group" aria-label={t.language}>
               <span className="header-lang-label">{t.language}</span>

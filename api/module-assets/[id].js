@@ -4,8 +4,7 @@ import { sql } from '../../lib/db.js'
 import { authorizeSiteAdmin } from '../../lib/siteAdminAuth.js'
 import { verifyToken, getUserById } from '../../lib/auth.js'
 import { parseSiteAdminEmails } from '../../lib/siteAdminEmails.js'
-
-const LEVEL_ORDER = ['free', 'standard', 'premium']
+import { canViewContent } from '../../lib/contentAccess.js'
 
 function getId(req) {
   const v = req.query?.id
@@ -13,32 +12,21 @@ function getId(req) {
   return String(v || '').trim()
 }
 
-function normalizeLevel(raw) {
-  const s = String(raw || '').toLowerCase().trim()
-  return LEVEL_ORDER.includes(s) ? s : 'free'
-}
-
-function canView(required, current) {
-  const reqIdx = LEVEL_ORDER.indexOf(normalizeLevel(required))
-  const curIdx = LEVEL_ORDER.indexOf(normalizeLevel(current))
-  return curIdx >= reqIdx
-}
-
 async function getViewer(req) {
   const requestAdminToken = String(req.headers['x-site-admin-token'] || '').trim()
   const configAdminToken = String(process.env.SITE_ADMIN_TOKEN || '').trim()
   if (configAdminToken && requestAdminToken && requestAdminToken === configAdminToken) {
-    return { isAdmin: true, level: 'premium' }
+    return { isAdmin: true, level: 'premium', isGuest: false }
   }
   const auth = req.headers.authorization
   const jwt = auth?.startsWith('Bearer ') ? auth.slice(7) : null
-  if (!jwt) return { isAdmin: false, level: 'free' }
+  if (!jwt) return { isAdmin: false, level: 'free', isGuest: true }
   const userId = await verifyToken(jwt)
-  if (!userId) return { isAdmin: false, level: 'free' }
+  if (!userId) return { isAdmin: false, level: 'free', isGuest: true }
   const user = await getUserById(userId)
-  if (!user) return { isAdmin: false, level: 'free' }
+  if (!user) return { isAdmin: false, level: 'free', isGuest: true }
   const isAdmin = parseSiteAdminEmails().includes(String(user.email || '').toLowerCase().trim())
-  return { isAdmin, level: user.level || 'free' }
+  return { isAdmin, level: user.level || 'free', isGuest: false }
 }
 
 export default async function handler(req, res) {
@@ -79,7 +67,10 @@ export default async function handler(req, res) {
     if (!rows.length) return res.status(404).json({ error: '资源不存在' })
     const row = rows[0]
     const viewer = await getViewer(req)
-    if (!viewer.isAdmin && !canView(row.required_level, viewer.level)) {
+    if (
+      !viewer.isAdmin &&
+      !canViewContent(viewer.level, row.required_level, { isGuest: viewer.isGuest })
+    ) {
       return res.status(403).json({ code: 'ASSET_LEVEL_FORBIDDEN', error: '当前会员等级不可查看该资源' })
     }
     const isVideo = String(row.mime_type || '').startsWith('video/')

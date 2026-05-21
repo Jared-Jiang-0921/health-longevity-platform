@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useFavorites } from '../hooks/useFavorites'
 import { getCourseById, CATEGORIES } from '../data/courses'
+import { shouldShowMembershipBadge } from '../data/membership'
 import { useLocale } from '../context/LocaleContext'
 import { getUi } from '../i18n/ui'
 import { getMembershipLevelLabel } from '../i18n/terms'
@@ -35,7 +36,8 @@ export default function MyFavorites() {
         {courses.map((course) => (
           <article key={course.id} className="favorite-card">
             {(() => {
-              const requiredMembership = course.requiredMembership || 'free'
+              const requiredMembership = course.requiredMembership
+              if (!shouldShowMembershipBadge(requiredMembership)) return null
               return (
                 <p className={`favorite-membership membership-badge membership-${requiredMembership}`}>
                   {getMembershipLevelLabel(requiredMembership, lang)}

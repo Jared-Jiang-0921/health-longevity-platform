@@ -1,11 +1,18 @@
 /**
- * 长寿产品证据库 — 商品目录（多图、SKU、中英文；全员可读，仅管理员可写）
+ * 长寿产品证据库 — 商品目录（多图、SKU、中英文；标题全员可见，正文按 required_level）
  */
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { sql } from '../lib/db.js'
 import { authorizeSiteAdmin } from '../lib/siteAdminAuth.js'
+import { verifyToken, getUserById } from '../lib/auth.js'
+import { parseSiteAdminEmails } from '../lib/siteAdminEmails.js'
+import {
+  canViewContent,
+  normalizeContentLevelForStorage,
+  parseContentRequiredLevel,
+} from '../lib/contentAccess.js'
 
 const STORAGE_DIR = path.join(process.cwd(), 'storage', 'product-catalog')
 const IMAGE_MAX_BYTES = 12 * 1024 * 1024
@@ -148,11 +155,39 @@ function normalizeSkusRow(raw) {
     .filter((x) => x.code || x.spec_zh || x.spec_en)
 }
 
-function rowToItem(row) {
+function normalizeLevel(raw) {
+  return normalizeContentLevelForStorage(raw)
+}
+
+async function getViewer(req) {
+  const adminAuth = await authorizeSiteAdmin(req)
+  if (adminAuth.ok) return { isAdmin: true, level: 'premium', isGuest: false }
+
+  const requestAdminToken = String(req.headers['x-site-admin-token'] || '').trim()
+  const configAdminToken = String(process.env.SITE_ADMIN_TOKEN || '').trim()
+  if (configAdminToken && requestAdminToken && requestAdminToken === configAdminToken) {
+    return { isAdmin: true, level: 'premium', isGuest: false }
+  }
+  const auth = req.headers.authorization
+  const jwt = auth?.startsWith('Bearer ') ? auth.slice(7) : null
+  if (!jwt) return { isAdmin: false, level: 'free', isGuest: true }
+  const userId = await verifyToken(jwt)
+  if (!userId) return { isAdmin: false, level: 'free', isGuest: true }
+  const user = await getUserById(userId)
+  if (!user) return { isAdmin: false, level: 'free', isGuest: true }
+  const allow = parseSiteAdminEmails()
+  const isAdmin = allow.includes(String(user.email || '').toLowerCase().trim())
+  return { isAdmin, level: user.level || 'free', isGuest: false }
+}
+
+function rowToItem(row, viewer) {
   const gallery = normalizeGalleryRow(row)
   const skus = normalizeSkusRow(row)
   const titleZh = String(row.title_zh || row.title || '').trim()
   const titleEn = String(row.title_en || '').trim()
+  const content_level = parseContentRequiredLevel(row.required_level)
+  const can_view =
+    viewer?.isAdmin || canViewContent(viewer?.level, row.required_level, { isGuest: viewer?.isGuest })
   return {
     id: row.id,
     category: row.category,
@@ -165,6 +200,9 @@ function rowToItem(row) {
     price_amount: row.price_amount != null ? String(row.price_amount) : '0',
     currency: row.currency,
     unit: row.unit,
+    required_level: row.required_level,
+    content_level,
+    can_view,
     gallery_count: gallery.length,
     skus,
     has_image: gallery.length > 0,
@@ -175,13 +213,15 @@ function rowToItem(row) {
 
 async function handleGetOne(req, res, id) {
   await ensureSchema()
+  const viewer = await getViewer(req)
   const rows = await sql`SELECT * FROM product_catalog WHERE id = ${id} LIMIT 1`
   if (!rows.length) return res.status(404).json({ code: 'NOT_FOUND', error: '商品不存在' })
-  return res.status(200).json({ ok: true, item: rowToItem(rows[0]) })
+  return res.status(200).json({ ok: true, item: rowToItem(rows[0], viewer) })
 }
 
 async function handleList(req, res) {
   await ensureSchema()
+  const viewer = await getViewer(req)
   const category = String(req.query?.category || '').trim().toLowerCase()
   let rows
   if (category && CATEGORY_IDS.has(category)) {
@@ -198,7 +238,7 @@ async function handleList(req, res) {
       LIMIT 300
     `
   }
-  return res.status(200).json({ ok: true, items: rows.map(rowToItem) })
+  return res.status(200).json({ ok: true, items: rows.map((row) => rowToItem(row, viewer)) })
 }
 
 /**
@@ -302,6 +342,7 @@ async function handlePost(req, res) {
   }
 
   const skus = normalizeSkuPayload(body)
+  const requiredLevel = normalizeLevel(body.requiredLevel ?? body.required_level ?? 'public')
 
   const rows = await sql`
     INSERT INTO product_catalog (
@@ -323,11 +364,12 @@ async function handlePost(req, res) {
       ${gallery[0]?.stored_name || null},
       ${gallery[0]?.mime || null},
       ${gallery[0]?.file_name || null},
-      ${'free'}
+      ${requiredLevel}
     )
     RETURNING *
   `
-  return res.status(201).json({ ok: true, item: rowToItem(rows[0]) })
+  const viewer = await getViewer(req)
+  return res.status(201).json({ ok: true, item: rowToItem(rows[0], viewer) })
 }
 
 async function handlePatch(req, res) {
@@ -380,6 +422,10 @@ async function handlePatch(req, res) {
 
   const skus =
     body.skus !== undefined || body.skuList !== undefined ? normalizeSkuPayload(body) : normalizeSkusRow(ex)
+  const requiredLevel =
+    body.requiredLevel != null || body.required_level != null
+      ? normalizeLevel(body.requiredLevel ?? body.required_level)
+      : normalizeLevel(ex.required_level)
 
   const rows = await sql`
     UPDATE product_catalog SET
@@ -401,12 +447,13 @@ async function handlePatch(req, res) {
       image_stored_name = ${gallery[0]?.stored_name || null},
       image_mime = ${gallery[0]?.mime || null},
       image_file_name = ${gallery[0]?.file_name || null},
-      required_level = ${'free'},
+      required_level = ${requiredLevel},
       updated_at = NOW()
     WHERE id = ${id}
     RETURNING *
   `
-  return res.status(200).json({ ok: true, item: rowToItem(rows[0]) })
+  const viewer = await getViewer(req)
+  return res.status(200).json({ ok: true, item: rowToItem(rows[0], viewer) })
 }
 
 async function handleDelete(req, res) {

@@ -5,7 +5,15 @@ import { useLocale } from '../context/LocaleContext'
 import { CATEGORIES, COURSES, getCourseById } from '../data/courses'
 import { PRODUCT_CATEGORIES, getProductById } from '../data/products'
 import ProductCatalogAdmin from './ProductCatalogAdmin'
+import ContentLockNotice from './ContentLockNotice'
+import { shouldShowMembershipBadge } from '../data/membership'
 import './ModuleAssetsPanel.css'
+
+function adminLevelValue(raw) {
+  const s = String(raw || '').trim().toLowerCase()
+  if (s === 'standard' || s === 'premium') return s
+  return 'public'
+}
 
 function formatSize(bytes) {
   const n = Number(bytes || 0)
@@ -128,12 +136,12 @@ export default function ModuleAssetsPanel({ moduleKey }) {
   const [summary, setSummary] = useState('')
   const [subcategory, setSubcategory] = useState('general')
   const [subtopic, setSubtopic] = useState('')
-  const [requiredLevel, setRequiredLevel] = useState('free')
+  const [requiredLevel, setRequiredLevel] = useState('public')
   const [file, setFile] = useState(null)
   const [error, setError] = useState('')
   const [hint, setHint] = useState('')
   const [editingId, setEditingId] = useState('')
-  const [editForm, setEditForm] = useState({ title: '', fileName: '', summary: '', subcategory: 'general', subtopic: '', requiredLevel: 'free' })
+  const [editForm, setEditForm] = useState({ title: '', fileName: '', summary: '', subcategory: 'general', subtopic: '', requiredLevel: 'public' })
   const [savedItemId, setSavedItemId] = useState('')
   const [activeSubcategory, setActiveSubcategory] = useState('')
   const [activeSubtopic, setActiveSubtopic] = useState('')
@@ -222,7 +230,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       removeFail: '删除失败',
       saveFail: '保存失败',
       videoRestricted: '视频资源仅管理员可下载',
-      levelTag: { free: '普通会员', standard: '标准会员', premium: '高级会员' },
+      levelTag: { public: '公开（游客可看）', standard: '标准会员', premium: '高级会员' },
       uploadOk: '上传成功',
       uploadFail: '上传失败',
       invalid: '请填写标题并选择文件',
@@ -262,7 +270,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       removeFail: 'Delete failed',
       saveFail: 'Save failed',
       videoRestricted: 'Video files are restricted to admins.',
-      levelTag: { free: 'Free', standard: 'Standard', premium: 'Premium' },
+      levelTag: { public: 'Public (guests OK)', standard: 'Standard', premium: 'Premium' },
       uploadOk: 'Upload successful',
       uploadFail: 'Upload failed',
       invalid: 'Please provide title and file.',
@@ -302,7 +310,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       removeFail: 'فشل الحذف',
       saveFail: 'فشل الحفظ',
       videoRestricted: 'ملفات الفيديو متاحة للتنزيل للمسؤول فقط.',
-      levelTag: { free: 'مجاني', standard: 'قياسي', premium: 'متميز' },
+      levelTag: { public: 'عام (للزوار)', standard: 'قياسي', premium: 'متميز' },
       uploadOk: 'تم الرفع بنجاح',
       uploadFail: 'فشل الرفع',
       invalid: 'يرجى إدخال عنوان واختيار ملف.',
@@ -498,7 +506,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       setActiveSubcategory(uploadedSubcategory)
       setActiveSubtopic(uploadedSubtopic)
       setSubtopic('')
-      setRequiredLevel('free')
+      setRequiredLevel('public')
       setFile(null)
       setHint(t.uploadOk)
       await loadItems()
@@ -520,7 +528,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       summary: item.summary || '',
       subcategory: normalizeSubcategoryValue(moduleKey, item.subcategory) || subcategoryOptions[0] || 'general',
       subtopic: item.subtopic || '',
-      requiredLevel: item.required_level || 'free',
+      requiredLevel: adminLevelValue(item.required_level),
     })
   }
 
@@ -659,7 +667,11 @@ export default function ModuleAssetsPanel({ moduleKey }) {
           </section>
           {!activeSubtopic ? <p className="module-assets-muted">{t.emptySubtopic}</p> : null}
           <ul className="module-assets-list">
-            {visibleItems.map((item) => (
+            {visibleItems.map((item) => {
+              const canView = item.can_view !== false
+              const showLevelBadge = shouldShowMembershipBadge(item.required_level)
+              const badgeLevel = item.content_level || item.required_level
+              return (
               <li key={item.id} className="module-assets-card">
               <div className="module-assets-head">
                 <strong className="module-assets-title">{item.title}</strong>
@@ -685,20 +697,30 @@ export default function ModuleAssetsPanel({ moduleKey }) {
                 <span className="module-assets-pill">{
                   item.subtopic || '待归类'
                 }</span>
-                <span className="module-assets-pill module-assets-pill-level">{t.levelTag?.[item.required_level] || item.required_level}</span>
+                {showLevelBadge ? (
+                  <span className={`module-assets-pill module-assets-pill-level membership-badge membership-${badgeLevel}`}>
+                    {t.levelTag?.[badgeLevel] || badgeLevel}
+                  </span>
+                ) : null}
               </p>
               {isAdmin && savedItemId === item.id ? <p className="module-assets-hint">{t.saveOk}</p> : null}
-              {item.summary ? <p className="module-assets-muted">{item.summary}</p> : null}
-              {isImage(item.mime_type) ? <img src={`/api/module-assets/${item.id}`} alt={item.title} className="module-assets-image" /> : null}
-              {isAudio(item.mime_type) ? <audio controls src={`/api/module-assets/${item.id}`} className="module-assets-media" /> : null}
-              {isVideo(item.mime_type) ? (
-                isAdmin ? <video controls src={`/api/module-assets/${item.id}`} className="module-assets-media" /> : <p className="module-assets-muted">{t.videoRestricted}</p>
-              ) : null}
-              {!isVideo(item.mime_type) || isAdmin ? (
-                <p className="module-assets-actions">
-                  <a className="module-assets-open-link" href={`/api/module-assets/${item.id}`} target="_blank" rel="noreferrer">{t.open}</a>
-                </p>
-              ) : null}
+              {canView ? (
+                <>
+                  {item.summary ? <p className="module-assets-muted">{item.summary}</p> : null}
+                  {isImage(item.mime_type) ? <img src={`/api/module-assets/${item.id}`} alt={item.title} className="module-assets-image" /> : null}
+                  {isAudio(item.mime_type) ? <audio controls src={`/api/module-assets/${item.id}`} className="module-assets-media" /> : null}
+                  {isVideo(item.mime_type) ? (
+                    isAdmin ? <video controls src={`/api/module-assets/${item.id}`} className="module-assets-media" /> : <p className="module-assets-muted">{t.videoRestricted}</p>
+                  ) : null}
+                  {!isVideo(item.mime_type) || isAdmin ? (
+                    <p className="module-assets-actions">
+                      <a className="module-assets-open-link" href={`/api/module-assets/${item.id}`} target="_blank" rel="noreferrer">{t.open}</a>
+                    </p>
+                  ) : null}
+                </>
+              ) : (
+                <ContentLockNotice requiredLevel={item.required_level} user={user} />
+              )}
               {isAdmin && editingId === item.id ? (
                 <form className="module-assets-upload module-assets-edit-inline" onSubmit={(e) => { e.preventDefault(); saveEdit() }}>
                   <h4>{t.edit}</h4>
@@ -738,7 +760,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
                   <label>
                     <span>{t.requiredLevel}</span>
                     <select value={editForm.requiredLevel} onChange={(e) => setEditForm((v) => ({ ...v, requiredLevel: e.target.value }))}>
-                      <option value="free">{t.levelTag?.free || 'free'}</option>
+                      <option value="public">{t.levelTag?.public || 'public'}</option>
                       <option value="standard">{t.levelTag?.standard || 'standard'}</option>
                       <option value="premium">{t.levelTag?.premium || 'premium'}</option>
                     </select>
@@ -754,7 +776,8 @@ export default function ModuleAssetsPanel({ moduleKey }) {
                 </form>
               ) : null}
               </li>
-            ))}
+              )
+            })}
           </ul>
         </>
       ) : null}
@@ -794,7 +817,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
           <label>
             <span>{t.requiredLevel}</span>
             <select value={requiredLevel} onChange={(e) => setRequiredLevel(e.target.value)}>
-              <option value="free">{t.levelTag?.free || 'free'}</option>
+              <option value="public">{t.levelTag?.public || 'public'}</option>
               <option value="standard">{t.levelTag?.standard || 'standard'}</option>
               <option value="premium">{t.levelTag?.premium || 'premium'}</option>
             </select>

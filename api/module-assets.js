@@ -5,6 +5,11 @@ import { sql } from '../lib/db.js'
 import { authorizeSiteAdmin } from '../lib/siteAdminAuth.js'
 import { verifyToken, getUserById } from '../lib/auth.js'
 import { parseSiteAdminEmails } from '../lib/siteAdminEmails.js'
+import {
+  canViewContent,
+  normalizeContentLevelForStorage,
+  parseContentRequiredLevel,
+} from '../lib/contentAccess.js'
 
 const STORAGE_DIR = path.join(process.cwd(), 'storage', 'module-assets')
 const MAX_FILE_SIZE = 100 * 1024 * 1024
@@ -38,8 +43,6 @@ const ALLOWED_MIME = new Set([
   'video/quicktime',
   'video/webm',
 ])
-const LEVEL_ORDER = ['free', 'standard', 'premium']
-
 async function ensureSchema() {
   await sql`
     CREATE TABLE IF NOT EXISTS module_assets (
@@ -96,46 +99,29 @@ function getExt(name) {
 }
 
 function normalizeLevel(raw) {
-  const s = String(raw || '').toLowerCase().trim()
-  const aliases = {
-    '普通会员': 'free',
-    '免费会员': 'free',
-    free: 'free',
-    '标准会员': 'standard',
-    standard: 'standard',
-    '高级会员': 'premium',
-    premium: 'premium',
-  }
-  const normalized = aliases[s] || s
-  return LEVEL_ORDER.includes(normalized) ? normalized : 'free'
-}
-
-function canView(required, current) {
-  const reqIdx = LEVEL_ORDER.indexOf(normalizeLevel(required))
-  const curIdx = LEVEL_ORDER.indexOf(normalizeLevel(current))
-  return curIdx >= reqIdx
+  return normalizeContentLevelForStorage(raw)
 }
 
 async function getViewer(req) {
   // 与上传/编辑/删除保持一致：如果满足整站管理员鉴权，则直接视为管理员查看全量资料
   const adminAuth = await authorizeSiteAdmin(req)
-  if (adminAuth.ok) return { isAdmin: true, level: 'premium' }
+  if (adminAuth.ok) return { isAdmin: true, level: 'premium', isGuest: false }
 
   const requestAdminToken = String(req.headers['x-site-admin-token'] || '').trim()
   const configAdminToken = String(process.env.SITE_ADMIN_TOKEN || '').trim()
   if (configAdminToken && requestAdminToken && requestAdminToken === configAdminToken) {
-    return { isAdmin: true, level: 'premium' }
+    return { isAdmin: true, level: 'premium', isGuest: false }
   }
   const auth = req.headers.authorization
   const jwt = auth?.startsWith('Bearer ') ? auth.slice(7) : null
-  if (!jwt) return { isAdmin: false, level: 'free' }
+  if (!jwt) return { isAdmin: false, level: 'free', isGuest: true }
   const userId = await verifyToken(jwt)
-  if (!userId) return { isAdmin: false, level: 'free' }
+  if (!userId) return { isAdmin: false, level: 'free', isGuest: true }
   const user = await getUserById(userId)
-  if (!user) return { isAdmin: false, level: 'free' }
+  if (!user) return { isAdmin: false, level: 'free', isGuest: true }
   const allow = parseSiteAdminEmails()
   const isAdmin = allow.includes(String(user.email || '').toLowerCase().trim())
-  return { isAdmin, level: user.level || 'free' }
+  return { isAdmin, level: user.level || 'free', isGuest: false }
 }
 
 async function handleList(req, res) {
@@ -150,8 +136,17 @@ async function handleList(req, res) {
     ORDER BY created_at DESC
     LIMIT 300
   `
-  const visible = viewer.isAdmin ? rows : rows.filter((row) => canView(row.required_level, viewer.level))
-  return res.status(200).json({ ok: true, items: visible })
+  const items = rows.map((row) => {
+    const content_level = parseContentRequiredLevel(row.required_level)
+    const can_view =
+      viewer.isAdmin || canViewContent(viewer.level, row.required_level, { isGuest: viewer.isGuest })
+    return {
+      ...row,
+      content_level,
+      can_view,
+    }
+  })
+  return res.status(200).json({ ok: true, items })
 }
 
 async function handleUpload(req, res) {
@@ -165,7 +160,7 @@ async function handleUpload(req, res) {
   const moduleKey = normalizeModuleKey(body.module)
   const subcategory = String(body.subcategory || 'general').trim().slice(0, 80) || 'general'
   const subtopic = String(body.subtopic || '').trim().slice(0, 120)
-  const requiredLevel = normalizeLevel(body.requiredLevel || 'free')
+  const requiredLevel = normalizeLevel(body.requiredLevel || 'public')
   const title = String(body.title || '').trim().slice(0, 200)
   const summary = String(body.summary || '').trim().slice(0, 4000)
   const fileName = sanitizeFileName(body.fileName)
@@ -211,7 +206,7 @@ async function handleUpdate(req, res) {
   const subtopic = String(body.subtopic || '').trim().slice(0, 120)
   const fileNameRaw = String(body.fileName || '').trim()
   const fileName = sanitizeFileName(fileNameRaw)
-  const requiredLevel = normalizeLevel(body.requiredLevel || 'free')
+  const requiredLevel = normalizeLevel(body.requiredLevel || 'public')
   if (!title) return res.status(400).json({ error: '标题不能为空' })
   if (!fileNameRaw) return res.status(400).json({ error: '资料名称不能为空' })
 

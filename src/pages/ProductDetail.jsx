@@ -4,7 +4,11 @@ import { getProductById, PRODUCT_CATEGORIES, isCatalogProductId } from '../data/
 import { getProductsEvidenceCopy } from '../data/productsEvidenceLibraryI18n'
 import { useLocale } from '../context/LocaleContext'
 import { useAuth } from '../context/AuthContext'
+import { shouldShowMembershipBadge } from '../data/membership'
+import { getMembershipLevelLabel } from '../i18n/terms'
 import { getUi } from '../i18n/ui'
+import ContentLockNotice from '../components/ContentLockNotice'
+import '../styles/membership-badge.css'
 import { pickCatalogLocale, pickSkuLocale } from '../lib/productCatalogLocale'
 import ProductCatalogGallery from '../components/ProductCatalogGallery'
 import './ProductDetail.css'
@@ -20,7 +24,7 @@ function formatPriceSymbol(currency) {
 export default function ProductDetail() {
   const { lang } = useLocale()
   const ui = getUi(lang)
-  const { getToken } = useAuth()
+  const { user, getToken } = useAuth()
   const ev = getProductsEvidenceCopy(lang)
   const t = {
     zh: {
@@ -138,6 +142,9 @@ export default function ProductDetail() {
   }
 
   const category = PRODUCT_CATEGORIES.find((c) => c.id === product.category)
+  const canView = product.catalog ? catalogRow?.can_view !== false : true
+  const requiredLevel = product.catalog ? catalogRow?.required_level : null
+  const showBadge = shouldShowMembershipBadge(requiredLevel)
 
   return (
     <div className="page-product-detail">
@@ -150,7 +157,7 @@ export default function ProductDetail() {
       </aside>
 
       <div className="product-detail-card">
-        {product.catalog && product.gallery_count > 0 ? (
+        {canView && product.catalog && product.gallery_count > 0 ? (
           <ProductCatalogGallery
             productId={product.id}
             galleryCount={product.gallery_count}
@@ -161,14 +168,25 @@ export default function ProductDetail() {
         <div className="product-detail-header">
           <span className="product-category-tag">{category?.label}</span>
           {product.catalog ? <span className="product-badge-managed product-detail-badge">上架商品</span> : null}
-          <h1>{product.title}</h1>
-          <p className="product-desc">{product.desc}</p>
-          {product.origin ? (
-            <p className="product-detail-origin"><strong>{t.origin}：</strong>{product.origin}</p>
+          {showBadge ? (
+            <span className={`membership-badge membership-${catalogRow?.content_level || requiredLevel}`}>
+              {getMembershipLevelLabel(catalogRow?.content_level || requiredLevel, lang)}
+            </span>
           ) : null}
+          <h1>{product.title}</h1>
+          {canView ? (
+            <>
+              <p className="product-desc">{product.desc}</p>
+              {product.origin ? (
+                <p className="product-detail-origin"><strong>{t.origin}：</strong>{product.origin}</p>
+              ) : null}
+            </>
+          ) : (
+            <ContentLockNotice requiredLevel={requiredLevel} user={user} />
+          )}
         </div>
 
-        {product.skus?.length ? (
+        {canView && product.skus?.length ? (
           <div className="product-detail-skus">
             <h2 className="product-detail-skus-title">{t.sku}</h2>
             <div className="product-detail-table-wrap">
@@ -198,30 +216,34 @@ export default function ProductDetail() {
           </div>
         ) : null}
 
-        <div className="product-detail-price">
-          <span className="price">{formatPriceSymbol(product.currency)}{product.price}</span>
-          <span className="unit">/{product.unit}</span>
-          {product.skus?.length ? (
-            <span className="product-detail-base-note">{lang === 'zh' ? '（基础标价；SKU 可能有单独定价）' : '(Base price; SKU may override)'}</span>
-          ) : null}
-        </div>
+        {canView ? (
+          <>
+            <div className="product-detail-price">
+              <span className="price">{formatPriceSymbol(product.currency)}{product.price}</span>
+              <span className="unit">/{product.unit}</span>
+              {product.skus?.length ? (
+                <span className="product-detail-base-note">{lang === 'zh' ? '（基础标价；SKU 可能有单独定价）' : '(Base price; SKU may override)'}</span>
+              ) : null}
+            </div>
 
-        <div className="product-detail-actions">
-          <Link
-            to="/payment"
-            state={{
-              product: {
-                id: product.id,
-                title: product.title,
-                price: product.price,
-                currency: product.currency,
-              },
-            }}
-            className="btn-primary"
-          >
-            {t.pay}
-          </Link>
-        </div>
+            <div className="product-detail-actions">
+              <Link
+                to="/payment"
+                state={{
+                  product: {
+                    id: product.id,
+                    title: product.title,
+                    price: product.price,
+                    currency: product.currency,
+                  },
+                }}
+                className="btn-primary"
+              >
+                {t.pay}
+              </Link>
+            </div>
+          </>
+        ) : null}
       </div>
     </div>
   )
