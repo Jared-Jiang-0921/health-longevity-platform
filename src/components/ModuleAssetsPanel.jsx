@@ -7,7 +7,16 @@ import { PRODUCT_CATEGORIES, getProductById } from '../data/products'
 import ProductCatalogAdmin from './ProductCatalogAdmin'
 import ContentLockNotice from './ContentLockNotice'
 import { shouldShowMembershipBadge } from '../data/membership'
+import { fileToBase64 } from '../lib/fileBase64'
 import './ModuleAssetsPanel.css'
+
+function uploadErrorMessage(err, t, lang) {
+  const msg = String(err?.message || '')
+  if (msg === 'Failed to fetch' || msg.includes('NetworkError') || msg.includes('Load failed')) {
+    return t.uploadNetworkFail || t.uploadFail
+  }
+  return msg || t.uploadFail
+}
 
 function adminLevelValue(raw) {
   const s = String(raw || '').trim().toLowerCase()
@@ -237,6 +246,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       titleRequired: '请填写标题',
       fileRequired: '请选择文件',
       fileTooLarge: '文件超过 100MB，请压缩后再上传',
+      uploadNetworkFail: '上传失败：视频/大文件请压缩到约 40MB 以内；若仍失败，需服务器 Nginx 放开上传大小（client_max_body_size ≥ 120m）',
       uncategorized: '未分类',
       subcategoryContent: '按亚类查看资料',
       subtopicContent: '再选择二层分类后显示材料',
@@ -277,6 +287,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       titleRequired: 'Please provide a title.',
       fileRequired: 'Please choose a file.',
       fileTooLarge: 'File exceeds 100MB, please compress and retry.',
+      uploadNetworkFail: 'Upload failed: compress video to ~40MB or less; server may need larger Nginx client_max_body_size (≥120m).',
       uncategorized: 'Uncategorized',
       subcategoryContent: 'Browse by subcategory',
       subtopicContent: 'Select a second-level category to view materials',
@@ -317,6 +328,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       titleRequired: 'يرجى إدخال العنوان.',
       fileRequired: 'يرجى اختيار ملف.',
       fileTooLarge: 'حجم الملف يتجاوز 100MB، يرجى ضغطه ثم إعادة الرفع.',
+      uploadNetworkFail: 'فشل الرفع: اضغط الفيديو إلى ~40MB أو زِد حد رفع Nginx على الخادم.',
       uncategorized: 'غير مصنف',
       subcategoryContent: 'تصفح حسب التصنيف الفرعي',
       subtopicContent: 'اختر تصنيفًا فرعيًا أدق لعرض المواد',
@@ -467,11 +479,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     try {
       const submittedSubcategory = normalizeSubcategoryValue(moduleKey, subcategory.trim() || 'general')
       const submittedSubtopic = resolveSubmitSubtopic(moduleKey, submittedSubcategory, subtopic)
-      const buffer = await file.arrayBuffer()
-      const bytes = new Uint8Array(buffer)
-      let binary = ''
-      for (let i = 0; i < bytes.length; i += 1) binary += String.fromCharCode(bytes[i])
-      const contentBase64 = btoa(binary)
+      const contentBase64 = await fileToBase64(file)
       const token = getToken()
       const res = await fetch('/api/module-assets', {
         method: 'POST',
@@ -492,6 +500,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
         }),
       })
       const data = await res.json().catch(() => ({}))
+      if (res.status === 413) throw new Error(data.error || t.uploadNetworkFail)
       if (!res.ok) throw new Error(data.error || t.uploadFail)
       if (data?.item?.id) {
         const uploadedItem = normalizeAssetItem(moduleKey, data.item)
@@ -511,7 +520,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       setHint(t.uploadOk)
       await loadItems()
     } catch (err) {
-      setError(err.message || t.uploadFail)
+      setError(uploadErrorMessage(err, t, lang))
     } finally {
       setSubmitting(false)
     }

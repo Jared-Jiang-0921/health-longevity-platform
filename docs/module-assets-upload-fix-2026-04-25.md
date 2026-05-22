@@ -66,6 +66,33 @@
   - 管理员可见所有会员等级资料（含高级会员）。
   - 分类与会员等级对应正确。
 
+## 短视频上传 `Failed to fetch`（2026-05 补充）
+
+**现象**：管理员在「长寿知识技能」上传 mp4/mov 时浏览器提示 `Failed to fetch`，小文件正常。
+
+**常见根因**：
+
+1. **Nginx** 默认 `client_max_body_size` 仅 1MB，视频 JSON（base64 后更大）被直接断开。
+2. **前端** 曾用逐字节 `btoa`，大文件导致浏览器卡死或请求发不出去。
+
+**修复**：
+
+- 前端改用 `FileReader` 转 base64（`src/lib/fileBase64.js`）。
+- `deploy/nginx-healthlongevity.conf.example` 的 `location /api/` 增加 `client_max_body_size 120m` 与 `proxy_*_timeout 300s`。
+- 服务器需手动合并到 `/etc/nginx/conf.d/healthlongevity.conf` 后 `nginx -t && systemctl reload nginx`。
+
+**ECS 一键改 Nginx（在服务器执行）**：
+
+```bash
+CONF=/etc/nginx/conf.d/healthlongevity.conf
+grep -q 'client_max_body_size' "$CONF" || sudo sed -i '/location \/api\//,/}/ {
+  /proxy_pass/i\        client_max_body_size 120m;\n        proxy_read_timeout 300s;\n        proxy_send_timeout 300s;
+}' "$CONF"
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+建议短视频 **≤ 40MB**（base64 后约 55MB），单文件上限仍为 100MB。
+
 ## 后续建议
 
 - 保留一条“管理员资料可见性”回归用例，覆盖：

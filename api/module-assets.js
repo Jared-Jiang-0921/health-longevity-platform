@@ -42,7 +42,35 @@ const ALLOWED_MIME = new Set([
   'video/mp4',
   'video/quicktime',
   'video/webm',
+  'video/x-m4v',
+  'video/mpeg',
 ])
+
+const EXT_TO_MIME = {
+  mp4: 'video/mp4',
+  mov: 'video/quicktime',
+  webm: 'video/webm',
+  m4v: 'video/x-m4v',
+  mp3: 'audio/mpeg',
+  m4a: 'audio/mp4',
+  wav: 'audio/wav',
+  ogg: 'audio/ogg',
+  png: 'image/png',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  gif: 'image/gif',
+  webp: 'image/webp',
+  pdf: 'application/pdf',
+}
+
+function resolveUploadMime(mimeType, fileName) {
+  const m = String(mimeType || '').trim().toLowerCase()
+  if (ALLOWED_MIME.has(m)) return m
+  const ext = getExt(fileName)
+  const fromExt = EXT_TO_MIME[ext]
+  if (fromExt && ALLOWED_MIME.has(fromExt)) return fromExt
+  return m
+}
 async function ensureSchema() {
   await sql`
     CREATE TABLE IF NOT EXISTS module_assets (
@@ -164,14 +192,16 @@ async function handleUpload(req, res) {
   const title = String(body.title || '').trim().slice(0, 200)
   const summary = String(body.summary || '').trim().slice(0, 4000)
   const fileName = sanitizeFileName(body.fileName)
-  const mimeType = String(body.mimeType || '').trim().toLowerCase()
+  const mimeType = resolveUploadMime(body.mimeType, fileName)
   const contentBase64 = String(body.contentBase64 || '').trim()
-  if (!moduleKey || !title || !fileName || !contentBase64 || !mimeType) {
-    return res.status(400).json({ error: '缺少必填字段（module/title/fileName/mimeType/contentBase64）' })
+  if (!moduleKey || !title || !fileName || !contentBase64) {
+    return res.status(400).json({ error: '缺少必填字段（module/title/fileName/contentBase64）' })
   }
   const ext = getExt(fileName)
   if (!ALLOWED_EXT.has(ext)) return res.status(400).json({ error: '不支持该文件扩展名' })
-  if (!ALLOWED_MIME.has(mimeType)) return res.status(400).json({ error: '不支持该文件类型' })
+  if (!ALLOWED_MIME.has(mimeType)) {
+    return res.status(400).json({ error: `不支持该文件类型（${mimeType || '未知'}），请使用 mp4 / mov / webm 等常见格式` })
+  }
 
   const fileBuffer = Buffer.from(contentBase64, 'base64')
   if (!fileBuffer.length) return res.status(400).json({ error: '上传文件为空' })

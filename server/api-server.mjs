@@ -161,6 +161,8 @@ async function readBodyBuffer(req) {
 }
 
 const PORT = Number(process.env.PORT || 3000)
+/** JSON 上传含 base64 时约为原文件的 4/3；与 Nginx client_max_body_size 对齐 */
+const MAX_API_BODY_BYTES = Number(process.env.MAX_API_BODY_BYTES || 150 * 1024 * 1024)
 
 // 与上方 projectRoot / .env 一致：勿依赖 process.cwd()（pm2、systemd 下 cwd 常非仓库根目录）
 const apiDirAbs = path.join(projectRoot, 'api')
@@ -240,6 +242,12 @@ const server = http.createServer(async (req, res) => {
       const method = String(req.method || '').toUpperCase()
       if (['POST', 'PUT', 'PATCH'].includes(method)) {
         const buf = await readBodyBuffer(req)
+        if (buf.length > MAX_API_BODY_BYTES) {
+          res.status(413).json({
+            error: `请求体超过 ${Math.floor(MAX_API_BODY_BYTES / (1024 * 1024))}MB 限制，请压缩视频后重试`,
+          })
+          return
+        }
         // 你现有 parseJson 逻辑：当 req.body 是 string 时再 JSON.parse
         req.body = toStringBody(buf)
       }
