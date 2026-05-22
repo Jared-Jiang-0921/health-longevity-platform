@@ -14,9 +14,9 @@ export default function HealthSkills() {
   const { lang } = useLocale()
   const ui = getUi(lang)
   const t = {
-    zh: { title: '长寿知识技能', desc: '系统化健康知识与技能课程，支持多语言与全球化学习。', cancel: '取消收藏', fav: '收藏' },
-    en: { title: 'Health Skills', desc: 'Structured health knowledge and skill courses with multilingual learning.', cancel: 'Remove favorite', fav: 'Favorite' },
-    ar: { title: 'مهارات الصحة', desc: 'دورات منهجية للمعرفة والمهارات الصحية مع دعم متعدد اللغات.', cancel: 'إزالة من المفضلة', fav: 'إضافة للمفضلة' },
+    zh: { title: '长寿知识技能', desc: '系统化健康知识与技能课程，支持多语言与全球化学习。', cancel: '取消收藏', fav: '收藏', series: '视频系列' },
+    en: { title: 'Health Skills', desc: 'Structured health knowledge and skill courses with multilingual learning.', cancel: 'Remove favorite', fav: 'Favorite', series: 'Video series' },
+    ar: { title: 'مهارات الصحة', desc: 'دورات منهجية للمعرفة والمهارات الصحية مع دعم متعدد اللغات.', cancel: 'إزالة من المفضلة', fav: 'إضافة للمفضلة', series: 'سلسلة فيديو' },
   }[lang || 'zh']
   const methodologyLine = getHealthSkillsContentApproach(lang)
   const [activeCategory, setActiveCategory] = useState(CATEGORIES[0]?.id || 'basics')
@@ -68,6 +68,9 @@ export default function HealthSkills() {
                 <div className="course-meta">
                   <span className="course-category">
                     {CATEGORIES.find((c) => c.id === course.category)?.label}
+                    {course.videoSeries ? (
+                      <span className="course-badge-series"> · {t.series}</span>
+                    ) : null}
                   </span>
                   <button
                     type="button"

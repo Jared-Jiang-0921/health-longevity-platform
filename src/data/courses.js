@@ -79,6 +79,8 @@ const courseModules = {
     },
     { type: 'video', title: '疫苗知识入门', duration: '10:00', videoUrl: DEMO_MP4 },
   ],
+  16: [],
+  17: [],
 }
 
 export const COURSES = [
@@ -119,6 +121,28 @@ export const COURSES = [
   },
   { id: 11, title: '认知健康与脑力训练', category: 'mental', duration: '6 周', level: '中级', desc: '记忆力、专注力与认知储备提升。', content: '认知储备理论、记忆策略、注意力训练及认知刺激活动。', modules: courseModules[11] },
   { id: 12, title: '情绪与心理韧性', category: 'mental', duration: '4 周', level: '初级', desc: '情绪识别、调节与社会联结。', content: '情绪ABC模型、认知重构、社会支持与心理韧性培养。', modules: courseModules[12] },
+  {
+    id: 16,
+    title: '老年人7分钟力量训练',
+    category: 'exercise',
+    duration: '视频系列',
+    level: '初级',
+    videoSeries: true,
+    desc: '面向老年人的 7 分钟力量训练短视频合集，可按集上传跟练内容。',
+    content: '管理员上传的短视频归入本系列后，将显示在下方「系列视频」列表中，会员可按集观看。',
+    modules: courseModules[16],
+  },
+  {
+    id: 17,
+    title: '燃脂7原则',
+    category: 'exercise',
+    duration: '视频系列',
+    level: '初级',
+    videoSeries: true,
+    desc: '燃脂训练原则讲解与跟练视频合集。',
+    content: '每条视频对应一个原则或一节跟练；上传时「系列合集」请选择「燃脂7原则」。',
+    modules: courseModules[17],
+  },
 ]
 
 export function getCourseById(id) {

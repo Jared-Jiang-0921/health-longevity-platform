@@ -3,6 +3,7 @@ import { matchPath, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
 import { CATEGORIES, COURSES, getCourseById } from '../data/courses'
+import { getSeriesTitlesForCategory } from '../data/healthSkillsSeries'
 import { PRODUCT_CATEGORIES, getProductById } from '../data/products'
 import ProductCatalogAdmin from './ProductCatalogAdmin'
 import ContentLockNotice from './ContentLockNotice'
@@ -111,10 +112,13 @@ function normalizeAssetItem(moduleKey, item) {
 }
 
 function resolveSubmitSubtopic(moduleKey, subcategoryValue, rawSubtopic) {
-  const options = getSubtopicOptions(moduleKey, subcategoryValue)
   const normalized = normalizeSubtopicValue(rawSubtopic)
+  if (moduleKey === 'health-skills') {
+    if (!normalized || normalized === '待归类') return ''
+    return normalized
+  }
+  const options = getSubtopicOptions(moduleKey, subcategoryValue)
   if (!options.length) return normalized
-  // 有预设细分类时，空值或不匹配都落到第一个合法项，避免进入“待归类”导致用户在目标细分类看不到
   return options.includes(normalized) ? normalized : options[0]
 }
 
@@ -124,12 +128,23 @@ function getSubtopicOptions(moduleKey, subcategoryLabel) {
   if (moduleKey === 'health-skills') {
     const category = CATEGORIES.find((c) => c.label === label || c.id === label)
     if (!category) return []
-    return COURSES
+    const courseTitles = COURSES
       .filter((course) => course.category === category.id)
       .map((course) => course.title)
+    return getSeriesTitlesForCategory(category.id, courseTitles)
   }
   if (moduleKey === 'products') return ['产品详情资料']
   return []
+}
+
+function mergeSubtopicOptions(moduleKey, subcategoryLabel, baseOptions, items) {
+  if (moduleKey !== 'health-skills') return baseOptions
+  const label = normalizeSubcategoryValue(moduleKey, subcategoryLabel)
+  const fromItems = items
+    .filter((item) => normalizeSubcategoryValue(moduleKey, item.subcategory) === label)
+    .map((item) => normalizeSubtopicValue(item.subtopic))
+    .filter((t) => t && t !== '待归类')
+  return Array.from(new Set([...baseOptions, ...fromItems]))
 }
 
 export default function ModuleAssetsPanel({ moduleKey }) {
@@ -159,8 +174,14 @@ export default function ModuleAssetsPanel({ moduleKey }) {
   const lastRouteBindingKeyRef = useRef('')
   const isAdmin = Boolean(user?.site_admin)
   const subcategoryOptions = useMemo(() => getSubcategoryOptions(moduleKey), [moduleKey])
-  const subtopicOptions = useMemo(() => getSubtopicOptions(moduleKey, subcategory), [moduleKey, subcategory])
-  const editSubtopicOptions = useMemo(() => getSubtopicOptions(moduleKey, editForm.subcategory), [moduleKey, editForm.subcategory])
+  const subtopicOptions = useMemo(
+    () => mergeSubtopicOptions(moduleKey, subcategory, getSubtopicOptions(moduleKey, subcategory), items),
+    [moduleKey, subcategory, items],
+  )
+  const editSubtopicOptions = useMemo(
+    () => mergeSubtopicOptions(moduleKey, editForm.subcategory, getSubtopicOptions(moduleKey, editForm.subcategory), items),
+    [moduleKey, editForm.subcategory, items],
+  )
   const availableSubcategories = useMemo(() => {
     const normalizedPreset = subcategoryOptions.map((opt) => normalizeSubcategoryValue(moduleKey, opt))
     const fromItems = items.map((item) => normalizeSubcategoryValue(moduleKey, item.subcategory))
@@ -220,8 +241,10 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       title: '标题',
       fileName: '资料名称',
       summary: '摘要（可选）',
-      subcategory: '亚类（例如：基础知识 / 课程 / 案例）',
-      subtopic: '二级维度（例如：长寿基础知识入门）',
+      subcategory: '课程大类（亚类）',
+      subtopic: '系列合集（如：老年人7分钟力量训练）',
+      seriesHint: '上传视频时请选择与课程系列一致的「系列合集」，视频会显示在该系列课程页。',
+      seriesRequired: '请选择系列合集',
       requiredLevel: '可见会员等级',
       choose: '选择文件',
       upload: '上传',
@@ -261,8 +284,9 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       title: 'Title',
       fileName: 'File Name',
       summary: 'Summary (optional)',
-      subcategory: 'Subcategory (e.g. basics/course/cases)',
-      subtopic: 'Subtopic (e.g. Longevity Basics Intro)',
+      subcategory: 'Category',
+      subtopic: 'Series collection',
+      seriesHint: 'Pick the series name; videos appear on that series course page.',
       requiredLevel: 'Required member level',
       choose: 'Choose file',
       upload: 'Upload',
@@ -302,8 +326,9 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       title: 'العنوان',
       fileName: 'اسم المادة',
       summary: 'الملخص (اختياري)',
-      subcategory: 'تصنيف فرعي (مثل أساسيات/دورات/حالات)',
-      subtopic: 'تصنيف أدق (مثل مقدمة أساسيات طول العمر)',
+      subcategory: 'التصنيف',
+      subtopic: 'مجموعة السلسلة',
+      seriesHint: 'اختر اسم السلسلة لعرض الفيديو في صفحة الدورة.',
       requiredLevel: 'الحد الأدنى للعضوية',
       choose: 'اختر ملفًا',
       upload: 'رفع',
@@ -471,6 +496,11 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       setError(t.fileRequired || t.invalid)
       return
     }
+    const seriesName = resolveSubmitSubtopic(moduleKey, subcategory, subtopic)
+    if (moduleKey === 'health-skills' && !seriesName) {
+      setError(t.seriesRequired || '请选择系列合集')
+      return
+    }
     if (file.size > 100 * 1024 * 1024) {
       setError(t.fileTooLarge || t.invalid)
       return
@@ -478,7 +508,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     setSubmitting(true)
     try {
       const submittedSubcategory = normalizeSubcategoryValue(moduleKey, subcategory.trim() || 'general')
-      const submittedSubtopic = resolveSubmitSubtopic(moduleKey, submittedSubcategory, subtopic)
+      const submittedSubtopic = resolveSubmitSubtopic(moduleKey, submittedSubcategory, subtopic) || seriesName
       const contentBase64 = await fileToBase64(file)
       const token = getToken()
       const res = await fetch('/api/module-assets', {
@@ -814,6 +844,9 @@ export default function ModuleAssetsPanel({ moduleKey }) {
               ))}
             </select>
           </label>
+          {moduleKey === 'health-skills' ? (
+            <p className="module-assets-hint module-assets-series-hint">{t.seriesHint}</p>
+          ) : null}
           <label>
             <span>{t.subtopic}</span>
             <select value={subtopic} onChange={(e) => setSubtopic(e.target.value)} disabled={!subtopicOptions.length}>

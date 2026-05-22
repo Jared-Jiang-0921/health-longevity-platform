@@ -113,6 +113,10 @@
   border-radius: 4px;
 }
 
+.course-badge-series {
+  font-weight: 600;
+}
+
 .course-duration {
   font-size: 0.75rem;
   color: var(--color-text-muted);

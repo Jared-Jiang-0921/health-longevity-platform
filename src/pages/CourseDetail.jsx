@@ -9,6 +9,7 @@ import { getUi } from '../i18n/ui'
 import { getMembershipLevelLabel } from '../i18n/terms'
 import { hasLevelAccess, shouldShowMembershipBadge } from '../data/membership'
 import ContentLockNotice from '../components/ContentLockNotice'
+import CourseSeriesVideos from '../components/CourseSeriesVideos'
 import '../styles/membership-badge.css'
 import './CourseDetail.css'
 
@@ -99,6 +100,8 @@ export default function CourseDetail() {
         <h2>{t.intro}</h2>
         <p>{course.content}</p>
       </section>
+
+      <CourseSeriesVideos course={course} />
 
       <section className="course-detail-actions">
         <button
