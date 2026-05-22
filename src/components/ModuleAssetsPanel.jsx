@@ -9,6 +9,7 @@ import ProductCatalogAdmin from './ProductCatalogAdmin'
 import ContentLockNotice from './ContentLockNotice'
 import { shouldShowMembershipBadge } from '../data/membership'
 import { fileToBase64 } from '../lib/fileBase64'
+import { moduleAssetUrl } from '../lib/moduleAssetUrl'
 import './ModuleAssetsPanel.css'
 
 function uploadErrorMessage(err, t, lang) {
@@ -746,16 +747,18 @@ export default function ModuleAssetsPanel({ moduleKey }) {
               {canView ? (
                 <>
                   {item.summary ? <p className="module-assets-muted">{item.summary}</p> : null}
-                  {isImage(item.mime_type) ? <img src={`/api/module-assets/${item.id}`} alt={item.title} className="module-assets-image" /> : null}
-                  {isAudio(item.mime_type) ? <audio controls src={`/api/module-assets/${item.id}`} className="module-assets-media" /> : null}
+                  {isImage(item.mime_type) ? (
+                    <img src={moduleAssetUrl(item.id, getToken())} alt={item.title} className="module-assets-image" />
+                  ) : null}
+                  {isAudio(item.mime_type) ? (
+                    <audio controls src={moduleAssetUrl(item.id, getToken())} className="module-assets-media" />
+                  ) : null}
                   {isVideo(item.mime_type) ? (
-                    isAdmin ? <video controls src={`/api/module-assets/${item.id}`} className="module-assets-media" /> : <p className="module-assets-muted">{t.videoRestricted}</p>
+                    <video controls src={moduleAssetUrl(item.id, getToken())} className="module-assets-media" preload="metadata" />
                   ) : null}
-                  {!isVideo(item.mime_type) || isAdmin ? (
-                    <p className="module-assets-actions">
-                      <a className="module-assets-open-link" href={`/api/module-assets/${item.id}`} target="_blank" rel="noreferrer">{t.open}</a>
-                    </p>
-                  ) : null}
+                  <p className="module-assets-actions">
+                    <a className="module-assets-open-link" href={moduleAssetUrl(item.id, getToken())} target="_blank" rel="noreferrer">{t.open}</a>
+                  </p>
                 </>
               ) : (
                 <ContentLockNotice requiredLevel={item.required_level} user={user} />

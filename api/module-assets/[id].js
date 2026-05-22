@@ -12,14 +12,25 @@ function getId(req) {
   return String(v || '').trim()
 }
 
+function readJwt(req) {
+  const auth = req.headers.authorization
+  if (auth?.startsWith('Bearer ')) return auth.slice(7)
+  const q = req.query?.access_token
+  const raw = Array.isArray(q) ? q[0] : q
+  const fromQuery = String(raw || '').trim()
+  return fromQuery || null
+}
+
 async function getViewer(req) {
+  const adminAuth = await authorizeSiteAdmin(req)
+  if (adminAuth.ok) return { isAdmin: true, level: 'premium', isGuest: false }
+
   const requestAdminToken = String(req.headers['x-site-admin-token'] || '').trim()
   const configAdminToken = String(process.env.SITE_ADMIN_TOKEN || '').trim()
   if (configAdminToken && requestAdminToken && requestAdminToken === configAdminToken) {
     return { isAdmin: true, level: 'premium', isGuest: false }
   }
-  const auth = req.headers.authorization
-  const jwt = auth?.startsWith('Bearer ') ? auth.slice(7) : null
+  const jwt = readJwt(req)
   if (!jwt) return { isAdmin: false, level: 'free', isGuest: true }
   const userId = await verifyToken(jwt)
   if (!userId) return { isAdmin: false, level: 'free', isGuest: true }
@@ -72,13 +83,6 @@ export default async function handler(req, res) {
       !canViewContent(viewer.level, row.required_level, { isGuest: viewer.isGuest })
     ) {
       return res.status(403).json({ code: 'ASSET_LEVEL_FORBIDDEN', error: '当前会员等级不可查看该资源' })
-    }
-    const isVideo = String(row.mime_type || '').startsWith('video/')
-    if (isVideo) {
-      const auth = await authorizeSiteAdmin(req)
-      if (!auth.ok) {
-        return res.status(403).json({ code: 'VIDEO_ADMIN_ONLY', error: '视频资源仅管理员可下载' })
-      }
     }
     const abs = path.join(process.cwd(), 'storage', 'module-assets', String(row.stored_name))
     const buf = await fs.readFile(abs)

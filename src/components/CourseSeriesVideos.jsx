@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
 import { CATEGORIES } from '../data/courses'
 import ContentLockNotice from './ContentLockNotice'
+import { moduleAssetUrl } from '../lib/moduleAssetUrl'
 import './CourseSeriesVideos.css'
 
 function isVideo(mime) {
@@ -15,6 +16,7 @@ function isVideo(mime) {
 export default function CourseSeriesVideos({ course }) {
   const { lang } = useLocale()
   const { user, getToken } = useAuth()
+  const mediaToken = getToken()
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -110,12 +112,12 @@ export default function CourseSeriesVideos({ course }) {
                 <video
                   controls
                   className="course-series-videos-player"
-                  src={`/api/module-assets/${item.id}`}
+                  src={moduleAssetUrl(item.id, mediaToken)}
                   preload="metadata"
                 />
               ) : (
                 <p className="course-series-videos-muted">
-                  <a href={`/api/module-assets/${item.id}`} target="_blank" rel="noreferrer">
+                  <a href={moduleAssetUrl(item.id, mediaToken)} target="_blank" rel="noreferrer">
                     {t.open}
                   </a>
                 </p>
