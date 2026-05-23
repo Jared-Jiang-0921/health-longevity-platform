@@ -86,18 +86,17 @@
 
 .hero-logo-wrap {
   display: inline-block;
-  padding: 0.65rem 1.1rem;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.97);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.28);
+  padding: 0;
+  background: transparent;
 }
 
 .hero-logo {
   display: block;
-  width: min(100%, 20rem);
+  width: min(100%, 22rem);
   height: auto;
-  max-height: 5rem;
+  max-height: 7.5rem;
   object-fit: contain;
+  filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.45));
 }
 
 .hero-title-sr {

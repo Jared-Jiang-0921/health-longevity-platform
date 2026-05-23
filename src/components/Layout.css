@@ -67,23 +67,21 @@
 
 .logo-wrap {
   display: inline-block;
-  padding: 0.35rem 0.65rem;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.97);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  padding: 0;
+  background: transparent;
+  transition: transform 0.2s ease, filter 0.2s ease;
 }
 
 .logo:hover .logo-wrap {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.28);
   transform: translateY(-1px);
+  filter: drop-shadow(0 2px 8px rgba(26, 111, 212, 0.25));
 }
 
 .logo-img {
   display: block;
   width: auto;
-  height: 2rem;
-  max-width: 11.5rem;
+  height: 2.35rem;
+  max-width: 12.5rem;
   object-fit: contain;
 }
 
@@ -106,7 +104,7 @@
   }
 
   .logo-wrap {
-    padding: 0.28rem 0.5rem;
+    padding: 0;
   }
 }
 
