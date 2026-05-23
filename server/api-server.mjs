@@ -188,11 +188,18 @@ const routeTable = await buildRouteTable(apiDirAbs)
 const moduleCache = new Map()
 
 async function importHandler(absFile) {
-  if (moduleCache.has(absFile)) return moduleCache.get(absFile)
-  const url = pathToFileURL(absFile).href
+  let mtimeMs = 0
+  try {
+    mtimeMs = (await fs.stat(absFile)).mtimeMs
+  } catch {
+    /* use 0 */
+  }
+  const cacheKey = `${absFile}:${mtimeMs}`
+  if (moduleCache.has(cacheKey)) return moduleCache.get(cacheKey)
+  const url = `${pathToFileURL(absFile).href}?mtime=${mtimeMs}`
   const mod = await import(url)
   const fn = mod?.default || mod?.handler || mod
-  moduleCache.set(absFile, { mod, fn })
+  moduleCache.set(cacheKey, { mod, fn })
   return { mod, fn }
 }
 
