@@ -17,6 +17,27 @@ ops_curl_health() {
   echo ""
 }
 
+ops_local_api_ok() {
+  curl -sf "$API_HEALTH_URL" >/dev/null 2>&1
+}
+
+# 生产 ECS 用 pm2；若未装 pm2 则回退 systemd
+ops_api_process_state() {
+  if command -v pm2 &>/dev/null && pm2 describe "$PM2_NAME" &>/dev/null 2>&1; then
+    if pm2 describe "$PM2_NAME" 2>/dev/null | grep -qE 'status.*online'; then
+      echo "online"
+      return 0
+    fi
+    echo "pm2-not-online"
+    return 1
+  fi
+  systemctl is-active "$PM2_NAME" 2>/dev/null || echo "inactive"
+}
+
+ops_api_runtime_ok() {
+  ops_local_api_ok
+}
+
 ops_reload_nginx() {
   if command -v nginx &>/dev/null; then
     nginx -t

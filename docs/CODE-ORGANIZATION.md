@@ -24,27 +24,34 @@
 | `lib/apiBody.js` | `parseApiJsonBody` |
 | `lib/apiQuery.js` | `getQueryParam`（动态路由 id） |
 | `src/lib/moduleAssetUrl.js` | 前端 `<video>` / 链接 URL |
-| `src/lib/fileBase64.js` | 上传前 base64 编码 |
+| `lib/storageInline.js` | 从 storage 读文件并 inline 返回（视频/PDF） |
 
 翻译 PDF（`api/translation-pdfs*`）仍使用 **PDF 专用** `sanitizeFileName`，不与通用上传合并。
 
-## API 路由（ECS）
+| `src/lib/fileBase64.js` | 上传前 base64 编码 |
+
+## API 路由（ECS + FC 共用）
 
 | 模块 | 职责 |
 |------|------|
-| `server/api-server.mjs` | 扫描 `api/**/*.js`，监听 `:3000`；handler 按文件 mtime 缓存失效 |
-| `fc/backend-entry.mjs` | 阿里云函数计算入口（独立 manifest） |
+| `lib/apiRouteTable.js` | `routeFromApiFile`、`matchApiRoute`、`walkApiJsFiles`、`buildApiRouteTable` |
+| `server/api-server.mjs` | ECS 监听 `:3000`；handler 按文件 mtime 缓存失效 |
+| `fc/backend-entry.mjs` | 函数计算入口（读 `fc/route-manifest.json`） |
+| `scripts/fc/generate-route-manifest.mjs` | 生成 FC manifest（与 ECS 同套路由解析） |
 
-改 `api/` 后 ECS 随 `pm2 restart` 生效；函数计算需重跑 `scripts/fc/generate-route-manifest.mjs`。
+改 `api/` 后：ECS 随 `pm2 restart` 生效；FC 需 `npm run fc:routes` 后重新部署函数。
 
 ## 运维脚本
 
 | 脚本 | 说明 |
 |------|------|
-| `scripts/ops/_common.sh` | `APP_DIR`、`ops_restart_api`、`ops_curl_health`、`ops_reload_nginx` |
-| `scripts/ops/deploy-ecs.sh` | 生产一键部署（source `_common.sh`） |
+| `scripts/ops/_common.sh` | `APP_DIR`、`ops_restart_api`、`ops_curl_health`、`ops_api_process_state`、`ops_reload_nginx` |
+| `scripts/ops/deploy-ecs.sh` | 生产一键部署 |
+| `scripts/ops/health-check.sh` | 外网 HTTPS + 本地 `/api/health` + pm2/systemd 进程状态 |
 | `scripts/ops/push-to-github.sh` | Mac 推送 + SSH 引导 |
-| `scripts/ops/patch-video-playback-ecs.sh` | **已过时**：仅当 Git 未含视频修复时的应急补丁 |
+| `scripts/ops/patch-video-playback-ecs.sh` | **已过时**应急补丁 |
+
+## API 路由（旧节已合并至上方）
 
 正式环境：**阿里云 ECS** `/opt/health-longevity-platform`，非 Vercel。
 

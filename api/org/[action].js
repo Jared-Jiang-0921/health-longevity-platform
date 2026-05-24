@@ -1,16 +1,18 @@
 import { randomUUID } from 'node:crypto'
 import { sql } from '../../lib/db.js'
 import { verifyToken, getUserById } from '../../lib/auth.js'
+import { parseApiJsonBody } from '../../lib/apiBody.js'
+import { getQueryParam } from '../../lib/apiQuery.js'
 import { ensureOrgTables, extractDomainFromEmail, getOrgContextByUserId, normalizeDomain } from '../../lib/orgs.js'
+
+const ORG_JSON_ERR = { payload: { code: 'INVALID_JSON', error: '请求数据格式不正确' } }
 
 function fail(res, status, code, error) {
   return res.status(status).json({ code, error })
 }
 
 function getAction(req) {
-  const a = req.query?.action
-  if (Array.isArray(a)) return String(a[0] || '').trim().toLowerCase()
-  return String(a || '').trim().toLowerCase()
+  return getQueryParam(req, 'action').toLowerCase()
 }
 
 async function requireUser(req, res) {
@@ -30,12 +32,7 @@ async function requireUser(req, res) {
 }
 
 function parseJson(req, res) {
-  try {
-    return typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {}
-  } catch {
-    fail(res, 400, 'INVALID_JSON', '请求数据格式不正确')
-    return null
-  }
+  return parseApiJsonBody(req, res, ORG_JSON_ERR)
 }
 
 async function getOperatorOrg(userId, orgId) {

@@ -1,12 +1,7 @@
-import fs from 'node:fs/promises'
 import path from 'node:path'
 import { sql } from '../../lib/db.js'
-
-function getId(req) {
-  const q = req.query?.id
-  if (Array.isArray(q)) return String(q[0] || '').trim()
-  return String(q || '').trim()
-}
+import { getQueryParam } from '../../lib/apiQuery.js'
+import { sendStoredFileInline } from '../../lib/storageInline.js'
 
 export default async function handler(req, res) {
   try {
@@ -14,7 +9,7 @@ export default async function handler(req, res) {
       res.setHeader('Allow', 'GET')
       return res.status(405).json({ error: 'Method not allowed' })
     }
-    const id = getId(req)
+    const id = getQueryParam(req, 'id')
     if (!id) return res.status(400).json({ error: '缺少文件 ID' })
 
     const rows = await sql`
@@ -27,10 +22,11 @@ export default async function handler(req, res) {
 
     const item = rows[0]
     const absPath = path.join(process.cwd(), 'storage', 'translation-pdfs', String(item.file_path))
-    const buf = await fs.readFile(absPath)
-    res.setHeader('Content-Type', 'application/pdf')
-    res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(item.file_name || 'document.pdf')}"`)
-    return res.status(200).send(buf)
+    return sendStoredFileInline(res, {
+      absPath,
+      mimeType: 'application/pdf',
+      fileName: item.file_name || 'document.pdf',
+    })
   } catch (e) {
     if (e?.code === 'ENOENT') return res.status(404).json({ error: '文件不存在或已被删除' })
     console.error('translation-pdfs/[id] error', e)

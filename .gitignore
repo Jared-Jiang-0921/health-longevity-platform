@@ -10,3 +10,4 @@ server/.env
 ops-backups/
 *.zip
 *.tar.gz
+.cursor/

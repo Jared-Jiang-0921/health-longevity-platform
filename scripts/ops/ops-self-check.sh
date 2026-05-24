@@ -2,8 +2,9 @@
 # ECS 上执行：健康检查 + 权限与关键文件存在性（root 推荐）
 set -euo pipefail
 
-APP_DIR="${APP_DIR:-/opt/health-longevity-platform}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=_common.sh
+source "$SCRIPT_DIR/_common.sh"
 
 echo "== Ops self-check =="
 

@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+# shellcheck source=_common.sh
+source "$SCRIPT_DIR/_common.sh"
 
-APP_DIR="${APP_DIR:-/opt/health-longevity-platform}"
 ENV_FILE="${ENV_FILE:-$APP_DIR/.env.prod}"
 NGINX_FILE="${NGINX_FILE:-/etc/nginx/conf.d/healthlongevity.conf}"
 BACKUP_DIR="${BACKUP_DIR:-$APP_DIR/ops-backups}"

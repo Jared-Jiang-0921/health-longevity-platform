@@ -5,6 +5,7 @@ import { authorizeSiteAdmin } from '../../lib/siteAdminAuth.js'
 import { getApiViewer } from '../../lib/apiViewer.js'
 import { getQueryParam } from '../../lib/apiQuery.js'
 import { canViewContent } from '../../lib/contentAccess.js'
+import { sendStoredFileInline } from '../../lib/storageInline.js'
 
 export default async function handler(req, res) {
   try {
@@ -51,10 +52,11 @@ export default async function handler(req, res) {
       return res.status(403).json({ code: 'ASSET_LEVEL_FORBIDDEN', error: '当前会员等级不可查看该资源' })
     }
     const abs = path.join(process.cwd(), 'storage', 'module-assets', String(row.stored_name))
-    const buf = await fs.readFile(abs)
-    res.setHeader('Content-Type', row.mime_type || 'application/octet-stream')
-    res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(row.file_name || 'asset')}"`)
-    return res.status(200).send(buf)
+    return sendStoredFileInline(res, {
+      absPath: abs,
+      mimeType: row.mime_type,
+      fileName: row.file_name || 'asset',
+    })
   } catch (e) {
     if (e?.code === 'ENOENT') return res.status(404).json({ error: '资源文件不存在或已删除' })
     console.error('module-assets/[id] api error', e)
