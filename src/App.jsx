@@ -53,7 +53,7 @@ export default function App() {
         <Route path="/health-skills/:id" element={<ProtectedModule><WithModuleAssets moduleKey="health-skills"><CourseDetail /></WithModuleAssets></ProtectedModule>} />
         <Route path="/health-skills/:id/learn" element={<ProtectedModule><WithModuleAssets moduleKey="health-skills"><CourseLearn /></WithModuleAssets></ProtectedModule>} />
         <Route path="/favorites" element={<ProtectedModule><WithModuleAssets moduleKey="favorites"><MyFavorites /></WithModuleAssets></ProtectedModule>} />
-        <Route path="/solutions" element={<ProtectedModule><WithModuleAssets moduleKey="solutions"><Solutions /></WithModuleAssets></ProtectedModule>} />
+        <Route path="/solutions" element={<ProtectedModule><Solutions /></ProtectedModule>} />
         <Route path="/health-questionnaire" element={<ProtectedModule><WithModuleAssets moduleKey="health-questionnaire"><HealthQuestionnaire /></WithModuleAssets></ProtectedModule>} />
         <Route path="/products" element={<ProtectedModule><WithModuleAssets moduleKey="products"><Products /></WithModuleAssets></ProtectedModule>} />
         <Route path="/products/:id" element={<ProtectedModule><WithModuleAssets moduleKey="products"><ProductDetail /></WithModuleAssets></ProtectedModule>} />
