@@ -3,18 +3,10 @@ import path from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { sql } from '../lib/db.js'
 import { authorizeSiteAdmin } from '../lib/siteAdminAuth.js'
+import { parseApiJsonBody } from '../lib/apiBody.js'
 
 const MAX_FILE_SIZE = 100 * 1024 * 1024
 const STORAGE_DIR = path.join(process.cwd(), 'storage', 'translation-pdfs')
-
-function parseJson(req, res) {
-  try {
-    return typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {}
-  } catch {
-    res.status(400).json({ error: '请求数据格式不正确' })
-    return null
-  }
-}
 
 function sanitizeFileName(name) {
   const raw = String(name || '').trim().toLowerCase()
@@ -37,7 +29,7 @@ async function handleUpload(req, res) {
   const auth = await authorizeSiteAdmin(req)
   if (!auth.ok) return res.status(auth.status).json({ code: auth.code, error: auth.error })
 
-  const body = parseJson(req, res)
+  const body = parseApiJsonBody(req, res)
   if (!body) return
 
   const title = String(body.title || '').trim().slice(0, 120)

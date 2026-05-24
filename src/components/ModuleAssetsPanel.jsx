@@ -9,6 +9,7 @@ import ProductCatalogAdmin from './ProductCatalogAdmin'
 import ContentLockNotice from './ContentLockNotice'
 import { shouldShowMembershipBadge } from '../data/membership'
 import { fileToBase64 } from '../lib/fileBase64'
+import { adminLevelValue } from '../lib/contentLevelAdmin'
 import { moduleAssetUrl } from '../lib/moduleAssetUrl'
 import './ModuleAssetsPanel.css'
 
@@ -18,12 +19,6 @@ function uploadErrorMessage(err, t, lang) {
     return t.uploadNetworkFail || t.uploadFail
   }
   return msg || t.uploadFail
-}
-
-function adminLevelValue(raw) {
-  const s = String(raw || '').trim().toLowerCase()
-  if (s === 'standard' || s === 'premium') return s
-  return 'public'
 }
 
 function formatSize(bytes) {

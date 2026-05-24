@@ -1,5 +1,6 @@
 import { sql } from '../lib/db.js'
 import { authorizeSiteAdmin } from '../lib/siteAdminAuth.js'
+import { parseApiJsonBody } from '../lib/apiBody.js'
 import { getCourseById } from '../src/data/courses.js'
 
 async function ensureSchema() {
@@ -10,15 +11,6 @@ async function ensureSchema() {
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `
-}
-
-function parseJson(req, res) {
-  try {
-    return typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {}
-  } catch {
-    res.status(400).json({ error: '请求数据格式不正确' })
-    return null
-  }
 }
 
 function normalizeModule(item) {
@@ -74,7 +66,7 @@ export default async function handler(req, res) {
     if (req.method === 'PATCH') {
       const auth = await authorizeSiteAdmin(req)
       if (!auth.ok) return res.status(auth.status).json({ code: auth.code, error: auth.error })
-      const body = parseJson(req, res)
+      const body = parseApiJsonBody(req, res)
       if (!body) return
       const courseId = resolveCourseId(req, body)
       if (!courseId) return res.status(400).json({ error: '缺少有效 courseId' })

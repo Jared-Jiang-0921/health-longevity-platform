@@ -2,47 +2,13 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import { sql } from '../../lib/db.js'
 import { authorizeSiteAdmin } from '../../lib/siteAdminAuth.js'
-import { verifyToken, getUserById } from '../../lib/auth.js'
-import { parseSiteAdminEmails } from '../../lib/siteAdminEmails.js'
+import { getApiViewer } from '../../lib/apiViewer.js'
+import { getQueryParam } from '../../lib/apiQuery.js'
 import { canViewContent } from '../../lib/contentAccess.js'
-
-function getId(req) {
-  const v = req.query?.id
-  if (Array.isArray(v)) return String(v[0] || '').trim()
-  return String(v || '').trim()
-}
-
-function readJwt(req) {
-  const auth = req.headers.authorization
-  if (auth?.startsWith('Bearer ')) return auth.slice(7)
-  const q = req.query?.access_token
-  const raw = Array.isArray(q) ? q[0] : q
-  const fromQuery = String(raw || '').trim()
-  return fromQuery || null
-}
-
-async function getViewer(req) {
-  const adminAuth = await authorizeSiteAdmin(req)
-  if (adminAuth.ok) return { isAdmin: true, level: 'premium', isGuest: false }
-
-  const requestAdminToken = String(req.headers['x-site-admin-token'] || '').trim()
-  const configAdminToken = String(process.env.SITE_ADMIN_TOKEN || '').trim()
-  if (configAdminToken && requestAdminToken && requestAdminToken === configAdminToken) {
-    return { isAdmin: true, level: 'premium', isGuest: false }
-  }
-  const jwt = readJwt(req)
-  if (!jwt) return { isAdmin: false, level: 'free', isGuest: true }
-  const userId = await verifyToken(jwt)
-  if (!userId) return { isAdmin: false, level: 'free', isGuest: true }
-  const user = await getUserById(userId)
-  if (!user) return { isAdmin: false, level: 'free', isGuest: true }
-  const isAdmin = parseSiteAdminEmails().includes(String(user.email || '').toLowerCase().trim())
-  return { isAdmin, level: user.level || 'free', isGuest: false }
-}
 
 export default async function handler(req, res) {
   try {
-    const id = getId(req)
+    const id = getQueryParam(req, 'id')
     if (!id) return res.status(400).json({ error: '缺少资源 ID' })
 
     if (req.method === 'DELETE') {
@@ -77,7 +43,7 @@ export default async function handler(req, res) {
     `
     if (!rows.length) return res.status(404).json({ error: '资源不存在' })
     const row = rows[0]
-    const viewer = await getViewer(req)
+    const viewer = await getApiViewer(req, { allowQueryToken: true })
     if (
       !viewer.isAdmin &&
       !canViewContent(viewer.level, row.required_level, { isGuest: viewer.isGuest })

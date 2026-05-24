@@ -1,20 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { PRODUCT_CATEGORIES } from '../data/products'
+import { adminLevelValue } from '../lib/contentLevelAdmin'
+import { fileToBase64 } from '../lib/fileBase64'
 import ProductCatalogImage from './ProductCatalogImage'
 import './ProductCatalogAdmin.css'
-
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const r = new FileReader()
-    r.onload = () => {
-      const s = String(r.result || '')
-      const i = s.indexOf(',')
-      resolve(i >= 0 ? s.slice(i + 1) : s)
-    }
-    r.onerror = () => reject(new Error('read failed'))
-    r.readAsDataURL(file)
-  })
-}
 
 const emptySku = () => ({ code: '', spec_zh: '', spec_en: '', price: '', currency: '' })
 
@@ -23,12 +12,6 @@ const LEVEL_OPTIONS = [
   { value: 'standard', label: '标准会员' },
   { value: 'premium', label: '高级会员' },
 ]
-
-function adminLevelValue(raw) {
-  const s = String(raw || '').trim().toLowerCase()
-  if (s === 'standard' || s === 'premium') return s
-  return 'public'
-}
 
 export default function ProductCatalogAdmin({ getToken }) {
   const [items, setItems] = useState([])

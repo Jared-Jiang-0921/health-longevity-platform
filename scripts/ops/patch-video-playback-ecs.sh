@@ -1,12 +1,19 @@
 #!/usr/bin/env bash
-# 在 ECS 上执行：当 Mac 暂时无法 git push 时，就地修补视频播放 API
-# 用法: bash scripts/ops/patch-video-playback-ecs.sh
+# 【已过时】视频播放修复已并入 main（620f735+）。请优先 git pull + deploy-ecs.sh。
+# 仅当服务器代码无法更新且仍返回 VIDEO_ADMIN_ONLY 时再运行本脚本。
 set -euo pipefail
-
-APP_DIR="${APP_DIR:-/opt/health-longevity-platform}"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+# shellcheck source=_common.sh
+source "$SCRIPT_DIR/_common.sh"
 ID_JS="$APP_DIR/api/module-assets/[id].js"
 
 cd "$APP_DIR"
+
+if ! grep -q 'VIDEO_ADMIN_ONLY' "$ID_JS" 2>/dev/null; then
+  echo "[skip] 仓库已含视频播放修复，请执行: bash scripts/ops/deploy-ecs.sh"
+  ops_restart_api
+  exit 0
+fi
 
 if grep -q 'VIDEO_ADMIN_ONLY' "$ID_JS" 2>/dev/null; then
   python3 <<'PY'
@@ -72,11 +79,11 @@ fi
 # 前端媒体 URL（若仓库尚无该文件则跳过 build 前的复制由 git pull 完成）
 if [[ -f "$APP_DIR/src/lib/moduleAssetUrl.js" ]]; then
   npm run build
-  pm2 restart healthlongevity-api --update-env 2>/dev/null || pm2 restart 0 --update-env
+  ops_restart_api
   sleep 2
 else
   echo "[warn] src/lib/moduleAssetUrl.js missing — run git pull after Mac push, then deploy-ecs.sh"
-  pm2 restart healthlongevity-api --update-env 2>/dev/null || pm2 restart 0 --update-env
+  ops_restart_api
   sleep 2
 fi
 

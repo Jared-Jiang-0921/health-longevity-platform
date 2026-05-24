@@ -3,13 +3,13 @@ import path from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { sql } from '../lib/db.js'
 import { authorizeSiteAdmin } from '../lib/siteAdminAuth.js'
-import { verifyToken, getUserById } from '../lib/auth.js'
-import { parseSiteAdminEmails } from '../lib/siteAdminEmails.js'
+import { parseApiJsonBody } from '../lib/apiBody.js'
+import { getApiViewer } from '../lib/apiViewer.js'
+import { attachContentAccessFields } from '../lib/contentListAccess.js'
 import {
-  canViewContent,
   normalizeContentLevelForStorage,
-  parseContentRequiredLevel,
 } from '../lib/contentAccess.js'
+import { getFileExtension, sanitizeUploadFileName } from '../lib/uploadFileName.js'
 
 const STORAGE_DIR = path.join(process.cwd(), 'storage', 'module-assets')
 const MAX_FILE_SIZE = 100 * 1024 * 1024
@@ -66,7 +66,7 @@ const EXT_TO_MIME = {
 function resolveUploadMime(mimeType, fileName) {
   const m = String(mimeType || '').trim().toLowerCase()
   if (ALLOWED_MIME.has(m)) return m
-  const ext = getExt(fileName)
+  const ext = getFileExtension(fileName)
   const fromExt = EXT_TO_MIME[ext]
   if (fromExt && ALLOWED_MIME.has(fromExt)) return fromExt
   return m
@@ -96,15 +96,6 @@ async function ensureSchema() {
   await sql`ALTER TABLE module_assets ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()`
 }
 
-function parseJson(req, res) {
-  try {
-    return typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {}
-  } catch {
-    res.status(400).json({ error: '请求数据格式不正确' })
-    return null
-  }
-}
-
 function normalizeModuleKey(raw) {
   return String(raw || '')
     .toLowerCase()
@@ -113,50 +104,11 @@ function normalizeModuleKey(raw) {
     .slice(0, 64)
 }
 
-function sanitizeFileName(fileName) {
-  const cleaned = String(fileName || '')
-    .replace(/[^\w.\-]/g, '_')
-    .replace(/_+/g, '_')
-    .slice(0, 120)
-  return cleaned || `asset_${Date.now()}`
-}
-
-function getExt(name) {
-  const parts = String(name || '').toLowerCase().split('.')
-  return parts.length > 1 ? parts.pop() : ''
-}
-
-function normalizeLevel(raw) {
-  return normalizeContentLevelForStorage(raw)
-}
-
-async function getViewer(req) {
-  // 与上传/编辑/删除保持一致：如果满足整站管理员鉴权，则直接视为管理员查看全量资料
-  const adminAuth = await authorizeSiteAdmin(req)
-  if (adminAuth.ok) return { isAdmin: true, level: 'premium', isGuest: false }
-
-  const requestAdminToken = String(req.headers['x-site-admin-token'] || '').trim()
-  const configAdminToken = String(process.env.SITE_ADMIN_TOKEN || '').trim()
-  if (configAdminToken && requestAdminToken && requestAdminToken === configAdminToken) {
-    return { isAdmin: true, level: 'premium', isGuest: false }
-  }
-  const auth = req.headers.authorization
-  const jwt = auth?.startsWith('Bearer ') ? auth.slice(7) : null
-  if (!jwt) return { isAdmin: false, level: 'free', isGuest: true }
-  const userId = await verifyToken(jwt)
-  if (!userId) return { isAdmin: false, level: 'free', isGuest: true }
-  const user = await getUserById(userId)
-  if (!user) return { isAdmin: false, level: 'free', isGuest: true }
-  const allow = parseSiteAdminEmails()
-  const isAdmin = allow.includes(String(user.email || '').toLowerCase().trim())
-  return { isAdmin, level: user.level || 'free', isGuest: false }
-}
-
 async function handleList(req, res) {
   await ensureSchema()
   const moduleKey = normalizeModuleKey(req.query?.module)
   if (!moduleKey) return res.status(400).json({ error: '缺少 module 参数' })
-  const viewer = await getViewer(req)
+  const viewer = await getApiViewer(req)
   const rows = await sql`
     SELECT id, module_key, subcategory, subtopic, required_level, title, summary, file_name, mime_type, file_size, uploader, created_at
     FROM module_assets
@@ -164,16 +116,10 @@ async function handleList(req, res) {
     ORDER BY created_at DESC
     LIMIT 300
   `
-  const items = rows.map((row) => {
-    const content_level = parseContentRequiredLevel(row.required_level)
-    const can_view =
-      viewer.isAdmin || canViewContent(viewer.level, row.required_level, { isGuest: viewer.isGuest })
-    return {
-      ...row,
-      content_level,
-      can_view,
-    }
-  })
+  const items = rows.map((row) => ({
+    ...row,
+    ...attachContentAccessFields(row, viewer),
+  }))
   return res.status(200).json({ ok: true, items })
 }
 
@@ -182,22 +128,22 @@ async function handleUpload(req, res) {
   const auth = await authorizeSiteAdmin(req)
   if (!auth.ok) return res.status(auth.status).json({ code: auth.code, error: auth.error })
 
-  const body = parseJson(req, res)
+  const body = parseApiJsonBody(req, res)
   if (!body) return
 
   const moduleKey = normalizeModuleKey(body.module)
   const subcategory = String(body.subcategory || 'general').trim().slice(0, 80) || 'general'
   const subtopic = String(body.subtopic || '').trim().slice(0, 120)
-  const requiredLevel = normalizeLevel(body.requiredLevel || 'public')
+  const requiredLevel = normalizeContentLevelForStorage(body.requiredLevel || 'public')
   const title = String(body.title || '').trim().slice(0, 200)
   const summary = String(body.summary || '').trim().slice(0, 4000)
-  const fileName = sanitizeFileName(body.fileName)
+  const fileName = sanitizeUploadFileName(body.fileName, 'asset')
   const mimeType = resolveUploadMime(body.mimeType, fileName)
   const contentBase64 = String(body.contentBase64 || '').trim()
   if (!moduleKey || !title || !fileName || !contentBase64) {
     return res.status(400).json({ error: '缺少必填字段（module/title/fileName/contentBase64）' })
   }
-  const ext = getExt(fileName)
+  const ext = getFileExtension(fileName)
   if (!ALLOWED_EXT.has(ext)) return res.status(400).json({ error: '不支持该文件扩展名' })
   if (!ALLOWED_MIME.has(mimeType)) {
     return res.status(400).json({ error: `不支持该文件类型（${mimeType || '未知'}），请使用 mp4 / mov / webm 等常见格式` })
@@ -225,7 +171,7 @@ async function handleUpdate(req, res) {
   const auth = await authorizeSiteAdmin(req)
   if (!auth.ok) return res.status(auth.status).json({ code: auth.code, error: auth.error })
 
-  const body = parseJson(req, res)
+  const body = parseApiJsonBody(req, res)
   if (!body) return
   const id = String(body.id || '').trim()
   if (!id) return res.status(400).json({ error: '缺少资源 id' })
@@ -235,8 +181,8 @@ async function handleUpdate(req, res) {
   const subcategory = String(body.subcategory || 'general').trim().slice(0, 80) || 'general'
   const subtopic = String(body.subtopic || '').trim().slice(0, 120)
   const fileNameRaw = String(body.fileName || '').trim()
-  const fileName = sanitizeFileName(fileNameRaw)
-  const requiredLevel = normalizeLevel(body.requiredLevel || 'public')
+  const fileName = sanitizeUploadFileName(fileNameRaw, 'asset')
+  const requiredLevel = normalizeContentLevelForStorage(body.requiredLevel || 'public')
   if (!title) return res.status(400).json({ error: '标题不能为空' })
   if (!fileNameRaw) return res.status(400).json({ error: '资料名称不能为空' })
 

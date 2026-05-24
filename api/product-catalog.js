@@ -6,13 +6,11 @@ import path from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { sql } from '../lib/db.js'
 import { authorizeSiteAdmin } from '../lib/siteAdminAuth.js'
-import { verifyToken, getUserById } from '../lib/auth.js'
-import { parseSiteAdminEmails } from '../lib/siteAdminEmails.js'
-import {
-  canViewContent,
-  normalizeContentLevelForStorage,
-  parseContentRequiredLevel,
-} from '../lib/contentAccess.js'
+import { parseApiJsonBody } from '../lib/apiBody.js'
+import { getApiViewer } from '../lib/apiViewer.js'
+import { attachContentAccessFields } from '../lib/contentListAccess.js'
+import { normalizeContentLevelForStorage } from '../lib/contentAccess.js'
+import { getFileExtension, sanitizeUploadFileName } from '../lib/uploadFileName.js'
 
 const STORAGE_DIR = path.join(process.cwd(), 'storage', 'product-catalog')
 const IMAGE_MAX_BYTES = 12 * 1024 * 1024
@@ -87,28 +85,6 @@ async function ensureSchema() {
   }
 }
 
-function parseJson(req, res) {
-  try {
-    return typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {}
-  } catch {
-    res.status(400).json({ error: '请求数据格式不正确' })
-    return null
-  }
-}
-
-function sanitizeFileName(fileName) {
-  const cleaned = String(fileName || '')
-    .replace(/[^\w.\-]/g, '_')
-    .replace(/_+/g, '_')
-    .slice(0, 120)
-  return cleaned || `image_${Date.now()}`
-}
-
-function getExt(name) {
-  const parts = String(name || '').toLowerCase().split('.')
-  return parts.length > 1 ? parts.pop() : ''
-}
-
 /** @param {any} raw */
 function normalizeGalleryRow(raw) {
   let g = raw?.gallery_json ?? raw?.gallery
@@ -155,39 +131,12 @@ function normalizeSkusRow(raw) {
     .filter((x) => x.code || x.spec_zh || x.spec_en)
 }
 
-function normalizeLevel(raw) {
-  return normalizeContentLevelForStorage(raw)
-}
-
-async function getViewer(req) {
-  const adminAuth = await authorizeSiteAdmin(req)
-  if (adminAuth.ok) return { isAdmin: true, level: 'premium', isGuest: false }
-
-  const requestAdminToken = String(req.headers['x-site-admin-token'] || '').trim()
-  const configAdminToken = String(process.env.SITE_ADMIN_TOKEN || '').trim()
-  if (configAdminToken && requestAdminToken && requestAdminToken === configAdminToken) {
-    return { isAdmin: true, level: 'premium', isGuest: false }
-  }
-  const auth = req.headers.authorization
-  const jwt = auth?.startsWith('Bearer ') ? auth.slice(7) : null
-  if (!jwt) return { isAdmin: false, level: 'free', isGuest: true }
-  const userId = await verifyToken(jwt)
-  if (!userId) return { isAdmin: false, level: 'free', isGuest: true }
-  const user = await getUserById(userId)
-  if (!user) return { isAdmin: false, level: 'free', isGuest: true }
-  const allow = parseSiteAdminEmails()
-  const isAdmin = allow.includes(String(user.email || '').toLowerCase().trim())
-  return { isAdmin, level: user.level || 'free', isGuest: false }
-}
-
 function rowToItem(row, viewer) {
   const gallery = normalizeGalleryRow(row)
   const skus = normalizeSkusRow(row)
   const titleZh = String(row.title_zh || row.title || '').trim()
   const titleEn = String(row.title_en || '').trim()
-  const content_level = parseContentRequiredLevel(row.required_level)
-  const can_view =
-    viewer?.isAdmin || canViewContent(viewer?.level, row.required_level, { isGuest: viewer?.isGuest })
+  const { content_level, can_view } = attachContentAccessFields(row, viewer)
   return {
     id: row.id,
     category: row.category,
@@ -213,7 +162,7 @@ function rowToItem(row, viewer) {
 
 async function handleGetOne(req, res, id) {
   await ensureSchema()
-  const viewer = await getViewer(req)
+  const viewer = await getApiViewer(req)
   const rows = await sql`SELECT * FROM product_catalog WHERE id = ${id} LIMIT 1`
   if (!rows.length) return res.status(404).json({ code: 'NOT_FOUND', error: '商品不存在' })
   return res.status(200).json({ ok: true, item: rowToItem(rows[0], viewer) })
@@ -221,7 +170,7 @@ async function handleGetOne(req, res, id) {
 
 async function handleList(req, res) {
   await ensureSchema()
-  const viewer = await getViewer(req)
+  const viewer = await getApiViewer(req)
   const category = String(req.query?.category || '').trim().toLowerCase()
   let rows
   if (category && CATEGORY_IDS.has(category)) {
@@ -246,10 +195,10 @@ async function handleList(req, res) {
  * @param {string} productId
  */
 async function writeGalleryImage(img, productId) {
-  const fileName = sanitizeFileName(img.fileName || 'pic.jpg')
+  const fileName = sanitizeUploadFileName(img.fileName || 'pic.jpg', 'image')
   const mime = String(img.mimeType || '').trim().toLowerCase()
   if (!ALLOWED_IMG_MIME.has(mime)) throw new Error('不支持的图片类型')
-  const ext = getExt(fileName)
+  const ext = getFileExtension(fileName)
   if (!ALLOWED_IMG_EXT.has(ext)) throw new Error('不支持的图片扩展名')
   const buf = Buffer.from(String(img.base64 || '').trim(), 'base64')
   if (!buf.length) throw new Error('图片为空')
@@ -293,7 +242,7 @@ async function handlePost(req, res) {
   const auth = await authorizeSiteAdmin(req)
   if (!auth.ok) return res.status(auth.status).json({ code: auth.code, error: auth.error })
 
-  const body = parseJson(req, res)
+  const body = parseApiJsonBody(req, res)
   if (!body) return
 
   const category = String(body.category || '').trim().toLowerCase()
@@ -342,7 +291,7 @@ async function handlePost(req, res) {
   }
 
   const skus = normalizeSkuPayload(body)
-  const requiredLevel = normalizeLevel(body.requiredLevel ?? body.required_level ?? 'public')
+  const requiredLevel = normalizeContentLevelForStorage(body.requiredLevel ?? body.required_level ?? 'public')
 
   const rows = await sql`
     INSERT INTO product_catalog (
@@ -368,7 +317,7 @@ async function handlePost(req, res) {
     )
     RETURNING *
   `
-  const viewer = await getViewer(req)
+  const viewer = await getApiViewer(req)
   return res.status(201).json({ ok: true, item: rowToItem(rows[0], viewer) })
 }
 
@@ -377,7 +326,7 @@ async function handlePatch(req, res) {
   const auth = await authorizeSiteAdmin(req)
   if (!auth.ok) return res.status(auth.status).json({ code: auth.code, error: auth.error })
 
-  const body = parseJson(req, res)
+  const body = parseApiJsonBody(req, res)
   if (!body) return
   const id = String(body.id || '').trim()
   if (!id) return res.status(400).json({ error: '缺少 id' })
@@ -424,8 +373,8 @@ async function handlePatch(req, res) {
     body.skus !== undefined || body.skuList !== undefined ? normalizeSkuPayload(body) : normalizeSkusRow(ex)
   const requiredLevel =
     body.requiredLevel != null || body.required_level != null
-      ? normalizeLevel(body.requiredLevel ?? body.required_level)
-      : normalizeLevel(ex.required_level)
+      ? normalizeContentLevelForStorage(body.requiredLevel ?? body.required_level)
+      : normalizeContentLevelForStorage(ex.required_level)
 
   const rows = await sql`
     UPDATE product_catalog SET
@@ -452,7 +401,7 @@ async function handlePatch(req, res) {
     WHERE id = ${id}
     RETURNING *
   `
-  const viewer = await getViewer(req)
+  const viewer = await getApiViewer(req)
   return res.status(200).json({ ok: true, item: rowToItem(rows[0], viewer) })
 }
 
