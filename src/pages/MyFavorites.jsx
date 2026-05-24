@@ -32,9 +32,9 @@ export default function MyFavorites() {
     <div className="page-my-favorites">
       <h1>{t.title}</h1>
       <p className="subtitle">{t.count} {courses.length} {t.lessons}</p>
-      <div className="favorites-grid">
+      <div className="favorites-grid content-card-grid">
         {courses.map((course) => (
-          <article key={course.id} className="favorite-card">
+          <article key={course.id} className="favorite-card content-card content-card--padded">
             {(() => {
               const requiredMembership = course.requiredMembership
               if (!shouldShowMembershipBadge(requiredMembership)) return null

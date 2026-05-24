@@ -58,6 +58,7 @@ export default function Layout({ children }) {
   const { user, logout } = useAuth()
   const { lang, setLang } = useLocale()
   const t = I18N[lang] || I18N.zh
+  const isHome = location.pathname === '/'
   const visibleNavItems = navItems.filter((item) => {
     if (item.siteAdminOnly && !user?.site_admin) return false
     if (item.authOnly && !user) return false
@@ -66,22 +67,26 @@ export default function Layout({ children }) {
 
   return (
     <>
-      <header className="site-header">
+      <header className={`site-header${isHome ? ' site-header--home' : ''}`}>
         <div className="header-inner">
           <div className="header-top">
-            <Link to="/" className="logo" aria-label={SITE_LEGAL.brandName}>
-              <span className="logo-wrap">
-                <img
-                  src={LOGO_SRC}
-                  alt=""
-                  className="logo-img"
-                  width={200}
-                  height={48}
-                  decoding="async"
-                />
-              </span>
-              <span className="logo-sr">{SITE_LEGAL.brandName}</span>
-            </Link>
+            {!isHome ? (
+              <Link to="/" className="logo" aria-label={SITE_LEGAL.brandName}>
+                <span className="logo-wrap">
+                  <img
+                    src={LOGO_SRC}
+                    alt=""
+                    className="logo-img"
+                    width={200}
+                    height={48}
+                    decoding="async"
+                  />
+                </span>
+                <span className="logo-sr">{SITE_LEGAL.brandName}</span>
+              </Link>
+            ) : (
+              <span className="header-home-spacer" aria-hidden="true" />
+            )}
             <div className="header-lang" role="group" aria-label={t.language}>
               <span className="header-lang-label">{t.language}</span>
               <select value={lang} onChange={(e) => setLang(e.target.value)} aria-label={t.language}>
@@ -121,8 +126,8 @@ export default function Layout({ children }) {
           </nav>
         </div>
       </header>
-      <main className="main">{children}</main>
-      <footer className="site-footer">
+      <main className={`main${isHome ? ' main--home' : ''}`}>{children}</main>
+      <footer className={`site-footer${isHome ? ' site-footer--home' : ''}`}>
         <div className="footer-inner">
           <p className="footer-copy">© {SITE_LEGAL.brandName}. {t.footerCopy}</p>
           <nav className="footer-legal" aria-label={t.legalAria}>

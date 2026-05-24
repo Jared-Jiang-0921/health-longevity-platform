@@ -53,9 +53,9 @@ export default function LongevityNews() {
         <p className="news-list-intro">{mod.listIntro}</p>
       </section>
 
-      <section className="news-list">
+      <section className="news-list content-card-stack">
         {RESEARCH_UPDATES.map((item) => (
-          <article key={item.id} className="news-card">
+          <article key={item.id} className="news-card content-card content-card--padded">
             <div className="news-meta">
               <span className="news-journal">{item.journal}</span>
               <span className="news-if">IF {item.impactFactor}</span>

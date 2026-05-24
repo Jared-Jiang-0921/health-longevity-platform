@@ -101,9 +101,9 @@ export default function CourseSeriesVideos({ course }) {
       {!loading && !seriesItems.length ? (
         <p className="course-series-videos-muted">{t.empty}</p>
       ) : (
-        <ul className="course-series-videos-list">
+        <ul className="course-series-videos-list content-card-stack">
           {seriesItems.map((item) => (
-            <li key={item.id} className="course-series-videos-card">
+            <li key={item.id} className="course-series-videos-card content-card content-card--padded">
               <h3 className="course-series-videos-title">{item.title}</h3>
               {item.summary ? <p className="course-series-videos-summary">{item.summary}</p> : null}
               {item.can_view === false ? (

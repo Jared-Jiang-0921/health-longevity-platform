@@ -36,7 +36,7 @@
 }
 
 .product-catalog-gallery-thumbs button.active {
-  border-color: var(--color-primary, #22c55e);
+  border-color: var(--color-primary);
 }
 
 .product-catalog-gallery-thumbs img {

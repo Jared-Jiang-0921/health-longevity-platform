@@ -168,7 +168,7 @@ export default function Home() {
               <Link
                 key={path}
                 to={path}
-                className="module-card"
+                className="module-card content-card content-card--lift-strong"
                 style={{ '--card-index': index }}
               >
                 <div className="module-card-visual">

@@ -19,16 +19,10 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
 }
 
 .course-series-videos-card {
-  padding: 1rem;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
+  list-style: none;
 }
 
 .course-series-videos-title {

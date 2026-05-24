@@ -64,9 +64,9 @@ export default function TCMPrevention() {
       {activeTab === TAB_HERBS && (
         <section className="tcm-section">
           <h2>{mod.herbsH2}</h2>
-          <div className="tcm-list">
+          <div className="tcm-list content-card-stack">
             {TCM_HERBS.map((herb) => (
-              <article key={herb.id} className="tcm-card herb-card">
+              <article key={herb.id} className="tcm-card herb-card content-card content-card--padded">
                 <h3>{herb.name}</h3>
                 <dl>
                   <dt>{mod.dtProperty}</dt>
@@ -87,9 +87,9 @@ export default function TCMPrevention() {
       {activeTab === TAB_PRESCRIPTIONS && (
         <section className="tcm-section">
           <h2>{mod.rxH2}</h2>
-          <div className="tcm-list">
+          <div className="tcm-list content-card-stack">
             {TCM_PRESCRIPTIONS.map((rx) => (
-              <article key={rx.id} className="tcm-card prescription-card">
+              <article key={rx.id} className="tcm-card prescription-card content-card content-card--padded">
                 <h3>{rx.name}</h3>
                 <dl>
                   <dt>{mod.dtEfficacy}</dt>

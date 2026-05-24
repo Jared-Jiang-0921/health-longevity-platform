@@ -1,13 +1,5 @@
-:root {
-  --color-bg: #0f1419;
-  --color-surface: #1a2332;
-  --color-primary: #22c55e;
-  --color-primary-hover: #16a34a;
-  --color-text: #e2e8f0;
-  --color-text-muted: #94a3b8;
-  --color-border: #334155;
-  --font-sans: 'DM Sans', 'Noto Sans SC', system-ui, sans-serif;
-}
+@import './styles/tokens.css';
+@import './styles/content-cards.css';
 
 * {
   box-sizing: border-box;
@@ -16,21 +8,70 @@
 body {
   margin: 0;
   font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
   background: var(--color-bg);
   color: var(--color-text);
-  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a {
-  color: var(--color-primary);
+  color: var(--color-link);
   text-decoration: none;
+  transition: color var(--transition-fast);
 }
 
 a:hover {
-  color: var(--color-primary-hover);
+  color: var(--color-link-hover);
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 #root {
   min-height: 100vh;
+}
+
+/* —— 可选工具类（全站复用） —— */
+.text-gradient-brand {
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.surface-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-5);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-inverse);
+  background: var(--gradient-brand);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: opacity var(--transition-base), transform var(--transition-fast), box-shadow var(--transition-base);
+  box-shadow: var(--shadow-brand);
+}
+
+.btn-primary:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
 }

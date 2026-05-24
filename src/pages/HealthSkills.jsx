@@ -58,13 +58,13 @@ export default function HealthSkills() {
       </section>
 
       <section className="course-list">
-        <div className="course-grid">
+        <div className="course-grid content-card-grid">
           {filtered.map((course) => {
             const favorite = isFavorite(course.id)
             const requiredMembership = course.requiredMembership
             const showBadge = shouldShowMembershipBadge(requiredMembership)
             return (
-              <article key={course.id} className="course-card">
+              <article key={course.id} className="course-card content-card content-card--padded">
                 <div className="course-meta">
                   <span className="course-category">
                     {CATEGORIES.find((c) => c.id === course.category)?.label}

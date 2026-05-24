@@ -185,7 +185,7 @@ function ConsultCard({ title, description, url, envHint, requiredLevel, user, co
   }, [href, t.linkInvalid, t.popupBlocked, buildConsultHref, consultEntry])
 
   return (
-    <article className={`consult-card ${!allowed ? 'consult-card-locked' : ''}`}>
+    <article className={`consult-card content-card content-card--padded ${!allowed ? 'consult-card-locked' : ''}`}>
       <h2>{title}</h2>
       <p className="consult-card-desc">{description}</p>
       <label className="consult-query">

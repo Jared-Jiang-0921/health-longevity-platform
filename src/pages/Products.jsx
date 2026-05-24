@@ -164,13 +164,13 @@ export default function Products() {
       </section>
 
       <section className="product-list">
-        <div className="product-grid">
+        <div className="product-grid content-card-grid">
           {mergedForCategory.map((product) => {
             const canView = product.can_view !== false
             const showBadge = shouldShowMembershipBadge(product.required_level)
             const badgeLevel = product.content_level || product.required_level
             return (
-            <article key={String(product.id)} className="product-card">
+            <article key={String(product.id)} className="product-card content-card">
               <div className="product-card-visual">
                 {canView ? (
                   <ProductCatalogImage
