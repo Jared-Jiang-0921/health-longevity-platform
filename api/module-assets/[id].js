@@ -5,6 +5,7 @@ import { authorizeSiteAdmin } from '../../lib/siteAdminAuth.js'
 import { getApiViewer } from '../../lib/apiViewer.js'
 import { getQueryParam } from '../../lib/apiQuery.js'
 import { canViewContent } from '../../lib/contentAccess.js'
+import { locateModuleAssetAbsPath, unlinkModuleAssetFile } from '../../lib/moduleAssetStorage.js'
 import { sendStoredFileInline } from '../../lib/storageInline.js'
 
 export default async function handler(req, res) {
@@ -23,10 +24,7 @@ export default async function handler(req, res) {
       if (!deleted.length) return res.status(404).json({ error: '资源不存在' })
       const storedName = String(deleted[0].stored_name || '')
       if (storedName) {
-        const abs = path.join(process.cwd(), 'storage', 'module-assets', storedName)
-        await fs.unlink(abs).catch((e) => {
-          if (e?.code !== 'ENOENT') throw e
-        })
+        await unlinkModuleAssetFile(storedName)
       }
       return res.status(200).json({ ok: true, id })
     }
@@ -51,7 +49,7 @@ export default async function handler(req, res) {
     ) {
       return res.status(403).json({ code: 'ASSET_LEVEL_FORBIDDEN', error: '当前会员等级不可查看该资源' })
     }
-    const abs = path.join(process.cwd(), 'storage', 'module-assets', String(row.stored_name))
+    const abs = await locateModuleAssetAbsPath(String(row.stored_name))
     return sendStoredFileInline(res, {
       absPath: abs,
       mimeType: row.mime_type,

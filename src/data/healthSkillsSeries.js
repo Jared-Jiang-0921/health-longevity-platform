@@ -1,6 +1,8 @@
 /**
  * 长寿知识技能 — 视频系列合集（与 module_assets.subtopic 字段一致）
  * 管理员上传时「系列合集」应选此处或 courses 中同名的课程标题。
+ *
+ * 磁盘目录（ECS）：storage/module-assets/health-skills/{系列合集名}/{文件id}.ext
  */
 import { CATEGORIES } from './courses'
 
@@ -19,6 +21,12 @@ export const HEALTH_SKILLS_VIDEO_SERIES = [
     title: '燃脂7原则',
     category: 'exercise',
     desc: '燃脂训练原则与跟练视频，按主题分集收录。',
+  },
+  {
+    id: 'immunity-autoimmune',
+    title: '自身免疫健康系列',
+    category: 'immunity',
+    desc: '与课程「免疫系统与健康防线」配套；上传时系列合集也可选课程名「免疫系统与健康防线」。',
   },
 ]
 

@@ -23,6 +23,7 @@
 | `lib/uploadFileName.js` | 通用文件名清理与扩展名 |
 | `lib/apiBody.js` | `parseApiJsonBody` |
 | `lib/apiQuery.js` | `getQueryParam`（动态路由 id） |
+| `lib/moduleAssetStorage.js` | 按系列分目录：`health-skills/{系列合集名}/{id}.ext` |
 | `src/lib/moduleAssetUrl.js` | 前端 `<video>` / 链接 URL |
 | `lib/storageInline.js` | 从 storage 读文件并 inline 返回（视频/PDF） |
 
@@ -54,6 +55,13 @@
 ## API 路由（旧节已合并至上方）
 
 正式环境：**阿里云 ECS** `/opt/health-longevity-platform`，非 Vercel。
+
+**已有视频迁入系列文件夹（ECS 一次性）：**
+
+```bash
+cd /opt/health-longevity-platform
+node scripts/ops/migrate-health-skills-series-folders.mjs
+```
 
 ## 回归检查清单
 

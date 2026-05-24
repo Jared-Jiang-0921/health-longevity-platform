@@ -10,6 +10,11 @@ import {
   normalizeContentLevelForStorage,
 } from '../lib/contentAccess.js'
 import { getFileExtension, sanitizeUploadFileName } from '../lib/uploadFileName.js'
+import {
+  relocateModuleAssetFile,
+  unlinkModuleAssetFile,
+  writeModuleAssetFile,
+} from '../lib/moduleAssetStorage.js'
 
 const STORAGE_DIR = path.join(process.cwd(), 'storage', 'module-assets')
 const MAX_FILE_SIZE = 100 * 1024 * 1024
@@ -155,8 +160,13 @@ async function handleUpload(req, res) {
 
   await fs.mkdir(STORAGE_DIR, { recursive: true })
   const id = randomUUID()
-  const storedName = `${id}.${ext || 'bin'}`
-  await fs.writeFile(path.join(STORAGE_DIR, storedName), fileBuffer)
+  const storedName = await writeModuleAssetFile({
+    moduleKey,
+    subtopic,
+    id,
+    ext,
+    buffer: fileBuffer,
+  })
 
   const rows = await sql`
     INSERT INTO module_assets (id, module_key, subcategory, subtopic, required_level, title, summary, file_name, stored_name, mime_type, file_size, uploader)
@@ -186,6 +196,27 @@ async function handleUpdate(req, res) {
   if (!title) return res.status(400).json({ error: '标题不能为空' })
   if (!fileNameRaw) return res.status(400).json({ error: '资料名称不能为空' })
 
+  const existing = await sql`
+    SELECT module_key, subtopic, stored_name
+    FROM module_assets
+    WHERE id = ${id}
+    LIMIT 1
+  `
+  if (!existing.length) return res.status(404).json({ error: '资源不存在' })
+
+  let storedName = String(existing[0].stored_name || '')
+  try {
+    storedName = await relocateModuleAssetFile({
+      storedName,
+      moduleKey: existing[0].module_key,
+      subtopic,
+      id,
+    })
+  } catch (e) {
+    console.error('module-assets relocate error', e)
+    return res.status(500).json({ error: '资料文件迁移失败' })
+  }
+
   const rows = await sql`
     UPDATE module_assets
     SET title = ${title},
@@ -193,6 +224,7 @@ async function handleUpdate(req, res) {
         subcategory = ${subcategory},
         subtopic = ${subtopic},
         file_name = ${fileName},
+        stored_name = ${storedName},
         required_level = ${requiredLevel},
         updated_at = NOW()
     WHERE id = ${id}

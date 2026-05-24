@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "fc:routes": "node scripts/fc/generate-route-manifest.mjs"
+    "fc:routes": "node scripts/fc/generate-route-manifest.mjs",
+    "ops:migrate-series-folders": "node scripts/ops/migrate-health-skills-series-folders.mjs"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
