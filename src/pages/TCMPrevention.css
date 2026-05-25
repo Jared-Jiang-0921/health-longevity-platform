@@ -1,45 +1,13 @@
 .page-tcm-prevention {
-  max-width: 800px;
-}
-
-.tcm-header {
-  margin-bottom: 2rem;
-}
-
-.tcm-header h1 {
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.tcm-header p {
-  color: var(--color-text-muted);
-  margin: 0;
-  line-height: 1.6;
+  max-width: var(--content-narrow);
 }
 
 .tcm-differentiation {
-  margin: 0 0 0.85rem;
-  font-size: 0.95rem;
-  line-height: 1.65;
   color: var(--color-text-muted);
 }
 
-.tcm-positioning {
-  margin: 0 0 1.15rem;
-  padding: 0.75rem 0.9rem;
-  border-radius: 10px;
-  border-left: 3px solid var(--color-primary);
-  background: rgba(34, 197, 94, 0.08);
-  font-size: 0.95rem;
-  font-weight: 500;
-  line-height: 1.6;
-  color: var(--color-text);
-}
-
 .tcm-section-title {
-  margin: 0 0 0.55rem;
-  font-size: 1.05rem;
-  color: var(--color-text);
+  /* page-section-title */
 }
 
 .tcm-columns {
@@ -68,7 +36,7 @@
 }
 
 .tcm-columns-table th {
-  background: rgba(34, 197, 94, 0.08);
+  background: var(--color-primary-muted);
   font-weight: 600;
 }
 
@@ -96,30 +64,7 @@
 }
 
 .tcm-tabs {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.tcm-tabs button {
-  padding: 0.6rem 1.25rem;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  color: var(--color-text-muted);
-  font-size: 0.95rem;
-  cursor: pointer;
-}
-
-.tcm-tabs button:hover {
-  border-color: var(--color-primary);
-  color: var(--color-text);
-}
-
-.tcm-tabs button.active {
-  background: rgba(34, 197, 94, 0.15);
-  border-color: var(--color-primary);
-  color: var(--color-primary);
+  margin-bottom: var(--space-5);
 }
 
 .tcm-section h2 {

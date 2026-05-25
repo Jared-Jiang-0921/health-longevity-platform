@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
 import { CATEGORIES } from '../data/courses'
+import { assetMatchesCourseSeries } from '../data/healthSkillsSeries'
 import ContentLockNotice from './ContentLockNotice'
 import { moduleAssetUrl } from '../lib/moduleAssetUrl'
 import './CourseSeriesVideos.css'
@@ -27,15 +28,10 @@ export default function CourseSeriesVideos({ course }) {
   )
 
   const seriesItems = useMemo(() => {
-    const title = String(course?.title || '').trim()
     return items
-      .filter((item) => {
-        const sub = String(item.subcategory || '').trim()
-        const topic = String(item.subtopic || '').trim()
-        return topic === title && (!categoryLabel || sub === categoryLabel)
-      })
+      .filter((item) => assetMatchesCourseSeries(item, course, categoryLabel))
       .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-  }, [items, course?.title, categoryLabel])
+  }, [items, course, categoryLabel])
 
   useEffect(() => {
     if (!course?.title) return undefined

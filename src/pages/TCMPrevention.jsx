@@ -17,7 +17,7 @@ export default function TCMPrevention() {
       <section className="tcm-header">
         <h1>{mod.title}</h1>
         <p className="tcm-differentiation">{mod.differentiation}</p>
-        <p className="tcm-positioning">{mod.positioning}</p>
+        <p className="tcm-positioning page-callout">{mod.positioning}</p>
 
         <section className="tcm-columns" aria-labelledby="tcm-columns-heading">
           <h2 id="tcm-columns-heading" className="tcm-section-title">{mod.columnsTitle}</h2>

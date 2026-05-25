@@ -18,7 +18,7 @@ export default function LongevityNews() {
         <h1>{mod.title}</h1>
         <p className="news-lead">{mod.lead}</p>
 
-        <aside className="news-caveat" role="note">
+        <aside className="news-caveat page-callout page-callout--info" role="note">
           <h2 className="news-caveat-title">{mod.caveatTitle}</h2>
           <p className="news-caveat-phrase">{mod.caveatPhrase}</p>
         </aside>

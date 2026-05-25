@@ -30,8 +30,10 @@ export default function MyFavorites() {
 
   return (
     <div className="page-my-favorites">
-      <h1>{t.title}</h1>
-      <p className="subtitle">{t.count} {courses.length} {t.lessons}</p>
+      <header className="page-header">
+        <h1>{t.title}</h1>
+        <p className="subtitle">{t.count} {courses.length} {t.lessons}</p>
+      </header>
       <div className="favorites-grid content-card-grid">
         {courses.map((course) => (
           <article key={course.id} className="favorite-card content-card content-card--padded">

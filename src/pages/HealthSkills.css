@@ -1,64 +1,13 @@
 .page-health-skills {
-  max-width: 900px;
-}
-
-.health-skills-header {
-  margin-bottom: 2rem;
-}
-
-.health-skills-header h1 {
-  font-size: 1.5rem;
-  margin: 0 0 0.5rem;
-}
-
-.health-skills-header p {
-  color: var(--color-text-muted);
-  margin: 0;
+  /* 布局与标题：page-chrome.css */
 }
 
 .health-skills-header p + p {
-  margin-top: 0.65rem;
-}
-
-.health-skills-methodology {
-  font-size: 0.9rem;
-  line-height: 1.55;
-  color: var(--color-text);
-  border-left: 3px solid var(--color-primary);
-  padding: 0.5rem 0 0.5rem 0.75rem;
-  background: rgba(34, 197, 94, 0.06);
-  border-radius: 0 8px 8px 0;
+  margin-top: var(--space-3);
 }
 
 .categories {
-  margin-bottom: 1.5rem;
-}
-
-.category-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.category-tabs button {
-  padding: 0.5rem 1rem;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  color: var(--color-text-muted);
-  font-size: 0.9rem;
-  cursor: pointer;
-}
-
-.category-tabs button:hover {
-  border-color: var(--color-primary);
-  color: var(--color-text);
-}
-
-.category-tabs button.active {
-  background: var(--color-primary-muted);
-  border-color: var(--color-primary);
-  color: var(--color-primary);
+  margin-bottom: var(--space-5);
 }
 
 .course-list {
@@ -121,7 +70,7 @@
   justify-content: space-between;
   align-items: center;
   padding-top: 0.75rem;
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid var(--color-border-subtle);
   gap: 0.5rem;
   flex-wrap: wrap;
 }

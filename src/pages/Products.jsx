@@ -103,7 +103,7 @@ export default function Products() {
       <section className="products-header">
         <h1>{ev.title}</h1>
         <p className="products-lead">{ev.lead}</p>
-        <aside className="products-role-disclaimer" role="note">
+        <aside className="products-role-disclaimer page-callout page-callout--warn" role="note">
           <p>{ev.roleDisclaimer}</p>
         </aside>
         <section className="products-reg-block" aria-labelledby="products-cn-reg">

@@ -1,0 +1,293 @@
+/**
+ * 顶栏与内页标题 — 全站品牌统一（Logo 蓝绿渐变）
+ */
+
+/* —— 顶栏（全站毛玻璃 + 品牌底边） —— */
+.site-header {
+  background: rgba(10, 16, 24, 0.86);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--color-border-subtle);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.16);
+  position: relative;
+}
+
+.site-header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--gradient-brand);
+  opacity: 0.38;
+  pointer-events: none;
+}
+
+.site-header--home {
+  background: rgba(10, 16, 24, 0.78);
+}
+
+.header-lang {
+  border-color: var(--color-border-subtle);
+  background: rgba(20, 30, 46, 0.6);
+  border-radius: var(--radius-md);
+}
+
+.header-lang select {
+  border-radius: var(--radius-sm);
+}
+
+.header-lang select:focus-visible {
+  border-color: var(--color-border-focus);
+}
+
+/* —— 内页模块容器 —— */
+.page-health-skills,
+.page-products,
+.page-longevity-news,
+.page-tcm-prevention,
+.page-solutions,
+.page-my-favorites,
+.page-course-detail,
+.page-course-learn,
+.page-product-detail {
+  max-width: var(--content-max);
+}
+
+.page-longevity-news,
+.page-tcm-prevention,
+.page-content {
+  max-width: var(--content-narrow);
+}
+
+/* —— 页面标题区 —— */
+.page-header,
+.health-skills-header,
+.products-header,
+.news-header,
+.tcm-header,
+.opportunities-header,
+.health-questionnaire-header,
+.course-detail-header,
+.learn-header,
+.product-detail-header {
+  margin-bottom: var(--space-8);
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid var(--color-border-subtle);
+  position: relative;
+}
+
+.page-header::after,
+.health-skills-header::after,
+.products-header::after,
+.news-header::after,
+.tcm-header::after,
+.opportunities-header::after,
+.health-questionnaire-header::after,
+.course-detail-header::after,
+.learn-header::after,
+.product-detail-header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: min(10rem, 42%);
+  height: 2px;
+  background: var(--gradient-brand);
+  border-radius: var(--radius-full);
+  opacity: 0.9;
+}
+
+.page-header h1,
+.health-skills-header h1,
+.products-header h1,
+.news-header h1,
+.tcm-header h1,
+.opportunities-header h1,
+.health-questionnaire-header h1,
+.course-detail-header h1,
+.learn-header h1,
+.product-detail-header h1,
+.page-solutions > h1,
+.page-my-favorites > h1,
+.page-content:not(.page-legal) > h1,
+.page-content .page-header h1 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-tight);
+  line-height: var(--line-height-tight);
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.page-lead,
+.health-skills-header > p:not(.health-skills-methodology):not(.page-callout),
+.products-header > p,
+.news-header > p:not(.news-caveat),
+.tcm-header > p:not(.tcm-positioning):not(.tcm-differentiation),
+.opportunities-audience,
+.opportunities-core,
+.solutions-lead,
+.page-header .subtitle,
+.page-my-favorites .subtitle,
+.health-questionnaire-header > p {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
+  color: var(--color-text-muted);
+}
+
+.page-header > p + p,
+.health-skills-header > p + p,
+.tcm-header > p + p {
+  margin-top: var(--space-3);
+}
+
+/* —— 强调说明块 —— */
+.page-callout,
+.health-skills-methodology,
+.tcm-positioning,
+.tcm-differentiation,
+.solutions-disclaimer,
+.products-role-disclaimer {
+  margin-bottom: var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
+  color: var(--color-text);
+  border-left: 3px solid var(--brand-teal);
+  background: var(--color-primary-muted);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.tcm-positioning {
+  font-weight: var(--font-weight-medium);
+}
+
+.page-callout--warn p,
+.solutions-disclaimer p,
+.products-role-disclaimer p {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
+  color: var(--color-text);
+}
+
+.page-callout--info,
+.news-caveat {
+  border-left-color: var(--brand-blue);
+  background: var(--color-info-muted);
+}
+
+.page-callout--warn,
+.solutions-disclaimer,
+.products-role-disclaimer {
+  border-left-color: var(--color-warning);
+  background: var(--color-warning-muted);
+}
+
+/* —— 区块小标题 —— */
+.page-section-title,
+.news-section-heading,
+.products-section-heading,
+.tcm-section-title,
+.opportunities-section-title,
+.solutions-features h2,
+.page-solutions h2:not(.consult-card h2) {
+  margin: var(--space-6) 0 var(--space-3);
+  padding-left: var(--space-3);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  line-height: var(--line-height-tight);
+  border-left: 3px solid var(--brand-teal);
+}
+
+/* —— 分类 Tab（全站统一） —— */
+.category-tabs,
+.tcm-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+}
+
+.category-tabs button,
+.tcm-tabs button {
+  padding: var(--space-2) var(--space-4);
+  background: rgba(20, 30, 46, 0.65);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    background var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.category-tabs button:hover,
+.tcm-tabs button:hover {
+  border-color: rgba(20, 184, 166, 0.45);
+  color: var(--color-text);
+  background: var(--color-primary-muted);
+}
+
+.category-tabs button.active,
+.tcm-tabs button.active {
+  background: var(--color-primary-muted);
+  border-color: var(--brand-teal);
+  color: var(--brand-teal);
+  box-shadow: inset 0 -2px 0 var(--brand-teal);
+}
+
+/* —— 返回链接 —— */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.back-link:hover {
+  color: var(--brand-teal);
+}
+
+/* —— 页脚品牌线（全站） —— */
+.site-footer {
+  position: relative;
+  border-top-color: var(--color-border-subtle);
+}
+
+.site-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: var(--gradient-brand);
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* —— 通用 page-content 标题 —— */
+.page-content h1 {
+  margin-bottom: var(--space-3);
+}
+
+.page-legal h1 {
+  background: none;
+  -webkit-text-fill-color: var(--color-text);
+  color: var(--color-text);
+}

@@ -1,19 +1,9 @@
 .page-longevity-news {
-  max-width: 720px;
+  /* page-chrome */
 }
 
 .news-header {
-  margin-bottom: 2rem;
-}
-
-.news-header h1 {
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.news-header p {
-  color: var(--color-text-muted);
-  margin: 0;
+  /* page-chrome */
 }
 
 .news-lead {
@@ -24,11 +14,7 @@
 }
 
 .news-caveat {
-  margin: 0 0 1.25rem;
-  padding: 0.85rem 1rem;
-  border-radius: 10px;
-  border: 1px solid rgba(59, 130, 246, 0.35);
-  background: rgba(59, 130, 246, 0.08);
+  /* page-callout--info */
 }
 
 .news-caveat-title {
@@ -46,9 +32,7 @@
 }
 
 .news-section-heading {
-  margin: 1.15rem 0 0.45rem;
-  font-size: 1.05rem;
-  color: var(--color-text);
+  /* page-section-title */
 }
 
 .news-sources-body {
@@ -80,7 +64,7 @@
 }
 
 .news-columns-table th {
-  background: rgba(34, 197, 94, 0.08);
+  background: var(--color-primary-muted);
   font-weight: 600;
 }
 

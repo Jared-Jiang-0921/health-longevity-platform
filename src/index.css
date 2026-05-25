@@ -1,5 +1,6 @@
 @import './styles/tokens.css';
 @import './styles/content-cards.css';
+@import './styles/page-chrome.css';
 
 * {
   box-sizing: border-box;

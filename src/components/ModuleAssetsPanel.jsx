@@ -3,7 +3,7 @@ import { matchPath, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
 import { CATEGORIES, COURSES, getCourseById } from '../data/courses'
-import { getSeriesTitlesForCategory } from '../data/healthSkillsSeries'
+import { getSeriesTitlesForCategory, getCanonicalSeriesSubtopic } from '../data/healthSkillsSeries'
 import { PRODUCT_CATEGORIES, getProductById } from '../data/products'
 import ProductCatalogAdmin from './ProductCatalogAdmin'
 import ContentLockNotice from './ContentLockNotice'
@@ -95,7 +95,14 @@ function resolveLinkedSubtopic(payload) {
 /** 与列表过滤、上传落库展示一致 */
 function normalizeSubtopicValue(raw) {
   const s = String(raw || '').trim()
-  return s || '待归类'
+  if (!s) return '待归类'
+  return s
+}
+
+function canonicalSubtopic(moduleKey, raw) {
+  if (moduleKey !== 'health-skills') return normalizeSubtopicValue(raw)
+  const c = getCanonicalSeriesSubtopic(raw)
+  return c || normalizeSubtopicValue(raw)
 }
 
 function normalizeAssetItem(moduleKey, item) {
@@ -103,16 +110,15 @@ function normalizeAssetItem(moduleKey, item) {
   return {
     ...item,
     subcategory: normalizeSubcategoryValue(moduleKey, item.subcategory),
-    subtopic: normalizeSubtopicValue(item.subtopic),
+    subtopic: canonicalSubtopic(moduleKey, item.subtopic),
   }
 }
 
 function resolveSubmitSubtopic(moduleKey, subcategoryValue, rawSubtopic) {
-  const normalized = normalizeSubtopicValue(rawSubtopic)
   if (moduleKey === 'health-skills') {
-    if (!normalized || normalized === '待归类') return ''
-    return normalized
+    return getCanonicalSeriesSubtopic(rawSubtopic) || ''
   }
+  const normalized = normalizeSubtopicValue(rawSubtopic)
   const options = getSubtopicOptions(moduleKey, subcategoryValue)
   if (!options.length) return normalized
   return options.includes(normalized) ? normalized : options[0]
@@ -138,7 +144,7 @@ function mergeSubtopicOptions(moduleKey, subcategoryLabel, baseOptions, items) {
   const label = normalizeSubcategoryValue(moduleKey, subcategoryLabel)
   const fromItems = items
     .filter((item) => normalizeSubcategoryValue(moduleKey, item.subcategory) === label)
-    .map((item) => normalizeSubtopicValue(item.subtopic))
+    .map((item) => canonicalSubtopic(moduleKey, item.subtopic))
     .filter((t) => t && t !== '待归类')
   return Array.from(new Set([...baseOptions, ...fromItems]))
 }
@@ -216,8 +222,9 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     if (!activeSubtopic) return []
     return items.filter((item) => {
       const sub = normalizeSubcategoryValue(moduleKey, item.subcategory)
-      const topic = normalizeSubtopicValue(item.subtopic)
-      return sub === activeSubcategory && topic === activeSubtopic
+      const topic = canonicalSubtopic(moduleKey, item.subtopic)
+      const activeTopic = canonicalSubtopic(moduleKey, activeSubtopic)
+      return sub === activeSubcategory && topic === activeTopic
     })
   }, [activeSubcategory, activeSubtopic, items, moduleKey])
   const activeSubtopicOptions = useMemo(() => {
@@ -225,8 +232,8 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     const fromPreset = getSubtopicOptions(moduleKey, activeSubcategory)
     const fromItems = items
       .filter((item) => normalizeSubcategoryValue(moduleKey, item.subcategory) === activeSubcategory)
-      .map((item) => normalizeSubtopicValue(item.subtopic))
-    return Array.from(new Set([...fromItems, ...fromPreset]))
+      .map((item) => canonicalSubtopic(moduleKey, item.subtopic))
+    return Array.from(new Set([...fromItems, ...fromPreset])).filter((t) => t && t !== '待归类')
   }, [moduleKey, activeSubcategory, items])
   const t = useMemo(() => ({
     zh: {

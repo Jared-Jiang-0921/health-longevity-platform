@@ -15,6 +15,7 @@ import {
   unlinkModuleAssetFile,
   writeModuleAssetFile,
 } from '../lib/moduleAssetStorage.js'
+import { resolveHealthSkillsAssetGrouping } from '../src/data/healthSkillsSeries.js'
 
 const STORAGE_DIR = path.join(process.cwd(), 'storage', 'module-assets')
 const MAX_FILE_SIZE = 100 * 1024 * 1024
@@ -137,8 +138,20 @@ async function handleUpload(req, res) {
   if (!body) return
 
   const moduleKey = normalizeModuleKey(body.module)
-  const subcategory = String(body.subcategory || 'general').trim().slice(0, 80) || 'general'
-  const subtopic = String(body.subtopic || '').trim().slice(0, 120)
+  let subcategory = String(body.subcategory || 'general').trim().slice(0, 80) || 'general'
+  let subtopic = String(body.subtopic || '').trim().slice(0, 120)
+  if (moduleKey === 'health-skills') {
+    const grouped = resolveHealthSkillsAssetGrouping({
+      subtopic,
+      subcategory,
+      title: String(body.title || '').trim(),
+    })
+    subcategory = grouped.subcategory.slice(0, 80) || subcategory
+    subtopic = grouped.subtopic.slice(0, 120)
+    if (!subtopic) {
+      return res.status(400).json({ error: '请选择系列合集（与课程系列一致）' })
+    }
+  }
   const requiredLevel = normalizeContentLevelForStorage(body.requiredLevel || 'public')
   const title = String(body.title || '').trim().slice(0, 200)
   const summary = String(body.summary || '').trim().slice(0, 4000)
@@ -188,8 +201,8 @@ async function handleUpdate(req, res) {
 
   const title = String(body.title || '').trim().slice(0, 200)
   const summary = String(body.summary || '').trim().slice(0, 4000)
-  const subcategory = String(body.subcategory || 'general').trim().slice(0, 80) || 'general'
-  const subtopic = String(body.subtopic || '').trim().slice(0, 120)
+  let subcategory = String(body.subcategory || 'general').trim().slice(0, 80) || 'general'
+  let subtopic = String(body.subtopic || '').trim().slice(0, 120)
   const fileNameRaw = String(body.fileName || '').trim()
   const fileName = sanitizeUploadFileName(fileNameRaw, 'asset')
   const requiredLevel = normalizeContentLevelForStorage(body.requiredLevel || 'public')
@@ -203,6 +216,21 @@ async function handleUpdate(req, res) {
     LIMIT 1
   `
   if (!existing.length) return res.status(404).json({ error: '资源不存在' })
+
+  const moduleKey = String(existing[0].module_key || '')
+  if (moduleKey === 'health-skills') {
+    const grouped = resolveHealthSkillsAssetGrouping({
+      subtopic,
+      subcategory,
+      title,
+      storedName: existing[0].stored_name,
+    })
+    subcategory = grouped.subcategory.slice(0, 80) || subcategory
+    subtopic = grouped.subtopic.slice(0, 120)
+    if (!subtopic) {
+      return res.status(400).json({ error: '请选择系列合集（与课程系列一致）' })
+    }
+  }
 
   let storedName = String(existing[0].stored_name || '')
   try {

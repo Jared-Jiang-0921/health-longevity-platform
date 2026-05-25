@@ -40,7 +40,7 @@ export default function HealthSkills() {
       <section className="health-skills-header">
         <h1>{t.title}</h1>
         <p>{t.desc}</p>
-        <p className="health-skills-methodology">{methodologyLine}</p>
+        <p className="health-skills-methodology page-callout">{methodologyLine}</p>
       </section>
 
       <section className="categories">

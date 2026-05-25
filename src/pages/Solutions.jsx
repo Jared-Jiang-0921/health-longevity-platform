@@ -269,10 +269,12 @@ export default function Solutions() {
 
   return (
     <div className="page-solutions">
-      <h1>{t.title}</h1>
-      <p className="solutions-lead">{t.lead}</p>
+      <header className="page-header">
+        <h1>{t.title}</h1>
+        <p className="solutions-lead">{t.lead}</p>
+      </header>
 
-      <aside className="solutions-disclaimer" role="note">
+      <aside className="solutions-disclaimer page-callout page-callout--warn" role="note">
         <p>{t.medicalDisclaimer}</p>
       </aside>
 
