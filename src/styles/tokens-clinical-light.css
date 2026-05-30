@@ -1,25 +1,9 @@
 /**
- * 临床浅色风 — 首页 + 顶栏/页脚（内页主体仍用深色 tokens）
+ * 临床浅色别名（与 :root tokens 同步，供 scoped 选择器使用）
  */
 .site-header--clinical,
 .site-footer--clinical,
-.main--home {
-  --clinical-bg: #f7f9fc;
-  --clinical-surface: #ffffff;
-  --clinical-text: #0f172a;
-  --clinical-text-secondary: #475569;
-  --clinical-text-muted: #64748b;
-  --clinical-border: #e2e8f0;
-  --clinical-primary: #2563eb;
-  --clinical-primary-hover: #1d4ed8;
-  --clinical-accent: #14b8a6;
-  --clinical-warning: #f59e0b;
-  --clinical-primary-muted: rgba(37, 99, 235, 0.08);
-  --clinical-accent-muted: rgba(20, 184, 166, 0.1);
-  --clinical-warning-muted: rgba(245, 158, 11, 0.12);
-  --clinical-shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 4px 12px rgba(15, 23, 42, 0.04);
-  --clinical-shadow-hover: 0 4px 16px rgba(15, 23, 42, 0.08), 0 8px 24px rgba(15, 23, 42, 0.06);
-  --clinical-radius-card: 16px;
-  --clinical-radius-btn: 12px;
-  --clinical-radius-pill: 999px;
+.main--home,
+.page-home {
+  /* 继承 :root，此处仅占位便于后续页面级覆盖 */
 }

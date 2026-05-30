@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { TCM_HERBS, TCM_PRESCRIPTIONS } from '../data/tcmPrevention'
 import { getTcmPreventionModuleCopy } from '../data/tcmPreventionModuleI18n'
+import { getVisualAssetUrl, getVisualAlt } from '../data/visualAssets'
 import { useLocale } from '../context/LocaleContext'
 import './TCMPrevention.css'
 
@@ -14,8 +15,24 @@ export default function TCMPrevention() {
 
   return (
     <div className="page-tcm-prevention">
+      <section className="tcm-hero-banner" aria-labelledby="tcm-banner-title">
+        <img
+          className="tcm-hero-banner-bg"
+          src={getVisualAssetUrl('bannerTcmPrevention')}
+          alt=""
+          decoding="async"
+        />
+        <div className="tcm-hero-banner-overlay" aria-hidden="true" />
+        <div className="tcm-hero-banner-content">
+          <h1 id="tcm-banner-title">{mod.bannerTitle}</h1>
+          <p className="tcm-hero-banner-line">{mod.bannerLine1}</p>
+          <p className="tcm-hero-banner-line">{mod.bannerLine2}</p>
+        </div>
+        <span className="visually-hidden">{getVisualAlt('bannerTcmPrevention', lang)}</span>
+      </section>
+
       <section className="tcm-header">
-        <h1>{mod.title}</h1>
+        <h2 className="tcm-page-title">{mod.title}</h2>
         <p className="tcm-differentiation">{mod.differentiation}</p>
         <p className="tcm-positioning page-callout">{mod.positioning}</p>
 

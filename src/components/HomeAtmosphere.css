@@ -1,0 +1,88 @@
+.home-atmosphere {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.home-atmo {
+  position: absolute;
+  will-change: transform;
+}
+
+.home-atmo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  opacity: 0.045;
+  filter: saturate(0.85);
+}
+
+.home-atmo--dna {
+  top: -4%;
+  right: -2%;
+  width: min(28vw, 320px);
+}
+
+.home-atmo--cells {
+  bottom: -6%;
+  left: -4%;
+  width: min(32vw, 360px);
+}
+
+.home-atmo--neurons {
+  top: 38%;
+  right: 8%;
+  width: min(36vw, 400px);
+}
+
+.home-atmo--neurons img {
+  opacity: 0.04;
+}
+
+@keyframes home-atmo-drift-slow {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -12px, 0); }
+}
+
+@keyframes home-atmo-drift-medium {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(8px, -8px, 0); }
+}
+
+@keyframes home-atmo-drift-fast {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(-6px, 10px, 0); }
+}
+
+.home-atmo-float--slow {
+  animation: home-atmo-drift-slow 28s ease-in-out infinite;
+}
+
+.home-atmo-float--medium {
+  animation: home-atmo-drift-medium 22s ease-in-out infinite;
+}
+
+.home-atmo-float--fast {
+  animation: home-atmo-drift-fast 18s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-atmo-float--slow,
+  .home-atmo-float--medium,
+  .home-atmo-float--fast {
+    animation: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-atmo--neurons {
+    display: none;
+  }
+
+  .home-atmo--dna {
+    width: min(40vw, 220px);
+    opacity: 0.7;
+  }
+}

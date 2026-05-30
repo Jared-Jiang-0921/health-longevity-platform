@@ -2,6 +2,102 @@
   max-width: var(--content-narrow);
 }
 
+/* —— 治未病视觉 Banner —— */
+.tcm-hero-banner {
+  position: relative;
+  height: 400px;
+  margin: calc(-1 * var(--space-8)) calc(-1 * var(--space-6)) var(--space-8);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-md);
+}
+
+.tcm-hero-banner-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.tcm-hero-banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    rgba(255, 255, 255, 0.92) 0%,
+    rgba(255, 255, 255, 0.78) 42%,
+    rgba(240, 253, 250, 0.55) 100%
+  );
+}
+
+.tcm-hero-banner-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  padding: 2rem 2.25rem;
+  max-width: 28rem;
+}
+
+.tcm-hero-banner-content h1 {
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+.tcm-hero-banner-line {
+  margin: 0;
+  font-size: clamp(1rem, 2vw, 1.125rem);
+  line-height: 1.65;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.tcm-hero-banner-line + .tcm-hero-banner-line {
+  margin-top: 0.25rem;
+  color: var(--color-accent);
+}
+
+.tcm-page-title {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 640px) {
+  .tcm-hero-banner {
+    height: min(400px, 72vw);
+    margin-left: calc(-1 * var(--space-4));
+    margin-right: calc(-1 * var(--space-4));
+    border-radius: var(--radius-md);
+  }
+
+  .tcm-hero-banner-content {
+    padding: 1.5rem 1.25rem;
+  }
+}
+
 .tcm-differentiation {
   color: var(--color-text-muted);
 }

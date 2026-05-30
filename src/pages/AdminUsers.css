@@ -106,7 +106,7 @@
 }
 
 .admin-hq-detail-row td {
-  background: rgba(15, 20, 25, 0.45);
+  background: var(--color-bg);
   vertical-align: top;
 }
 

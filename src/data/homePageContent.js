@@ -1,5 +1,28 @@
 /** 首页静态内容（中文为主；EN/AR 为简化占位） */
 
+export const HOME_STATS = [
+  {
+    id: 'studies',
+    value: '12,856+',
+    label: { zh: '已收录研究', en: 'Studies indexed', ar: 'دراسات مفهرسة' },
+  },
+  {
+    id: 'evidence',
+    value: '3,200+',
+    label: { zh: '证据条目', en: 'Evidence entries', ar: 'مداخل أدلة' },
+  },
+  {
+    id: 'plans',
+    value: '1,680+',
+    label: { zh: '健康方案', en: 'Health plans', ar: 'خطط صحية' },
+  },
+  {
+    id: 'daily',
+    value: '24+',
+    label: { zh: '每日更新', en: 'Daily updates', ar: 'تحديثات يومية' },
+  },
+]
+
 export const HOME_MODULES = [
   {
     path: '/solutions',
@@ -164,6 +187,8 @@ export function getHomeCopy(lang) {
     trustRiskDesc: '提示就医指征、药物相互作用与特殊人群',
     modulesTitle: '六大模块',
     modulesLead: '从 AI 建议到证据清单，一站式预防保健入口',
+    statsTitle: '长寿科学观察站',
+    statsLead: '持续追踪研究、证据与方案，数据驱动决策',
     moduleEnter: '进入模块',
     todayTitle: '今日更新',
     todayCurated: '编辑精选 · 非实时推送',
@@ -199,6 +224,8 @@ export function getHomeCopy(lang) {
     trustRiskDesc: 'Care prompts, interactions, special populations',
     modulesTitle: 'Six modules',
     modulesLead: 'From AI guidance to evidence checklists',
+    statsTitle: 'Longevity Science Observatory',
+    statsLead: 'Tracking research, evidence, and plans at a glance',
     moduleEnter: 'Enter module',
     todayTitle: 'Updates',
     todayCurated: 'Editor’s picks · not live feed',

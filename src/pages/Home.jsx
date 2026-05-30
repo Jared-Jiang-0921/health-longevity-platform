@@ -2,12 +2,20 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
 import { getMembershipLevelLabel } from '../i18n/terms'
+import HomeAtmosphere from '../components/HomeAtmosphere'
 import {
   HOME_MODULES,
+  HOME_STATS,
   HOME_TODAY_FRONTIER,
   HOME_HOT_EVIDENCE,
   getHomeCopy,
 } from '../data/homePageContent'
+import {
+  getModuleVisualByPath,
+  getModuleVisualAlt,
+  getVisualAssetUrl,
+  getVisualAlt,
+} from '../data/visualAssets'
 import './Home.css'
 
 function EvidenceChip({ grade }) {
@@ -26,6 +34,7 @@ export default function Home() {
     <div className="page-home">
       {/* Hero */}
       <section className="home-hero" aria-labelledby="home-hero-heading">
+        <HomeAtmosphere />
         <div className="home-hero-inner">
           <div className="home-hero-copy">
             <h1 id="home-hero-heading">{copy.heroH1}</h1>
@@ -44,22 +53,20 @@ export default function Home() {
               </p>
             ) : null}
           </div>
-          <aside className="home-demo-card" aria-label={copy.demoLabel}>
-            <span className="home-demo-badge">{copy.demoLabel}</span>
-            <div className="home-demo-block">
-              <h3>{copy.demoRisk}</h3>
-              <p>{copy.demoRiskVal}</p>
-            </div>
-            <div className="home-demo-block">
-              <h3>{copy.demoAdvice}</h3>
-              <p>{copy.demoAdviceVal}</p>
-            </div>
-            <div className="home-demo-tags">
-              <span className="home-chip home-chip--evidence">证据 B</span>
-              <span className="home-chip home-chip--audience">一般成人</span>
-              <span className="home-chip home-chip--warn">需个体化</span>
-            </div>
-          </aside>
+          <figure className="home-hero-visual">
+            <img
+              src={getVisualAssetUrl('heroCockpit')}
+              alt={getVisualAlt('heroCockpit', lang)}
+              width={1200}
+              height={900}
+              loading="eager"
+              decoding="async"
+              className="home-hero-visual-img"
+            />
+            <figcaption className="home-hero-visual-caption">
+              {lang === 'en' ? 'Digital health twin · Live metrics' : '数字健康孪生 · 实时指标'}
+            </figcaption>
+          </figure>
         </div>
       </section>
 
@@ -84,6 +91,22 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Stats */}
+      <section className="home-stats" aria-labelledby="home-stats-heading">
+        <header className="home-section-header">
+          <h2 id="home-stats-heading">{copy.statsTitle}</h2>
+          <p>{copy.statsLead}</p>
+        </header>
+        <div className="home-stats-grid">
+          {HOME_STATS.map((stat) => (
+            <article key={stat.id} className="home-stat-card">
+              <p className="home-stat-value">{stat.value}</p>
+              <p className="home-stat-label">{stat.label[lang] || stat.label.zh}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
       {/* Modules */}
       <section className="home-modules" aria-labelledby="home-modules-heading">
         <header className="home-section-header">
@@ -96,24 +119,38 @@ export default function Home() {
             const desc = mod.desc[lang] || mod.desc.zh
             const chips = mod.chips[lang] || mod.chips.zh
             const disclaimer = mod.disclaimer?.[lang] || mod.disclaimer?.zh
+            const coverSrc = getModuleVisualByPath(mod.path)
+            const coverAlt = getModuleVisualAlt(mod.path, lang)
             return (
               <article
                 key={mod.path}
                 className={`home-module-card${mod.muted ? ' home-module-card--muted' : ''}${mod.accent ? ' home-module-card--tcm' : ''}`}
               >
-                <h3>{title}</h3>
-                <p className="home-module-desc">{desc}</p>
-                <ul className="home-module-chips">
-                  {chips.map((chip) => (
-                    <li key={chip}>{chip}</li>
-                  ))}
-                </ul>
-                {disclaimer ? (
-                  <p className="home-module-disclaimer">{disclaimer}</p>
-                ) : null}
-                <Link to={mod.path} className="home-btn home-btn--card">
-                  {copy.moduleEnter}
-                </Link>
+                <div className="home-module-cover">
+                  <img
+                    src={coverSrc}
+                    alt={coverAlt}
+                    loading="lazy"
+                    decoding="async"
+                    className="home-module-cover-img"
+                  />
+                  <div className="home-module-cover-shade" aria-hidden="true" />
+                </div>
+                <div className="home-module-body">
+                  <h3>{title}</h3>
+                  <p className="home-module-desc">{desc}</p>
+                  <ul className="home-module-chips">
+                    {chips.map((chip) => (
+                      <li key={chip}>{chip}</li>
+                    ))}
+                  </ul>
+                  {disclaimer ? (
+                    <p className="home-module-disclaimer">{disclaimer}</p>
+                  ) : null}
+                  <Link to={mod.path} className="home-btn home-btn--card">
+                    {copy.moduleEnter}
+                  </Link>
+                </div>
               </article>
             )
           })}
@@ -158,7 +195,10 @@ export default function Home() {
                   <p className="home-today-meta">
                     <span>适用：{item.audience}</span>
                   </p>
-                  <p className="home-today-risk">⚠ {item.risk}</p>
+                  <p className="home-today-risk">
+                    <span className="home-today-risk-label">注意</span>
+                    {item.risk}
+                  </p>
                 </li>
               ))}
             </ul>

@@ -1,47 +1,52 @@
-/* 首页 — 临床浅色风（tokens-clinical-light.css） */
+/* 首页 — 临床浅色风 + 高级视觉层 */
 
 .page-home {
-  background: var(--clinical-bg, #f7f9fc);
+  background: linear-gradient(180deg, #f8fbff 0%, #ffffff 30%, #f6fafd 100%);
   color: var(--clinical-text, #0f172a);
+  min-height: 100%;
 }
 
 /* —— Hero —— */
 .home-hero {
-  padding: clamp(2rem, 5vw, 3.5rem) clamp(1.25rem, 4vw, 2rem) clamp(2.5rem, 6vw, 4rem);
+  position: relative;
+  overflow: hidden;
+  padding: clamp(2.75rem, 6vw, 4.25rem) clamp(1.5rem, 4vw, 2.5rem) clamp(3rem, 7vw, 4.75rem);
   border-bottom: 1px solid var(--clinical-border, #e2e8f0);
-  background: linear-gradient(180deg, #fff 0%, var(--clinical-bg, #f7f9fc) 100%);
+  background: transparent;
 }
 
 .home-hero-inner {
+  position: relative;
+  z-index: 1;
   max-width: 72rem;
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2rem;
-  align-items: start;
+  gap: 2.25rem;
+  align-items: center;
 }
 
 @media (min-width: 900px) {
   .home-hero-inner {
-    grid-template-columns: 1.05fr 0.95fr;
-    gap: 2.5rem;
+    grid-template-columns: 1.08fr 0.92fr;
+    gap: 3rem;
     align-items: center;
   }
 }
 
 .home-hero-copy h1 {
-  margin: 0 0 1rem;
-  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  margin: 0 0 1.25rem;
+  font-size: clamp(1.875rem, 4.2vw, 2.875rem);
   font-weight: 700;
-  line-height: 1.25;
+  line-height: 1.22;
   letter-spacing: -0.02em;
   color: var(--clinical-text, #0f172a);
 }
 
 .home-hero-sub {
-  margin: 0 0 1.5rem;
-  font-size: clamp(0.9375rem, 1.8vw, 1rem);
-  line-height: 1.7;
+  margin: 0 0 1.75rem;
+  font-size: clamp(0.9375rem, 1.8vw, 1.0625rem);
+  line-height: 1.72;
   color: var(--clinical-text-secondary, #475569);
   max-width: 38rem;
 }
@@ -49,13 +54,49 @@
 .home-hero-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 0.85rem;
 }
 
 .home-hero-user {
   margin: 1rem 0 0;
   font-size: 0.875rem;
   color: var(--clinical-text-muted, #64748b);
+}
+
+.home-hero-visual {
+  margin: 0;
+  position: relative;
+  border-radius: var(--clinical-radius-card, 16px);
+  overflow: hidden;
+  border: 1px solid var(--clinical-border, #e2e8f0);
+  box-shadow:
+    0 4px 24px rgba(15, 23, 42, 0.06),
+    0 12px 48px rgba(37, 99, 235, 0.08);
+  background: var(--clinical-surface, #fff);
+}
+
+.home-hero-visual-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.home-hero-visual-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 0.55rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--clinical-text-secondary, #475569);
+  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.95));
+  text-align: center;
 }
 
 .home-demo-card {
@@ -186,7 +227,7 @@
 .home-trust {
   max-width: 72rem;
   margin: 0 auto;
-  padding: 2rem clamp(1.25rem, 4vw, 2rem);
+  padding: var(--space-12) clamp(1.5rem, 4vw, 2.5rem) var(--space-8);
 }
 
 .home-section-title {
@@ -237,15 +278,73 @@
   color: var(--clinical-text-secondary, #475569);
 }
 
+/* —— Stats（长寿科学观察站） —— */
+.home-stats {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: var(--space-8) clamp(1.5rem, 4vw, 2.5rem) var(--space-10);
+}
+
+.home-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .home-stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.15rem;
+  }
+}
+
+.home-stat-card {
+  position: relative;
+  padding: 1.25rem 1.15rem 1.1rem;
+  background: var(--clinical-surface, #fff);
+  border: 1px solid var(--clinical-border, #e2e8f0);
+  border-radius: var(--clinical-radius-card, 16px);
+  box-shadow: var(--clinical-shadow);
+  overflow: hidden;
+}
+
+.home-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--clinical-primary, #2563eb), var(--clinical-accent, #14b8a6));
+  opacity: 0.85;
+}
+
+.home-stat-value {
+  margin: 0 0 0.35rem;
+  font-size: clamp(1.5rem, 3vw, 1.875rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--clinical-text, #0f172a);
+  font-variant-numeric: tabular-nums;
+}
+
+.home-stat-label {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--clinical-text-muted, #64748b);
+}
+
 /* —— Modules —— */
 .home-modules {
   max-width: 72rem;
   margin: 0 auto;
-  padding: 0 clamp(1.25rem, 4vw, 2rem) 2.5rem;
+  padding: var(--space-10) clamp(1.5rem, 4vw, 2.5rem) var(--space-16);
 }
 
 .home-section-header {
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--space-8);
   text-align: center;
 }
 
@@ -265,7 +364,7 @@
 .home-module-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.15rem;
+  gap: 1.35rem;
 }
 
 @media (min-width: 640px) {
@@ -283,17 +382,52 @@
 .home-module-card {
   display: flex;
   flex-direction: column;
-  padding: 1.35rem 1.35rem 1.25rem;
+  padding: 0;
   background: var(--clinical-surface, #fff);
   border: 1px solid var(--clinical-border, #e2e8f0);
   border-radius: var(--clinical-radius-card, 16px);
   box-shadow: var(--clinical-shadow);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
 }
 
 .home-module-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
   box-shadow: var(--clinical-shadow-hover);
+}
+
+.home-module-cover {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--clinical-bg, #f7f9fc);
+}
+
+.home-module-cover-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.35s ease;
+}
+
+.home-module-card:hover .home-module-cover-img {
+  transform: scale(1.03);
+}
+
+.home-module-cover-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 55%, rgba(15, 23, 42, 0.04) 100%);
+  pointer-events: none;
+}
+
+.home-module-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 1.15rem 1.25rem 1.2rem;
 }
 
 .home-module-card h3 {
@@ -338,12 +472,22 @@
 }
 
 .home-module-card--tcm {
-  border-top: 3px solid var(--clinical-accent, #14b8a6);
+  border-top: none;
+}
+
+.home-module-card--tcm .home-module-cover::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--clinical-accent, #14b8a6);
+  z-index: 1;
 }
 
 .home-module-card--muted {
-  opacity: 0.82;
-  background: #fafbfc;
+  opacity: 0.92;
 }
 
 .home-module-card--muted h3 {
@@ -359,7 +503,7 @@
 .home-today {
   max-width: 72rem;
   margin: 0 auto;
-  padding: 2rem clamp(1.25rem, 4vw, 2rem) 2.5rem;
+  padding: var(--space-10) clamp(1.5rem, 4vw, 2.5rem) var(--space-12);
   border-top: 1px solid var(--clinical-border, #e2e8f0);
 }
 
@@ -454,11 +598,23 @@
   color: #b45309 !important;
 }
 
+.home-today-risk-label {
+  display: inline-block;
+  margin-right: 0.35rem;
+  padding: 0.1rem 0.4rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  border-radius: 4px;
+  background: var(--clinical-warning-muted);
+  color: #b45309;
+  vertical-align: middle;
+}
+
 /* —— Steps —— */
 .home-steps {
   max-width: 48rem;
   margin: 0 auto;
-  padding: 2rem clamp(1.25rem, 4vw, 2rem) 3.5rem;
+  padding: var(--space-10) clamp(1.5rem, 4vw, 2.5rem) var(--space-16);
   text-align: center;
   border-top: 1px solid var(--clinical-border, #e2e8f0);
 }
@@ -534,6 +690,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .home-module-card:hover,
+  .home-module-card:hover .home-module-cover-img,
   .home-btn--primary:hover {
     transform: none;
   }

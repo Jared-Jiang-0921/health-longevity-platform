@@ -1,11 +1,11 @@
 /**
- * Longevity Atlas / 长健星图 — 全站 Design Tokens
- * 与 Logo 蓝 → 青绿 → 绿渐变一致；组件请优先使用语义变量（--color-*），勿硬编码色值。
+ * Longevity Atlas — 全站 Design Tokens（临床浅色风）
+ * 主色冷蓝 #2563EB · 点缀青绿 #14B8A6 · 白底可读
  */
 :root {
-  /* —— 品牌色（Logo） —— */
-  --brand-blue: #1a6fd4;
-  --brand-blue-dark: #1558a8;
+  /* —— 品牌色 —— */
+  --brand-blue: #2563eb;
+  --brand-blue-dark: #1d4ed8;
   --brand-teal: #14b8a6;
   --brand-teal-dark: #0d9488;
   --brand-green: #22c55e;
@@ -25,68 +25,70 @@
   );
   --gradient-brand-soft: linear-gradient(
     135deg,
-    rgba(26, 111, 212, 0.14) 0%,
-    rgba(20, 184, 166, 0.1) 48%,
-    rgba(34, 197, 94, 0.08) 100%
+    rgba(37, 99, 235, 0.06) 0%,
+    rgba(20, 184, 166, 0.05) 48%,
+    rgba(34, 197, 94, 0.04) 100%
   );
 
-  /* —— 背景与表面（深色 + 冷蓝底） —— */
-  --color-bg: #0a1018;
-  --color-bg-elevated: #0f1419;
-  --color-surface: #141f2e;
-  --color-surface-hover: #1a2838;
-  --color-surface-glass: rgba(15, 20, 25, 0.72);
-  --color-border: #2a3a4f;
-  --color-border-subtle: rgba(148, 163, 184, 0.14);
-  --color-border-focus: rgba(20, 184, 166, 0.45);
+  /* —— 背景与表面 —— */
+  --color-bg: #f7f9fc;
+  --color-bg-elevated: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f1f5f9;
+  --color-surface-glass: rgba(255, 255, 255, 0.92);
+  --color-border: #e2e8f0;
+  --color-border-subtle: #e2e8f0;
+  --color-border-focus: rgba(37, 99, 235, 0.45);
 
   /* —— 文字 —— */
-  --color-text: #e8eef4;
-  --color-text-muted: #8fa3bb;
-  --color-text-faint: #64748b;
-  --color-text-inverse: #0a1018;
+  --color-text: #0f172a;
+  --color-text-muted: #64748b;
+  --color-text-secondary: #475569;
+  --color-text-faint: #94a3b8;
+  --color-text-inverse: #ffffff;
 
-  /* —— 交互（主色取 Logo 青绿） —— */
-  --color-primary: var(--brand-teal);
-  --color-primary-hover: var(--brand-teal-dark);
-  --color-primary-muted: rgba(20, 184, 166, 0.14);
-  --color-accent: var(--brand-blue);
-  --color-accent-hover: var(--brand-blue-dark);
-  --color-link: #6ee7d8;
-  --color-link-hover: var(--brand-teal);
+  /* —— 交互 —— */
+  --color-primary: var(--brand-blue);
+  --color-primary-hover: var(--brand-blue-dark);
+  --color-primary-muted: rgba(37, 99, 235, 0.08);
+  --color-accent: var(--brand-teal);
+  --color-accent-hover: var(--brand-teal-dark);
+  --color-accent-muted: rgba(20, 184, 166, 0.1);
+  --color-link: var(--brand-blue);
+  --color-link-hover: var(--brand-blue-dark);
 
   /* —— 语义色 —— */
   --color-success: var(--brand-green);
-  --color-success-muted: rgba(34, 197, 94, 0.12);
+  --color-success-muted: rgba(34, 197, 94, 0.1);
   --color-warning: #f59e0b;
   --color-warning-muted: rgba(245, 158, 11, 0.12);
-  --color-danger: #f87171;
-  --color-danger-muted: rgba(248, 113, 113, 0.12);
+  --color-danger: #dc2626;
+  --color-danger-muted: rgba(220, 38, 38, 0.08);
   --color-info: var(--brand-blue);
-  --color-info-muted: rgba(26, 111, 212, 0.12);
+  --color-info-muted: rgba(37, 99, 235, 0.08);
 
   /* —— 会员角标 —— */
-  --membership-standard-border: rgba(26, 111, 212, 0.55);
-  --membership-standard-text: #93c5fd;
-  --membership-standard-bg: rgba(26, 111, 212, 0.1);
-  --membership-premium-border: rgba(245, 158, 11, 0.5);
-  --membership-premium-text: #fcd34d;
+  --membership-standard-border: rgba(37, 99, 235, 0.35);
+  --membership-standard-text: #1d4ed8;
+  --membership-standard-bg: rgba(37, 99, 235, 0.08);
+  --membership-premium-border: rgba(245, 158, 11, 0.45);
+  --membership-premium-text: #b45309;
   --membership-premium-bg: rgba(245, 158, 11, 0.1);
 
-  /* —— 氛围光（Hero / 页面背景） —— */
-  --glow-blue: rgba(26, 111, 212, 0.22);
-  --glow-teal: rgba(20, 184, 166, 0.18);
-  --glow-green: rgba(34, 197, 94, 0.16);
+  /* —— 氛围（浅底微光，内页少用） —— */
+  --glow-blue: rgba(37, 99, 235, 0.08);
+  --glow-teal: rgba(20, 184, 166, 0.06);
+  --glow-green: rgba(34, 197, 94, 0.05);
 
   /* —— 字体 —— */
   --font-sans: 'DM Sans', 'Noto Sans SC', system-ui, -apple-system, sans-serif;
-  --font-size-xs: 0.75rem;
+  --font-size-xs: 0.8125rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
   --font-size-lg: 1.125rem;
   --font-size-xl: 1.25rem;
-  --font-size-2xl: 1.5rem;
-  --font-size-3xl: 1.875rem;
+  --font-size-2xl: 1.75rem;
+  --font-size-3xl: 2.25rem;
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
@@ -96,7 +98,7 @@
   --line-height-relaxed: 1.75;
   --letter-spacing-tight: -0.02em;
 
-  /* —— 间距（4px 基准） —— */
+  /* —— 间距 —— */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -106,23 +108,22 @@
   --space-8: 2rem;
   --space-10: 2.5rem;
   --space-12: 3rem;
+  --space-16: 4rem;
 
   /* —— 圆角 —— */
   --radius-sm: 6px;
   --radius-md: 10px;
-  --radius-lg: 14px;
+  --radius-lg: 16px;
   --radius-xl: 20px;
   --radius-full: 9999px;
 
   /* —— 阴影 —— */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.24);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.28);
-  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.38);
-  --shadow-brand: 0 4px 24px rgba(20, 184, 166, 0.22);
-  --shadow-glow-blue: 0 0 48px rgba(26, 111, 212, 0.2);
-  --shadow-glow-green: 0 0 48px rgba(34, 197, 94, 0.14);
-  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 6px 20px rgba(0, 0, 0, 0.28), 0 16px 40px rgba(0, 0, 0, 0.22);
-  --shadow-card-hover: 0 1px 0 rgba(255, 255, 255, 0.08) inset, 0 14px 36px rgba(0, 0, 0, 0.38), 0 0 28px rgba(20, 184, 166, 0.14);
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.06);
+  --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.08);
+  --shadow-brand: 0 2px 12px rgba(37, 99, 235, 0.22);
+  --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.06), 0 4px 12px rgba(15, 23, 42, 0.04);
+  --shadow-card-hover: 0 4px 16px rgba(15, 23, 42, 0.08), 0 8px 24px rgba(15, 23, 42, 0.05);
 
   /* —— 动效 —— */
   --transition-fast: 150ms ease;
@@ -134,6 +135,26 @@
   --content-narrow: 44rem;
   --header-height: 4rem;
 
-  /* —— 焦点环（无障碍） —— */
+  /* —— 焦点环 —— */
   --focus-ring: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-border-focus);
+
+  /* —— 与 Home.css 兼容的 clinical 别名 —— */
+  --clinical-bg: var(--color-bg);
+  --clinical-surface: var(--color-surface);
+  --clinical-text: var(--color-text);
+  --clinical-text-secondary: var(--color-text-secondary);
+  --clinical-text-muted: var(--color-text-muted);
+  --clinical-border: var(--color-border);
+  --clinical-primary: var(--color-primary);
+  --clinical-primary-hover: var(--color-primary-hover);
+  --clinical-accent: var(--color-accent);
+  --clinical-warning: var(--color-warning);
+  --clinical-primary-muted: var(--color-primary-muted);
+  --clinical-accent-muted: var(--color-accent-muted);
+  --clinical-warning-muted: var(--color-warning-muted);
+  --clinical-shadow: var(--shadow-card);
+  --clinical-shadow-hover: var(--shadow-card-hover);
+  --clinical-radius-card: var(--radius-lg);
+  --clinical-radius-btn: 12px;
+  --clinical-radius-pill: var(--radius-full);
 }

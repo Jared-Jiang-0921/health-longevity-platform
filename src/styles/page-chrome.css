@@ -1,48 +1,8 @@
 /**
- * 顶栏与内页标题 — 全站品牌统一（Logo 蓝绿渐变）
+ * 内页标题、Tab、说明块 — 临床浅色风
  */
 
-/* —— 顶栏（全站毛玻璃 + 品牌底边） —— */
-.site-header {
-  background: rgba(10, 16, 24, 0.86);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--color-border-subtle);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.16);
-  position: relative;
-}
-
-.site-header::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 1px;
-  background: var(--gradient-brand);
-  opacity: 0.38;
-  pointer-events: none;
-}
-
-.site-header--home {
-  background: rgba(10, 16, 24, 0.78);
-}
-
-.header-lang {
-  border-color: var(--color-border-subtle);
-  background: rgba(20, 30, 46, 0.6);
-  border-radius: var(--radius-md);
-}
-
-.header-lang select {
-  border-radius: var(--radius-sm);
-}
-
-.header-lang select:focus-visible {
-  border-color: var(--color-border-focus);
-}
-
-/* —— 内页模块容器 —— */
+/* —— 内页容器 —— */
 .page-health-skills,
 .page-products,
 .page-longevity-news,
@@ -74,7 +34,7 @@
 .product-detail-header {
   margin-bottom: var(--space-8);
   padding-bottom: var(--space-5);
-  border-bottom: 1px solid var(--color-border-subtle);
+  border-bottom: 1px solid var(--color-border);
   position: relative;
 }
 
@@ -92,11 +52,10 @@
   position: absolute;
   left: 0;
   bottom: -1px;
-  width: min(10rem, 42%);
+  width: min(8rem, 38%);
   height: 2px;
-  background: var(--gradient-brand);
+  background: var(--color-primary);
   border-radius: var(--radius-full);
-  opacity: 0.9;
 }
 
 .page-header h1,
@@ -118,10 +77,7 @@
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--letter-spacing-tight);
   line-height: var(--line-height-tight);
-  background: var(--gradient-brand);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--color-text);
 }
 
 .page-lead,
@@ -138,7 +94,7 @@
   margin: 0;
   font-size: var(--font-size-sm);
   line-height: var(--line-height-relaxed);
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
 }
 
 .page-header > p + p,
@@ -159,8 +115,8 @@
   font-size: var(--font-size-sm);
   line-height: var(--line-height-relaxed);
   color: var(--color-text);
-  border-left: 3px solid var(--brand-teal);
-  background: var(--color-primary-muted);
+  border-left: 3px solid var(--color-accent);
+  background: var(--color-accent-muted);
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
 }
 
@@ -179,7 +135,7 @@
 
 .page-callout--info,
 .news-caveat {
-  border-left-color: var(--brand-blue);
+  border-left-color: var(--color-primary);
   background: var(--color-info-muted);
 }
 
@@ -204,10 +160,10 @@
   font-weight: var(--font-weight-semibold);
   color: var(--color-text);
   line-height: var(--line-height-tight);
-  border-left: 3px solid var(--brand-teal);
+  border-left: 3px solid var(--color-primary);
 }
 
-/* —— 分类 Tab（全站统一） —— */
+/* —— 分类 Tab —— */
 .category-tabs,
 .tcm-tabs {
   display: flex;
@@ -219,22 +175,21 @@
 .category-tabs button,
 .tcm-tabs button {
   padding: var(--space-2) var(--space-4);
-  background: rgba(20, 30, 46, 0.65);
-  border: 1px solid var(--color-border-subtle);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
   cursor: pointer;
   transition:
     border-color var(--transition-fast),
     color var(--transition-fast),
-    background var(--transition-fast),
-    box-shadow var(--transition-fast);
+    background var(--transition-fast);
 }
 
 .category-tabs button:hover,
 .tcm-tabs button:hover {
-  border-color: rgba(20, 184, 166, 0.45);
+  border-color: var(--color-primary);
   color: var(--color-text);
   background: var(--color-primary-muted);
 }
@@ -242,9 +197,9 @@
 .category-tabs button.active,
 .tcm-tabs button.active {
   background: var(--color-primary-muted);
-  border-color: var(--brand-teal);
-  color: var(--brand-teal);
-  box-shadow: inset 0 -2px 0 var(--brand-teal);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
 }
 
 /* —— 返回链接 —— */
@@ -260,34 +215,38 @@
 }
 
 .back-link:hover {
-  color: var(--brand-teal);
+  color: var(--color-primary);
 }
 
-/* —— 页脚品牌线（全站） —— */
-.site-footer {
-  position: relative;
-  border-top-color: var(--color-border-subtle);
-}
-
-.site-footer::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 10%;
-  right: 10%;
-  height: 1px;
-  background: var(--gradient-brand);
-  opacity: 0.35;
-  pointer-events: none;
-}
-
-/* —— 通用 page-content 标题 —— */
 .page-content h1 {
   margin-bottom: var(--space-3);
 }
 
 .page-legal h1 {
-  background: none;
-  -webkit-text-fill-color: var(--color-text);
   color: var(--color-text);
+}
+
+/* —— 内页表格 —— */
+.products-table-wrap,
+.news-table-wrap,
+.tcm-table-wrap,
+.solutions-table-wrap {
+  border-color: var(--color-border);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.products-scoring-table th,
+.news-columns-table th,
+.tcm-columns-table th,
+.solutions-features-table th {
+  background: var(--color-primary-muted);
+  color: var(--color-text);
+}
+
+.products-scoring-table td,
+.news-columns-table td,
+.tcm-columns-table td,
+.solutions-features-table td {
+  border-color: var(--color-border);
 }

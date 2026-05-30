@@ -5,9 +5,9 @@
   bottom: 0;
   z-index: 200;
   padding: 1rem 1.25rem;
-  background: rgba(15, 20, 25, 0.97);
+  background: var(--color-surface);
   border-top: 1px solid var(--color-border);
-  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.08);
 }
 
 .cookie-banner-inner {
@@ -26,7 +26,7 @@
   min-width: min(100%, 280px);
   font-size: 0.875rem;
   line-height: 1.55;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
 }
 
 .cookie-banner-text a {

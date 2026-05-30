@@ -61,16 +61,16 @@ a:hover {
   font-weight: var(--font-weight-semibold);
   font-size: var(--font-size-sm);
   color: var(--color-text-inverse);
-  background: var(--gradient-brand);
+  background: var(--color-primary);
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: 12px;
   cursor: pointer;
-  transition: opacity var(--transition-base), transform var(--transition-fast), box-shadow var(--transition-base);
+  transition: background var(--transition-base), transform var(--transition-fast), box-shadow var(--transition-base);
   box-shadow: var(--shadow-brand);
 }
 
 .btn-primary:hover {
-  opacity: 0.92;
+  background: var(--color-primary-hover);
   transform: translateY(-1px);
 }
 

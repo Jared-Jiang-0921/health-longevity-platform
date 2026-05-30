@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 640" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="dnaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563EB"/>
+      <stop offset="50%" stop-color="#14B8A6"/>
+      <stop offset="100%" stop-color="#2563EB"/>
+    </linearGradient>
+  </defs>
+  <path d="M120 0 C220 80 260 160 120 240 C-20 320 20 400 120 480 C220 560 260 640 120 720" stroke="url(#dnaGrad)" stroke-width="2.5" stroke-opacity="0.55"/>
+  <path d="M360 0 C260 80 220 160 360 240 C500 320 460 400 360 480 C260 560 220 640 360 720" stroke="url(#dnaGrad)" stroke-width="2.5" stroke-opacity="0.55"/>
+  <g stroke="#2563EB" stroke-opacity="0.35" stroke-width="1.2">
+    <line x1="155" y1="60" x2="325" y2="100"/>
+    <line x1="95" y1="180" x2="385" y2="220"/>
+    <line x1="155" y1="300" x2="325" y2="340"/>
+    <line x1="95" y1="420" x2="385" y2="460"/>
+    <line x1="155" y1="540" x2="325" y2="580"/>
+  </g>
+  <circle cx="155" cy="60" r="4" fill="#2563EB" fill-opacity="0.4"/>
+  <circle cx="325" cy="100" r="4" fill="#14B8A6" fill-opacity="0.4"/>
+  <circle cx="95" cy="180" r="4" fill="#14B8A6" fill-opacity="0.4"/>
+  <circle cx="385" cy="220" r="4" fill="#2563EB" fill-opacity="0.4"/>
+  <circle cx="155" cy="300" r="4" fill="#2563EB" fill-opacity="0.4"/>
+  <circle cx="325" cy="340" r="4" fill="#14B8A6" fill-opacity="0.4"/>
+  <circle cx="95" cy="420" r="4" fill="#14B8A6" fill-opacity="0.4"/>
+  <circle cx="385" cy="460" r="4" fill="#2563EB" fill-opacity="0.4"/>
+</svg>

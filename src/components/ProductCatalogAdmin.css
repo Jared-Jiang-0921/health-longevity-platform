@@ -1,36 +1,38 @@
 .product-catalog-admin {
   margin-bottom: 1.75rem;
   padding: 1rem 1.25rem;
-  border: 1px solid rgba(46, 204, 113, 0.35);
-  border-radius: 12px;
-  background: rgba(15, 40, 28, 0.45);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .product-catalog-admin-title {
   margin: 0 0 0.35rem;
   font-size: 1.05rem;
+  color: var(--color-text);
 }
 
 .product-catalog-admin-note {
   margin: 0 0 1rem;
   font-size: 0.85rem;
-  opacity: 0.88;
+  color: var(--color-text-secondary);
   line-height: 1.5;
 }
 
 .product-catalog-admin-muted {
-  opacity: 0.75;
+  color: var(--color-text-muted);
   font-size: 0.9rem;
 }
 
 .product-catalog-admin-error {
-  color: #ff6b6b;
+  color: var(--color-danger);
   margin: 0.25rem 0;
   font-size: 0.9rem;
 }
 
 .product-catalog-admin-hint {
-  color: #69db7c;
+  color: var(--color-accent);
   margin: 0.25rem 0;
   font-size: 0.9rem;
 }
@@ -53,6 +55,7 @@
   flex-direction: column;
   gap: 0.25rem;
   font-size: 0.85rem;
+  color: var(--color-text-secondary);
 }
 
 .product-catalog-admin-grid input,
@@ -60,9 +63,9 @@
 .product-catalog-admin-full textarea {
   padding: 0.45rem 0.55rem;
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(0, 0, 0, 0.25);
-  color: inherit;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 
 .product-catalog-admin-span2 {
@@ -78,12 +81,13 @@
 .product-catalog-admin-list-wrap {
   margin-top: 1.5rem;
   padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--color-border);
 }
 
 .product-catalog-admin-list-wrap h5 {
   margin: 0 0 0.65rem;
   font-size: 0.95rem;
+  color: var(--color-text);
 }
 
 .product-catalog-admin-list {
@@ -98,8 +102,8 @@
 .product-catalog-admin-row {
   padding: 0.65rem 0.75rem;
   border-radius: 10px;
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
 }
 
 .product-catalog-admin-meta {
@@ -113,14 +117,16 @@
 .product-catalog-admin-meta strong {
   display: block;
   margin-bottom: 0.25rem;
+  color: var(--color-text);
 }
 
 .product-catalog-admin-pill {
   font-size: 0.72rem;
   padding: 0.15rem 0.45rem;
   border-radius: 999px;
-  background: rgba(46, 204, 113, 0.15);
-  border: 1px solid rgba(46, 204, 113, 0.35);
+  background: var(--color-accent-muted);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
 }
 
 .product-catalog-admin-actions {
@@ -131,8 +137,8 @@
 }
 
 .product-catalog-admin-danger {
-  border-color: rgba(255, 107, 107, 0.5);
-  color: #ffb3b3;
+  border-color: var(--color-danger);
+  color: var(--color-danger);
 }
 
 .product-catalog-admin-edit {
@@ -158,6 +164,7 @@
 
 .product-catalog-admin-thumb.product-catalog-image-ph {
   min-height: 72px;
+  background: var(--color-primary-muted);
 }
 
 .product-catalog-admin-meta-text {
@@ -176,8 +183,8 @@
   margin: 0.5rem 0 1rem;
   padding: 0.65rem 0.75rem;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
 }
 
 .product-catalog-admin-skus-head {
@@ -190,6 +197,7 @@
 
 .product-catalog-admin-skus-head strong {
   font-size: 0.88rem;
+  color: var(--color-text);
 }
 
 .product-catalog-admin-sku-row {
@@ -203,9 +211,9 @@
 .product-catalog-admin-sku-row input {
   padding: 0.35rem 0.45rem;
   border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(0, 0, 0, 0.25);
-  color: inherit;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
   font-size: 0.8rem;
 }
 

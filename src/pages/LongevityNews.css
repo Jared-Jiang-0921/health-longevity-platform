@@ -108,9 +108,9 @@
 .news-if {
   font-size: 0.75rem;
   color: var(--color-text-muted);
-  background: rgba(255,255,255,0.05);
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
+  background: var(--color-primary-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
 }
 
 .news-month {

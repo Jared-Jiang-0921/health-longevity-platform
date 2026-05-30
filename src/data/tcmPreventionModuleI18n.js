@@ -3,6 +3,9 @@
  */
 const COPY = {
   zh: {
+    bannerTitle: '中医治未病',
+    bannerLine1: '顺四时而养生',
+    bannerLine2: '调体质而防未病',
     title: '中医药特色 · 治未病',
     differentiation:
       '许多健康长寿类站点偏重西方「抗衰老」叙事；本模块以中医治未病为根基，并与现代预防医学、生活方式医学对照融合，形成具有中国特色的差异化内容路径。',
@@ -32,6 +35,9 @@ const COPY = {
     dtSource: '出处',
   },
   en: {
+    bannerTitle: 'TCM Preventive Care',
+    bannerLine1: 'Live with the seasons',
+    bannerLine2: 'Balance constitution before illness',
     title: 'TCM · Preventive Care (治未病)',
     differentiation:
       'Many longevity sites lean heavily on Western “anti-aging” framing. Here we anchor on TCM preventive care (治未病) and pair it with modern preventive and lifestyle medicine for a distinctly Chinese-differentiated path.',
@@ -61,6 +67,9 @@ const COPY = {
     dtSource: 'Source',
   },
   ar: {
+    bannerTitle: 'الوقاية قبل المرض',
+    bannerLine1: 'العيش مع الفصول',
+    bannerLine2: 'ضبط النمط قبل المرض',
     title: 'الطب الصيني · الوقاية قبل المرض',
     differentiation:
       'كثير من مواقع طول العمر تركز على «مكافحة الشيخوخة» بمنظور غربي. هنا نركز على الوقاية الصينية قبل المرض ونربطها بالطب الوقائي الحديث وطب نمط الحياة لمسار مميز.',
