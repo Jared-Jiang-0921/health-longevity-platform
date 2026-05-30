@@ -8,14 +8,15 @@
     "build": "vite build",
     "preview": "vite preview",
     "fc:routes": "node scripts/fc/generate-route-manifest.mjs",
-    "ops:migrate-series-folders": "node scripts/ops/migrate-health-skills-series-folders.mjs"
+    "ops:migrate-series-folders": "node scripts/ops/migrate-health-skills-series-folders.mjs",
+    "ops:visual-webp": "node scripts/ops/convert-visual-webp.mjs"
   },
   "dependencies": {
-    "dotenv": "^16.4.5",
     "@neondatabase/serverless": "^0.10.0",
     "@stripe/react-stripe-js": "^2.4.0",
     "@stripe/stripe-js": "^4.2.0",
     "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
     "jose": "^5.9.0",
     "nodemailer": "^8.0.4",
     "otplib": "^13.4.0",
@@ -29,6 +30,7 @@
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.19",
     "@vitejs/plugin-react": "^4.2.1",
+    "sharp": "^0.34.5",
     "vite": "^5.1.0"
   }
 }

@@ -141,6 +141,23 @@ export function resolveVisualUrl(asset) {
   return asset.localPath
 }
 
+/**
+ * @param {{ localPath: string, image2Key?: string }} asset
+ * @returns {{ fallback: string, webp: string | null, isCdn: boolean }}
+ */
+export function resolveVisualSources(asset) {
+  if (!asset) {
+    return { fallback: '', webp: null, isCdn: false }
+  }
+  if (IMAGE2_BASE && asset.image2Key) {
+    const url = `${IMAGE2_BASE}/${asset.image2Key}`
+    return { fallback: url, webp: null, isCdn: true }
+  }
+  const fallback = asset.localPath
+  const webp = fallback.replace(/\.png$/i, '.webp')
+  return { fallback, webp, isCdn: false }
+}
+
 /** @param {keyof typeof VISUAL_ASSETS} id */
 export function getVisualAsset(id) {
   return VISUAL_ASSETS[id]
@@ -160,10 +177,22 @@ export function getModuleVisualUrl(visualKey) {
   return resolveVisualUrl(asset)
 }
 
+/** @param {keyof typeof VISUAL_ASSETS} id */
+export function getVisualAssetSources(id) {
+  const asset = VISUAL_ASSETS[id]
+  return resolveVisualSources(asset)
+}
+
+/** @param {string} visualKey */
+export function getModuleVisualSources(visualKey) {
+  const asset = MODULE_VISUAL_ASSETS[visualKey]
+  return resolveVisualSources(asset)
+}
+
 /** @param {string} path - module route e.g. /solutions */
-export function getModuleVisualByPath(path) {
+export function getModuleVisualSourcesByPath(path) {
   const key = MODULE_PATH_TO_VISUAL_KEY[path]
-  return key ? getModuleVisualUrl(key) : ''
+  return key ? getModuleVisualSources(key) : resolveVisualSources(null)
 }
 
 /** @param {string} path */

@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { TCM_HERBS, TCM_PRESCRIPTIONS } from '../data/tcmPrevention'
 import { getTcmPreventionModuleCopy } from '../data/tcmPreventionModuleI18n'
-import { getVisualAssetUrl, getVisualAlt } from '../data/visualAssets'
+import VisualImage from '../components/VisualImage'
+import { getVisualAssetSources, getVisualAlt } from '../data/visualAssets'
 import { useLocale } from '../context/LocaleContext'
 import './TCMPrevention.css'
 
@@ -16,9 +17,10 @@ export default function TCMPrevention() {
   return (
     <div className="page-tcm-prevention">
       <section className="tcm-hero-banner" aria-labelledby="tcm-banner-title">
-        <img
+        <VisualImage
+          pictureClassName="tcm-hero-banner-bg"
           className="tcm-hero-banner-bg"
-          src={getVisualAssetUrl('bannerTcmPrevention')}
+          sources={getVisualAssetSources('bannerTcmPrevention')}
           alt=""
           decoding="async"
         />

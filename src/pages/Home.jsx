@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
 import { getMembershipLevelLabel } from '../i18n/terms'
 import HomeAtmosphere from '../components/HomeAtmosphere'
+import VisualImage from '../components/VisualImage'
 import {
   HOME_MODULES,
   HOME_STATS,
@@ -11,9 +12,9 @@ import {
   getHomeCopy,
 } from '../data/homePageContent'
 import {
-  getModuleVisualByPath,
+  getModuleVisualSourcesByPath,
   getModuleVisualAlt,
-  getVisualAssetUrl,
+  getVisualAssetSources,
   getVisualAlt,
 } from '../data/visualAssets'
 import './Home.css'
@@ -54,8 +55,8 @@ export default function Home() {
             ) : null}
           </div>
           <figure className="home-hero-visual">
-            <img
-              src={getVisualAssetUrl('heroCockpit')}
+            <VisualImage
+              sources={getVisualAssetSources('heroCockpit')}
               alt={getVisualAlt('heroCockpit', lang)}
               width={1200}
               height={900}
@@ -82,7 +83,7 @@ export default function Home() {
             const desc = mod.desc[lang] || mod.desc.zh
             const chips = mod.chips[lang] || mod.chips.zh
             const disclaimer = mod.disclaimer?.[lang] || mod.disclaimer?.zh
-            const coverSrc = getModuleVisualByPath(mod.path)
+            const coverSources = getModuleVisualSourcesByPath(mod.path)
             const coverAlt = getModuleVisualAlt(mod.path, lang)
             return (
               <article
@@ -90,8 +91,8 @@ export default function Home() {
                 className={`home-module-card${mod.muted ? ' home-module-card--muted' : ''}${mod.accent ? ' home-module-card--tcm' : ''}`}
               >
                 <div className="home-module-cover">
-                  <img
-                    src={coverSrc}
+                  <VisualImage
+                    sources={coverSources}
                     alt={coverAlt}
                     loading="lazy"
                     decoding="async"

@@ -13,7 +13,8 @@
   box-shadow: var(--shadow-md);
 }
 
-.tcm-hero-banner-bg {
+.tcm-hero-banner picture.tcm-hero-banner-bg,
+.tcm-hero-banner picture.tcm-hero-banner-bg img {
   position: absolute;
   inset: 0;
   width: 100%;
