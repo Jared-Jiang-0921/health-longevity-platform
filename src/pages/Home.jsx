@@ -70,43 +70,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Trust */}
-      <section className="home-trust" aria-labelledby="home-trust-heading">
-        <h2 id="home-trust-heading" className="home-section-title home-section-title--compact">
-          {copy.trustTitle}
-        </h2>
-        <div className="home-trust-grid">
-          <article className="home-trust-card">
-            <h3>{copy.trustEvidence}</h3>
-            <p>{copy.trustEvidenceDesc}</p>
-          </article>
-          <article className="home-trust-card">
-            <h3>{copy.trustAudience}</h3>
-            <p>{copy.trustAudienceDesc}</p>
-          </article>
-          <article className="home-trust-card">
-            <h3>{copy.trustRisk}</h3>
-            <p>{copy.trustRiskDesc}</p>
-          </article>
-        </div>
-      </section>
-
-      {/* Stats */}
-      <section className="home-stats" aria-labelledby="home-stats-heading">
-        <header className="home-section-header">
-          <h2 id="home-stats-heading">{copy.statsTitle}</h2>
-          <p>{copy.statsLead}</p>
-        </header>
-        <div className="home-stats-grid">
-          {HOME_STATS.map((stat) => (
-            <article key={stat.id} className="home-stat-card">
-              <p className="home-stat-value">{stat.value}</p>
-              <p className="home-stat-label">{stat.label[lang] || stat.label.zh}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
       {/* Modules */}
       <section className="home-modules" aria-labelledby="home-modules-heading">
         <header className="home-section-header">
@@ -226,6 +189,43 @@ export default function Home() {
         <Link to={primaryTo} state={primaryState} className="home-btn home-btn--primary home-steps-cta">
           {copy.ctaPrimary}
         </Link>
+      </section>
+
+      {/* Trust */}
+      <section className="home-trust" aria-labelledby="home-trust-heading">
+        <h2 id="home-trust-heading" className="home-section-title home-section-title--compact">
+          {copy.trustTitle}
+        </h2>
+        <div className="home-trust-grid">
+          <article className="home-trust-card">
+            <h3>{copy.trustEvidence}</h3>
+            <p>{copy.trustEvidenceDesc}</p>
+          </article>
+          <article className="home-trust-card">
+            <h3>{copy.trustAudience}</h3>
+            <p>{copy.trustAudienceDesc}</p>
+          </article>
+          <article className="home-trust-card">
+            <h3>{copy.trustRisk}</h3>
+            <p>{copy.trustRiskDesc}</p>
+          </article>
+        </div>
+      </section>
+
+      {/* Stats */}
+      <section className="home-stats" aria-labelledby="home-stats-heading">
+        <header className="home-section-header">
+          <h2 id="home-stats-heading">{copy.statsTitle}</h2>
+          <p>{copy.statsLead}</p>
+        </header>
+        <div className="home-stats-grid">
+          {HOME_STATS.map((stat) => (
+            <article key={stat.id} className="home-stat-card">
+              <p className="home-stat-value">{stat.value}</p>
+              <p className="home-stat-label">{stat.label[lang] || stat.label.zh}</p>
+            </article>
+          ))}
+        </div>
       </section>
     </div>
   )
