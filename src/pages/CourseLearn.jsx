@@ -8,6 +8,7 @@ import { getUi } from '../i18n/ui'
 import { getMembershipLevelLabel } from '../i18n/terms'
 import { hasLevelAccess, shouldShowMembershipBadge } from '../data/membership'
 import ContentLockNotice from '../components/ContentLockNotice'
+import ModuleAccessHint from '../components/ModuleAccessHint'
 import '../styles/membership-badge.css'
 import './CourseLearn.css'
 
@@ -177,7 +178,11 @@ export default function CourseLearn() {
       <div className="learn-header">
         <Link to={`/health-skills/${id}`} className="back-link">← {t.back}</Link>
         <h1>{course.title}</h1>
-        {isAdmin ? <p className="learn-methodology">{methodologyLine}</p> : null}
+        {isAdmin ? (
+          <p className="learn-methodology">{methodologyLine}</p>
+        ) : (
+          <ModuleAccessHint moduleKey="health-skills" />
+        )}
       </div>
 
       <div className="learn-layout">

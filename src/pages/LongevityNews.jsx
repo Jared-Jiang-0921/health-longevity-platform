@@ -2,6 +2,7 @@ import { RESEARCH_UPDATES, getMonthLabel } from '../data/longevityNews'
 import { getLongevityNewsModuleCopy } from '../data/longevityNewsModuleI18n'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
+import ModuleAccessHint from '../components/ModuleAccessHint'
 import './LongevityNews.css'
 
 export default function LongevityNews() {
@@ -57,7 +58,9 @@ export default function LongevityNews() {
 
             <p className="news-list-intro">{mod.listIntro}</p>
           </>
-        ) : null}
+        ) : (
+          <ModuleAccessHint moduleKey="longevity-news" />
+        )}
       </section>
 
       {isAdmin ? (

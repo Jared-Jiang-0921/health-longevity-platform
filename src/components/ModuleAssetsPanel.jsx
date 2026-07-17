@@ -7,6 +7,7 @@ import { getSeriesTitlesForCategory, getCanonicalSeriesSubtopic } from '../data/
 import { PRODUCT_CATEGORIES, getProductById } from '../data/products'
 import ProductCatalogAdmin from './ProductCatalogAdmin'
 import ContentLockNotice from './ContentLockNotice'
+import ModuleAccessHint from './ModuleAccessHint'
 import { shouldShowMembershipBadge } from '../data/membership'
 import { fileToBase64 } from '../lib/fileBase64'
 import { adminLevelValue } from '../lib/contentLevelAdmin'
@@ -184,11 +185,15 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     () => mergeSubtopicOptions(moduleKey, editForm.subcategory, getSubtopicOptions(moduleKey, editForm.subcategory), items),
     [moduleKey, editForm.subcategory, items],
   )
+  /** 非管理员只看到已有实际上传资料的亚类；规划/示例预设仅管理员用于上传分类 */
   const availableSubcategories = useMemo(() => {
-    const normalizedPreset = subcategoryOptions.map((opt) => normalizeSubcategoryValue(moduleKey, opt))
     const fromItems = items.map((item) => normalizeSubcategoryValue(moduleKey, item.subcategory))
+    if (!isAdmin) {
+      return Array.from(new Set(fromItems)).filter(Boolean)
+    }
+    const normalizedPreset = subcategoryOptions.map((opt) => normalizeSubcategoryValue(moduleKey, opt))
     return Array.from(new Set([...normalizedPreset, ...fromItems])).filter(Boolean)
-  }, [items, moduleKey, subcategoryOptions])
+  }, [items, moduleKey, subcategoryOptions, isAdmin])
   const latestItem = items[0] || null
   const routeBinding = useMemo(() => {
     if (moduleKey === 'health-skills') {
@@ -229,12 +234,15 @@ export default function ModuleAssetsPanel({ moduleKey }) {
   }, [activeSubcategory, activeSubtopic, items, moduleKey])
   const activeSubtopicOptions = useMemo(() => {
     if (!activeSubcategory) return []
-    const fromPreset = getSubtopicOptions(moduleKey, activeSubcategory)
     const fromItems = items
       .filter((item) => normalizeSubcategoryValue(moduleKey, item.subcategory) === activeSubcategory)
       .map((item) => canonicalSubtopic(moduleKey, item.subtopic))
+    if (!isAdmin) {
+      return Array.from(new Set(fromItems)).filter((t) => t && t !== '待归类')
+    }
+    const fromPreset = getSubtopicOptions(moduleKey, activeSubcategory)
     return Array.from(new Set([...fromItems, ...fromPreset])).filter((t) => t && t !== '待归类')
-  }, [moduleKey, activeSubcategory, items])
+  }, [moduleKey, activeSubcategory, items, isAdmin])
   const t = useMemo(() => ({
     zh: {
       section: '模块资料',
@@ -651,10 +659,27 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     }
   }
 
+  const pageHasAccessHint = [
+    'health-skills',
+    'products',
+    'longevity-news',
+    'tcm-prevention',
+    'translation-opportunities',
+  ].includes(moduleKey)
+
+  if (!isAdmin && !loading && !items.length) {
+    if (pageHasAccessHint) return null
+    return (
+      <section className="module-assets-panel">
+        <ModuleAccessHint moduleKey={moduleKey} />
+      </section>
+    )
+  }
+
   return (
     <section className="module-assets-panel">
-      <h3>{t.section}</h3>
       {loading ? <p className="module-assets-muted">{t.loading}</p> : null}
+      <h3>{t.section}</h3>
       {isAdmin ? (
         <p className="module-assets-debug">
           <strong>{t.debugMapping}:</strong> module=`{moduleKey}` / subcategory=`{activeSubcategory || '-'}`
@@ -667,7 +692,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
           {items[0] ? ` / latest=${items[0].subcategory || '-'} > ${items[0].subtopic || '-'}` : ''}
         </p>
       ) : null}
-      {!loading && !items.length ? <p className="module-assets-muted">{t.empty}</p> : null}
+      {isAdmin && !loading && !items.length ? <p className="module-assets-muted">{t.empty}</p> : null}
       {availableSubcategories.length ? (
         <>
           <section className="module-assets-subtabs">

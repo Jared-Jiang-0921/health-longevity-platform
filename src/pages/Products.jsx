@@ -10,6 +10,7 @@ import { getUi } from '../i18n/ui'
 import '../styles/membership-badge.css'
 import { pickCatalogLocale } from '../lib/productCatalogLocale'
 import ProductCatalogImage from '../components/ProductCatalogImage'
+import ModuleAccessHint from '../components/ModuleAccessHint'
 import './Products.css'
 
 function formatPriceSymbol(currency) {
@@ -153,7 +154,9 @@ export default function Products() {
 
             <p className="products-list-note">{ev.listFooterNote}</p>
           </>
-        ) : null}
+        ) : (
+          <ModuleAccessHint moduleKey="products" />
+        )}
       </section>
 
       <section className="categories">

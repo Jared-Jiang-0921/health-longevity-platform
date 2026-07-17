@@ -2,6 +2,7 @@ import './TranslationOpportunities.css'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
 import { getTranslationOpportunitiesModuleCopy } from '../data/translationOpportunitiesModuleI18n'
+import ModuleAccessHint from '../components/ModuleAccessHint'
 
 export default function TranslationOpportunities() {
   const { lang } = useLocale()
@@ -45,7 +46,9 @@ export default function TranslationOpportunities() {
               <p className="opportunities-monetization-body">{mod.monetizationBody}</p>
             </section>
           </>
-        ) : null}
+        ) : (
+          <ModuleAccessHint moduleKey="translation-opportunities" />
+        )}
       </section>
 
       {isAdmin ? (

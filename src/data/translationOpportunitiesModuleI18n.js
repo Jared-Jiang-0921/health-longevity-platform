@@ -8,7 +8,7 @@ const COPY = {
       '面向创业者、投资人、研究者与企业团队：把前沿长寿与健康研究「翻译」为可评估的商业机会，而非只做泛科普。',
     core:
       '本模块强调「研究—产品—市场」链条：从论文、指南与临床需求中提炼可落地的技术、产品与服务形态，并提示监管、证据与获客等关键风险。',
-    columnsTitle: '建议栏目',
+    columnsTitle: '建议栏目（示例规划）',
     colColumn: '栏目',
     colContent: '内容',
     columnRows: [
@@ -30,7 +30,7 @@ const COPY = {
       'For founders, investors, researchers, and enterprise teams: translate frontier longevity and health research into assessable commercial opportunities—not generic science popularization alone.',
     core:
       'We focus on the research → product → market chain: extract actionable tech, product, and service shapes from papers, guidelines, and clinical needs, while flagging regulatory, evidence, and go-to-market risks.',
-    columnsTitle: 'Suggested columns',
+    columnsTitle: 'Suggested columns (planning sample)',
     colColumn: 'Column',
     colContent: 'Focus',
     columnRows: [

@@ -17,6 +17,7 @@ import {
   getVisualAssetSources,
   getVisualAlt,
 } from '../data/visualAssets'
+import ModuleAccessHint from '../components/ModuleAccessHint'
 import './Home.css'
 
 function EvidenceChip({ grade }) {
@@ -180,7 +181,15 @@ export default function Home() {
             </div>
           </div>
         </section>
-      ) : null}
+      ) : (
+        <section className="home-today" aria-labelledby="home-today-heading">
+          <header className="home-section-header">
+            <h2 id="home-today-heading">{copy.todayTitle}</h2>
+            <p className="home-curated-note">{copy.todayCurated}</p>
+          </header>
+          <ModuleAccessHint moduleKey="home" />
+        </section>
+      )}
 
       {/* Steps */}
       <section className="home-steps" aria-labelledby="home-steps-heading">

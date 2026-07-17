@@ -8,6 +8,7 @@ import { useLocale } from '../context/LocaleContext'
 import { getUi } from '../i18n/ui'
 import { getMembershipLevelLabel } from '../i18n/terms'
 import { shouldShowMembershipBadge } from '../data/membership'
+import ModuleAccessHint from '../components/ModuleAccessHint'
 import '../styles/membership-badge.css'
 import './HealthSkills.css'
 
@@ -45,7 +46,9 @@ export default function HealthSkills() {
         <p>{t.desc}</p>
         {isAdmin ? (
           <p className="health-skills-methodology page-callout">{methodologyLine}</p>
-        ) : null}
+        ) : (
+          <ModuleAccessHint moduleKey="health-skills" />
+        )}
       </section>
 
       <section className="categories">

@@ -5,6 +5,7 @@ import VisualImage from '../components/VisualImage'
 import { getVisualAssetSources, getVisualAlt } from '../data/visualAssets'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
+import ModuleAccessHint from '../components/ModuleAccessHint'
 import './TCMPrevention.css'
 
 const TAB_HERBS = 'herbs'
@@ -67,7 +68,9 @@ export default function TCMPrevention() {
 
             <p className="tcm-bridge">{mod.bridgeTabs}</p>
           </>
-        ) : null}
+        ) : (
+          <ModuleAccessHint moduleKey="tcm-prevention" />
+        )}
       </section>
 
       <div className="tcm-tabs">

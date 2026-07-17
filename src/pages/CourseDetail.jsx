@@ -9,6 +9,7 @@ import { getUi } from '../i18n/ui'
 import { getMembershipLevelLabel } from '../i18n/terms'
 import { hasLevelAccess, shouldShowMembershipBadge } from '../data/membership'
 import ContentLockNotice from '../components/ContentLockNotice'
+import ModuleAccessHint from '../components/ModuleAccessHint'
 import CourseSeriesVideos from '../components/CourseSeriesVideos'
 import '../styles/membership-badge.css'
 import './CourseDetail.css'
@@ -94,7 +95,11 @@ export default function CourseDetail() {
           ) : null}
         </div>
         <p className="course-desc">{course.desc}</p>
-        {isAdmin ? <p className="course-methodology">{methodologyLine}</p> : null}
+        {isAdmin ? (
+          <p className="course-methodology">{methodologyLine}</p>
+        ) : (
+          <ModuleAccessHint moduleKey="health-skills" />
+        )}
       </header>
 
       <section className="course-detail-content">
