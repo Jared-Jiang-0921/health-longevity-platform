@@ -18,9 +18,36 @@ export default function CourseDetail() {
   const { lang } = useLocale()
   const ui = getUi(lang)
   const t = {
-    zh: { nf: '未找到该课程', back: '返回课程列表', intro: '课程简介', cancel: '取消收藏', fav: '收藏', faved: '已收藏' },
-    en: { nf: 'Course not found', back: 'Back to course list', intro: 'Course Overview', cancel: 'Remove favorite', fav: 'Favorite', faved: 'Favorited' },
-    ar: { nf: 'الدورة غير موجودة', back: 'العودة للدورات', intro: 'مقدمة الدورة', cancel: 'إزالة من المفضلة', fav: 'مفضلة', faved: 'مفضلة' },
+    zh: {
+      nf: '未找到该课程',
+      back: '返回课程列表',
+      intro: '合集简介',
+      cancel: '取消收藏',
+      fav: '收藏',
+      faved: '已收藏',
+      openBook: '打开合集',
+      learn: '开始学习',
+    },
+    en: {
+      nf: 'Course not found',
+      back: 'Back to course list',
+      intro: 'About this collection',
+      cancel: 'Remove favorite',
+      fav: 'Favorite',
+      faved: 'Favorited',
+      openBook: 'Open collection',
+      learn: 'Start learning',
+    },
+    ar: {
+      nf: 'الدورة غير موجودة',
+      back: 'العودة للدورات',
+      intro: 'عن المجموعة',
+      cancel: 'إزالة من المفضلة',
+      fav: 'مفضلة',
+      faved: 'مفضلة',
+      openBook: 'فتح المجموعة',
+      learn: 'ابدأ التعلم',
+    },
   }[lang || 'zh']
   const { id } = useParams()
   const course = getCourseById(id)
@@ -118,9 +145,15 @@ export default function CourseDetail() {
         >
           {favorite ? `♥ ${t.faved}` : `♡ ${t.fav}`}
         </button>
-        <Link to={`/health-skills/${course.id}/learn`} className="btn-primary">
-          {ui.learn}
-        </Link>
+        {course.videoSeries ? (
+          <a href="#course-series-videos-heading" className="btn-primary">
+            {t.openBook}
+          </a>
+        ) : (
+          <Link to={`/health-skills/${course.id}/learn`} className="btn-primary">
+            {t.learn || ui.learn}
+          </Link>
+        )}
       </section>
     </div>
   )

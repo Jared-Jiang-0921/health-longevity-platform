@@ -18,9 +18,30 @@ export default function HealthSkills() {
   const isAdmin = Boolean(user?.site_admin)
   const ui = getUi(lang)
   const t = {
-    zh: { title: '长寿知识技能', desc: '系统化健康知识与技能课程，支持多语言与全球化学习。', cancel: '取消收藏', fav: '收藏', series: '视频系列' },
-    en: { title: 'Health Skills', desc: 'Structured health knowledge and skill courses with multilingual learning.', cancel: 'Remove favorite', fav: 'Favorite', series: 'Video series' },
-    ar: { title: 'مهارات الصحة', desc: 'دورات منهجية للمعرفة والمهارات الصحية مع دعم متعدد اللغات.', cancel: 'إزالة من المفضلة', fav: 'إضافة للمفضلة', series: 'سلسلة فيديو' },
+    zh: {
+      title: '长寿知识技能',
+      desc: '系统化健康知识与技能课程，支持多语言与全球化学习。同一系列合集像一本书，点进后再观看各集视频。',
+      cancel: '取消收藏',
+      fav: '收藏',
+      series: '视频合集',
+      openBook: '打开合集',
+    },
+    en: {
+      title: 'Health Skills',
+      desc: 'Structured courses. A video series works like a book—open it, then watch each episode.',
+      cancel: 'Remove favorite',
+      fav: 'Favorite',
+      series: 'Video collection',
+      openBook: 'Open',
+    },
+    ar: {
+      title: 'مهارات الصحة',
+      desc: 'دورات منهجية. المجموعة مثل كتاب: افتحها ثم شاهد كل حلقة.',
+      cancel: 'إزالة من المفضلة',
+      fav: 'إضافة للمفضلة',
+      series: 'مجموعة فيديو',
+      openBook: 'فتح',
+    },
   }[lang || 'zh']
   const methodologyLine = getHealthSkillsContentApproach(lang)
   const [activeCategory, setActiveCategory] = useState(CATEGORIES[0]?.id || 'basics')
@@ -99,7 +120,7 @@ export default function HealthSkills() {
                   ) : null}
                   <span className="course-level">{course.level}</span>
                   <Link to={`/health-skills/${course.id}`} className="btn-learn">
-                    {ui.learn}
+                    {course.videoSeries ? t.openBook : ui.learn}
                   </Link>
                 </div>
               </article>
