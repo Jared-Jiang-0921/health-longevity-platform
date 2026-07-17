@@ -3,6 +3,7 @@ import { TCM_HERBS, TCM_PRESCRIPTIONS } from '../data/tcmPrevention'
 import { getTcmPreventionModuleCopy } from '../data/tcmPreventionModuleI18n'
 import VisualImage from '../components/VisualImage'
 import { getVisualAssetSources, getVisualAlt } from '../data/visualAssets'
+import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
 import './TCMPrevention.css'
 
@@ -11,6 +12,8 @@ const TAB_PRESCRIPTIONS = 'prescriptions'
 
 export default function TCMPrevention() {
   const { lang } = useLocale()
+  const { user } = useAuth()
+  const isAdmin = Boolean(user?.site_admin)
   const mod = getTcmPreventionModuleCopy(lang)
   const [activeTab, setActiveTab] = useState(TAB_HERBS)
 
@@ -38,29 +41,33 @@ export default function TCMPrevention() {
         <p className="tcm-differentiation">{mod.differentiation}</p>
         <p className="tcm-positioning page-callout">{mod.positioning}</p>
 
-        <section className="tcm-columns" aria-labelledby="tcm-columns-heading">
-          <h2 id="tcm-columns-heading" className="tcm-section-title">{mod.columnsTitle}</h2>
-          <div className="tcm-table-wrap">
-            <table className="tcm-columns-table">
-              <thead>
-                <tr>
-                  <th scope="col">{mod.colModule}</th>
-                  <th scope="col">{mod.colContent}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {mod.columnRows.map((row) => (
-                  <tr key={row.module}>
-                    <td>{row.module}</td>
-                    <td>{row.content}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+        {isAdmin ? (
+          <>
+            <section className="tcm-columns" aria-labelledby="tcm-columns-heading">
+              <h2 id="tcm-columns-heading" className="tcm-section-title">{mod.columnsTitle}</h2>
+              <div className="tcm-table-wrap">
+                <table className="tcm-columns-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">{mod.colModule}</th>
+                      <th scope="col">{mod.colContent}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {mod.columnRows.map((row) => (
+                      <tr key={row.module}>
+                        <td>{row.module}</td>
+                        <td>{row.content}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
 
-        <p className="tcm-bridge">{mod.bridgeTabs}</p>
+            <p className="tcm-bridge">{mod.bridgeTabs}</p>
+          </>
+        ) : null}
       </section>
 
       <div className="tcm-tabs">

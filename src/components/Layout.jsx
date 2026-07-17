@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
-import { canAccess } from '../data/membership'
+import { canAccess, getRequiredLevel } from '../data/membership'
 import { SITE_LEGAL } from '../data/siteLegal'
 import CookieConsentBanner from './CookieConsentBanner'
 import './Layout.css'
@@ -88,7 +88,12 @@ export default function Layout({ children }) {
   const t = I18N[lang] || I18N.zh
   const isHome = location.pathname === '/'
 
-  const visibleNavItems = primaryNavItems.filter((item) => canAccess(item.path, user?.level))
+  const visibleNavItems = primaryNavItems.filter((item) => {
+    const required = getRequiredLevel(item.path)
+    // 游客仍展示「需登录」类入口（如长寿知识技能），点进页面后再引导注册
+    if (!user) return !required || required === 'free'
+    return canAccess(item.path, user.level, { isGuest: false })
+  })
 
   return (
     <>

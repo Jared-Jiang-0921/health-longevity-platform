@@ -19,8 +19,6 @@ export default function LegalDocument({ doc }) {
       <p className="legal-meta">
         {lang === 'zh' ? '最后更新：' : lang === 'ar' ? 'آخر تحديث: ' : 'Last updated: '}
         {meta.lastUpdated}
-        {' · '}
-        <span className="legal-meta-muted">{meta.governingLawNote}</span>
       </p>
 
       <h1>{bundle.title}</h1>
@@ -33,14 +31,6 @@ export default function LegalDocument({ doc }) {
           ))}
         </section>
       ))}
-
-      <p className="legal-counsel-note">
-        {lang === 'zh'
-          ? '以上文本为结构化模板，供律师按各司法辖区审阅、修改与定稿，不构成正式法律意见。'
-          : lang === 'ar'
-            ? 'هذه النصوص نماذج منظّمة للمراجعة القانونية ولا تشكل استشارة قانونية رسمية.'
-            : 'This document is a structured template for legal review. It is not a substitute for advice from a qualified attorney in your markets.'}
-      </p>
 
       <p className="legal-back">
         <Link to="/">{lang === 'zh' ? '首页' : lang === 'ar' ? 'الرئيسية' : 'Home'}</Link>

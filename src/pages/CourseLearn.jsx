@@ -177,7 +177,7 @@ export default function CourseLearn() {
       <div className="learn-header">
         <Link to={`/health-skills/${id}`} className="back-link">← {t.back}</Link>
         <h1>{course.title}</h1>
-        <p className="learn-methodology">{methodologyLine}</p>
+        {isAdmin ? <p className="learn-methodology">{methodologyLine}</p> : null}
       </div>
 
       <div className="learn-layout">

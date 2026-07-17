@@ -25,6 +25,7 @@ export default function CourseDetail() {
   const course = getCourseById(id)
   const { isFavorite, toggle } = useFavorites()
   const { user } = useAuth()
+  const isAdmin = Boolean(user?.site_admin)
 
   if (!course) {
     return (
@@ -93,7 +94,7 @@ export default function CourseDetail() {
           ) : null}
         </div>
         <p className="course-desc">{course.desc}</p>
-        <p className="course-methodology">{methodologyLine}</p>
+        {isAdmin ? <p className="course-methodology">{methodologyLine}</p> : null}
       </header>
 
       <section className="course-detail-content">

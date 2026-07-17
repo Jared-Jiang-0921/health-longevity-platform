@@ -26,58 +26,58 @@ export const HOME_STATS = [
 export const HOME_MODULES = [
   {
     path: '/solutions',
-    title: { zh: 'AI长寿师', en: 'AI Longevity Coach', ar: 'مدرب طول العمر' },
-    desc: {
-      zh: '输入情况，生成分层建议与就医提示',
-      en: 'Enter your context for tiered guidance and care prompts.',
-      ar: 'أدخل وضعك للحصول على إرشادات.',
+    title: { zh: 'AI 长寿方案师', en: 'AI Longevity Coach', ar: 'مدرب طول العمر بالذكاء الاصطناعي' },
+    intro: {
+      zh: '基于您的健康画像与目标，生成分层行动建议：风险识别、优先级排序、报告解读与就医提示。全程标注证据等级与适用边界，仅供健康教育，不替代诊疗。',
+      en: 'Builds a health profile and tiered action plan—risks, priorities, lab context, and care prompts—with evidence grades and clear boundaries. Education only, not medical care.',
+      ar: 'يُنشئ صورة صحية وخطة متدرجة مع درجات الأدلة وحدود الاستخدام. للتعليم فقط.',
     },
     chips: {
-      zh: ['个性化', '可解释', '不替代诊疗'],
-      en: ['Personalized', 'Explainable', 'Not medical care'],
-      ar: ['شخصي', 'قابل للتفسير', 'ليس رعاية'],
+      zh: ['健康画像', '可解释建议', '就医提示'],
+      en: ['Health profile', 'Explainable', 'Care prompts'],
+      ar: ['صورة صحية', 'قابل للتفسير', 'تنبيهات'],
     },
   },
   {
     path: '/health-skills',
-    title: { zh: '长寿知识技能', en: 'Health Skills', ar: 'مهارات الصحة' },
-    desc: {
-      zh: '把医学证据变成可执行清单',
-      en: 'Turn evidence into actionable checklists.',
-      ar: 'حوّل الأدلة إلى قوائم عمل.',
+    title: { zh: '长寿知识技能', en: 'Health Skills', ar: 'مهارات طول العمر' },
+    intro: {
+      zh: '将循证医学与生活方式干预拆解为可学可练的结构：知识卡片、实操清单、证据等级、适用人群与风险提示。覆盖睡眠、代谢、运动、营养等主题，支持系列课程与视频学习。',
+      en: 'Structured learning—cards, checklists, evidence grades, audience fit, and risk notes—on sleep, metabolism, exercise, and nutrition, with courses and video series.',
+      ar: 'تعلم منظم ببطاقات وقوائم ودرجات أدلة حول النوم والتمثيل والحركة والتغذية.',
     },
     chips: {
-      zh: ['证据等级', '实践步骤', '风险提示'],
-      en: ['Evidence grade', 'Steps', 'Risk notes'],
-      ar: ['درجة الأدلة', 'خطوات', 'مخاطر'],
+      zh: ['系列课程', '证据等级', '实操清单'],
+      en: ['Course series', 'Evidence grade', 'Checklists'],
+      ar: ['دورات', 'أدلة', 'قوائم'],
     },
   },
   {
     path: '/products',
-    title: { zh: '长寿产品证据库', en: 'Evidence Library', ar: 'مكتبة الأدلة' },
-    desc: {
-      zh: '成分—证据—风险—适用人群一页看懂',
-      en: 'Ingredients, evidence, risks, and audience in one view.',
-      ar: 'مكونات وأدلة ومخاطر في صفحة واحدة.',
+    title: { zh: '长寿产品证据库', en: 'Product Evidence Library', ar: 'مكتبة أدلة المنتجات' },
+    intro: {
+      zh: '汇集健康产品与补充剂的成分说明、研究证据、监管信息与相互作用提示，并标明适用人群与谨慎事项。帮助您在购买前完成「证据核对」，不做治疗方案包装。',
+      en: 'Ingredients, research evidence, regulatory context, interactions, and who should use or avoid each product—evidence-first, not sold as treatment.',
+      ar: 'مكونات وأدلة وتنظيم وتفاعلات وجمهور مستهدف قبل الشراء.',
     },
     chips: {
-      zh: ['监管信息', '相互作用', '证据分级'],
-      en: ['Regulatory', 'Interactions', 'Grading'],
-      ar: ['تنظيمي', 'تفاعلات', 'تصنيف'],
+      zh: ['成分证据', '监管信息', '相互作用'],
+      en: ['Ingredients', 'Regulatory', 'Interactions'],
+      ar: ['مكونات', 'تنظيم', 'تفاعلات'],
     },
   },
   {
     path: '/tcm-prevention',
-    title: { zh: '中医治未病', en: 'Preventive TCM', ar: 'الوقاية الصينية' },
-    desc: {
-      zh: '体质辨识 × 四时养生：构建你的日常预防方案',
-      en: 'Constitution × seasonal care for daily prevention.',
-      ar: 'نمط الجسم والوقاية الموسمية.',
+    title: { zh: '中医药特色 · 治未病', en: 'TCM Preventive Care', ar: 'الوقاية بالطب الصيني' },
+    intro: {
+      zh: '以中医治未病思想结合现代预防医学：体质辨识、四时养生、饮食调养、情志调摄与导引运动，并提供药食同源与经典方资料。强调教育参考，不替代辨证论治与处方。',
+      en: 'TCM preventive care plus modern prevention—constitution, seasons, diet, mind–body, movement, with herbs and classical formulas (education only).',
+      ar: 'وقاية صينية مع طب وقائي حديث؛ أنماط وفصول وتغذية وحركة.',
     },
     chips: {
-      zh: ['体质评估', '四季调养', '食养与起居'],
-      en: ['Constitution', 'Seasons', 'Diet & lifestyle'],
-      ar: ['نمط', 'فصول', 'تغذية'],
+      zh: ['体质调养', '四时养生', '药食同源'],
+      en: ['Constitution', 'Seasons', 'Food therapy'],
+      ar: ['نمط', 'فصول', 'غذاء دوائي'],
     },
     accent: true,
     disclaimer: {
@@ -88,32 +88,31 @@ export const HOME_MODULES = [
   },
   {
     path: '/longevity-news',
-    title: { zh: '前沿医学资讯', en: 'Medical Insights', ar: 'مستجدات طبية' },
-    desc: {
-      zh: '指南/顶刊/试验进展，按证据解读',
-      en: 'Guidelines, journals, trials—with evidence framing.',
-      ar: 'إرشادات ودوريات وتجارب.',
+    title: { zh: '前沿医学资讯', en: 'Frontier Medical Insights', ar: 'مستجدات طبية رائدة' },
+    intro: {
+      zh: '追踪 PubMed、顶刊与临床指南中的长寿与慢病相关进展，提供证据解读与试验动态。统一审慎表述，区分「前沿发现」与「已证实有效」，避免夸大疗效。',
+      en: 'Digests from PubMed, leading journals, and guidelines—with evidence framing and trial updates. Frontier findings are not equated with proven efficacy.',
+      ar: 'ملخصات من دوريات وإرشادات مع إطار أدلة وتجارب.',
     },
     chips: {
-      zh: ['PubMed', '指南速递', '试验追踪'],
-      en: ['PubMed', 'Guidelines', 'Trials'],
-      ar: ['PubMed', 'إرشادات', 'تجارب'],
+      zh: ['指南速递', '顶刊解读', '试验追踪'],
+      en: ['Guidelines', 'Journal digests', 'Trials'],
+      ar: ['إرشادات', 'دوريات', 'تجارب'],
     },
   },
   {
     path: '/translation-opportunities',
-    title: { zh: '转化应用机会', en: 'Commercialization', ar: 'فرص التطبيق' },
-    desc: {
-      zh: '从研究到场景：机会、合规与落地路径',
-      en: 'Research to market: opportunities and compliance paths.',
-      ar: 'من البحث إلى السوق.',
+    title: { zh: '转化应用机遇', en: 'Translation & Commercialization', ar: 'فرص التحويل' },
+    intro: {
+      zh: '面向创业者、投资人与产业团队：从研究、指南与临床需求中提炼可落地的技术、产品与服务形态，并提示监管、证据与获客等关键风险。涵盖产业趋势、商业模式与机会库。',
+      en: 'For founders and industry: translational signals, business models, opportunity bank, and compliance risks—from research to viable products and services.',
+      ar: 'لرواد الأعمال: إشارات تحويل ونماذج أعمال ومخاطر امتثال.',
     },
     chips: {
-      zh: ['产业趋势', '合规风险', '场景库'],
-      en: ['Trends', 'Compliance', 'Use cases'],
-      ar: ['اتجاهات', 'امتثال', 'سيناريوهات'],
+      zh: ['产业趋势', '商业模式', '合规风险'],
+      en: ['Trends', 'Business models', 'Compliance'],
+      ar: ['اتجاهات', 'نماذج', 'امتثال'],
     },
-    muted: true,
   },
 ]
 
@@ -185,8 +184,8 @@ export function getHomeCopy(lang) {
     trustAudienceDesc: '明确谁可能受益、谁应谨慎或避免',
     trustRisk: '风险与相互作用',
     trustRiskDesc: '提示就医指征、药物相互作用与特殊人群',
-    modulesTitle: '六大模块',
-    modulesLead: '从 AI 建议到证据清单，一站式预防保健入口',
+    modulesTitle: '六大服务模块',
+    modulesLead: '每项模块均配有专属封面与主要内容介绍，点击进入对应能力',
     statsTitle: '长寿科学观察站',
     statsLead: '持续追踪研究、证据与方案，数据驱动决策',
     moduleEnter: '进入模块',
@@ -222,8 +221,8 @@ export function getHomeCopy(lang) {
     trustAudienceDesc: 'Who may benefit vs. who should be cautious',
     trustRisk: 'Risks & interactions',
     trustRiskDesc: 'Care prompts, interactions, special populations',
-    modulesTitle: 'Six modules',
-    modulesLead: 'From AI guidance to evidence checklists',
+    modulesTitle: 'Six service modules',
+    modulesLead: 'Each module has a cover image and a main introduction—tap to explore',
     statsTitle: 'Longevity Science Observatory',
     statsLead: 'Tracking research, evidence, and plans at a glance',
     moduleEnter: 'Enter module',

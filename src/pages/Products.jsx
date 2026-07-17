@@ -22,7 +22,8 @@ function formatPriceSymbol(currency) {
 
 export default function Products() {
   const { lang } = useLocale()
-  const { getToken } = useAuth()
+  const { user, getToken } = useAuth()
+  const isAdmin = Boolean(user?.site_admin)
   const ui = getUi(lang)
   const ev = getProductsEvidenceCopy(lang)
   const originLabel = { zh: '产地', en: 'Origin', ar: 'المنشأ' }[lang] || '产地'
@@ -75,17 +76,19 @@ export default function Products() {
           content_level: row.content_level,
         }
       })
-    const staticList = PRODUCTS.filter((p) => p.category === activeCategory).map((p) => ({
-      ...p,
-      title: p.title,
-      desc: p.desc,
-      origin: '',
-      catalog: false,
-      gallery_count: 0,
-      skus: [],
-    }))
+    const staticList = isAdmin
+      ? PRODUCTS.filter((p) => p.category === activeCategory).map((p) => ({
+          ...p,
+          title: p.title,
+          desc: p.desc,
+          origin: '',
+          catalog: false,
+          gallery_count: 0,
+          skus: [],
+        }))
+      : []
     return [...fromDb, ...staticList]
-  }, [catalogItems, activeCategory, lang])
+  }, [catalogItems, activeCategory, lang, isAdmin])
 
   useEffect(() => {
     const selected = PRODUCT_CATEGORIES.find((c) => c.id === activeCategory)
@@ -115,38 +118,42 @@ export default function Products() {
           <p>{ev.intlBody}</p>
         </section>
 
-        <section className="products-types" aria-labelledby="products-types-heading">
-          <h2 id="products-types-heading" className="products-section-heading">{ev.productTypesTitle}</h2>
-          <ul className="products-types-list">
-            {ev.productTypes.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="products-scoring" aria-labelledby="products-scoring-heading">
-          <h2 id="products-scoring-heading" className="products-section-heading">{ev.scoringTitle}</h2>
-          <div className="products-table-wrap">
-            <table className="products-scoring-table">
-              <thead>
-                <tr>
-                  <th scope="col">{ev.colDimension}</th>
-                  <th scope="col">{ev.colExplain}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {ev.scoringRows.map((row) => (
-                  <tr key={row.dimension}>
-                    <td>{row.dimension}</td>
-                    <td>{row.explain}</td>
-                  </tr>
+        {isAdmin ? (
+          <>
+            <section className="products-types" aria-labelledby="products-types-heading">
+              <h2 id="products-types-heading" className="products-section-heading">{ev.productTypesTitle}</h2>
+              <ul className="products-types-list">
+                {ev.productTypes.map((item) => (
+                  <li key={item}>{item}</li>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+              </ul>
+            </section>
 
-        <p className="products-list-note">{ev.listFooterNote}</p>
+            <section className="products-scoring" aria-labelledby="products-scoring-heading">
+              <h2 id="products-scoring-heading" className="products-section-heading">{ev.scoringTitle}</h2>
+              <div className="products-table-wrap">
+                <table className="products-scoring-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">{ev.colDimension}</th>
+                      <th scope="col">{ev.colExplain}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ev.scoringRows.map((row) => (
+                      <tr key={row.dimension}>
+                        <td>{row.dimension}</td>
+                        <td>{row.explain}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <p className="products-list-note">{ev.listFooterNote}</p>
+          </>
+        ) : null}
       </section>
 
       <section className="categories">

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { CATEGORIES, COURSES } from '../data/courses'
 import { getHealthSkillsContentApproach } from '../data/healthSkillsContentApproach'
 import { useFavorites } from '../hooks/useFavorites'
+import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
 import { getUi } from '../i18n/ui'
 import { getMembershipLevelLabel } from '../i18n/terms'
@@ -12,6 +13,8 @@ import './HealthSkills.css'
 
 export default function HealthSkills() {
   const { lang } = useLocale()
+  const { user } = useAuth()
+  const isAdmin = Boolean(user?.site_admin)
   const ui = getUi(lang)
   const t = {
     zh: { title: '长寿知识技能', desc: '系统化健康知识与技能课程，支持多语言与全球化学习。', cancel: '取消收藏', fav: '收藏', series: '视频系列' },
@@ -40,7 +43,9 @@ export default function HealthSkills() {
       <section className="health-skills-header">
         <h1>{t.title}</h1>
         <p>{t.desc}</p>
-        <p className="health-skills-methodology page-callout">{methodologyLine}</p>
+        {isAdmin ? (
+          <p className="health-skills-methodology page-callout">{methodologyLine}</p>
+        ) : null}
       </section>
 
       <section className="categories">

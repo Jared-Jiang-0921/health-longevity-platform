@@ -1,13 +1,48 @@
-import { useLocation } from 'react-router-dom'
-import { Link } from 'react-router-dom'
+import { useLocation, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useLocale } from '../context/LocaleContext'
 import { canAccess, getRequiredLevel, MEMBERSHIP_LEVELS } from '../data/membership'
+
+const COPY = {
+  zh: {
+    registerTitle: '注册会员观看课程',
+    registerBody: '普通用户需先注册并登录会员后，才能查看长寿知识技能课程内容。',
+    register: '注册会员',
+    login: '登录',
+    home: '返回首页',
+    deniedTitle: '权限不足',
+    deniedBody: (name) => `该模块需要「${name}」及以上等级。请升级会员后使用。`,
+    upgrade: '升级会员',
+  },
+  en: {
+    registerTitle: 'Register to watch courses',
+    registerBody: 'Please register and sign in as a member to view Health Skills courses.',
+    register: 'Register',
+    login: 'Login',
+    home: 'Back to home',
+    deniedTitle: 'Access denied',
+    deniedBody: (name) => `This module requires ${name} or higher. Please upgrade your membership.`,
+    upgrade: 'Upgrade',
+  },
+  ar: {
+    registerTitle: 'سجّل عضوية لمشاهدة الدورات',
+    registerBody: 'يرجى التسجيل وتسجيل الدخول كعضو لمشاهدة دورات المعرفة والمهارات.',
+    register: 'إنشاء حساب',
+    login: 'تسجيل الدخول',
+    home: 'العودة للرئيسية',
+    deniedTitle: 'غير مسموح',
+    deniedBody: (name) => `تتطلب هذه الوحدة ${name} أو أعلى. يرجى ترقية العضوية.`,
+    upgrade: 'ترقية العضوية',
+  },
+}
 
 export default function ProtectedModule({ children }) {
   const location = useLocation()
   const { user } = useAuth()
+  const { lang } = useLocale()
+  const t = COPY[lang] || COPY.zh
   const path = location.pathname
-  const allowed = canAccess(path, user?.level)
+  const allowed = canAccess(path, user?.level, { isGuest: !user })
   const required = getRequiredLevel(path)
 
   if (allowed) return children
@@ -15,14 +50,14 @@ export default function ProtectedModule({ children }) {
   if (!user) {
     return (
       <div className="page-content page-register-required">
-        <h1>需要注册为会员才能查看</h1>
-        <p>请先注册或登录后访问该模块内容。</p>
+        <h1>{t.registerTitle}</h1>
+        <p>{t.registerBody}</p>
         <p className="register-actions">
-          <Link to="/register" className="btn-primary">注册</Link>
+          <Link to="/register" className="btn-primary">{t.register}</Link>
           <span className="action-sep"> </span>
-          <Link to="/login">登录</Link>
+          <Link to="/login">{t.login}</Link>
         </p>
-        <p><Link to="/" className="back-link">返回首页</Link></p>
+        <p><Link to="/" className="back-link">{t.home}</Link></p>
       </div>
     )
   }
@@ -30,10 +65,10 @@ export default function ProtectedModule({ children }) {
   const levelName = required ? MEMBERSHIP_LEVELS[required]?.name : '登录'
   return (
     <div className="page-content">
-      <h1>权限不足</h1>
-      <p>该模块需要「{levelName}」及以上等级。请升级会员后使用。</p>
-      <p><Link to="/payment">升级会员</Link></p>
-      <p><Link to="/">返回首页</Link></p>
+      <h1>{t.deniedTitle}</h1>
+      <p>{t.deniedBody(levelName)}</p>
+      <p><Link to="/payment">{t.upgrade}</Link></p>
+      <p><Link to="/">{t.home}</Link></p>
     </div>
   )
 }

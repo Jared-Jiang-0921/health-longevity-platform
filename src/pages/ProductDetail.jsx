@@ -59,7 +59,8 @@ export default function ProductDetail() {
     },
   }[lang || 'zh']
   const { id } = useParams()
-  const staticProduct = getProductById(id)
+  const isAdmin = Boolean(user?.site_admin)
+  const staticProduct = isAdmin ? getProductById(id) : undefined
   const [catalogRow, setCatalogRow] = useState(null)
   const [catalogLoading, setCatalogLoading] = useState(() => Boolean(id && isCatalogProductId(id)))
 

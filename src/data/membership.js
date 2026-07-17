@@ -24,7 +24,8 @@ export const MEMBERSHIP_LEVELS = {
  * 各模块入口最低等级；null 表示不拦模块（游客可进页看标题，正文由条目级控制）
  */
 export const MODULE_ACCESS = {
-  '/health-skills': null,
+  /** 至少普通会员（已注册登录）；游客不可看课程 */
+  '/health-skills': 'free',
   '/solutions': null,
   '/products': null,
   '/longevity-news': null,
@@ -33,7 +34,12 @@ export const MODULE_ACCESS = {
   '/favorites': null,
 }
 
-export function canAccess(path, level) {
+/**
+ * @param {string} path
+ * @param {string | null | undefined} level
+ * @param {{ isGuest?: boolean }} [options]
+ */
+export function canAccess(path, level, options = {}) {
   const normalized = path.replace(/\/$/, '') || '/'
   if (normalized === '/') return true
   let required = null
@@ -44,6 +50,9 @@ export function canAccess(path, level) {
     }
   }
   if (!required) return true
+  const isGuest = options.isGuest ?? (level == null || level === '')
+  // 模块一旦设置最低等级，游客必须先注册/登录（normalizeLevel 会把空值当成 free，不能直接放行）
+  if (isGuest) return false
   const u = normalizeLevel(level)
   const userOrder = LEVEL_ORDER.indexOf(u)
   const requiredOrder = LEVEL_ORDER.indexOf(required)

@@ -1,10 +1,13 @@
 import { RESEARCH_UPDATES, getMonthLabel } from '../data/longevityNews'
 import { getLongevityNewsModuleCopy } from '../data/longevityNewsModuleI18n'
+import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
 import './LongevityNews.css'
 
 export default function LongevityNews() {
   const { lang } = useLocale()
+  const { user } = useAuth()
+  const isAdmin = Boolean(user?.site_admin)
   const mod = getLongevityNewsModuleCopy(lang)
   const t = {
     zh: { read: '阅读原文' },
@@ -23,54 +26,60 @@ export default function LongevityNews() {
           <p className="news-caveat-phrase">{mod.caveatPhrase}</p>
         </aside>
 
-        <section className="news-sources" aria-labelledby="news-sources-heading">
-          <h2 id="news-sources-heading" className="news-section-heading">{mod.sourcesTitle}</h2>
-          <p className="news-sources-body">{mod.sourcesBody}</p>
-        </section>
+        {isAdmin ? (
+          <>
+            <section className="news-sources" aria-labelledby="news-sources-heading">
+              <h2 id="news-sources-heading" className="news-section-heading">{mod.sourcesTitle}</h2>
+              <p className="news-sources-body">{mod.sourcesBody}</p>
+            </section>
 
-        <section className="news-columns" aria-labelledby="news-columns-heading">
-          <h2 id="news-columns-heading" className="news-section-heading">{mod.columnsTitle}</h2>
-          <div className="news-table-wrap">
-            <table className="news-columns-table">
-              <thead>
-                <tr>
-                  <th scope="col">{mod.colColumn}</th>
-                  <th scope="col">{mod.colContent}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {mod.columnRows.map((row) => (
-                  <tr key={row.column}>
-                    <td>{row.column}</td>
-                    <td>{row.content}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+            <section className="news-columns" aria-labelledby="news-columns-heading">
+              <h2 id="news-columns-heading" className="news-section-heading">{mod.columnsTitle}</h2>
+              <div className="news-table-wrap">
+                <table className="news-columns-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">{mod.colColumn}</th>
+                      <th scope="col">{mod.colContent}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {mod.columnRows.map((row) => (
+                      <tr key={row.column}>
+                        <td>{row.column}</td>
+                        <td>{row.content}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
 
-        <p className="news-list-intro">{mod.listIntro}</p>
+            <p className="news-list-intro">{mod.listIntro}</p>
+          </>
+        ) : null}
       </section>
 
-      <section className="news-list content-card-stack">
-        {RESEARCH_UPDATES.map((item) => (
-          <article key={item.id} className="news-card content-card content-card--padded">
-            <div className="news-meta">
-              <span className="news-journal">{item.journal}</span>
-              <span className="news-if">IF {item.impactFactor}</span>
-              <span className="news-month">{getMonthLabel(item.month, lang)}</span>
-            </div>
-            <h3>{item.title}</h3>
-            <p>{item.summary}</p>
-            {item.url && (
-              <a href={item.url} className="news-link" target="_blank" rel="noopener noreferrer">
-                {t.read} →
-              </a>
-            )}
-          </article>
-        ))}
-      </section>
+      {isAdmin ? (
+        <section className="news-list content-card-stack">
+          {RESEARCH_UPDATES.map((item) => (
+            <article key={item.id} className="news-card content-card content-card--padded">
+              <div className="news-meta">
+                <span className="news-journal">{item.journal}</span>
+                <span className="news-if">IF {item.impactFactor}</span>
+                <span className="news-month">{getMonthLabel(item.month, lang)}</span>
+              </div>
+              <h3>{item.title}</h3>
+              <p>{item.summary}</p>
+              {item.url && (
+                <a href={item.url} className="news-link" target="_blank" rel="noopener noreferrer">
+                  {t.read} →
+                </a>
+              )}
+            </article>
+          ))}
+        </section>
+      ) : null}
     </div>
   )
 }

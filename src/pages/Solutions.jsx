@@ -29,9 +29,6 @@ const I18N = {
       { name: '行动计划', detail: '7天、30天、90天健康改善计划' },
       { name: '医生转介提示', detail: '出现异常指标或高风险情况时建议就医' },
     ],
-    devSummary: '技术集成说明（可选阅读）',
-    devNote:
-      '外接咨询双端口跳转 longevityconsult（Manus），链接附带 hl_consult_entry（professional / general）及会员参数；若配置内容入口，附带 hl_channel=content。请在 .env 中配置完整 https URL 后重新构建前端。',
     loading: '正在验证会员身份，请稍候…',
     intakeTitle: '先完善健康问卷',
     intakeLine1: '在使用 AI 长寿方案师相关服务前，建议先填写健康问卷。问卷会记录您的目标、关注问题、病史、用药和生活方式，并与',
@@ -41,8 +38,7 @@ const I18N = {
     intakeLegal: '查看健康数据说明',
     contentTitle: '内容资源',
     contentBtn: '进入内容',
-    contentDesc:
-      '与咨询并列的「内容通道」，跳转 longevity 侧内容或知识库页面。链接会附带 hl_channel=content 及与咨询相同的身份参数。',
+    contentDesc: '与咨询并列的内容通道，可进入长寿相关内容与知识库。',
     queryLabel: '咨询问题（可选）',
     queryPlaceholder: '例如：高级会员如何制定长寿饮食方案？',
     enter: '进入咨询',
@@ -75,9 +71,6 @@ const I18N = {
       { name: 'Action plans', detail: '7-, 30-, and 90-day improvement tracks' },
       { name: 'Clinical escalation', detail: 'Prompts to see a clinician when results are abnormal or risk is high' },
     ],
-    devSummary: 'Technical integration (optional)',
-    devNote:
-      'External consult links append hl_consult_entry (professional / general) and membership context; optional content entry uses hl_channel=content. Configure full https URLs in .env and rebuild the frontend.',
     loading: 'Verifying membership…',
     intakeTitle: 'Complete Health Questionnaire First',
     intakeLine1: 'Before using the AI Longevity Coach, please complete the questionnaire. It captures goals, concerns, history, medications, and lifestyle, consistent with the ',
@@ -87,8 +80,7 @@ const I18N = {
     intakeLegal: 'View Health Data Notice',
     contentTitle: 'Content Resources',
     contentBtn: 'Open Content',
-    contentDesc:
-      'Parallel “content channel” to consultations; opens your longevity content or knowledge base with hl_channel=content and the same identity context.',
+    contentDesc: 'A content channel alongside consultation—open longevity materials or the knowledge base.',
     queryLabel: 'Question (optional)',
     queryPlaceholder: 'e.g. How to design a longevity diet plan?',
     enter: 'Enter Consultation',
@@ -121,9 +113,6 @@ const I18N = {
       { name: 'خطط عمل', detail: 'مسارات 7 و30 و90 يوماً' },
       { name: 'توجيه طبي', detail: 'تنبيه بمراجعة الطبيب عند مؤشرات شاذة أو مخاطر مرتفعة' },
     ],
-    devSummary: 'ملاحظات تقنية (اختياري)',
-    devNote:
-      'روابط الاستشارة الخارجية تضيف hl_consult_entry (احترافي/عام) وسياق العضوية؛ قناة المحتوى تستخدم hl_channel=content. اضبط عناوين https كاملة في .env وأعد بناء الواجهة.',
     loading: 'جار التحقق من العضوية…',
     intakeTitle: 'أكمل الاستبيان الصحي أولاً',
     intakeLine1: 'قبل استخدام مدرب طول العمر بالذكاء الاصطناعي، يُنصح باستكمال الاستبيان. يُسجّل أهدافك ومخاوفك وتاريخك وأدويتك وأسلوب حياتك بما يتوافق مع ',
@@ -133,8 +122,7 @@ const I18N = {
     intakeLegal: 'عرض إشعار البيانات الصحية',
     contentTitle: 'موارد المحتوى',
     contentBtn: 'دخول المحتوى',
-    contentDesc:
-      'قناة محتوى موازية للاستشارات؛ تفتح محتوى طول العمر أو المعرفة مع hl_channel=content ونفس سياق الهوية.',
+    contentDesc: 'قناة محتوى موازية للاستشارات لفتح مواد طول العمر أو قاعدة المعرفة.',
     queryLabel: 'سؤال الاستشارة (اختياري)',
     queryPlaceholder: 'مثال: كيف أضع خطة غذائية لطول العمر؟',
     enter: 'دخول الاستشارة',
@@ -300,11 +288,6 @@ export default function Solutions() {
         </div>
       </section>
 
-      <details className="solutions-dev-details">
-        <summary>{t.devSummary}</summary>
-        <p>{t.devNote}</p>
-      </details>
-
       <section className="solutions-intake-card">
         <h2>{t.intakeTitle}</h2>
         <p>
@@ -356,7 +339,7 @@ export default function Solutions() {
             description={t.genDesc}
             url={CONSULT_GENERAL_URL}
             envHint="VITE_CONSULT_GENERAL_URL 或 VITE_MANUS_SELF_URL（可与专业同址；未填时沿用专业 URL）"
-            requiredLevel="free"
+            requiredLevel="standard"
             user={user}
             consultEntry="general"
             t={t}

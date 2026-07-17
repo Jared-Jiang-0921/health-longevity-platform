@@ -189,22 +189,6 @@
   }
 }
 
-.solutions-dev-details {
-  margin-bottom: 1.25rem;
-  font-size: 0.82rem;
-  color: var(--color-text-muted);
-}
-
-.solutions-dev-details summary {
-  cursor: pointer;
-  color: var(--color-text-muted);
-}
-
-.solutions-dev-details p {
-  margin: 0.5rem 0 0;
-  line-height: 1.5;
-}
-
 .solutions-code-inline {
   font-size: 0.78em;
   padding: 0.1em 0.35em;

@@ -27,6 +27,7 @@ export default function Home() {
   const { lang } = useLocale()
   const copy = getHomeCopy(lang)
   const { user } = useAuth()
+  const isAdmin = Boolean(user?.site_admin)
 
   const primaryTo = user ? '/solutions' : '/login'
   const primaryState = user ? undefined : { from: { pathname: '/solutions' } }
@@ -78,32 +79,42 @@ export default function Home() {
           <p>{copy.modulesLead}</p>
         </header>
         <div className="home-module-grid">
-          {HOME_MODULES.map((mod) => {
+          {HOME_MODULES.map((mod, index) => {
             const title = mod.title[lang] || mod.title.zh
-            const desc = mod.desc[lang] || mod.desc.zh
+            const intro = mod.intro[lang] || mod.intro.zh
             const chips = mod.chips[lang] || mod.chips.zh
             const disclaimer = mod.disclaimer?.[lang] || mod.disclaimer?.zh
             const coverSources = getModuleVisualSourcesByPath(mod.path)
             const coverAlt = getModuleVisualAlt(mod.path, lang)
+            const moduleNum = String(index + 1).padStart(2, '0')
             return (
               <article
                 key={mod.path}
-                className={`home-module-card${mod.muted ? ' home-module-card--muted' : ''}${mod.accent ? ' home-module-card--tcm' : ''}`}
+                className={`home-module-card${mod.accent ? ' home-module-card--tcm' : ''}`}
               >
-                <div className="home-module-cover">
-                  <VisualImage
-                    sources={coverSources}
-                    alt={coverAlt}
-                    loading="lazy"
-                    decoding="async"
-                    className="home-module-cover-img"
-                  />
-                  <div className="home-module-cover-shade" aria-hidden="true" />
-                </div>
+                <Link to={mod.path} className="home-module-cover-link">
+                  <div className="home-module-cover">
+                    <VisualImage
+                      sources={coverSources}
+                      alt={coverAlt}
+                      loading="lazy"
+                      decoding="async"
+                      className="home-module-cover-img"
+                    />
+                    <div className="home-module-cover-shade" aria-hidden="true" />
+                    <span className="home-module-index" aria-hidden="true">
+                      {moduleNum}
+                    </span>
+                  </div>
+                </Link>
                 <div className="home-module-body">
-                  <h3>{title}</h3>
-                  <p className="home-module-desc">{desc}</p>
-                  <ul className="home-module-chips">
+                  <h3>
+                    <Link to={mod.path} className="home-module-title-link">
+                      {title}
+                    </Link>
+                  </h3>
+                  <p className="home-module-intro">{intro}</p>
+                  <ul className="home-module-chips" aria-label={title}>
                     {chips.map((chip) => (
                       <li key={chip}>{chip}</li>
                     ))}
@@ -112,7 +123,7 @@ export default function Home() {
                     <p className="home-module-disclaimer">{disclaimer}</p>
                   ) : null}
                   <Link to={mod.path} className="home-btn home-btn--card">
-                    {copy.moduleEnter}
+                    {copy.moduleEnter} →
                   </Link>
                 </div>
               </article>
@@ -121,54 +132,55 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Today updates */}
-      <section className="home-today" aria-labelledby="home-today-heading">
-        <header className="home-section-header">
-          <h2 id="home-today-heading">{copy.todayTitle}</h2>
-          <p className="home-curated-note">{copy.todayCurated}</p>
-        </header>
-        <div className="home-today-grid">
-          <div className="home-today-col">
-            <h3>{copy.todayFrontier}</h3>
-            <ul className="home-today-list">
-              {HOME_TODAY_FRONTIER.map((item) => (
-                <li key={item.id} className="home-today-item">
-                  <div className="home-today-item-head">
-                    <Link to="/longevity-news" className="home-today-link">
-                      {item.title}
-                    </Link>
-                    <EvidenceChip grade={item.evidence} />
-                  </div>
-                  <span className="home-today-source">{item.source}</span>
-                  <p>{item.summary}</p>
-                </li>
-              ))}
-            </ul>
+      {isAdmin ? (
+        <section className="home-today" aria-labelledby="home-today-heading">
+          <header className="home-section-header">
+            <h2 id="home-today-heading">{copy.todayTitle}</h2>
+            <p className="home-curated-note">{copy.todayCurated}</p>
+          </header>
+          <div className="home-today-grid">
+            <div className="home-today-col">
+              <h3>{copy.todayFrontier}</h3>
+              <ul className="home-today-list">
+                {HOME_TODAY_FRONTIER.map((item) => (
+                  <li key={item.id} className="home-today-item">
+                    <div className="home-today-item-head">
+                      <Link to="/longevity-news" className="home-today-link">
+                        {item.title}
+                      </Link>
+                      <EvidenceChip grade={item.evidence} />
+                    </div>
+                    <span className="home-today-source">{item.source}</span>
+                    <p>{item.summary}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="home-today-col">
+              <h3>{copy.todayHot}</h3>
+              <ul className="home-today-list">
+                {HOME_HOT_EVIDENCE.map((item) => (
+                  <li key={item.id} className="home-today-item">
+                    <div className="home-today-item-head">
+                      <Link to="/products" className="home-today-link">
+                        {item.name}
+                      </Link>
+                      <EvidenceChip grade={item.evidence} />
+                    </div>
+                    <p className="home-today-meta">
+                      <span>适用：{item.audience}</span>
+                    </p>
+                    <p className="home-today-risk">
+                      <span className="home-today-risk-label">注意</span>
+                      {item.risk}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-          <div className="home-today-col">
-            <h3>{copy.todayHot}</h3>
-            <ul className="home-today-list">
-              {HOME_HOT_EVIDENCE.map((item) => (
-                <li key={item.id} className="home-today-item">
-                  <div className="home-today-item-head">
-                    <Link to="/products" className="home-today-link">
-                      {item.name}
-                    </Link>
-                    <EvidenceChip grade={item.evidence} />
-                  </div>
-                  <p className="home-today-meta">
-                    <span>适用：{item.audience}</span>
-                  </p>
-                  <p className="home-today-risk">
-                    <span className="home-today-risk-label">注意</span>
-                    {item.risk}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
+        </section>
+      ) : null}
 
       {/* Steps */}
       <section className="home-steps" aria-labelledby="home-steps-heading">
