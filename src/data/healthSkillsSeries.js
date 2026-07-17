@@ -38,6 +38,13 @@ export const HEALTH_SKILLS_VIDEO_SERIES = [
     aliases: ['免疫系统与健康防线'],
     desc: '与课程「免疫系统与健康防线」配套；上传时系列合集也可选课程名「免疫系统与健康防线」。',
   },
+  {
+    id: 'hormone-balance',
+    title: '激素平衡入门',
+    category: 'hormone',
+    courseIds: [18],
+    desc: '激素平衡亚类视频合集，上传时亚类选「激素平衡」，系列合集选「激素平衡入门」。',
+  },
 ]
 
 export function getCategoryLabel(categoryId) {

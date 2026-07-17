@@ -18,6 +18,7 @@ export const CATEGORIES = [
   { id: 'stress', label: '压力管理' },
   { id: 'chronic', label: '慢性病预防' },
   { id: 'immunity', label: '免疫健康' },
+  { id: 'hormone', label: '激素平衡' },
   { id: 'mental', label: '心理健康' },
 ]
 
@@ -81,6 +82,7 @@ const courseModules = {
   ],
   16: [],
   17: [],
+  18: [],
 }
 
 export const COURSES = [
@@ -142,6 +144,18 @@ export const COURSES = [
     desc: '燃脂训练原则讲解与跟练视频合集。',
     content: '每条视频对应一个原则或一节跟练；上传时「系列合集」请选择「燃脂7原则」。',
     modules: courseModules[17],
+  },
+  {
+    id: 18,
+    title: '激素平衡入门',
+    category: 'hormone',
+    duration: '视频系列',
+    level: '初级',
+    videoSeries: true,
+    requiredMembership: 'standard',
+    desc: '激素与代谢、睡眠、压力的关系及可执行的生活方式要点；可按集上传视频。',
+    content: '管理员上传的短视频归入本系列后，将显示在下方「系列视频」列表中。内容为健康教育参考，不替代诊疗。',
+    modules: courseModules[18],
   },
 ]
 
