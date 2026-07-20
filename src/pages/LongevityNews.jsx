@@ -2,7 +2,7 @@ import { RESEARCH_UPDATES, getMonthLabel } from '../data/longevityNews'
 import { getLongevityNewsModuleCopy } from '../data/longevityNewsModuleI18n'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
-import ModuleAccessHint from '../components/ModuleAccessHint'
+import LongevityNewsFeed from '../components/LongevityNewsFeed'
 import './LongevityNews.css'
 
 export default function LongevityNews() {
@@ -58,13 +58,15 @@ export default function LongevityNews() {
 
             <p className="news-list-intro">{mod.listIntro}</p>
           </>
-        ) : (
-          <ModuleAccessHint moduleKey="longevity-news" />
-        )}
+        ) : null}
       </section>
+
+      {/* 正式内容：栏目目录 → 点开阅读（按条目会员等级） */}
+      <LongevityNewsFeed />
 
       {isAdmin ? (
         <section className="news-list content-card-stack">
+          <h2 className="news-section-heading">{mod.listIntro}</h2>
           {RESEARCH_UPDATES.map((item) => (
             <article key={item.id} className="news-card content-card content-card--padded">
               <div className="news-meta">

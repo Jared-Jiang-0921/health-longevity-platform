@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
 import { CATEGORIES, COURSES, getCourseById } from '../data/courses'
 import { getSeriesTitlesForCategory, getCanonicalSeriesSubtopic } from '../data/healthSkillsSeries'
+import { LONGEVITY_NEWS_COLUMN_LABELS } from '../data/longevityNewsColumns'
 import { PRODUCT_CATEGORIES, getProductById } from '../data/products'
 import ProductCatalogAdmin from './ProductCatalogAdmin'
 import ContentLockNotice from './ContentLockNotice'
@@ -46,7 +47,7 @@ function getSubcategoryOptions(moduleKey) {
     'health-skills': courseCategories,
     products: productCategories,
     // 与页面现有结构/文案尽量一一对应
-    'longevity-news': ['Nature Medicine', 'Cell', 'Lancet Healthy Longevity', 'Science', 'Aging Cell', 'Nature Aging'],
+    'longevity-news': LONGEVITY_NEWS_COLUMN_LABELS,
     'tcm-prevention': ['中草药单药', '经典处方'],
     'translation-opportunities': ['长寿产业趋势', '技术转化雷达', '商业模式拆解', '产品机会库', '创业风险提示'],
     solutions: ['专业健康长寿咨询', '自我健康促进咨询', '内容资源', '健康问卷与评估'],
@@ -137,6 +138,7 @@ function getSubtopicOptions(moduleKey, subcategoryLabel) {
     return getSeriesTitlesForCategory(category.id, courseTitles)
   }
   if (moduleKey === 'products') return ['产品详情资料']
+  if (moduleKey === 'longevity-news') return ['文章']
   return []
 }
 
@@ -165,10 +167,20 @@ export default function ModuleAssetsPanel({ moduleKey }) {
   const [subtopic, setSubtopic] = useState('')
   const [requiredLevel, setRequiredLevel] = useState('public')
   const [file, setFile] = useState(null)
+  const [externalUrl, setExternalUrl] = useState('')
+  const [uploadMode, setUploadMode] = useState(() => (moduleKey === 'longevity-news' ? 'link' : 'file'))
   const [error, setError] = useState('')
   const [hint, setHint] = useState('')
   const [editingId, setEditingId] = useState('')
-  const [editForm, setEditForm] = useState({ title: '', fileName: '', summary: '', subcategory: 'general', subtopic: '', requiredLevel: 'public' })
+  const [editForm, setEditForm] = useState({
+    title: '',
+    fileName: '',
+    summary: '',
+    subcategory: 'general',
+    subtopic: '',
+    requiredLevel: 'public',
+    externalUrl: '',
+  })
   const [savedItemId, setSavedItemId] = useState('')
   const [activeSubcategory, setActiveSubcategory] = useState('')
   const [activeSubtopic, setActiveSubtopic] = useState('')
@@ -249,6 +261,14 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       empty: '暂无资料。',
       loading: '加载中…',
       uploadTitle: '管理员上传',
+      uploadModeFile: '上传文件',
+      uploadModeLink: '发布链接',
+      externalUrl: '文章链接（微信公众号等）',
+      externalUrlPh: 'https://mp.weixin.qq.com/...',
+      externalUrlRequired: '请填写 http/https 链接',
+      linkHint: '适合公众号文章：填标题、摘要与原文链接即可，无需上传文件。',
+      openLink: '打开原文',
+      linkTag: '外链',
       title: '标题',
       fileName: '资料名称',
       summary: '摘要（可选）',
@@ -292,6 +312,14 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       empty: 'No files yet.',
       loading: 'Loading…',
       uploadTitle: 'Admin Upload',
+      uploadModeFile: 'Upload file',
+      uploadModeLink: 'Publish link',
+      externalUrl: 'Article URL (WeChat etc.)',
+      externalUrlPh: 'https://mp.weixin.qq.com/...',
+      externalUrlRequired: 'Please enter an http/https URL',
+      linkHint: 'For WeChat posts: title, summary, and original URL—no file needed.',
+      openLink: 'Open original',
+      linkTag: 'Link',
       title: 'Title',
       fileName: 'File Name',
       summary: 'Summary (optional)',
@@ -334,6 +362,14 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       empty: 'لا توجد ملفات بعد.',
       loading: 'جارٍ التحميل…',
       uploadTitle: 'رفع المسؤول',
+      uploadModeFile: 'رفع ملف',
+      uploadModeLink: 'نشر رابط',
+      externalUrl: 'رابط المقال',
+      externalUrlPh: 'https://mp.weixin.qq.com/...',
+      externalUrlRequired: 'يرجى إدخال رابط http/https',
+      linkHint: 'لمقالات WeChat: العنوان والملخص والرابط دون ملف.',
+      openLink: 'فتح الأصل',
+      linkTag: 'رابط',
       title: 'العنوان',
       fileName: 'اسم المادة',
       summary: 'الملخص (اختياري)',
@@ -503,6 +539,65 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       setError(t.titleRequired || t.invalid)
       return
     }
+    const useLink = uploadMode === 'link' || (moduleKey === 'longevity-news' && !file && externalUrl.trim())
+    if (useLink) {
+      const url = externalUrl.trim()
+      if (!url) {
+        setError(t.externalUrlRequired || t.invalid)
+        return
+      }
+      const seriesName = resolveSubmitSubtopic(moduleKey, subcategory, subtopic) || (moduleKey === 'longevity-news' ? '文章' : '')
+      if (moduleKey === 'health-skills' && !seriesName) {
+        setError(t.seriesRequired || '请选择系列合集')
+        return
+      }
+      setSubmitting(true)
+      try {
+        const submittedSubcategory = normalizeSubcategoryValue(moduleKey, subcategory.trim() || 'general')
+        const submittedSubtopic = resolveSubmitSubtopic(moduleKey, submittedSubcategory, subtopic) || seriesName || '文章'
+        const token = getToken()
+        const res = await fetch('/api/module-assets', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({
+            module: moduleKey,
+            title: title.trim(),
+            summary: summary.trim(),
+            subcategory: submittedSubcategory,
+            subtopic: submittedSubtopic,
+            requiredLevel,
+            externalUrl: url,
+          }),
+        })
+        const data = await res.json().catch(() => ({}))
+        if (!res.ok) throw new Error(data.error || t.uploadFail)
+        if (data?.item?.id) {
+          const uploadedItem = normalizeAssetItem(moduleKey, data.item)
+          setItems((prev) => [uploadedItem, ...prev.filter((it) => it.id !== uploadedItem.id)])
+        }
+        setTitle('')
+        setSummary('')
+        setExternalUrl('')
+        setSubcategory(subcategoryOptions[0] || 'general')
+        const uploadedSubcategory = normalizeSubcategoryValue(moduleKey, data?.item?.subcategory || submittedSubcategory)
+        const uploadedSubtopic = normalizeSubtopicValue(data?.item?.subtopic || submittedSubtopic)
+        setPinnedSelection({ subcategory: uploadedSubcategory, subtopic: uploadedSubtopic })
+        setActiveSubcategory(uploadedSubcategory)
+        setActiveSubtopic(uploadedSubtopic)
+        setSubtopic('')
+        setRequiredLevel('public')
+        setHint(t.uploadOk)
+        await loadItems()
+      } catch (err) {
+        setError(uploadErrorMessage(err, t, lang))
+      } finally {
+        setSubmitting(false)
+      }
+      return
+    }
     if (!file) {
       setError(t.fileRequired || t.invalid)
       return
@@ -538,6 +633,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
           fileName: file.name,
           mimeType: file.type || 'application/octet-stream',
           contentBase64,
+          ...(externalUrl.trim() ? { externalUrl: externalUrl.trim() } : {}),
         }),
       })
       const data = await res.json().catch(() => ({}))
@@ -549,6 +645,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       }
       setTitle('')
       setSummary('')
+      setExternalUrl('')
       setSubcategory(subcategoryOptions[0] || 'general')
       const uploadedSubcategory = normalizeSubcategoryValue(moduleKey, data?.item?.subcategory || submittedSubcategory)
       const uploadedSubtopic = normalizeSubtopicValue(data?.item?.subtopic || submittedSubtopic)
@@ -579,6 +676,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       subcategory: normalizeSubcategoryValue(moduleKey, item.subcategory) || subcategoryOptions[0] || 'general',
       subtopic: item.subtopic || '',
       requiredLevel: adminLevelValue(item.required_level),
+      externalUrl: item.external_url || '',
     })
   }
 
@@ -605,11 +703,12 @@ export default function ModuleAssetsPanel({ moduleKey }) {
         body: JSON.stringify({
           id: editingId,
           title: editForm.title.trim(),
-          fileName: editForm.fileName.trim(),
+          fileName: editForm.fileName.trim() || 'external-link',
           summary: editForm.summary.trim(),
           subcategory: savedSc,
           subtopic: savedSt,
           requiredLevel: editForm.requiredLevel,
+          externalUrl: editForm.externalUrl?.trim() || '',
         }),
       })
       const data = await res.json().catch(() => ({}))
@@ -659,10 +758,12 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     }
   }
 
+  /** 资讯正式阅读由 LongevityNewsFeed 承担，非管理员不重复展示资料区 */
+  if (!isAdmin && moduleKey === 'longevity-news') return null
+
   const pageHasAccessHint = [
     'health-skills',
     'products',
-    'longevity-news',
     'tcm-prevention',
     'translation-opportunities',
   ].includes(moduleKey)
@@ -738,11 +839,18 @@ export default function ModuleAssetsPanel({ moduleKey }) {
               const canView = item.can_view !== false
               const showLevelBadge = shouldShowMembershipBadge(item.required_level)
               const badgeLevel = item.content_level || item.required_level
+              const isLinkItem = Boolean(String(item.external_url || '').trim())
+                && (!Number(item.file_size) || item.mime_type === 'text/uri-list')
+              const openHref = isLinkItem
+                ? String(item.external_url).trim()
+                : moduleAssetUrl(item.id, getToken())
               return (
               <li key={item.id} className="module-assets-card">
               <div className="module-assets-head">
                 <strong className="module-assets-title">{item.title}</strong>
-                <span className="module-assets-size module-assets-pill">{formatSize(item.file_size)}</span>
+                <span className="module-assets-size module-assets-pill">
+                  {isLinkItem ? (t.linkTag || '外链') : formatSize(item.file_size)}
+                </span>
               </div>
               {isAdmin ? (
                 <p className="module-assets-actions">
@@ -774,17 +882,19 @@ export default function ModuleAssetsPanel({ moduleKey }) {
               {canView ? (
                 <>
                   {item.summary ? <p className="module-assets-muted">{item.summary}</p> : null}
-                  {isImage(item.mime_type) ? (
+                  {!isLinkItem && isImage(item.mime_type) ? (
                     <img src={moduleAssetUrl(item.id, getToken())} alt={item.title} className="module-assets-image" />
                   ) : null}
-                  {isAudio(item.mime_type) ? (
+                  {!isLinkItem && isAudio(item.mime_type) ? (
                     <audio controls src={moduleAssetUrl(item.id, getToken())} className="module-assets-media" />
                   ) : null}
-                  {isVideo(item.mime_type) ? (
+                  {!isLinkItem && isVideo(item.mime_type) ? (
                     <video controls src={moduleAssetUrl(item.id, getToken())} className="module-assets-media" preload="metadata" />
                   ) : null}
                   <p className="module-assets-actions">
-                    <a className="module-assets-open-link" href={moduleAssetUrl(item.id, getToken())} target="_blank" rel="noreferrer">{t.open}</a>
+                    <a className="module-assets-open-link" href={openHref} target="_blank" rel="noreferrer">
+                      {isLinkItem ? (t.openLink || t.open) : t.open}
+                    </a>
                   </p>
                 </>
               ) : (
@@ -797,13 +907,23 @@ export default function ModuleAssetsPanel({ moduleKey }) {
                     <span>{t.title}</span>
                     <input value={editForm.title} onChange={(e) => setEditForm((v) => ({ ...v, title: e.target.value }))} />
                   </label>
-                  <label>
-                    <span>{t.fileName}</span>
-                    <input value={editForm.fileName} onChange={(e) => setEditForm((v) => ({ ...v, fileName: e.target.value }))} />
-                  </label>
+                  {!isLinkItem ? (
+                    <label>
+                      <span>{t.fileName}</span>
+                      <input value={editForm.fileName} onChange={(e) => setEditForm((v) => ({ ...v, fileName: e.target.value }))} />
+                    </label>
+                  ) : null}
                   <label>
                     <span>{t.summary}</span>
                     <textarea rows={3} value={editForm.summary} onChange={(e) => setEditForm((v) => ({ ...v, summary: e.target.value }))} />
+                  </label>
+                  <label>
+                    <span>{t.externalUrl || '外链'}</span>
+                    <input
+                      value={editForm.externalUrl || ''}
+                      onChange={(e) => setEditForm((v) => ({ ...v, externalUrl: e.target.value }))}
+                      placeholder={t.externalUrlPh}
+                    />
                   </label>
                   <label>
                     <span>{t.subcategory}</span>
@@ -858,6 +978,27 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       {isAdmin ? (
         <form className="module-assets-upload" onSubmit={onSubmit}>
           <h4>{t.uploadTitle}</h4>
+          {moduleKey === 'longevity-news' ? (
+            <div className="module-assets-subtabs-row" style={{ marginBottom: '0.75rem' }}>
+              <button
+                type="button"
+                className={`module-assets-subtab ${uploadMode === 'link' ? 'active' : ''}`}
+                onClick={() => setUploadMode('link')}
+              >
+                {t.uploadModeLink}
+              </button>
+              <button
+                type="button"
+                className={`module-assets-subtab ${uploadMode === 'file' ? 'active' : ''}`}
+                onClick={() => setUploadMode('file')}
+              >
+                {t.uploadModeFile}
+              </button>
+            </div>
+          ) : null}
+          {uploadMode === 'link' ? (
+            <p className="module-assets-hint">{t.linkHint}</p>
+          ) : null}
           <label>
             <span>{t.title}</span>
             <input value={title} onChange={(e) => setTitle(e.target.value)} />
@@ -866,6 +1007,16 @@ export default function ModuleAssetsPanel({ moduleKey }) {
             <span>{t.summary}</span>
             <textarea rows={3} value={summary} onChange={(e) => setSummary(e.target.value)} />
           </label>
+          {uploadMode === 'link' || moduleKey === 'longevity-news' ? (
+            <label>
+              <span>{t.externalUrl}</span>
+              <input
+                value={externalUrl}
+                onChange={(e) => setExternalUrl(e.target.value)}
+                placeholder={t.externalUrlPh}
+              />
+            </label>
+          ) : null}
           <label>
             <span>{t.subcategory}</span>
             <select value={subcategory} onChange={(e) => setSubcategory(e.target.value)}>
@@ -894,14 +1045,16 @@ export default function ModuleAssetsPanel({ moduleKey }) {
               <option value="premium">{t.levelTag?.premium || 'premium'}</option>
             </select>
           </label>
-          <label>
-            <span>{t.choose}</span>
-            <input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} />
-          </label>
+          {uploadMode === 'file' ? (
+            <label>
+              <span>{t.choose}</span>
+              <input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} />
+            </label>
+          ) : null}
           {error ? <p className="module-assets-error">{error}</p> : null}
           {hint ? <p className="module-assets-hint">{hint}</p> : null}
           <button type="submit" className="btn-primary" disabled={submitting}>
-            {submitting ? t.uploading : t.upload}
+            {submitting ? t.uploading : (uploadMode === 'link' ? t.uploadModeLink : t.upload)}
           </button>
         </form>
       ) : null}

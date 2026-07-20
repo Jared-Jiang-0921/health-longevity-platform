@@ -5,7 +5,7 @@ const COPY = {
   zh: {
     title: '前沿医学资讯',
     lead:
-      '本模块可作为平台专业壁垒：围绕经同行评审的文献与权威机构公开信息做精选与解读，帮助用户建立证据层级意识；以下为计划中的内容来源与栏目结构，具体稿件将按此框架逐步上线。',
+      '围绕经同行评审的文献与权威机构公开信息做精选与解读，帮助建立证据层级意识。正式稿按栏目上线：先选栏目，再点开单篇阅读；管理员可继续上传 PDF/图文归档到对应栏目。',
     sourcesTitle: '内容来源（示例）',
     sourcesBody:
       'PubMed；Nature、Science、Cell、The Lancet、NEJM、JAMA、BMJ 等学术期刊与子刊；Cochrane 系统综述；WHO、FDA、NMPA 等监管机构公开信息；国家卫健委、中华医学会等发布的指南与共识（以公开可检索版本为准）。',
@@ -27,7 +27,7 @@ const COPY = {
   en: {
     title: 'Frontier Medical Insights',
     lead:
-      'This module is designed as a professional moat: curated interpretation around peer-reviewed literature and authoritative public sources, helping readers calibrate evidence strength. Sources and columns below describe the editorial plan; live articles will roll out under this frame.',
+      'Curated interpretation of peer-reviewed literature and authoritative public sources. Browse by column, then open each piece. Admins can upload PDFs and media into the matching column.',
     sourcesTitle: 'Sources (examples)',
     sourcesBody:
       'PubMed; journals such as Nature, Science, Cell, The Lancet, NEJM, JAMA, BMJ and their family titles; Cochrane reviews; regulator communications (e.g., WHO, FDA, NMPA); national guidelines and society consensus where publicly retrievable.',
@@ -49,7 +49,7 @@ const COPY = {
   ar: {
     title: 'مستجدات طبية رائدة',
     lead:
-      'يهدف القسم إلى بناء تميّز مهني عبر تلخيص وقراءة منظّمة للأدبيات المحكمة والمصادر الرسمية، مع توضيح قوة الدليل. المصادر والأعمدة أدناه تصف الخطة؛ ستُستبدل العناصر لاحقاً بمحتوى فعلي.',
+      'تلخيص وقراءة منظّمة للأدبيات المحكمة والمصادر الرسمية. تصفّح حسب العمود ثم افتح كل مقال. يمكن للمسؤولين رفع ملفات إلى العمود المناسب.',
     sourcesTitle: 'مصادر (أمثلة)',
     sourcesBody:
       'PubMed؛ دوريات مثل Nature وScience وCell وThe Lancet وNEJM وJAMA وBMJ؛ مراجعات كوكران؛ تعاميم منظمات مثل WHO وFDA وNMPA؛ إرشادات وطنية وجمعيات عند توفرها علناً.',

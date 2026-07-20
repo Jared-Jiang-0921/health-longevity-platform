@@ -63,29 +63,29 @@ const HINTS = {
   'longevity-news': {
     zh: {
       title: '本模块内容分级',
-      lead: '正式资讯与资料按会员等级开放；示例条目与管理员上传区不对游客及其他会员展示。',
+      lead: '正式资讯按栏目与条目等级开放：速递/证据解读偏普通会员；争议观察与试验追踪偏标准会员；指南更新偏高级会员。',
       tiers: {
-        free: '大部分公开资讯摘要',
-        standard: '标准会员专属栏目与深度解读',
-        premium: '高级会员专属报告与完整资料',
+        free: '每周速递、证据解读等公开档稿件',
+        standard: '争议研究观察、临床试验追踪',
+        premium: '指南与共识更新及专属上传资料',
       },
     },
     en: {
       title: 'Content by membership',
-      lead: 'Editorial content unlocks by membership. Sample cards and admin upload UI are hidden from guests and members.',
+      lead: 'Columns unlock by tier: digests for members; controversy/trials for standard; guidelines for premium.',
       tiers: {
-        free: 'Most public news summaries',
-        standard: 'Standard-only columns and deep dives',
-        premium: 'Premium reports and full assets',
+        free: 'Weekly digests and evidence explainers',
+        standard: 'Controversy watch and trial tracker',
+        premium: 'Guideline updates and exclusive uploads',
       },
     },
     ar: {
       title: 'المحتوى حسب العضوية',
-      lead: 'المحتوى التحريري حسب العضوية. البطاقات التجريبية وواجهة الرفع مخفية عن الزوار والأعضاء.',
+      lead: 'الأعمدة حسب المستوى: ملخصات للأعضاء؛ جدل وتجارب للقياسي؛ إرشادات للمميز.',
       tiers: {
-        free: 'معظم ملخصات الأخبار العامة',
-        standard: 'أعمدة وتحليلات للأعضاء القياسيين',
-        premium: 'تقارير وملفات حصرية للمميزين',
+        free: 'ملخصات أسبوعية وشرح الأدلة',
+        standard: 'مراقبة الجدل ومتابعة التجارب',
+        premium: 'تحديثات الإرشادات وملفات حصرية',
       },
     },
   },

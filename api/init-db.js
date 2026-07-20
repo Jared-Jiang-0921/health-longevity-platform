@@ -148,6 +148,7 @@ export default async function handler(req, res) {
     await sql`CREATE INDEX IF NOT EXISTS idx_module_assets_module_key ON module_assets(module_key, created_at DESC)`
     await sql`ALTER TABLE module_assets ADD COLUMN IF NOT EXISTS subcategory TEXT NOT NULL DEFAULT 'general'`
     await sql`ALTER TABLE module_assets ADD COLUMN IF NOT EXISTS required_level TEXT NOT NULL DEFAULT 'free'`
+    await sql`ALTER TABLE module_assets ADD COLUMN IF NOT EXISTS external_url TEXT`
 
     return res.status(200).json({ ok: true, message: 'users/orgs/org_members/org_invites/payment_event_logs/health_questionnaires/translation_pdfs/module_assets tables ready' })
   } catch (e) {

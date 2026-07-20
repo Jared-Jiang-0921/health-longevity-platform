@@ -35,7 +35,7 @@ export default async function handler(req, res) {
     }
 
     const rows = await sql`
-      SELECT file_name, stored_name, mime_type, required_level
+      SELECT file_name, stored_name, mime_type, required_level, external_url
       FROM module_assets
       WHERE id = ${id}
       LIMIT 1
@@ -49,7 +49,14 @@ export default async function handler(req, res) {
     ) {
       return res.status(403).json({ code: 'ASSET_LEVEL_FORBIDDEN', error: '当前会员等级不可查看该资源' })
     }
-    const abs = await locateModuleAssetAbsPath(String(row.stored_name))
+    const externalUrl = String(row.external_url || '').trim()
+    const storedName = String(row.stored_name || '').trim()
+    if (externalUrl && !storedName) {
+      res.writeHead(302, { Location: externalUrl })
+      res.end()
+      return undefined
+    }
+    const abs = await locateModuleAssetAbsPath(storedName)
     return sendStoredFileInline(res, {
       absPath: abs,
       mimeType: row.mime_type,
