@@ -99,6 +99,21 @@ const routeTable = await buildApiRouteTable(apiDirAbs)
   routeTable.push({ segments, paramKeys, catchAll, absFile })
   console.warn(`[api-server] ensured route /api/${segments.join('/')} (${relFromApi})`)
 })('product-catalog.js')
+;(function ensureApiRouteFromFile(relFromApi) {
+  const absFile = path.normalize(path.join(apiDirAbs, relFromApi))
+  if (!fsSync.existsSync(absFile) || !fsSync.statSync(absFile).isFile()) return
+  const relNative = path.relative(apiDirAbs, absFile)
+  const { segments, paramKeys, catchAll } = routeFromApiFile(relNative)
+  const dup = routeTable.some(
+    (r) =>
+      r.catchAll === catchAll &&
+      r.segments.length === segments.length &&
+      r.segments.every((s, i) => s === segments[i]),
+  )
+  if (dup) return
+  routeTable.push({ segments, paramKeys, catchAll, absFile })
+  console.warn(`[api-server] ensured route /api/${segments.join('/')} (${relFromApi})`)
+})('product-evidence.js')
 
 const moduleCache = new Map()
 

@@ -180,6 +180,15 @@
     },
     {
       "segments": [
+        "product-evidence"
+      ],
+      "paramKeys": [],
+      "catchAll": false,
+      "modulePath": "../api/product-evidence.js",
+      "sourceFile": "api/product-evidence.js"
+    },
+    {
+      "segments": [
         "stripe-webhook"
       ],
       "paramKeys": [],

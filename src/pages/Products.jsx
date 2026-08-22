@@ -10,6 +10,7 @@ import { getUi } from '../i18n/ui'
 import '../styles/membership-badge.css'
 import { pickCatalogLocale } from '../lib/productCatalogLocale'
 import ProductCatalogImage from '../components/ProductCatalogImage'
+import ProductEvidenceWorkbench from '../components/ProductEvidenceWorkbench'
 import ModuleAccessHint from '../components/ModuleAccessHint'
 import './Products.css'
 
@@ -107,6 +108,9 @@ export default function Products() {
       <section className="products-header">
         <h1>{ev.title}</h1>
         <p className="products-lead">{ev.lead}</p>
+
+        <ProductEvidenceWorkbench />
+
         <aside className="products-role-disclaimer page-callout page-callout--warn" role="note">
           <p>{ev.roleDisclaimer}</p>
         </aside>

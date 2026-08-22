@@ -1,0 +1,179 @@
+.product-evidence-card {
+  margin: 1.25rem 0 0;
+  padding: 1rem 1.1rem 1.15rem;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface);
+}
+
+.product-evidence-card-head h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+}
+
+.product-evidence-card-head p,
+.product-evidence-card-muted,
+.product-evidence-disclaimer {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+.product-evidence-card-error {
+  margin: 0.5rem 0 0;
+  color: var(--color-danger, #b42318);
+  font-size: 0.88rem;
+}
+
+.product-evidence-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.75rem 0 0.65rem;
+}
+
+.product-evidence-card-pill {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.product-evidence-status,
+.product-evidence-block,
+.product-evidence-claim {
+  margin-top: 0.75rem;
+  padding: 0.7rem 0.8rem;
+  border-radius: 10px;
+  background: var(--color-surface-hover, rgba(0, 0, 0, 0.03));
+}
+
+.product-evidence-status p,
+.product-evidence-block p,
+.product-evidence-claim p {
+  margin: 0.35rem 0 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.product-evidence-status a {
+  display: inline-block;
+  margin-top: 0.4rem;
+  font-size: 0.82rem;
+}
+
+.product-evidence-status.is-verified {
+  border-left: 3px solid #2f6b57;
+}
+
+.product-evidence-status.is-mismatch,
+.product-evidence-status.is-invalid_format {
+  border-left: 3px solid #b45309;
+}
+
+.product-evidence-status.is-not_found,
+.product-evidence-status.is-error {
+  border-left: 3px solid #b42318;
+}
+
+.product-evidence-block h3,
+.product-evidence-claim h3 {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.product-evidence-unsuitable {
+  color: #9a3412;
+}
+
+.product-evidence-claim ul {
+  margin: 0.4rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.85rem;
+}
+
+.product-evidence-claim.is-violation {
+  border-left: 3px solid #b42318;
+}
+
+.product-evidence-claim.is-warning {
+  border-left: 3px solid #b45309;
+}
+
+.product-evidence-claim.is-pass {
+  border-left: 3px solid #2f6b57;
+}
+
+.product-evidence-disclaimer {
+  margin-top: 0.85rem !important;
+}
+
+.product-evidence-workbench {
+  margin: 1.25rem 0 0.5rem;
+  padding: 1rem 1.1rem 1.15rem;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface);
+}
+
+.product-evidence-workbench > h2 {
+  margin: 0 0 0.4rem;
+  font-size: 1.1rem;
+}
+
+.product-evidence-workbench > p {
+  margin: 0 0 0.9rem;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+}
+
+.product-evidence-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem 0.85rem;
+  margin-bottom: 0.75rem;
+}
+
+.product-evidence-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.82rem;
+}
+
+.product-evidence-form input,
+.product-evidence-form select,
+.product-evidence-form textarea {
+  font: inherit;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg, #fff);
+}
+
+.product-evidence-form-full {
+  grid-column: 1 / -1;
+}
+
+.product-evidence-form .btn-primary {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+
+.product-evidence-workbench .product-evidence-card {
+  margin: 0.5rem 0 0;
+  padding: 0.75rem 0 0;
+  border: 0;
+  border-top: 1px solid var(--color-border);
+  border-radius: 0;
+  background: transparent;
+}
+
+@media (max-width: 640px) {
+  .product-evidence-form {
+    grid-template-columns: 1fr;
+  }
+}
