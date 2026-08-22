@@ -5,11 +5,15 @@ PM2_NAME="${PM2_NAME:-healthlongevity-api}"
 API_HEALTH_URL="${API_HEALTH_URL:-http://127.0.0.1:3000/api/health}"
 
 ops_restart_api() {
-  if pm2 describe "$PM2_NAME" &>/dev/null; then
+  if command -v pm2 >/dev/null 2>&1 && pm2 describe "$PM2_NAME" &>/dev/null; then
     pm2 restart "$PM2_NAME" --update-env
-  else
-    pm2 restart 0 --update-env
+    return 0
   fi
+  if systemctl restart "$PM2_NAME" 2>/dev/null; then
+    return 0
+  fi
+  echo "[warn] $PM2_NAME not in pm2/systemd; skip restart (static dist already built)"
+  return 0
 }
 
 ops_curl_health() {

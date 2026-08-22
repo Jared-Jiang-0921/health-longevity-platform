@@ -123,44 +123,7 @@ export default function Products() {
           <p>{ev.intlBody}</p>
         </section>
 
-        {isAdmin ? (
-          <>
-            <section className="products-types" aria-labelledby="products-types-heading">
-              <h2 id="products-types-heading" className="products-section-heading">{ev.productTypesTitle}</h2>
-              <ul className="products-types-list">
-                {ev.productTypes.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </section>
-
-            <section className="products-scoring" aria-labelledby="products-scoring-heading">
-              <h2 id="products-scoring-heading" className="products-section-heading">{ev.scoringTitle}</h2>
-              <div className="products-table-wrap">
-                <table className="products-scoring-table">
-                  <thead>
-                    <tr>
-                      <th scope="col">{ev.colDimension}</th>
-                      <th scope="col">{ev.colExplain}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {ev.scoringRows.map((row) => (
-                      <tr key={row.dimension}>
-                        <td>{row.dimension}</td>
-                        <td>{row.explain}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-
-            <p className="products-list-note">{ev.listFooterNote}</p>
-          </>
-        ) : (
-          <ModuleAccessHint moduleKey="products" />
-        )}
+        {isAdmin ? null : <ModuleAccessHint moduleKey="products" />}
       </section>
 
       <section className="categories">

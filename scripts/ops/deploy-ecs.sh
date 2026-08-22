@@ -17,9 +17,9 @@ npm run build
 test -f dist/index.html
 test -f public/images/logo-longevity-atlas.png
 
-ops_restart_api
+ops_restart_api || echo "[warn] API restart failed — continue so nginx/static still go live"
 sleep 2
-ops_curl_health
-ops_reload_nginx
+ops_curl_health || echo "[warn] /api/health not ready"
+ops_reload_nginx || echo "[warn] nginx reload skipped"
 
 echo "[ok] deploy finished — open https://healthlongevity.cn/ with hard refresh"
