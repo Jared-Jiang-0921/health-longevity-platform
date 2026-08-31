@@ -27,9 +27,11 @@ export const MODULE_ACCESS = {
   /** 至少普通会员（已注册登录）；游客不可看课程 */
   '/health-skills': 'free',
   '/solutions': null,
+  '/consult': 'free',
   '/products': null,
   '/longevity-news': null,
   '/tcm-prevention': null,
+  '/health-monitor': 'premium',
   '/translation-opportunities': null,
   '/favorites': null,
 }

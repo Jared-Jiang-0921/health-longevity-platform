@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
-import { canAccess, getRequiredLevel } from '../data/membership'
+import { canAccess } from '../data/membership'
 import { SITE_LEGAL } from '../data/siteLegal'
 import CookieConsentBanner from './CookieConsentBanner'
 import './Layout.css'
@@ -12,9 +12,9 @@ const LOGO_SRC = '/images/logo-longevity-atlas.png'
 const primaryNavItems = [
   { path: '/', label: { zh: '首页', en: 'Home', ar: 'الرئيسية' } },
   { path: '/solutions', label: { zh: 'AI长寿师', en: 'AI Coach', ar: 'مدرب AI' } },
-  { path: '/health-skills', label: { zh: '长寿知识技能', en: 'Health Skills', ar: 'مهارات' } },
   { path: '/products', label: { zh: '长寿产品证据库', en: 'Evidence Library', ar: 'مكتبة الأدلة' } },
   { path: '/tcm-prevention', label: { zh: '中医治未病', en: 'Preventive TCM', ar: 'وقاية صينية' } },
+  { path: '/health-skills', label: { zh: '长寿知识技能', en: 'Health Skills', ar: 'مهارات' } },
   { path: '/longevity-news', label: { zh: '前沿医学资讯', en: 'Medical Insights', ar: 'مستجدات' } },
   { path: '/translation-opportunities', label: { zh: '转化应用机会', en: 'Commercialization', ar: 'فرص' }, muted: true },
 ]
@@ -23,6 +23,9 @@ const adminFooterItems = [
   { path: '/ops/payment-monitor', label: { zh: '支付巡检', en: 'Payment Monitor', ar: 'مراقبة الدفع' } },
   { path: '/ops/users', label: { zh: '用户管理', en: 'Users Admin', ar: 'إدارة المستخدمين' } },
   { path: '/ops/health-questionnaires', label: { zh: '问卷记录', en: 'Questionnaires', ar: 'استبيانات' } },
+  { path: '/ops/consult-reviews', label: { zh: '咨询审核', en: 'Consult Review', ar: 'مراجعة الاستشارة' } },
+  { path: '/ops/consult-quota', label: { zh: '咨询额度', en: 'Consult Quota', ar: 'حصة الاستشارة' } },
+  { path: '/ops/consult-feedback', label: { zh: '咨询点踩', en: 'Consult Feedback', ar: 'تقييم الاستشارة' } },
 ]
 
 const I18N = {
@@ -88,12 +91,8 @@ export default function Layout({ children }) {
   const t = I18N[lang] || I18N.zh
   const isHome = location.pathname === '/'
 
-  const visibleNavItems = primaryNavItems.filter((item) => {
-    const required = getRequiredLevel(item.path)
-    // 游客仍展示「需登录」类入口（如长寿知识技能），点进页面后再引导注册
-    if (!user) return !required || required === 'free'
-    return canAccess(item.path, user.level, { isGuest: false })
-  })
+  // 顶栏与首页卡片对齐，始终展示模块入口；游客/等级不足由 ProtectedModule 在页内引导
+  const visibleNavItems = primaryNavItems
 
   return (
     <>

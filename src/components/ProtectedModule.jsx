@@ -7,6 +7,8 @@ const COPY = {
   zh: {
     registerTitle: '注册会员观看课程',
     registerBody: '普通用户需先注册并登录会员后，才能查看长寿知识技能课程内容。',
+    monitorTitle: '请先登录',
+    monitorBody: 'AI健康监测需登录后使用，并仅向高级会员开放。',
     register: '注册会员',
     login: '登录',
     home: '返回首页',
@@ -17,6 +19,8 @@ const COPY = {
   en: {
     registerTitle: 'Register to watch courses',
     registerBody: 'Please register and sign in as a member to view Health Skills courses.',
+    monitorTitle: 'Please sign in',
+    monitorBody: 'AI Health Monitor requires sign-in and a Premium membership.',
     register: 'Register',
     login: 'Login',
     home: 'Back to home',
@@ -27,6 +31,8 @@ const COPY = {
   ar: {
     registerTitle: 'سجّل عضوية لمشاهدة الدورات',
     registerBody: 'يرجى التسجيل وتسجيل الدخول كعضو لمشاهدة دورات المعرفة والمهارات.',
+    monitorTitle: 'يرجى تسجيل الدخول',
+    monitorBody: 'رصد الصحة يتطلب تسجيل الدخول وعضوية مميزة.',
     register: 'إنشاء حساب',
     login: 'تسجيل الدخول',
     home: 'العودة للرئيسية',
@@ -47,11 +53,13 @@ export default function ProtectedModule({ children }) {
 
   if (allowed) return children
 
+  const isMonitor = path === '/health-monitor' || path.startsWith('/health-monitor/')
+
   if (!user) {
     return (
       <div className="page-content page-register-required">
-        <h1>{t.registerTitle}</h1>
-        <p>{t.registerBody}</p>
+        <h1>{isMonitor ? t.monitorTitle : t.registerTitle}</h1>
+        <p>{isMonitor ? t.monitorBody : t.registerBody}</p>
         <p className="register-actions">
           <Link to="/register" className="btn-primary">{t.register}</Link>
           <span className="action-sep"> </span>

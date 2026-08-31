@@ -1,15 +1,14 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useCallback, useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
 import { hasLevelAccess, MEMBERSHIP_LEVELS } from '../data/membership'
 import { getPatterns } from '../i18n/patterns'
-import { getConsultGeneralUrl, getConsultProfessionalUrl, getContentEntryUrl } from '../config/externalUrls'
+import { getContentEntryUrl } from '../config/externalUrls'
 import { appendExternalEntryParams } from '../lib/externalEntry'
+import ModulePageHero from '../components/ModulePageHero'
 import './Solutions.css'
 
-const CONSULT_PRO_URL = getConsultProfessionalUrl()
-const CONSULT_GENERAL_URL = getConsultGeneralUrl()
 const CONTENT_ENTRY_URL = getContentEntryUrl()
 
 const I18N = {
@@ -19,8 +18,6 @@ const I18N = {
     lead: '结合问卷与多维度信息，协助您形成健康画像、识别主要风险，并给出营养、运动、睡眠等方面的综合建议与分阶段行动计划；异常时提示就医。以下为能力范围说明。',
     medicalDisclaimer: '本平台提供健康教育与辅助决策信息，不替代医生诊断、治疗和处方。',
     featuresTitle: '能力范围',
-    colFeature: '功能',
-    colContent: '内容',
     features: [
       { name: '基础健康画像', detail: '年龄、性别、身高体重、睡眠、运动、饮食、慢病史、家族史' },
       { name: '风险识别', detail: '代谢风险、心血管风险、认知风险、炎症风险、肌少风险' },
@@ -43,16 +40,13 @@ const I18N = {
     queryPlaceholder: '例如：高级会员如何制定长寿饮食方案？',
     enter: '进入咨询',
     enterAndQuery: '进入并查询',
-    openDirectly: '若未自动跳转，请点此直接打开咨询页',
-    popupBlocked: '浏览器拦截了新标签页，请点击下方链接打开咨询页',
-    linkInvalid: '咨询链接无效，请联系管理员检查配置',
     upgrade: '升级会员',
     proTitle: '专业健康长寿咨询',
     proDesc:
-      '面向专业人士，侧重专业知识和技能，涵盖临床医学、基础医学、功能医学、保健医学、运动医学、营养学等。',
+      '面向专业人士。知识库覆盖基础医学、临床医学、功能医学、长寿学等全书；可按需检索 PubMed、Cochrane、欧洲 PMC。仍不替代诊疗与处方。',
     genTitle: '自我健康促进咨询',
     genDesc:
-      '面向普通人群，侧重免疫与免疫力、激素与内分泌平衡、神经与情绪心理、睡眠、营养饮食、科学运动等日常生活关注领域。',
+      '面向普通人群。检索生活方式、营养、运动、睡眠、情绪与大众向长寿科普；不含药理、免疫学教材、内外科等专科知识，也不检索 PubMed / Cochrane / 欧洲 PMC。',
   },
   en: {
     langKey: 'en',
@@ -61,8 +55,6 @@ const I18N = {
     medicalDisclaimer:
       'This platform provides health education and decision-support information only. It does not replace a physician’s diagnosis, treatment, or prescriptions.',
     featuresTitle: 'What it covers',
-    colFeature: 'Area',
-    colContent: 'Includes',
     features: [
       { name: 'Baseline profile', detail: 'Age, sex, height/weight, sleep, activity, diet, chronic conditions, family history' },
       { name: 'Risk signals', detail: 'Metabolic, cardiovascular, cognitive, inflammatory, sarcopenia-related' },
@@ -85,16 +77,13 @@ const I18N = {
     queryPlaceholder: 'e.g. How to design a longevity diet plan?',
     enter: 'Enter Consultation',
     enterAndQuery: 'Enter & Query',
-    openDirectly: 'If auto-open fails, click here to open directly',
-    popupBlocked: 'Popup was blocked. Please use the direct link below.',
-    linkInvalid: 'Consultation URL is invalid. Please contact admin.',
     upgrade: 'Upgrade',
     proTitle: 'Professional longevity consultation',
     proDesc:
-      'For professionals—clinical and basic medicine, functional medicine, wellness, sports medicine, nutrition, and related domains.',
+      'For professionals. Full knowledge base: basic, clinical, functional, and longevity medicine. Optional PubMed, Cochrane, and Europe PMC. Not a substitute for diagnosis or prescriptions.',
     genTitle: 'Self-care longevity consultation',
     genDesc:
-      'For the general public—immunity, hormones, mood and sleep, nutrition, structured movement, and everyday risk factors.',
+      'For the general public. Lifestyle, nutrition, movement, sleep, and popular longevity sources. No specialty textbooks and no PubMed / Cochrane / Europe PMC.',
   },
   ar: {
     langKey: 'ar',
@@ -103,8 +92,6 @@ const I18N = {
     medicalDisclaimer:
       'تقدم المنصة تعليماً صحياً ومعلومات داعمة للقرار فقط، ولا تحل محل تشخيص أو علاج أو وصفات الطبيب.',
     featuresTitle: 'نطاق القدرات',
-    colFeature: 'الوظيفة',
-    colContent: 'المحتوى',
     features: [
       { name: 'صورة صحية أساسية', detail: 'العمر والجنس والطول والوزن والنوم والنشاط والغذاء والأمراض المزمنة وتاريخ العائلة' },
       { name: 'تقدير المخاطر', detail: 'أيضي، قلبي، إدراكي، التهابي، وهزال عضلي' },
@@ -127,50 +114,27 @@ const I18N = {
     queryPlaceholder: 'مثال: كيف أضع خطة غذائية لطول العمر؟',
     enter: 'دخول الاستشارة',
     enterAndQuery: 'ادخل وابحث',
-    openDirectly: 'إذا لم يتم الفتح تلقائيًا، اضغط هنا للفتح مباشرة',
-    popupBlocked: 'تم حظر فتح تبويب جديد، يرجى استخدام الرابط المباشر أدناه',
-    linkInvalid: 'رابط الاستشارة غير صالح، يرجى التواصل مع المسؤول',
     upgrade: 'ترقية العضوية',
     proTitle: 'استشارة طول العمر المهنية',
     proDesc:
-      'للمتخصصين: الطب السريري والأساسي والطب الوظيفي والوقاية وطب الرياضة والتغذية وما يتصل بها.',
+      'للمتخصصين: قاعدة المعرفة كاملة (الطب الأساسي والسريري والوظيفي وعلوم طول العمر)، مع خيار PubMed وCochrane وEurope PMC. لا يغني عن التشخيص أو الوصفات.',
     genTitle: 'استشارة تعزيز الصحة الذاتية',
     genDesc:
-      'للجمهور: المناعة والهرمونات والمزاج والنوم والتغذية والنشاط اليومي.',
+      'للجمهور: نمط الحياة والتغذية والحركة والنوم وطول العمر الموجّه للعامة. بدون كتب تخصصية وبدون PubMed / Cochrane / Europe PMC.',
   },
 }
 
-function ConsultCard({ title, description, url, envHint, requiredLevel, user, consultEntry, t, p, buildConsultHref }) {
+function ConsultCard({ title, description, requiredLevel, consultEntry, user, t, p }) {
+  const navigate = useNavigate()
   const [query, setQuery] = useState('')
-  const [openError, setOpenError] = useState('')
-  const ready = Boolean(url?.trim())
   const allowed = hasLevelAccess(user?.level, requiredLevel, { isGuest: !user })
-  const href = useMemo(
-    () => appendExternalEntryParams(url, user, { consultEntry, query, lang: t.langKey }),
-    [url, user, consultEntry, query, t.langKey],
-  )
-  const [opening, setOpening] = useState(false)
-  const openConsult = useCallback(async (e) => {
-    if (e?.preventDefault) e.preventDefault()
-    setOpenError('')
-    if (!href) {
-      setOpenError(t.linkInvalid || '')
-      return
-    }
-    setOpening(true)
-    try {
-      const finalHref = await buildConsultHref(href, consultEntry)
-      const popup = window.open(finalHref, '_blank', 'noopener,noreferrer')
-      if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-        setOpenError(t.popupBlocked || '')
-        return
-      }
-    } catch {
-      setOpenError(t.popupBlocked || '')
-    } finally {
-      setOpening(false)
-    }
-  }, [href, t.linkInvalid, t.popupBlocked, buildConsultHref, consultEntry])
+
+  const openConsult = useCallback(() => {
+    const sp = new URLSearchParams()
+    sp.set('entry', consultEntry)
+    if (query.trim()) sp.set('q', query.trim())
+    navigate(`/consult?${sp.toString()}`)
+  }, [consultEntry, navigate, query])
 
   return (
     <article className={`consult-card content-card content-card--padded ${!allowed ? 'consult-card-locked' : ''}`}>
@@ -191,31 +155,15 @@ function ConsultCard({ title, description, url, envHint, requiredLevel, user, co
           <p className="consult-lock-msg">{p.requiresLevel(MEMBERSHIP_LEVELS[requiredLevel]?.name || requiredLevel)}</p>
           <Link to="/payment" className="consult-card-btn consult-btn-upgrade">{t.upgrade}</Link>
         </div>
-      ) : ready ? (
-        <>
-          <button
-            type="button"
-            className="consult-card-btn consult-card-btn-block"
-            onClick={openConsult}
-            disabled={opening}
-          >
-            {opening ? t.enter : (query.trim() ? t.enterAndQuery : t.enter)}
-          </button>
-          <a
-            className="consult-open-direct"
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {t.openDirectly}
-          </a>
-        </>
       ) : (
-        <p className="consult-card-missing">
-          {p.configureEnvVar(envHint)}
-        </p>
+        <button
+          type="button"
+          className="consult-card-btn consult-card-btn-block"
+          onClick={openConsult}
+        >
+          {query.trim() ? t.enterAndQuery : t.enter}
+        </button>
       )}
-      {openError ? <p className="consult-card-missing">{openError}</p> : null}
     </article>
   )
 }
@@ -224,32 +172,7 @@ export default function Solutions() {
   const { lang } = useLocale()
   const t = I18N[lang] || I18N.zh
   const p = getPatterns(lang)
-  const { user, loading, refreshUser, getToken } = useAuth()
-
-  const buildConsultHref = useCallback(async (baseHref, entry) => {
-    const token = getToken?.()
-    if (!token || !baseHref) return baseHref
-    try {
-      const res = await fetch('/api/consult-sso-ticket', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ entry, lang }),
-      })
-      if (!res.ok) return baseHref
-      const data = await res.json().catch(() => ({}))
-      const ssoToken = String(data?.token || '').trim()
-      if (!ssoToken) return baseHref
-      const u = new URL(baseHref, window.location.origin)
-      u.searchParams.set('sso_token', ssoToken)
-      u.searchParams.set('sso_issuer', 'healthlongevity')
-      return /^https?:\/\//i.test(baseHref) ? u.toString() : `${u.pathname}${u.search}${u.hash}`
-    } catch {
-      return baseHref
-    }
-  }, [getToken, lang])
+  const { user, loading, refreshUser } = useAuth()
 
   useEffect(() => {
     refreshUser()
@@ -257,10 +180,9 @@ export default function Solutions() {
 
   return (
     <div className="page-solutions">
-      <header className="page-header">
-        <h1>{t.title}</h1>
-        <p className="solutions-lead">{t.lead}</p>
-      </header>
+      <ModulePageHero path="/solutions" title={t.title}>
+        <p className="module-page-hero-line">{t.lead}</p>
+      </ModulePageHero>
 
       <aside className="solutions-disclaimer page-callout page-callout--warn" role="note">
         <p>{t.medicalDisclaimer}</p>
@@ -268,24 +190,14 @@ export default function Solutions() {
 
       <section className="solutions-features" aria-labelledby="solutions-features-heading">
         <h2 id="solutions-features-heading">{t.featuresTitle}</h2>
-        <div className="solutions-table-wrap">
-          <table className="solutions-features-table">
-            <thead>
-              <tr>
-                <th scope="col">{t.colFeature}</th>
-                <th scope="col">{t.colContent}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {t.features.map((row) => (
-                <tr key={row.name}>
-                  <td>{row.name}</td>
-                  <td>{row.detail}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ul className="solutions-features-grid">
+          {t.features.map((row) => (
+            <li key={row.name}>
+              <strong>{row.name}</strong>
+              <p>{row.detail}</p>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="solutions-intake-card">
@@ -325,26 +237,20 @@ export default function Solutions() {
           <ConsultCard
             title={t.proTitle}
             description={t.proDesc}
-            url={CONSULT_PRO_URL}
-            envHint="VITE_CONSULT_PROFESSIONAL_URL（或 VITE_MANUS_PROFESSIONAL_URL）"
-            requiredLevel="standard"
+            requiredLevel="premium"
             user={user}
             consultEntry="professional"
             t={t}
             p={p}
-            buildConsultHref={buildConsultHref}
           />
           <ConsultCard
             title={t.genTitle}
             description={t.genDesc}
-            url={CONSULT_GENERAL_URL}
-            envHint="VITE_CONSULT_GENERAL_URL 或 VITE_MANUS_SELF_URL（可与专业同址；未填时沿用专业 URL）"
-            requiredLevel="standard"
+            requiredLevel="free"
             user={user}
             consultEntry="general"
             t={t}
             p={p}
-            buildConsultHref={buildConsultHref}
           />
         </div>
       </>

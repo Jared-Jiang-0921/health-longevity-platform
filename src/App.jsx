@@ -9,6 +9,7 @@ import CourseDetail from './pages/CourseDetail'
 import CourseLearn from './pages/CourseLearn'
 import MyFavorites from './pages/MyFavorites'
 import Solutions from './pages/Solutions'
+import Consult from './pages/Consult'
 import HealthQuestionnaire from './pages/HealthQuestionnaire'
 import Products from './pages/Products'
 import ProductDetail from './pages/ProductDetail'
@@ -24,6 +25,9 @@ import PaymentSuccess from './pages/PaymentSuccess'
 import PaymentOpsMonitor from './pages/PaymentOpsMonitor'
 import AdminUsers from './pages/AdminUsers'
 import AdminQuestionnaires from './pages/AdminQuestionnaires'
+import AdminConsultReviews from './pages/AdminConsultReviews'
+import AdminConsultQuota from './pages/AdminConsultQuota'
+import AdminConsultFeedback from './pages/AdminConsultFeedback'
 import Tax from './pages/Tax'
 import LegalTerms from './pages/LegalTerms'
 import LegalPrivacy from './pages/LegalPrivacy'
@@ -39,7 +43,7 @@ function WithModuleAssets({ moduleKey, children }) {
   return (
     <>
       {children}
-      <ModuleAssetsPanel moduleKey={moduleKey} />
+      <ModuleAssetsPanel key={moduleKey} moduleKey={moduleKey} />
     </>
   )
 }
@@ -54,11 +58,12 @@ export default function App() {
         <Route path="/health-skills/:id/learn" element={<ProtectedModule><WithModuleAssets moduleKey="health-skills"><CourseLearn /></WithModuleAssets></ProtectedModule>} />
         <Route path="/favorites" element={<ProtectedModule><WithModuleAssets moduleKey="favorites"><MyFavorites /></WithModuleAssets></ProtectedModule>} />
         <Route path="/solutions" element={<ProtectedModule><Solutions /></ProtectedModule>} />
+        <Route path="/consult" element={<ProtectedModule><Consult /></ProtectedModule>} />
         <Route path="/health-questionnaire" element={<ProtectedModule><WithModuleAssets moduleKey="health-questionnaire"><HealthQuestionnaire /></WithModuleAssets></ProtectedModule>} />
-        <Route path="/products" element={<ProtectedModule><WithModuleAssets moduleKey="products"><Products /></WithModuleAssets></ProtectedModule>} />
-        <Route path="/products/:id" element={<ProtectedModule><WithModuleAssets moduleKey="products"><ProductDetail /></WithModuleAssets></ProtectedModule>} />
-        <Route path="/longevity-news" element={<ProtectedModule><WithModuleAssets moduleKey="longevity-news"><LongevityNews /></WithModuleAssets></ProtectedModule>} />
+        <Route path="/products" element={<ProtectedModule><Products /></ProtectedModule>} />
+        <Route path="/products/:id" element={<ProtectedModule><ProductDetail /></ProtectedModule>} />
         <Route path="/tcm-prevention" element={<ProtectedModule><WithModuleAssets moduleKey="tcm-prevention"><TCMPrevention /></WithModuleAssets></ProtectedModule>} />
+        <Route path="/longevity-news" element={<ProtectedModule><WithModuleAssets moduleKey="longevity-news"><LongevityNews /></WithModuleAssets></ProtectedModule>} />
         <Route path="/translation-opportunities" element={<ProtectedModule><WithModuleAssets moduleKey="translation-opportunities"><TranslationOpportunities /></WithModuleAssets></ProtectedModule>} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -69,6 +74,9 @@ export default function App() {
         <Route path="/ops/payment-monitor" element={<SiteAdminOnly><PaymentOpsMonitor /></SiteAdminOnly>} />
         <Route path="/ops/users" element={<SiteAdminOnly><AdminUsers /></SiteAdminOnly>} />
         <Route path="/ops/health-questionnaires" element={<SiteAdminOnly><AdminQuestionnaires /></SiteAdminOnly>} />
+        <Route path="/ops/consult-reviews" element={<SiteAdminOnly><AdminConsultReviews /></SiteAdminOnly>} />
+        <Route path="/ops/consult-quota" element={<SiteAdminOnly><AdminConsultQuota /></SiteAdminOnly>} />
+        <Route path="/ops/consult-feedback" element={<SiteAdminOnly><AdminConsultFeedback /></SiteAdminOnly>} />
         <Route path="/account" element={<WithModuleAssets moduleKey="account"><Account /></WithModuleAssets>} />
         <Route path="/org" element={<SiteAdminOnly><OrgConsole /></SiteAdminOnly>} />
         <Route path="/org/invite/accept" element={<ProtectedModule><OrgInviteAccept /></ProtectedModule>} />

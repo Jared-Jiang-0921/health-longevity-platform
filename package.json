@@ -16,15 +16,22 @@
     "@stripe/react-stripe-js": "^2.4.0",
     "@stripe/stripe-js": "^4.2.0",
     "bcryptjs": "^2.4.3",
+    "docx": "^9.7.1",
     "dotenv": "^16.4.5",
     "jose": "^5.9.0",
+    "mammoth": "^1.9.1",
     "nodemailer": "^8.0.4",
     "otplib": "^13.4.0",
+    "pdfjs-dist": "^4.10.38",
     "pg": "^8.20.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-markdown": "^10.1.0",
     "react-router-dom": "^6.22.0",
-    "stripe": "^17.4.0"
+    "remark-gfm": "^4.0.1",
+    "remark-parse": "^11.0.0",
+    "stripe": "^17.4.0",
+    "unified": "^11.0.5"
   },
   "devDependencies": {
     "@types/react": "^18.2.55",
