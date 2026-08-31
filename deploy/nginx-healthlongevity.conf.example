@@ -31,12 +31,27 @@ server {
     add_header X-Frame-Options SAMEORIGIN always;
     add_header Permissions-Policy "geolocation=(), microphone=(self), camera=()" always;
 
+    # 无扩展名路径（/ 或 SPA 路由）不能走 octet-stream，否则 Chrome 会弹出「存储为」
+    location = / {
+        rewrite ^ /index.html last;
+    }
+
     location ~* \.mjs$ {
         default_type application/javascript;
     }
 
+    location ~* \.html$ {
+        charset utf-8;
+        default_type text/html;
+        add_header Cache-Control "no-store, no-cache, must-revalidate, max-age=0" always;
+    }
+
     location / {
-        try_files $uri $uri/ /index.html;
+        try_files $uri $uri/ @spa;
+    }
+
+    location @spa {
+        rewrite ^ /index.html last;
     }
 
     # AI 咨询 SSE：必须写在通用 /api/ 之前（更长前缀优先）
