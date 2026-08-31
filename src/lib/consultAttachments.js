@@ -137,6 +137,17 @@ export async function compressImage(file, maxEdge = 1280, quality = 0.72) {
   }
 }
 
+async function loadPdfDocument(pdfjs, fileBuffer, disableWorker) {
+  // 每次用新副本：worker 失败后原 ArrayBuffer 可能已被 transfer 掏空
+  const data = new Uint8Array(fileBuffer.slice(0))
+  return pdfjs.getDocument({
+    data,
+    disableWorker: Boolean(disableWorker),
+    isEvalSupported: false,
+    useSystemFonts: true,
+  }).promise
+}
+
 async function extractPdfText(file) {
   const pdfjs = await import('pdfjs-dist/build/pdf.mjs')
   try {
@@ -145,12 +156,12 @@ async function extractPdfText(file) {
   } catch {
     /* worker 可选；失败时走主线程解析 */
   }
-  const data = new Uint8Array(await file.arrayBuffer())
+  const fileBuffer = await file.arrayBuffer()
   let doc
   try {
-    doc = await pdfjs.getDocument({ data }).promise
+    doc = await loadPdfDocument(pdfjs, fileBuffer, false)
   } catch {
-    doc = await pdfjs.getDocument({ data, disableWorker: true }).promise
+    doc = await loadPdfDocument(pdfjs, fileBuffer, true)
   }
   const max = Math.min(doc.numPages, MAX_PDF_PAGES)
   const parts = []
@@ -202,7 +213,7 @@ export async function fileToAttachment(file, copy) {
     try {
       text = await extractPdfText(file)
     } catch {
-      fail('attachScannedPdf', '未能从 PDF 抽出文字，请改用可复制的文档或拍摄清晰照片')
+      fail('attachPdfFail', '这份 PDF 暂时无法解析，请刷新后重试，或改用可复制的 Word，或把报告拍成清晰照片上传')
     }
     if (!text || text.length < 40) fail('attachScannedPdf', '未能从 PDF 抽出文字，请改用可复制的文档或拍摄清晰照片')
     return {
