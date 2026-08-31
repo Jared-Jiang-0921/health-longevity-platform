@@ -10,6 +10,10 @@
 # 若出现「Welcome to nginx!」，通常是未加载本配置，或 default 站点抢占了未匹配的域名。
 #
 # 安全：下方含基础响应头；HTTPS 块请额外加 HSTS。修改后 nginx -t && systemctl reload nginx
+#
+# 端口约定：
+#   3000 — 主站 api-server（/api/*）
+#   3001 — AI 健康咨询模块（仅 /api/ai/*，需 SSE 关缓冲）
 
 # ---------- HTTP（可先恢复访问；有证书后再用 certbot 或下方 HTTPS 块）----------
 server {
@@ -25,10 +29,28 @@ server {
     add_header X-Content-Type-Options nosniff always;
     add_header Referrer-Policy strict-origin-when-cross-origin always;
     add_header X-Frame-Options SAMEORIGIN always;
-    add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
+    add_header Permissions-Policy "geolocation=(), microphone=(self), camera=()" always;
 
     location / {
         try_files $uri $uri/ /index.html;
+    }
+
+    # AI 咨询 SSE：必须写在通用 /api/ 之前（更长前缀优先）
+    location /api/ai/ {
+        client_max_body_size 25m;
+        proxy_pass http://127.0.0.1:3001;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Connection '';
+        proxy_buffering off;
+        proxy_cache off;
+        chunked_transfer_encoding on;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
+        gzip off;
     }
 
     location /api/ {
@@ -61,13 +83,30 @@ server {
 #     add_header X-Content-Type-Options nosniff always;
 #     add_header Referrer-Policy strict-origin-when-cross-origin always;
 #     add_header X-Frame-Options SAMEORIGIN always;
-#     add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
+#     add_header Permissions-Policy "geolocation=(), microphone=(self), camera=()" always;
 #
 #     root /opt/health-longevity-platform/dist;
 #     index index.html;
 #
 #     location / {
 #         try_files $uri $uri/ /index.html;
+#     }
+#
+#     location /api/ai/ {
+#         client_max_body_size 25m;
+#         proxy_pass http://127.0.0.1:3001;
+#         proxy_http_version 1.1;
+#         proxy_set_header Host $host;
+#         proxy_set_header X-Real-IP $remote_addr;
+#         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+#         proxy_set_header X-Forwarded-Proto $scheme;
+#         proxy_set_header Connection '';
+#         proxy_buffering off;
+#         proxy_cache off;
+#         chunked_transfer_encoding on;
+#         proxy_read_timeout 300s;
+#         proxy_send_timeout 300s;
+#         gzip off;
 #     }
 #
 #     location /api/ {
