@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
 import { getMembershipLevelLabel } from '../i18n/terms'
@@ -19,12 +19,24 @@ const I18N = {
   ar: { title: 'الدفع العالمي', loading: 'جار التحميل…', needLogin: 'يرجى تسجيل الدخول قبل ترقية العضوية.', login: 'تسجيل الدخول', register: 'إنشاء حساب', current: 'الحالي', pay: 'الدفع الآن', paying: 'جار التحويل…', wechat: 'WeChat Pay', alipay: 'Alipay', card: 'بطاقة', method: 'طريقة الدفع', note: 'اختر الخطة ثم اضغط WeChat Pay أو Alipay أو البطاقة. ستتم الترقية تلقائيًا بعد نجاح الدفع.', currency: 'العملة:', failed: 'ستتم الترقية تلقائيًا بعد الدفع. إذا لم تُفتح صفحة التحصيل، أعد المحاولة أو تواصل مع الدعم.', errLogin: 'يرجى تسجيل الدخول أولاً', errCreate: 'تعذر إنشاء جلسة الدفع', errNet: 'خطأ في الشبكة: ' },
 }
 
+function resolvePlanId(raw) {
+  const id = String(raw || '').trim()
+  return CHECKOUT_PLANS.some((p) => p.id === id) ? id : 'standard_monthly'
+}
+
+function resolveCurrencyCode(raw) {
+  const code = String(raw || '').toUpperCase().trim()
+  const options = paymentCurrencyOptions()
+  return options.includes(code) ? code : getDefaultPaymentCurrency()
+}
+
 export default function Payment() {
   const { lang } = useLocale()
   const t = I18N[lang] || I18N.zh
   const { user, loading: authLoading, getToken } = useAuth()
-  const [selectedPlan, setSelectedPlan] = useState('standard_monthly')
-  const [selectedCurrency, setSelectedCurrency] = useState(getDefaultPaymentCurrency())
+  const [searchParams] = useSearchParams()
+  const [selectedPlan, setSelectedPlan] = useState(() => resolvePlanId(searchParams.get('plan')))
+  const [selectedCurrency, setSelectedCurrency] = useState(() => resolveCurrencyCode(searchParams.get('currency')))
   const [loading, setLoading] = useState(false)
   const [loadingMethod, setLoadingMethod] = useState(null)
   const [error, setError] = useState(null)

@@ -698,7 +698,7 @@ export default function Consult() {
           {!allowed ? (
             <div className="consult-locked content-card content-card--padded">
               <p>{t.needLevel(MEMBERSHIP_LEVELS[required]?.name || required)}</p>
-              <Link to="/payment" className="btn-primary">{t.upgrade}</Link>
+              <Link to={required === 'premium' ? '/payment?plan=premium_monthly' : '/payment?plan=standard_monthly'} className="btn-primary">{t.upgrade}</Link>
             </div>
           ) : (
             <>
@@ -725,7 +725,7 @@ export default function Consult() {
                       : t.quotaLine(formatQuotaTokens(quota.used, lang), formatQuotaTokens(quota.limit, lang))}
                   </p>
                   {!quota.unlimited && quota.level !== 'premium' ? (
-                    <Link to="/payment">{t.quotaUpgrade}</Link>
+                    <Link to="/payment?plan=premium_monthly">{t.quotaUpgrade}</Link>
                   ) : null}
                 </aside>
               ) : null}

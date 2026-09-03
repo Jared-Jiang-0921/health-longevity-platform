@@ -166,6 +166,7 @@ export default async function handler(req, res) {
     const methodCfg = stripeMethodConfig(method)
     const session = await stripe.checkout.sessions.create({
       ...methodCfg,
+      locale: 'auto',
       client_reference_id: userId,
       metadata: { plan, user_id: userId, payment_method: method },
       line_items: [{

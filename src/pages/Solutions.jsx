@@ -153,7 +153,7 @@ function ConsultCard({ title, description, requiredLevel, consultEntry, user, t,
       {!allowed ? (
         <div className="consult-card-lock">
           <p className="consult-lock-msg">{p.requiresLevel(MEMBERSHIP_LEVELS[requiredLevel]?.name || requiredLevel)}</p>
-          <Link to="/payment" className="consult-card-btn consult-btn-upgrade">{t.upgrade}</Link>
+          <Link to={requiredLevel === 'premium' ? '/payment?plan=premium_monthly' : '/payment?plan=standard_monthly'} className="consult-card-btn consult-btn-upgrade">{t.upgrade}</Link>
         </div>
       ) : (
         <button

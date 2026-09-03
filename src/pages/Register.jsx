@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
 import { getUi } from '../i18n/ui'
-import { getMessages } from '../i18n/messages'
 import { CHECKOUT_PLANS, REGISTER_FREE_ID } from '../data/checkoutPlans.js'
 import {
   CURRENCY_LABELS,
@@ -13,21 +12,20 @@ import {
   membershipLevelLabel,
   paymentCurrencyOptions,
 } from '../lib/paymentFormat.js'
-import { CHECKOUT_API, getProviderDisplayName, PAYMENT_PROVIDER } from '../lib/checkoutApi.js'
+import { getProviderDisplayName, PAYMENT_PROVIDER } from '../lib/checkoutApi.js'
 import './Auth.css'
 
 const STANDARD_PLANS = CHECKOUT_PLANS.filter((p) => p.tier === 'standard')
 const PREMIUM_PLANS = CHECKOUT_PLANS.filter((p) => p.tier === 'premium')
 const I18N = {
-  zh: { title: '会员注册', login: '登录', hasAcc: '已有账号？', email: '邮箱', nickname: '昵称（可选）', password: '密码', confirm: '确认密码', register: '注册', registering: '注册中…', toPay: '注册并去支付', toPaying: '注册并跳转支付…', choose: '选择会员类型', payCurrency: '支付币种（与结算页一致）' },
-  en: { title: 'Sign Up', login: 'Login', hasAcc: 'Already have an account?', email: 'Email', nickname: 'Display name (optional)', password: 'Password', confirm: 'Confirm password', register: 'Sign up', registering: 'Signing up…', toPay: 'Sign up & Pay', toPaying: 'Signing up & Redirecting…', choose: 'Choose membership tier', payCurrency: 'Payment currency' },
-  ar: { title: 'إنشاء حساب', login: 'تسجيل الدخول', hasAcc: 'لديك حساب بالفعل؟', email: 'البريد الإلكتروني', nickname: 'الاسم المعروض (اختياري)', password: 'كلمة المرور', confirm: 'تأكيد كلمة المرور', register: 'إنشاء الحساب', registering: 'جار إنشاء الحساب…', toPay: 'إنشاء الحساب والدفع', toPaying: 'جار الإنشاء والتحويل…', choose: 'اختر نوع العضوية', payCurrency: 'عملة الدفع' },
+  zh: { title: '会员注册', login: '登录', hasAcc: '已有账号？', forgot: '忘记密码？', email: '邮箱', nickname: '昵称（可选）', password: '密码', confirm: '确认密码', register: '注册', registering: '注册中…', toPay: '注册并去支付', toPaying: '注册成功，正在进入支付页…', choose: '选择会员类型', payCurrency: '支付币种（与结算页一致）' },
+  en: { title: 'Sign Up', login: 'Login', hasAcc: 'Already have an account?', forgot: 'Forgot password?', email: 'Email', nickname: 'Display name (optional)', password: 'Password', confirm: 'Confirm password', register: 'Sign up', registering: 'Signing up…', toPay: 'Sign up & Pay', toPaying: 'Opening checkout…', choose: 'Choose membership tier', payCurrency: 'Payment currency' },
+  ar: { title: 'إنشاء حساب', login: 'تسجيل الدخول', hasAcc: 'لديك حساب بالفعل؟', forgot: 'هل نسيت كلمة المرور؟', email: 'البريد الإلكتروني', nickname: 'الاسم المعروض (اختياري)', password: 'كلمة المرور', confirm: 'تأكيد كلمة المرور', register: 'إنشاء الحساب', registering: 'جار إنشاء الحساب…', toPay: 'إنشاء الحساب والدفع', toPaying: 'جار فتح صفحة الدفع…', choose: 'اختر نوع العضوية', payCurrency: 'عملة الدفع' },
 }
 
 export default function Register() {
   const { lang } = useLocale()
   const ui = getUi(lang)
-  const msg = getMessages(lang)
   const t = I18N[lang] || I18N.zh
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
@@ -38,7 +36,7 @@ export default function Register() {
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [agreeLegal, setAgreeLegal] = useState(false)
-  const { register, getToken } = useAuth()
+  const { register } = useAuth()
   const navigate = useNavigate()
 
   const PAYMENT_CURRENCY_OPTIONS = useMemo(() => paymentCurrencyOptions(), [])
@@ -85,37 +83,8 @@ export default function Register() {
       return
     }
 
-    const token = getToken()
-    if (!token) {
-      setSubmitting(false)
-      setError('注册成功但未获取登录凭证，请尝试登录后再去支付页完成付款')
-      return
-    }
-
-    try {
-      const res = await fetch(CHECKOUT_API, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          plan: selectedPath,
-          currency: selectedCurrency,
-          origin: window.location.origin,
-        }),
-      })
-      const data = await res.json().catch(() => ({}))
-      if (data.url) {
-        window.location.href = data.url
-        return
-      }
-      setError(data.error || '无法创建支付会话，您已注册成功，可前往「支付结算」页面继续付款')
-    } catch (e) {
-      setError(msg.networkError + (e.message || 'please retry'))
-    } finally {
-      setSubmitting(false)
-    }
+    const qs = new URLSearchParams({ plan: selectedPath, currency: selectedCurrency })
+    navigate(`/payment?${qs.toString()}`)
   }
 
   return (
@@ -126,7 +95,7 @@ export default function Register() {
           <fieldset className="register-tiers">
             <legend className="register-tiers-legend">{t.choose}</legend>
             <p className="auth-note register-tiers-intro">
-              普通会员免费；标准/高级会员需在注册后完成在线支付，价格与「支付结算」页一致（{getProviderDisplayName(PAYMENT_PROVIDER)}）。
+              普通会员免费；标准/高级会员注册成功后进入与咨询升级相同的支付页，可选微信支付、支付宝或银行卡（{getProviderDisplayName(PAYMENT_PROVIDER)}）。
             </p>
 
             <label className={`plan-card register-tier-card ${selectedPath === REGISTER_FREE_ID ? 'selected' : ''}`}>
@@ -238,6 +207,7 @@ export default function Register() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="请输入密码"
+              autoComplete="new-password"
             />
           </label>
           <label>
@@ -247,6 +217,7 @@ export default function Register() {
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
               placeholder="再次输入密码"
+              autoComplete="new-password"
             />
           </label>
 
