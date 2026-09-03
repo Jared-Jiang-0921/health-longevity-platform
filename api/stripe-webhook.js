@@ -7,7 +7,6 @@ import Stripe from 'stripe'
 import { applyMembershipFromPlan } from '../lib/membershipCheckout.js'
 import { PLANS } from '../lib/plans.js'
 import { claimSessionPaid, upsertPaymentLog } from '../lib/paymentOps.js'
-import { maybeNotifyAfterStripeCheckoutSuccess } from '../lib/stripeAirwallexBridge.js'
 
 export const config = {
   api: { bodyParser: false },
@@ -107,22 +106,6 @@ export default async function handler(req, res) {
         currency,
         status: 'event_processed',
       })
-
-      const bridge = await maybeNotifyAfterStripeCheckoutSuccess(session, { source: 'stripe_webhook' })
-      if (!bridge.skipped) {
-        await upsertPaymentLog({
-          provider: 'stripe',
-          eventKey: `stripe_airwallex_notify:${sessionId}`,
-          source: 'stripe_webhook',
-          userId: String(userId),
-          sessionId,
-          plan,
-          currency,
-          status: bridge.ok ? 'airwallex_bridge_ok' : 'airwallex_bridge_failed',
-          errorCode: bridge.ok ? null : 'AIRWALLEX_BRIDGE_FAILED',
-          errorMessage: bridge.ok ? null : String(bridge.error || ''),
-        })
-      }
     } catch (e) {
       console.error('Webhook update user failed:', e)
       await upsertPaymentLog({

@@ -8,7 +8,6 @@ import { verifyToken, getUserById } from '../lib/auth.js'
 import { applyMembershipFromPlan } from '../lib/membershipCheckout.js'
 import { PLANS } from '../lib/plans.js'
 import { claimSessionPaid, upsertPaymentLog } from '../lib/paymentOps.js'
-import { maybeNotifyAfterStripeCheckoutSuccess } from '../lib/stripeAirwallexBridge.js'
 
 export default async function handler(req, res) {
   const fail = (status, code, error) => res.status(status).json({ code, error })
@@ -127,22 +126,6 @@ export default async function handler(req, res) {
       currency,
       status: 'membership_applied',
     })
-
-    const bridge = await maybeNotifyAfterStripeCheckoutSuccess(session, { source: 'confirm_checkout' })
-    if (!bridge.skipped) {
-      await upsertPaymentLog({
-        provider: 'stripe',
-        eventKey: `stripe_airwallex_notify:${sessionId}`,
-        source: 'confirm_checkout',
-        userId: String(userIdFromJwt),
-        sessionId,
-        plan,
-        currency,
-        status: bridge.ok ? 'airwallex_bridge_ok' : 'airwallex_bridge_failed',
-        errorCode: bridge.ok ? null : 'AIRWALLEX_BRIDGE_FAILED',
-        errorMessage: bridge.ok ? null : String(bridge.error || ''),
-      })
-    }
 
     const user = await getUserById(userIdFromJwt)
     return res.status(200).json({ ok: true, user })

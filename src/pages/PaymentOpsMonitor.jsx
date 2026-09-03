@@ -111,7 +111,6 @@ export default function PaymentOpsMonitor() {
           <select value={provider} onChange={(e) => setProvider(e.target.value)}>
             <option value="">{t.all}</option>
             <option value="stripe">stripe</option>
-            <option value="airwallex">airwallex</option>
           </select>
         </label>
         <label className="ops-token">

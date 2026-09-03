@@ -62,6 +62,25 @@ function resolveCheckoutMethod(body) {
   return 'card'
 }
 
+/** 香港等地 Stripe 账户：WeChat Pay / Alipay 仅支持 CNY、HKD，USD 会直接被拒。 */
+const WALLET_CURRENCIES = {
+  wechat: ['cny', 'hkd'],
+  alipay: ['cny', 'hkd'],
+}
+
+function resolvePresentmentCurrency({ method, requested, rates }) {
+  const wallet = WALLET_CURRENCIES[method]
+  if (!wallet) return requested
+  const usable = (code) => Boolean(code && wallet.includes(code) && rates[code] > 0)
+  const forced = String(process.env.PAYMENT_WALLET_CURRENCY || '').toLowerCase().trim()
+  if (usable(forced)) return forced
+  if (usable(requested)) return requested
+  for (const code of wallet) {
+    if (usable(code)) return code
+  }
+  return requested
+}
+
 function stripeMethodConfig(method) {
   if (method === 'wechat') {
     return {
@@ -83,17 +102,20 @@ function stripeMethodConfig(method) {
 
 function friendlyStripeError(e, method) {
   const msg = String(e?.message || '')
-  if (/wechat/i.test(msg)) {
+  if (/currency provided/i.test(msg) || /support the following currencies/i.test(msg) || /invalid.*currenc/i.test(msg)) {
+    return '当前展示币种无法用于微信/支付宝。本收款账户仅支持人民币或港币结算，请改选 CNY/HKD，或先用银行卡。'
+  }
+  if (/not activated|not enabled|has not been activated/i.test(msg) && /wechat/i.test(msg)) {
     return '微信支付尚未在收款账户中开通。请到 Stripe Dashboard → 设置 → 支付方式 启用 WeChat Pay，或先使用银行卡。'
   }
-  if (/alipay/i.test(msg)) {
+  if (/not activated|not enabled|has not been activated/i.test(msg) && /alipay/i.test(msg)) {
     return '支付宝尚未在收款账户中开通。请到 Stripe Dashboard → 设置 → 支付方式 启用 Alipay，或先使用银行卡。'
   }
   if (method === 'wechat') {
-    return '无法创建微信支付会话。请确认 Stripe 已启用 WeChat Pay，或改用银行卡。'
+    return '无法创建微信支付会话。请改选人民币结算后再试，或先使用银行卡。'
   }
   if (method === 'alipay') {
-    return '无法创建支付宝会话。请确认 Stripe 已启用 Alipay，或改用银行卡。'
+    return '无法创建支付宝会话。请改选人民币结算后再试，或先使用银行卡。'
   }
   return '支付通道暂时不可用，请稍后重试'
 }
@@ -148,7 +170,12 @@ export default async function handler(req, res) {
     const allowedCurrencies = resolveAllowedCurrencies(defaultCurrency)
     const manualRates = resolveManualRates(baseCurrency)
     const requestedCurrency = String(body.currency || '').toLowerCase().trim()
-    const currency = allowedCurrencies.includes(requestedCurrency) ? requestedCurrency : defaultCurrency
+    const displayCurrency = allowedCurrencies.includes(requestedCurrency) ? requestedCurrency : defaultCurrency
+    const currency = resolvePresentmentCurrency({
+      method,
+      requested: displayCurrency,
+      rates: manualRates,
+    })
     const convertedUnitAmount = convertFromBaseMinor(planConfig.amount, baseCurrency, currency, manualRates)
     if (!convertedUnitAmount || convertedUnitAmount <= 0) {
       return fail(400, 'INVALID_MANUAL_RATE', '手动汇率配置无效，请联系管理员')
@@ -168,7 +195,13 @@ export default async function handler(req, res) {
       ...methodCfg,
       locale: 'auto',
       client_reference_id: userId,
-      metadata: { plan, user_id: userId, payment_method: method },
+      metadata: {
+        plan,
+        user_id: userId,
+        payment_method: method,
+        requested_currency: displayCurrency,
+        presentment_currency: currency,
+      },
       line_items: [{
         price_data: {
           currency,

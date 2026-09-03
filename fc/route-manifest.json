@@ -21,18 +21,6 @@
     },
     {
       "segments": [
-        "airwallex",
-        ":path"
-      ],
-      "paramKeys": [
-        "path"
-      ],
-      "catchAll": true,
-      "modulePath": "../api/airwallex/[...path].js",
-      "sourceFile": "api/airwallex/[...path].js"
-    },
-    {
-      "segments": [
         "auth",
         ":path"
       ],

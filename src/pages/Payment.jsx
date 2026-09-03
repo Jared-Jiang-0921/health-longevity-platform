@@ -14,9 +14,9 @@ import {
 import { checkoutApiForMethod, getProviderDisplayName, PAYMENT_PROVIDER } from '../lib/checkoutApi.js'
 
 const I18N = {
-  zh: { title: '在线全球化支付结算', loading: '加载中…', needLogin: '升级会员需先登录。', login: '登录', register: '注册', current: '当前', pay: '去支付', paying: '跳转中…', wechat: '微信支付', alipay: '支付宝', card: '银行卡', method: '支付方式', note: '选择套餐后，请点下方「微信支付」「支付宝」或「银行卡」。支付成功后自动升级会员。', currency: '币种选择：', failed: '支付完成后将自动升级会员；若未能打开收款页，请稍后重试或联系本站支持。', errLogin: '请先登录', errCreate: '无法创建支付会话', errNet: '网络错误：' },
-  en: { title: 'Global Checkout', loading: 'Loading…', needLogin: 'Please login before upgrading.', login: 'Login', register: 'Sign up', current: 'Current', pay: 'Pay Now', paying: 'Redirecting…', wechat: 'WeChat Pay', alipay: 'Alipay', card: 'Card', method: 'Payment method', note: 'Choose a plan, then tap WeChat Pay, Alipay, or Card. Membership upgrades automatically after success.', currency: 'Currency:', failed: 'Membership upgrades automatically after payment. If checkout does not open, retry later or contact support.', errLogin: 'Please login first', errCreate: 'Failed to create checkout session', errNet: 'Network error: ' },
-  ar: { title: 'الدفع العالمي', loading: 'جار التحميل…', needLogin: 'يرجى تسجيل الدخول قبل ترقية العضوية.', login: 'تسجيل الدخول', register: 'إنشاء حساب', current: 'الحالي', pay: 'الدفع الآن', paying: 'جار التحويل…', wechat: 'WeChat Pay', alipay: 'Alipay', card: 'بطاقة', method: 'طريقة الدفع', note: 'اختر الخطة ثم اضغط WeChat Pay أو Alipay أو البطاقة. ستتم الترقية تلقائيًا بعد نجاح الدفع.', currency: 'العملة:', failed: 'ستتم الترقية تلقائيًا بعد الدفع. إذا لم تُفتح صفحة التحصيل، أعد المحاولة أو تواصل مع الدعم.', errLogin: 'يرجى تسجيل الدخول أولاً', errCreate: 'تعذر إنشاء جلسة الدفع', errNet: 'خطأ في الشبكة: ' },
+  zh: { title: '在线全球化支付结算', loading: '加载中…', needLogin: '升级会员需先登录。', login: '登录', register: '注册', current: '当前', pay: '去支付', paying: '跳转中…', wechat: '微信支付', alipay: '支付宝', card: '银行卡', method: '支付方式', note: '选择套餐后，请点下方「微信支付」「支付宝」或「银行卡」。支付成功后自动升级会员。', walletHint: '微信支付和支付宝由本收款账户按人民币或港币结算。若当前展示为美元等其他币种，点击后会按汇率自动转为人民币收款，会员权益不变。', currency: '币种选择：', failed: '支付完成后将自动升级会员；若未能打开收款页，请稍后重试或联系本站支持。', errLogin: '请先登录', errCreate: '无法创建支付会话', errNet: '网络错误：' },
+  en: { title: 'Global Checkout', loading: 'Loading…', needLogin: 'Please login before upgrading.', login: 'Login', register: 'Sign up', current: 'Current', pay: 'Pay Now', paying: 'Redirecting…', wechat: 'WeChat Pay', alipay: 'Alipay', card: 'Card', method: 'Payment method', note: 'Choose a plan, then tap WeChat Pay, Alipay, or Card. Membership upgrades automatically after success.', walletHint: 'WeChat Pay and Alipay settle in CNY or HKD on this account. If another currency is selected, checkout converts to CNY at the configured rate.', currency: 'Currency:', failed: 'Membership upgrades automatically after payment. If checkout does not open, retry later or contact support.', errLogin: 'Please login first', errCreate: 'Failed to create checkout session', errNet: 'Network error: ' },
+  ar: { title: 'الدفع العالمي', loading: 'جار التحميل…', needLogin: 'يرجى تسجيل الدخول قبل ترقية العضوية.', login: 'تسجيل الدخول', register: 'إنشاء حساب', current: 'الحالي', pay: 'الدفع الآن', paying: 'جار التحويل…', wechat: 'WeChat Pay', alipay: 'Alipay', card: 'بطاقة', method: 'طريقة الدفع', note: 'اختر الخطة ثم اضغط WeChat Pay أو Alipay أو البطاقة. ستتم الترقية تلقائيًا بعد نجاح الدفع.', walletHint: 'WeChat Pay و Alipay تتم تسويتهما بـ CNY أو HKD. إذا اخترت عملة أخرى فسيتم التحويل إلى CNY.', currency: 'العملة:', failed: 'ستتم الترقية تلقائيًا بعد الدفع. إذا لم تُفتح صفحة التحصيل، أعد المحاولة أو تواصل مع الدعم.', errLogin: 'يرجى تسجيل الدخول أولاً', errCreate: 'تعذر إنشاء جلسة الدفع', errNet: 'خطأ في الشبكة: ' },
 }
 
 function resolvePlanId(raw) {
@@ -161,6 +161,7 @@ export default function Payment() {
         </div>
         <div className="payment-summary">
           <p className="payment-method-label">{t.method}</p>
+          <p className="payment-note">{t.walletHint}</p>
           <div className="pay-method-grid">
             <button
               type="button"
