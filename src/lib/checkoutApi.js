@@ -6,8 +6,17 @@ export const CHECKOUT_API =
     ? '/api/airwallex/create-checkout-session'
     : '/api/create-checkout-session')
 
+export function checkoutApiForMethod(method) {
+  if (PAYMENT_PROVIDER === 'airwallex') {
+    if (method === 'wechat') return '/api/airwallex/create-wechat-session'
+    if (method === 'alipay') return '/api/airwallex/create-alipay-session'
+  }
+  return CHECKOUT_API
+}
+
 export function getProviderDisplayName(provider) {
-  return provider === 'airwallex' ? '空中云汇（生产接入）' : 'Stripe（生产可用）'
+  if (provider === 'airwallex') return '空中云汇'
+  return 'Stripe（银行卡 / 微信 / 支付宝）'
 }
 
 export { PAYMENT_PROVIDER }

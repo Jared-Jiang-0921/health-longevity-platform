@@ -54,6 +54,50 @@ function convertFromBaseMinor(baseMinorAmount, baseCurrency, targetCurrency, rat
   return Math.round(targetMajor * minorFactor(targetCurrency))
 }
 
+function resolveCheckoutMethod(body) {
+  const raw = String(body?.method || body?.payment_method || 'card').toLowerCase().trim()
+  if (raw === 'wechat' || raw === 'wechat_pay' || raw === 'weixin') return 'wechat'
+  if (raw === 'alipay' || raw === 'alipaycn') return 'alipay'
+  if (raw === 'auto') return 'auto'
+  return 'card'
+}
+
+function stripeMethodConfig(method) {
+  if (method === 'wechat') {
+    return {
+      payment_method_types: ['wechat_pay'],
+      payment_method_options: { wechat_pay: { client: 'web' } },
+    }
+  }
+  if (method === 'alipay') {
+    return { payment_method_types: ['alipay'] }
+  }
+  if (method === 'auto') {
+    return {
+      payment_method_types: ['card', 'alipay', 'wechat_pay'],
+      payment_method_options: { wechat_pay: { client: 'web' } },
+    }
+  }
+  return { payment_method_types: ['card'] }
+}
+
+function friendlyStripeError(e, method) {
+  const msg = String(e?.message || '')
+  if (/wechat/i.test(msg)) {
+    return '微信支付尚未在收款账户中开通。请到 Stripe Dashboard → 设置 → 支付方式 启用 WeChat Pay，或先使用银行卡。'
+  }
+  if (/alipay/i.test(msg)) {
+    return '支付宝尚未在收款账户中开通。请到 Stripe Dashboard → 设置 → 支付方式 启用 Alipay，或先使用银行卡。'
+  }
+  if (method === 'wechat') {
+    return '无法创建微信支付会话。请确认 Stripe 已启用 WeChat Pay，或改用银行卡。'
+  }
+  if (method === 'alipay') {
+    return '无法创建支付宝会话。请确认 Stripe 已启用 Alipay，或改用银行卡。'
+  }
+  return '支付通道暂时不可用，请稍后重试'
+}
+
 export default async function handler(req, res) {
   const fail = (status, code, error) => res.status(status).json({ code, error })
   if (req.method !== 'POST') {
@@ -95,6 +139,7 @@ export default async function handler(req, res) {
     return fail(400, 'INVALID_ORIGIN', '请求来源地址无效')
   }
 
+  const method = resolveCheckoutMethod(body)
   const stripe = new Stripe(secret)
   try {
     const requestEventKey = `checkout_create:${randomUUID()}`
@@ -116,11 +161,13 @@ export default async function handler(req, res) {
       plan,
       currency,
       status: 'requested',
+      errorCode: method,
     })
+    const methodCfg = stripeMethodConfig(method)
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
+      ...methodCfg,
       client_reference_id: userId,
-      metadata: { plan, user_id: userId },
+      metadata: { plan, user_id: userId, payment_method: method },
       line_items: [{
         price_data: {
           currency,
@@ -146,9 +193,19 @@ export default async function handler(req, res) {
       currency,
       status: 'session_created',
     })
-    return res.status(200).json({ url: session.url })
+    return res.status(200).json({ url: session.url, method })
   } catch (e) {
-    console.error('create-checkout-session', e)
-    return fail(500, 'PAYMENT_PROVIDER_ERROR', '支付通道暂时不可用，请稍后重试')
+    console.error('create-checkout-session', e?.message || e)
+    await upsertPaymentLog({
+      provider: 'stripe',
+      eventKey: `checkout_create_error:${randomUUID()}`,
+      source: 'create_checkout',
+      userId: String(userId),
+      plan,
+      status: 'provider_error',
+      errorCode: String(e?.code || method || 'STRIPE_ERROR'),
+      errorMessage: String(e?.message || ''),
+    }).catch(() => {})
+    return fail(502, 'PAYMENT_PROVIDER_ERROR', friendlyStripeError(e, method))
   }
 }
