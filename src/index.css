@@ -24,6 +24,23 @@ a {
   transition: color var(--transition-fast);
 }
 
+.seo-prerender {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+}
+
+.seo-prerender h1,
+.seo-prerender h2,
+.seo-prerender h3 {
+  line-height: 1.35;
+}
+
+.seo-prerender-langs {
+  margin: 0 0 1.25rem;
+  font-size: 0.9rem;
+}
+
 a:hover {
   color: var(--color-link-hover);
 }

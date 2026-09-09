@@ -2,7 +2,7 @@
  * 法律文档：英文 / 简体中文 / 阿拉伯语（正式书面语）
  * 占位主体名与联系方式来自 siteLegal.js；上线前请律师审阅各法域版本。
  */
-import { SITE_LEGAL } from './siteLegal'
+import { SITE_LEGAL } from './siteLegal.js'
 
 const { legalEntityName, contactEmail, contactAddress, lastUpdated } = SITE_LEGAL
 

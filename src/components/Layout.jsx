@@ -3,7 +3,9 @@ import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
 import { canAccess } from '../data/membership'
 import { SITE_LEGAL } from '../data/siteLegal'
+import { pathWithLocale } from '../lib/localePath'
 import CookieConsentBanner from './CookieConsentBanner'
+import SeoHead from './SeoHead'
 import './Layout.css'
 
 const LOGO_SRC = '/images/logo-longevity-atlas.png'
@@ -94,8 +96,19 @@ export default function Layout({ children }) {
   // 顶栏与首页卡片对齐，始终展示模块入口；游客/等级不足由 ProtectedModule 在页内引导
   const visibleNavItems = primaryNavItems
 
+  const switchLang = (next) => {
+    const url = pathWithLocale(next, location.pathname, location.search, location.hash)
+    const current = `${window.location.pathname}${window.location.search}${window.location.hash}`
+    if (url !== current) {
+      window.location.assign(url)
+      return
+    }
+    setLang(next)
+  }
+
   return (
     <>
+      <SeoHead />
       <header className="site-header site-header--clinical">
         <div className="header-inner header-inner--clinical">
           <Link to="/" className="logo" aria-label={SITE_LEGAL.brandName}>
@@ -129,7 +142,7 @@ export default function Layout({ children }) {
           </nav>
           <div className="header-actions">
             <div className="header-lang" role="group" aria-label={t.language}>
-              <select value={lang} onChange={(e) => setLang(e.target.value)} aria-label={t.language}>
+              <select value={lang} onChange={(e) => switchLang(e.target.value)} aria-label={t.language}>
                 <option value="zh">简体中文</option>
                 <option value="en">English</option>
                 <option value="ar">العربية</option>

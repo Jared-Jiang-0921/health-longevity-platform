@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { detectLangFromPathname } from '../lib/localePath.js'
 
 const STORAGE_KEY = 'health-platform-lang'
 const SUPPORTED = ['zh', 'en', 'ar']
@@ -7,10 +8,19 @@ function normalizeLang(raw) {
   const s = String(raw || '').toLowerCase().trim()
   if (s === 'zh' || s === 'zh-cn' || s === 'zh-hans') return 'zh'
   if (s === 'ar' || s === 'ar-sa' || s === 'ar-ae') return 'ar'
-  return 'en'
+  if (s === 'en' || s === 'en-us' || s === 'en-gb') return 'en'
+  return 'zh'
 }
 
 function resolveInitialLang() {
+  if (typeof window !== 'undefined') {
+    const fromPath = detectLangFromPathname(window.location.pathname)
+    if (fromPath === 'en' || fromPath === 'ar') return fromPath
+    const params = new URLSearchParams(window.location.search)
+    const fromQuery = params.get('lang')
+    if (fromQuery) return normalizeLang(fromQuery)
+    if (fromPath === 'zh') return 'zh'
+  }
   try {
     const saved = localStorage.getItem(STORAGE_KEY)
     if (saved) return normalizeLang(saved)

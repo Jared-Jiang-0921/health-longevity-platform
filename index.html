@@ -1,15 +1,53 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-Hans">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>长健星图 Longevity Atlas | 健康长寿独立平台</title>
+    <title>长健星图 Longevity Atlas | 循证健康长寿平台</title>
+    <meta
+      name="description"
+      content="基于指南与研究证据，结合中医体质与四时养生，提供可执行的生活方式与风险提示。教育信息，不替代诊疗。"
+    />
+    <meta name="robots" content="index,follow" />
+    <link rel="canonical" href="https://www.healthlongevity.cn/" />
+    <link rel="alternate" hreflang="zh-Hans" href="https://www.healthlongevity.cn/" />
+    <link rel="alternate" hreflang="en" href="https://www.healthlongevity.cn/en/" />
+    <link rel="alternate" hreflang="ar" href="https://www.healthlongevity.cn/ar/" />
+    <link rel="alternate" hreflang="x-default" href="https://www.healthlongevity.cn/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="长健星图 Longevity Atlas" />
+    <meta property="og:title" content="长健星图 Longevity Atlas | 循证健康长寿平台" />
+    <meta
+      property="og:description"
+      content="基于指南与研究证据，结合中医体质与四时养生，提供可执行的生活方式与风险提示。教育信息，不替代诊疗。"
+    />
+    <meta property="og:url" content="https://www.healthlongevity.cn/" />
+    <meta property="og:image" content="https://www.healthlongevity.cn/images/logo-longevity-atlas.png" />
+    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:locale:alternate" content="ar_AE" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
+    <script>
+      (function () {
+        var p = location.pathname
+        var el = document.documentElement
+        if (p === '/en' || p.indexOf('/en/') === 0) {
+          el.lang = 'en'
+          el.dir = 'ltr'
+        } else if (p === '/ar' || p.indexOf('/ar/') === 0) {
+          el.lang = 'ar'
+          el.dir = 'rtl'
+        } else {
+          el.lang = 'zh-Hans'
+          el.dir = 'ltr'
+        }
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>
