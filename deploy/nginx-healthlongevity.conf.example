@@ -23,6 +23,11 @@ server {
 
     server_tokens off;
 
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 256;
+    gzip_types text/plain text/css application/javascript application/json image/svg+xml;
+
     root /opt/health-longevity-platform/dist;
     index index.html;
 
@@ -44,6 +49,16 @@ server {
         charset utf-8;
         default_type text/html;
         add_header Cache-Control "no-store, no-cache, must-revalidate, max-age=0" always;
+    }
+
+    location /assets/ {
+        add_header Cache-Control "public, max-age=31536000, immutable" always;
+        try_files $uri =404;
+    }
+
+    location /images/ {
+        add_header Cache-Control "public, max-age=604800" always;
+        try_files $uri =404;
     }
 
     location = /robots.txt {
@@ -128,6 +143,16 @@ server {
 #
 #     location = /robots.txt {
 #         default_type text/plain;
+#     }
+#
+#     location /assets/ {
+#         add_header Cache-Control "public, max-age=31536000, immutable" always;
+#         try_files $uri =404;
+#     }
+#
+#     location /images/ {
+#         add_header Cache-Control "public, max-age=604800" always;
+#         try_files $uri =404;
 #     }
 #
 #     location = /sitemap.xml {

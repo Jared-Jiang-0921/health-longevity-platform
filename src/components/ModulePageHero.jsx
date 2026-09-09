@@ -20,6 +20,9 @@ export default function ModulePageHero({ path, title, children }) {
         className="module-page-hero-img"
         sources={sources}
         alt=""
+        width={1280}
+        height={720}
+        loading="eager"
         decoding="async"
       />
       <div className="module-page-hero-overlay" aria-hidden="true" />

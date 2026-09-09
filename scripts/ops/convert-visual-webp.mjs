@@ -10,7 +10,7 @@ import sharp from 'sharp'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '../..')
 const VISUAL_DIR = path.join(ROOT, 'public/images/visual')
-const QUALITY = 84
+const QUALITY = 76
 
 async function walkPng(dir) {
   const entries = await readdir(dir, { withFileTypes: true })
@@ -30,7 +30,8 @@ async function convertOne(pngPath) {
   const webpPath = pngPath.replace(/\.png$/i, '.webp')
   const pngStat = await stat(pngPath)
   await sharp(pngPath)
-    .webp({ quality: QUALITY, effort: 4 })
+    .resize({ width: 1280, height: 1280, fit: 'inside', withoutEnlargement: true })
+    .webp({ quality: 76, effort: 4 })
     .toFile(webpPath)
   const webpStat = await stat(webpPath)
   const saved = ((1 - webpStat.size / pngStat.size) * 100).toFixed(1)

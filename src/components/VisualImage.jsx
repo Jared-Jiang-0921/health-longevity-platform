@@ -10,6 +10,7 @@ export default function VisualImage({
   decoding = 'async',
   width,
   height,
+  sizes,
   ...rest
 }) {
   if (!sources?.fallback) return null
@@ -21,6 +22,7 @@ export default function VisualImage({
     decoding,
     width,
     height,
+    sizes: sizes || (loading === 'eager' ? '(max-width: 720px) 100vw, 640px' : '(max-width: 720px) 100vw, 400px'),
     ...rest,
   }
 
@@ -31,7 +33,7 @@ export default function VisualImage({
   return (
     <picture className={pictureClassName}>
       <source srcSet={sources.webp} type="image/webp" />
-      <img src={sources.fallback} {...imgProps} />
+      <img src={sources.webp} {...imgProps} />
     </picture>
   )
 }

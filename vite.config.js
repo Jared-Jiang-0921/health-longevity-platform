@@ -3,6 +3,22 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (
+            id.includes('node_modules/react-dom') ||
+            id.includes('node_modules/react/') ||
+            id.includes('node_modules/scheduler') ||
+            id.includes('node_modules/react-router')
+          ) {
+            return 'react'
+          }
+        },
+      },
+    },
+  },
   server: {
     proxy: {
       // 本地与 Payment.jsx 默认路径一致；需另开 terminal 运行 server/create-payment-intent.js（默认 4242）

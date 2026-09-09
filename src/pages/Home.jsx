@@ -64,6 +64,7 @@ export default function Home() {
               height={900}
               loading="eager"
               decoding="async"
+              fetchPriority="high"
               className="home-hero-visual-img"
             />
             <figcaption className="home-hero-visual-caption">
@@ -98,6 +99,8 @@ export default function Home() {
                     <VisualImage
                       sources={coverSources}
                       alt={coverAlt}
+                      width={640}
+                      height={360}
                       loading="lazy"
                       decoding="async"
                       className="home-module-cover-img"
