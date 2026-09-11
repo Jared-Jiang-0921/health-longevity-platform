@@ -1,5 +1,6 @@
 .page-longevity-news {
-  /* page-chrome */
+  width: 100%;
+  max-width: var(--content-max);
 }
 
 .news-header {
@@ -7,28 +8,10 @@
 }
 
 .news-lead {
-  margin: 0 0 1rem;
+  margin: 0;
   line-height: 1.65;
   font-size: 0.95rem;
   color: var(--color-text-muted);
-}
-
-.news-caveat {
-  /* page-callout--info */
-}
-
-.news-caveat-title {
-  margin: 0 0 0.45rem;
-  font-size: 0.95rem;
-  color: var(--color-text);
-}
-
-.news-caveat-phrase {
-  margin: 0;
-  font-size: 0.95rem;
-  font-weight: 600;
-  line-height: 1.55;
-  color: var(--color-text);
 }
 
 .news-section-heading {
@@ -42,100 +25,9 @@
   color: var(--color-text-muted);
 }
 
-.news-table-wrap {
-  overflow-x: auto;
-  border-radius: 10px;
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-}
-
-.news-columns-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.875rem;
-}
-
-.news-columns-table th,
-.news-columns-table td {
-  padding: 0.6rem 0.8rem;
-  text-align: left;
-  vertical-align: top;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.news-columns-table th {
-  background: var(--color-primary-muted);
-  font-weight: 600;
-}
-
-.news-columns-table tr:last-child td {
-  border-bottom: none;
-}
-
-.news-columns-table td:first-child {
-  font-weight: 500;
-  width: 9rem;
-  color: var(--color-text);
-}
-
-@media (max-width: 520px) {
-  .news-columns-table td:first-child {
-    width: 7rem;
-  }
-}
-
 .news-list-intro {
   margin: 1.15rem 0 0;
   font-size: 0.82rem;
   color: var(--color-text-muted);
   line-height: 1.5;
-}
-
-.news-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  align-items: center;
-  margin-bottom: 0.75rem;
-}
-
-.news-journal {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--color-primary);
-}
-
-.news-if {
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
-  background: var(--color-primary-muted);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-}
-
-.news-month {
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
-}
-
-.news-card h3 {
-  font-size: 1rem;
-  margin: 0 0 0.5rem;
-  line-height: 1.4;
-}
-
-.news-card p {
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
-  margin: 0 0 0.75rem;
-  line-height: 1.6;
-}
-
-.news-link {
-  font-size: 0.85rem;
-  color: var(--color-primary);
-}
-
-.news-link:hover {
-  color: var(--color-primary-hover);
 }

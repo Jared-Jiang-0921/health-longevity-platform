@@ -111,9 +111,9 @@ export const SEO_PAGES = [
       ar: 'مستجدات طبية',
     },
     description: {
-      zh: '长寿与预防医学前沿资讯：速递、证据解读、试验追踪与指南更新，按会员等级开放。',
-      en: 'Longevity and prevention insights—digests, evidence explainers, trials and guidelines by membership tier.',
-      ar: 'مستجدات طول العمر والوقاية حسب مستوى العضوية.',
+      zh: '长寿与预防医学前沿资讯卡片：公众号解读的标题、关键词与摘要可被检索；完整正文打开微信原文。覆盖衰老时钟、NMN、运动、睡眠与临床试验。',
+      en: 'Longevity insight cards with titles, keywords and summaries for search; full WeChat posts stay on the original page.',
+      ar: 'بطاقات رؤى طول العمر بعناوين وكلمات مفتاحية للبحث. النص الكامل يبقى في المصدر.',
     },
   },
   {

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
@@ -9,6 +9,7 @@ import {
 } from '../data/longevityNewsColumns'
 import { getLongevityNewsArticles } from '../data/longevityNewsArticles'
 import { hasLevelAccess, shouldShowMembershipBadge } from '../data/membership'
+import { extractLongevityKeywords, newsCardExcerpt } from '../lib/longevityNewsCard'
 import { getMembershipLevelLabel } from '../i18n/terms'
 import ContentLockNotice from './ContentLockNotice'
 import { moduleAssetUrl } from '../lib/moduleAssetUrl'
@@ -23,9 +24,19 @@ function isImage(mime) {
   return String(mime || '').startsWith('image/')
 }
 
-/**
- * 正式资讯阅读：栏目（像书架分区）→ 条目目录 → 点开阅读/打开资料
- */
+function kindLabel(kind, t) {
+  if (kind === 'link') return t.link
+  if (kind === 'upload') return t.uploaded
+  return t.editorial
+}
+
+function formatDate(iso) {
+  const s = String(iso || '').slice(0, 10)
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return ''
+  const [y, m, d] = s.split('-')
+  return `${y}.${m}.${d}`
+}
+
 export default function LongevityNewsFeed() {
   const { lang } = useLocale()
   const { user, getToken } = useAuth()
@@ -37,83 +48,105 @@ export default function LongevityNewsFeed() {
 
   const t = {
     zh: {
-      columns: '资讯栏目',
-      toc: '本栏目目录',
-      empty: '本栏目暂无正式稿件。管理员可在下方上传区按栏目归档。',
+      kicker: '长寿医学简报',
+      columns: '栏目',
+      empty: '本栏目还没有稿件。管理员可在页面底部用「发布链接」或「批量导入」归档公众号文章。',
       loading: '加载中…',
       read: '阅读本篇',
       back: '返回目录',
-      open: '打开/下载资料',
-      source: '来源与检索',
+      open: '打开资料',
+      source: '来源',
       takeaways: '阅读要点',
-      uploaded: '上传资料',
-      link: '公众号/外链',
+      keywords: '关键词',
+      uploaded: '站内资料',
+      link: '微信原文',
       editorial: '编辑稿',
       openWechat: '打开微信原文',
-      login: '登录',
-      upgrade: '升级会员',
+      login: '登录后阅读',
+      upgrade: '升级后阅读',
+      count: (n) => `${n} 篇`,
     },
     en: {
+      kicker: 'Medical briefing',
       columns: 'Columns',
-      toc: 'In this column',
-      empty: 'No articles in this column yet.',
+      empty: 'No pieces in this column yet.',
       loading: 'Loading…',
       read: 'Read',
-      back: 'Back to list',
-      open: 'Open / download',
-      source: 'Sources',
+      back: 'Back',
+      open: 'Open file',
+      source: 'Source',
       takeaways: 'Takeaways',
-      uploaded: 'Uploaded file',
-      link: 'External link',
+      keywords: 'Keywords',
+      uploaded: 'File',
+      link: 'Original',
       editorial: 'Editorial',
       openWechat: 'Open original',
-      login: 'Login',
-      upgrade: 'Upgrade',
+      login: 'Log in to read',
+      upgrade: 'Upgrade to read',
+      count: (n) => `${n}`,
     },
     ar: {
+      kicker: 'موجز طبي',
       columns: 'الأعمدة',
-      toc: 'في هذا العمود',
       empty: 'لا مقالات بعد.',
       loading: 'جارٍ التحميل…',
       read: 'اقرأ',
-      back: 'عودة للقائمة',
-      open: 'فتح / تنزيل',
-      source: 'المصادر',
+      back: 'عودة',
+      open: 'فتح',
+      source: 'المصدر',
       takeaways: 'نقاط',
-      uploaded: 'ملف مرفوع',
-      link: 'رابط خارجي',
-      editorial: 'مقال تحريري',
+      keywords: 'كلمات مفتاحية',
+      uploaded: 'ملف',
+      link: 'الأصل',
+      editorial: 'تحريري',
       openWechat: 'فتح الأصل',
-      login: 'تسجيل الدخول',
-      upgrade: 'ترقية',
+      login: 'سجّل لل قراءة',
+      upgrade: 'رقِّ ل القراءة',
+      count: (n) => `${n}`,
     },
   }[lang || 'zh']
+
+  const loadUploads = useCallback(async () => {
+    const token = getToken()
+    const res = await fetch(`/api/module-assets?module=longevity-news&ts=${Date.now()}`, {
+      cache: 'no-store',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) throw new Error(data.error || 'load failed')
+    return Array.isArray(data.items) ? data.items : []
+  }, [getToken])
 
   useEffect(() => {
     let cancelled = false
     setLoading(true)
-    const token = getToken()
-    ;(async () => {
-      try {
-        const res = await fetch(`/api/module-assets?module=longevity-news&ts=${Date.now()}`, {
-          cache: 'no-store',
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        })
-        const data = await res.json().catch(() => ({}))
-        if (!cancelled && res.ok) setUploads(Array.isArray(data.items) ? data.items : [])
-        else if (!cancelled) setUploads([])
-      } catch {
-        if (!cancelled) setUploads([])
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    })()
+    loadUploads()
+      .then((items) => { if (!cancelled) setUploads(items) })
+      .catch(() => { if (!cancelled) setUploads([]) })
+      .finally(() => { if (!cancelled) setLoading(false) })
+    const onUpdated = (e) => {
+      if (e.detail?.module && e.detail.module !== 'longevity-news') return
+      loadUploads().then((items) => { if (!cancelled) setUploads(items) }).catch(() => {})
+    }
+    window.addEventListener('module-assets-updated', onUpdated)
     return () => {
       cancelled = true
+      window.removeEventListener('module-assets-updated', onUpdated)
     }
-  }, [getToken])
+  }, [loadUploads])
 
   const columnMeta = getLongevityNewsColumn(activeColumn)
+
+  const columnCounts = useMemo(() => {
+    const staticAll = getLongevityNewsArticles()
+    const map = {}
+    for (const col of LONGEVITY_NEWS_COLUMNS) {
+      const nStatic = staticAll.filter((a) => a.column === col.label).length
+      const nUp = uploads.filter((item) => String(item.subcategory || '').trim() === col.label).length
+      map[col.label] = nStatic + nUp
+    }
+    return map
+  }, [uploads])
 
   const entries = useMemo(() => {
     const staticOnes = getLongevityNewsArticles()
@@ -124,6 +157,8 @@ export default function LongevityNewsFeed() {
         title: a.title,
         summary: a.summary,
         takeaways: a.takeaways || [],
+        keywords: extractLongevityKeywords(a.title, a.summary),
+        excerpt: newsCardExcerpt(a.summary),
         sourceNote: a.sourceNote || '',
         url: a.url || '',
         publishedAt: a.publishedAt || '',
@@ -142,8 +177,10 @@ export default function LongevityNewsFeed() {
           assetId: item.id,
           title: item.title,
           summary: item.summary || '',
+          excerpt: newsCardExcerpt(item.summary),
+          keywords: extractLongevityKeywords(item.title, item.summary),
           takeaways: [],
-          sourceNote: isLink ? '原文发布于外链（如微信公众号），完整内容以原文为准。' : '',
+          sourceNote: isLink ? '原文在微信公众号，完整内容以微信页面为准。' : '',
           url: extUrl,
           publishedAt: item.created_at ? String(item.created_at).slice(0, 10) : '',
           requiredLevel: item.content_level || item.required_level || columnMeta?.requiredLevel || 'free',
@@ -154,7 +191,7 @@ export default function LongevityNewsFeed() {
       })
       .sort((a, b) => String(b.publishedAt).localeCompare(String(a.publishedAt)))
 
-    return [...staticOnes, ...uploadOnes]
+    return [...uploadOnes, ...staticOnes]
   }, [activeColumn, uploads, user, columnMeta])
 
   const active = entries.find((e) => e.id === activeId) || null
@@ -163,54 +200,104 @@ export default function LongevityNewsFeed() {
     setActiveId('')
   }, [activeColumn])
 
-  return (
-    <section className="longevity-news-feed" aria-labelledby="ln-feed-columns">
-      <h2 id="ln-feed-columns" className="longevity-news-feed-heading">
-        {t.columns}
-      </h2>
-      <div className="longevity-news-feed-tabs" role="tablist">
-        {LONGEVITY_NEWS_COLUMNS.map((col) => (
-          <button
-            key={col.id}
-            type="button"
-            role="tab"
-            aria-selected={activeColumn === col.label}
-            className={`longevity-news-feed-tab ${activeColumn === col.label ? 'active' : ''}`}
-            onClick={() => setActiveColumn(col.label)}
-          >
-            {col.label}
-            {shouldShowMembershipBadge(col.requiredLevel) ? (
-              <span className={`membership-badge membership-${col.requiredLevel}`}>
-                {getMembershipLevelLabel(col.requiredLevel, lang)}
-              </span>
-            ) : null}
+  const renderCard = (item) => {
+    const locked = !item.canView
+    const open = () => { if (!locked) setActiveId(item.id) }
+    return (
+      <article
+        key={item.id}
+        className={`ln-card ${locked ? 'is-locked' : ''}`}
+      >
+        <div className="ln-card-meta">
+          <span className="ln-card-kind">{kindLabel(item.kind, t)}</span>
+          {item.publishedAt ? <time dateTime={item.publishedAt}>{formatDate(item.publishedAt)}</time> : null}
+          {shouldShowMembershipBadge(item.requiredLevel) ? (
+            <span className={`membership-badge membership-${item.requiredLevel}`}>
+              {getMembershipLevelLabel(item.requiredLevel, lang)}
+            </span>
+          ) : null}
+        </div>
+        <h3 className="ln-card-title">{item.title}</h3>
+        {item.keywords?.length ? (
+          <ul className="ln-keywords" aria-label={t.keywords}>
+            {item.keywords.map((kw) => (
+              <li key={kw}>{kw}</li>
+            ))}
+          </ul>
+        ) : null}
+        {item.excerpt ? <p className="ln-card-excerpt">{item.excerpt}</p> : null}
+        {locked ? (
+          <p className="ln-card-cta">
+            {!user ? <Link to="/login">{t.login}</Link> : <Link to="/payment">{t.upgrade}</Link>}
+          </p>
+        ) : (
+          <button type="button" className="ln-card-cta-btn" onClick={open}>
+            {t.read} →
           </button>
-        ))}
+        )}
+      </article>
+    )
+  }
+
+  return (
+    <section className="ln-desk" aria-labelledby="ln-desk-kicker">
+      <p id="ln-desk-kicker" className="visually-hidden">{t.kicker}</p>
+
+      <div className="ln-toolbar" aria-label={t.columns}>
+        <div className="ln-cols" role="tablist" aria-label={t.columns}>
+          {LONGEVITY_NEWS_COLUMNS.map((col) => (
+            <button
+              key={col.id}
+              type="button"
+              role="tab"
+              aria-selected={activeColumn === col.label}
+              className={`ln-col ${activeColumn === col.label ? 'is-active' : ''}`}
+              onClick={() => setActiveColumn(col.label)}
+            >
+              <span className="ln-col-name">{col.label}</span>
+              <span className="ln-col-count">{t.count(columnCounts[col.label] || 0)}</span>
+              {shouldShowMembershipBadge(col.requiredLevel) ? (
+                <span className={`membership-badge membership-${col.requiredLevel}`}>
+                  {getMembershipLevelLabel(col.requiredLevel, lang)}
+                </span>
+              ) : null}
+            </button>
+          ))}
+        </div>
       </div>
       {columnMeta ? (
-        <p className="longevity-news-feed-blurb">{getLongevityNewsColumnBlurb(columnMeta, lang)}</p>
+        <p className="ln-blurb">{getLongevityNewsColumnBlurb(columnMeta, lang)}</p>
       ) : null}
 
-      {loading ? <p className="longevity-news-feed-muted">{t.loading}</p> : null}
+      {loading ? <p className="ln-muted">{t.loading}</p> : null}
 
       {active ? (
-        <article className="longevity-news-reader content-card content-card--padded">
-          <button type="button" className="longevity-news-back" onClick={() => setActiveId('')}>
+        <article className="ln-essay">
+          <button type="button" className="ln-back" onClick={() => setActiveId('')}>
             ← {t.back}
           </button>
-          <p className="longevity-news-feed-muted">
-            {active.kind === 'link' ? t.link : active.kind === 'upload' ? t.uploaded : t.editorial}
-            {active.publishedAt ? ` · ${active.publishedAt}` : ''}
+          <p className="ln-essay-kicker">
+            {kindLabel(active.kind, t)}
+            {active.publishedAt ? ` · ${formatDate(active.publishedAt)}` : ''}
           </p>
-          <h3>{active.title}</h3>
+          <h2 className="ln-essay-title">{active.title}</h2>
           {!active.canView ? (
             <ContentLockNotice requiredLevel={active.rawRequired || active.requiredLevel} user={user} />
           ) : (
             <>
-              {active.summary ? <p className="longevity-news-body">{active.summary}</p> : null}
+              {active.keywords?.length ? (
+                <ul className="ln-keywords ln-keywords--essay" aria-label={t.keywords}>
+                  {active.keywords.map((kw) => (
+                    <li key={kw}>{kw}</li>
+                  ))}
+                </ul>
+              ) : null}
+              {active.excerpt ? (
+                <p className="ln-essay-lede">{active.excerpt}</p>
+              ) : null}
               {active.takeaways?.length ? (
-                <div className="longevity-news-takeaways">
-                  <h4>{t.takeaways}</h4>
+                <div className="ln-takeaways">
+                  <h3>{t.takeaways}</h3>
                   <ul>
                     {active.takeaways.map((line) => (
                       <li key={line}>{line}</li>
@@ -219,85 +306,55 @@ export default function LongevityNewsFeed() {
                 </div>
               ) : null}
               {active.sourceNote ? (
-                <p className="longevity-news-feed-muted">
-                  {t.source}：{active.sourceNote}
-                </p>
+                <p className="ln-muted">{t.source}：{active.sourceNote}</p>
               ) : null}
               {active.url ? (
-                <p>
-                  <a href={active.url} target="_blank" rel="noopener noreferrer" className="news-link">
-                    {active.kind === 'link' ? t.openWechat : t.open} →
-                  </a>
-                </p>
+                <a href={active.url} target="_blank" rel="noopener noreferrer" className="ln-wechat">
+                  {active.kind === 'link' ? t.openWechat : t.open}
+                </a>
               ) : null}
               {active.kind === 'upload' && active.assetId ? (
                 isVideo(active.mime) ? (
                   <video
                     controls
-                    className="longevity-news-media"
+                    className="ln-media"
                     src={moduleAssetUrl(active.assetId, mediaToken)}
                     preload="metadata"
                   />
                 ) : isImage(active.mime) ? (
                   <img
-                    className="longevity-news-media"
+                    className="ln-media"
                     src={moduleAssetUrl(active.assetId, mediaToken)}
                     alt={active.title}
                   />
-                ) : (
+                ) : !active.url ? (
                   <p>
                     <a
                       href={moduleAssetUrl(active.assetId, mediaToken)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="news-link"
+                      className="ln-wechat ln-wechat--ghost"
                     >
-                      {t.open} →
+                      {t.open}
                     </a>
                   </p>
-                )
+                ) : null
               ) : null}
             </>
           )}
         </article>
       ) : (
         <>
-          <h3 className="longevity-news-toc-title">{t.toc}</h3>
+          <div className="ln-list-heading">
+            <h2>{activeColumn}</h2>
+            <p>{t.count(entries.length)}</p>
+          </div>
           {!loading && !entries.length ? (
-            <p className="longevity-news-feed-muted">{t.empty}</p>
+            <p className="ln-empty">{t.empty}</p>
           ) : (
-            <ol className="longevity-news-toc">
-              {entries.map((item, index) => (
-                <li key={item.id} className="longevity-news-toc-item content-card content-card--padded">
-                  <div className="longevity-news-toc-head">
-                    <span className="longevity-news-toc-num">{index + 1}</span>
-                    {shouldShowMembershipBadge(item.requiredLevel) ? (
-                      <span className={`membership-badge membership-${item.requiredLevel}`}>
-                        {getMembershipLevelLabel(item.requiredLevel, lang)}
-                      </span>
-                    ) : null}
-                    <span className="longevity-news-kind">
-                      {item.kind === 'link' ? t.link : item.kind === 'upload' ? t.uploaded : t.editorial}
-                    </span>
-                  </div>
-                  <h4>{item.title}</h4>
-                  {item.summary ? <p className="longevity-news-feed-muted">{item.summary}</p> : null}
-                  {!item.canView ? (
-                    <p className="longevity-news-lock-line">
-                      {!user ? (
-                        <Link to="/login">{t.login}</Link>
-                      ) : (
-                        <Link to="/payment">{t.upgrade}</Link>
-                      )}
-                    </p>
-                  ) : (
-                    <button type="button" className="btn-primary" onClick={() => setActiveId(item.id)}>
-                      {t.read}
-                    </button>
-                  )}
-                </li>
-              ))}
-            </ol>
+            <div className="ln-grid">
+              {entries.map((item) => renderCard(item))}
+            </div>
           )}
         </>
       )}

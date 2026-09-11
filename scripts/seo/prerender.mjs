@@ -6,7 +6,10 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { HOME_MODULES, getHomeCopy } from '../../src/data/homePageContent.js'
-import { SEO_LANGS, SEO_PAGES, absoluteUrl } from '../../src/data/seo.js'
+import { getLongevityNewsArticles } from '../../src/data/longevityNewsArticles.js'
+import { LONGEVITY_NEWS_COLUMNS } from '../../src/data/longevityNewsColumns.js'
+import { SEO_LANGS, SEO_PAGES, SITE_ORIGIN, absoluteUrl } from '../../src/data/seo.js'
+import { toNewsSearchCard } from '../../src/lib/longevityNewsCard.js'
 import { langSpec, renderHeadSnippet, resolveSeo } from '../../src/lib/seoDocument.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -61,9 +64,91 @@ function homeBody(lang) {
   `
 }
 
-function pageBody(page, lang) {
+async function loadLongevityNewsCards() {
+  const staticCards = getLongevityNewsArticles().map((item) => toNewsSearchCard(item))
+  const origin = String(process.env.SEO_NEWS_API || 'http://127.0.0.1:3000').replace(/\/$/, '')
+  let uploads = []
+  try {
+    const res = await fetch(`${origin}/api/module-assets?module=longevity-news`, {
+      signal: AbortSignal.timeout(12000),
+    })
+    if (res.ok) {
+      const data = await res.json()
+      uploads = (Array.isArray(data.items) ? data.items : []).map((item) =>
+        toNewsSearchCard({
+          id: `upload-${item.id}`,
+          column: item.subcategory,
+          title: item.title,
+          summary: item.summary,
+          external_url: item.external_url,
+          created_at: item.created_at,
+        }),
+      )
+    } else {
+      console.warn(`[seo] longevity-news assets HTTP ${res.status} from ${origin}`)
+    }
+  } catch (err) {
+    console.warn(`[seo] longevity-news assets skipped: ${err.message}`)
+  }
+  return [...uploads, ...staticCards].filter((card) => card.title)
+}
+
+function newsJsonLd(lang, cards) {
+  const canonical = absoluteUrl(lang, '/longevity-news')
+  const keywords = [...new Set(cards.flatMap((card) => card.keywords))].slice(0, 48)
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: lang === 'zh' ? '前沿医学资讯检索卡片' : 'Longevity insight cards',
+    url: canonical,
+    numberOfItems: cards.length,
+    itemListElement: cards.slice(0, 200).map((card, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'Article',
+        headline: card.title,
+        keywords: card.keywords.join(', '),
+        description: card.excerpt || card.title,
+        url: `${canonical}#${encodeURIComponent(card.id)}`,
+        isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
+        ...(card.url ? { isBasedOn: card.url } : {}),
+      },
+    })),
+    ...(keywords.length ? { keywords: keywords.join(', ') } : {}),
+  }
+}
+
+function newsBody(lang, cards) {
+  const seo = resolveSeo('/longevity-news', lang)
+  const grouped = new Map()
+  for (const col of LONGEVITY_NEWS_COLUMNS) grouped.set(col.label, [])
+  for (const card of cards) {
+    const label = card.column || '其他'
+    if (!grouped.has(label)) grouped.set(label, [])
+    grouped.get(label).push(card)
+  }
+  const sections = []
+  for (const [label, items] of grouped) {
+    if (!items.length) continue
+    const articles = items
+      .map((card) => {
+        const kws = card.keywords.length
+          ? `<p>关键词：${escapeHtml(card.keywords.join('、'))}</p>`
+          : ''
+        const excerpt = card.excerpt ? `<p>${escapeHtml(card.excerpt)}</p>` : ''
+        return `<article id="${escapeHtml(card.id)}"><h3>${escapeHtml(card.title)}</h3>${kws}${excerpt}</article>`
+      })
+      .join('')
+    sections.push(`<section><h2>${escapeHtml(label)}</h2>${articles}</section>`)
+  }
+  return `<h1>${escapeHtml(seo.title)}</h1><p>${escapeHtml(seo.description)}</p>${moduleIntro('/longevity-news', lang)}${sections.join('')}`
+}
+
+function pageBody(page, lang, newsCards) {
   if (page.type === 'home') return homeBody(lang)
   if (page.type === 'legal') return legalBody(page, lang)
+  if (page.path === '/longevity-news') return newsBody(lang, newsCards)
   const seo = resolveSeo(page.path, lang)
   const extra = moduleIntro(page.path, lang)
   return `<h1>${escapeHtml(seo.title)}</h1><p>${escapeHtml(seo.description)}</p>${extra}`
@@ -84,7 +169,7 @@ function stripBaselineSeo(html) {
     .replace(/<link\s+rel="alternate"[\s\S]*?>\s*/gi, '')
 }
 
-function injectHtml(template, { lang, pathname, body }) {
+function injectHtml(template, { lang, pathname, body, extraHead = '' }) {
   const spec = langSpec(lang)
   const head = renderHeadSnippet({ lang, pathname })
   const langs = langLinks(pathname, lang)
@@ -96,7 +181,7 @@ function injectHtml(template, { lang, pathname, body }) {
     </div>`
   let html = stripBaselineSeo(template)
   html = html.replace(/<html([^>]*)>/i, `<html lang="${spec.htmlLang}" dir="${spec.dir}">`)
-  html = html.replace('</head>', `    ${head}\n  </head>`)
+  html = html.replace('</head>', `    ${head}\n    ${extraHead}\n  </head>`)
   html = html.replace(/<div id="root"><\/div>/, root)
   return html
 }
@@ -128,13 +213,20 @@ ${urls.join('\n')}
 
 async function main() {
   const template = await fs.readFile(path.join(distDir, 'index.html'), 'utf8')
+  const newsCards = await loadLongevityNewsCards()
+  console.log(`[seo] longevity-news cards: ${newsCards.length}`)
   let count = 0
   for (const page of SEO_PAGES) {
     for (const spec of SEO_LANGS) {
+      const extraHead =
+        page.path === '/longevity-news'
+          ? `<script type="application/ld+json" data-seo-news="1">${JSON.stringify(newsJsonLd(spec.id, newsCards))}</script>`
+          : ''
       const html = injectHtml(template, {
         lang: spec.id,
         pathname: page.path,
-        body: pageBody(page, spec.id),
+        body: pageBody(page, spec.id, newsCards),
+        extraHead,
       })
       const dest = distFileFor(spec.id, page.path)
       await fs.mkdir(path.dirname(dest), { recursive: true })

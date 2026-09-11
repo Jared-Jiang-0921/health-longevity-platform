@@ -5,7 +5,7 @@ const COPY = {
   zh: {
     title: '前沿医学资讯',
     lead:
-      '围绕经同行评审的文献与权威机构公开信息做精选与解读，帮助建立证据层级意识。正式稿按栏目上线：先选栏目，再点开单篇阅读；管理员可继续上传 PDF/图文归档到对应栏目。',
+      '精选经同行评审的文献与权威公开信息，也收录公众号解读。每篇在本站显示为检索卡片（标题、关键词、摘要），完整正文请打开微信原文。',
     sourcesTitle: '内容来源（示例）',
     sourcesBody:
       'PubMed；Nature、Science、Cell、The Lancet、NEJM、JAMA、BMJ 等学术期刊与子刊；Cochrane 系统综述；WHO、FDA、NMPA 等监管机构公开信息；国家卫健委、中华医学会等发布的指南与共识（以公开可检索版本为准）。',
@@ -23,6 +23,9 @@ const COPY = {
       { column: '指南与共识更新', content: '关注权威机构发布的新版建议与证据等级变化' },
     ],
     listIntro: '以下为示例条目（演示排版与外链形态），后续将按上表栏目与证据约定替换为真实策划稿。',
+    wechatTitle: '如何把公众号文章移到本栏目',
+    wechatBody:
+      '微信不允许把公众号全文嵌进别的网站。做法：复制标题和链接，到本页底部「模块资料」发布。标题请写清研究主题（如 NMN、衰老时钟），本站会自动抽出关键词做成检索卡片；完整正文仍打开微信原文。',
   },
   en: {
     title: 'Frontier Medical Insights',
@@ -45,6 +48,9 @@ const COPY = {
       { column: 'Guideline updates', content: 'New or revised recommendations from authoritative bodies' },
     ],
     listIntro: 'Cards below are placeholders for layout; replace with editorial content following the plan above.',
+    wechatTitle: 'Moving WeChat articles here',
+    wechatBody:
+      'WeChat does not allow embedding full posts. Copy each title and URL from the official account, then use Publish link or Bulk import at the bottom (one line: title | URL). Readers open the original in WeChat.',
   },
   ar: {
     title: 'مستجدات طبية رائدة',
@@ -67,6 +73,9 @@ const COPY = {
       { column: 'تحديثات الإرشادات', content: 'توصيات جديدة أو معدّلة من جهات موثوقة' },
     ],
     listIntro: 'البطاقات أدناه للعرض التجريبي—استبدلها بمحتوى تحريري لاحقاً.',
+    wechatTitle: 'نقل مقالات WeChat',
+    wechatBody:
+      'لا يمكن تضمين مقال WeChat كاملاً. انسخ العنوان والرابط ثم انشره من أسفل الصفحة، سطراً لكل مقال: العنوان | الرابط.',
   },
 }
 
