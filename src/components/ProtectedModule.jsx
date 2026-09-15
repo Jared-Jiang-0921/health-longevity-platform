@@ -9,6 +9,8 @@ const COPY = {
     registerBody: '普通用户需先注册并登录会员后，才能查看长寿知识技能课程内容。',
     monitorTitle: '请先登录',
     monitorBody: 'AI健康监测需登录后使用，并仅向高级会员开放。',
+    riskTitle: '请先登录',
+    riskBody: '第一期三项评估需登录，且仅向标准会员及以上开放。',
     register: '注册会员',
     login: '登录',
     home: '返回首页',
@@ -21,6 +23,8 @@ const COPY = {
     registerBody: 'Please register and sign in as a member to view Health Skills courses.',
     monitorTitle: 'Please sign in',
     monitorBody: 'AI Health Monitor requires sign-in and a Premium membership.',
+    riskTitle: 'Please sign in',
+    riskBody: 'Phase-1 assessments require Standard membership or higher.',
     register: 'Register',
     login: 'Login',
     home: 'Back to home',
@@ -33,6 +37,8 @@ const COPY = {
     registerBody: 'يرجى التسجيل وتسجيل الدخول كعضو لمشاهدة دورات المعرفة والمهارات.',
     monitorTitle: 'يرجى تسجيل الدخول',
     monitorBody: 'رصد الصحة يتطلب تسجيل الدخول وعضوية مميزة.',
+    riskTitle: 'يرجى تسجيل الدخول',
+    riskBody: 'تتطلب تقييمات المرحلة الأولى عضوية قياسية أو أعلى.',
     register: 'إنشاء حساب',
     login: 'تسجيل الدخول',
     home: 'العودة للرئيسية',
@@ -54,12 +60,13 @@ export default function ProtectedModule({ children }) {
   if (allowed) return children
 
   const isMonitor = path === '/health-monitor' || path.startsWith('/health-monitor/')
+  const isRisk = path === '/solutions/risk' || path.startsWith('/solutions/risk/')
 
   if (!user) {
     return (
       <div className="page-content page-register-required">
-        <h1>{isMonitor ? t.monitorTitle : t.registerTitle}</h1>
-        <p>{isMonitor ? t.monitorBody : t.registerBody}</p>
+        <h1>{isMonitor ? t.monitorTitle : isRisk ? t.riskTitle : t.registerTitle}</h1>
+        <p>{isMonitor ? t.monitorBody : isRisk ? t.riskBody : t.registerBody}</p>
         <p className="register-actions">
           <Link to="/register" className="btn-primary">{t.register}</Link>
           <span className="action-sep"> </span>
@@ -75,7 +82,11 @@ export default function ProtectedModule({ children }) {
     <div className="page-content">
       <h1>{t.deniedTitle}</h1>
       <p>{t.deniedBody(levelName)}</p>
-      <p><Link to="/payment">{t.upgrade}</Link></p>
+      <p>
+        <Link to={required === 'premium' ? '/payment?plan=premium_monthly' : '/payment?plan=standard_monthly'}>
+          {t.upgrade}
+        </Link>
+      </p>
       <p><Link to="/">{t.home}</Link></p>
     </div>
   )

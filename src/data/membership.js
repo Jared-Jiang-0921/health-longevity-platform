@@ -23,9 +23,27 @@ export const MEMBERSHIP_LEVELS = {
 /**
  * 各模块入口最低等级；null 表示不拦模块（游客可进页看标题，正文由条目级控制）
  */
+function findModuleAccess(path) {
+  const normalized = path.replace(/\/$/, '') || '/'
+  let required = null
+  let matched = false
+  let bestLen = -1
+  for (const [prefix, req] of Object.entries(MODULE_ACCESS)) {
+    if (normalized === prefix || normalized.startsWith(`${prefix}/`)) {
+      if (prefix.length > bestLen) {
+        required = req
+        matched = true
+        bestLen = prefix.length
+      }
+    }
+  }
+  return { required, matched }
+}
+
 export const MODULE_ACCESS = {
   /** 至少普通会员（已注册登录）；游客不可看课程 */
   '/health-skills': 'free',
+  '/solutions/risk': 'standard',
   '/solutions': null,
   '/consult': 'free',
   '/products': null,
@@ -44,13 +62,7 @@ export const MODULE_ACCESS = {
 export function canAccess(path, level, options = {}) {
   const normalized = path.replace(/\/$/, '') || '/'
   if (normalized === '/') return true
-  let required = null
-  for (const [prefix, req] of Object.entries(MODULE_ACCESS)) {
-    if (normalized === prefix || normalized.startsWith(prefix + '/')) {
-      required = req
-      break
-    }
-  }
+  const { required } = findModuleAccess(normalized)
   if (!required) return true
   const isGuest = options.isGuest ?? (level == null || level === '')
   // 模块一旦设置最低等级，游客必须先注册/登录（normalizeLevel 会把空值当成 free，不能直接放行）
@@ -64,10 +76,8 @@ export function canAccess(path, level, options = {}) {
 export function getRequiredLevel(path) {
   const normalized = path.replace(/\/$/, '') || '/'
   if (normalized === '/') return null
-  for (const [prefix, req] of Object.entries(MODULE_ACCESS)) {
-    if (normalized === prefix || normalized.startsWith(prefix + '/')) return req
-  }
-  return null
+  const { required, matched } = findModuleAccess(normalized)
+  return matched ? required : null
 }
 
 /** 统一为小写，避免接口返回大小写不一致导致权限误判 */

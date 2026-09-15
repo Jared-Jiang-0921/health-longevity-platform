@@ -13,6 +13,7 @@ const MyFavorites = lazy(() => import('./pages/MyFavorites'))
 const Solutions = lazy(() => import('./pages/Solutions'))
 const Consult = lazy(() => import('./pages/Consult'))
 const HealthQuestionnaire = lazy(() => import('./pages/HealthQuestionnaire'))
+const RiskAssessments = lazy(() => import('./pages/RiskAssessments'))
 const Products = lazy(() => import('./pages/Products'))
 const ProductDetail = lazy(() => import('./pages/ProductDetail'))
 const LongevityNews = lazy(() => import('./pages/LongevityNews'))
@@ -69,6 +70,7 @@ export default function App() {
           <Route path="/health-skills/:id/learn" element={<ProtectedModule><WithModuleAssets moduleKey="health-skills"><CourseLearn /></WithModuleAssets></ProtectedModule>} />
           <Route path="/favorites" element={<ProtectedModule><WithModuleAssets moduleKey="favorites"><MyFavorites /></WithModuleAssets></ProtectedModule>} />
           <Route path="/solutions" element={<ProtectedModule><Solutions /></ProtectedModule>} />
+          <Route path="/solutions/risk" element={<ProtectedModule><RiskAssessments /></ProtectedModule>} />
           <Route path="/consult" element={<ProtectedModule><Consult /></ProtectedModule>} />
           <Route path="/health-questionnaire" element={<ProtectedModule><WithModuleAssets moduleKey="health-questionnaire"><HealthQuestionnaire /></WithModuleAssets></ProtectedModule>} />
           <Route path="/products" element={<ProtectedModule><Products /></ProtectedModule>} />

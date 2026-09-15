@@ -37,9 +37,10 @@ export async function fetchConsultProfile(token, { timeoutMs = 3000 } = {}) {
   const timer = setTimeout(() => ac.abort(), timeoutMs)
   const headers = { Authorization: `Bearer ${token}` }
   try {
-    const [qRes, snapRes] = await Promise.all([
+    const [qRes, snapRes, riskRes] = await Promise.all([
       fetch('/api/health-questionnaire', { headers, signal: ac.signal }),
       fetch('/api/health-monitor/snapshot', { headers, signal: ac.signal }).catch(() => null),
+      fetch('/api/risk-assessments', { headers, signal: ac.signal }).catch(() => null),
     ])
     if (!qRes.ok && qRes.status !== 401) {
       // 问卷失败仍尝试设备摘要
@@ -50,6 +51,11 @@ export async function fetchConsultProfile(token, { timeoutMs = 3000 } = {}) {
       const snap = await snapRes.json().catch(() => ({}))
       const summary = String(snap.summaryText || '').trim().slice(0, FIELD_MAX)
       if (summary) profile.deviceSummary = summary
+    }
+    if (riskRes && riskRes.ok) {
+      const risk = await riskRes.json().catch(() => ({}))
+      const riskSummary = String(risk.riskSummary || '').trim().slice(0, FIELD_MAX)
+      if (riskSummary) profile.riskSummary = riskSummary
     }
     const has = Object.keys(profile).length > 0
     return {

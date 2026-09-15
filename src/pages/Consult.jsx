@@ -58,11 +58,12 @@ const COPY = {
     europepmc: '检索欧洲 PMC',
     europepmcHint: '开放医学文献（含 MEDLINE/PMC）。Web of Science 需机构订阅，无法直接接入。',
     thinkingPubmed: '正在检索知识库与文献库…',
-    profileReady: '已接入你的健康问卷（目标、关注问题、生活方式等），若已授权 AI健康监测，回答也会结合设备摘要。',
-    profileMissing: '尚未填写健康问卷，回答将较通用。填写后可获得更贴合的建议。',
+    profileReady: '已接入你的健康问卷与本站风险评估摘要（若已填写）；若已授权 AI健康监测，回答也会结合设备摘要。',
+    profileMissing: '尚未填写健康问卷或三项评估，回答将较通用。填写后可获得更贴合的建议。',
     profileError: '问卷暂时无法读取，本次按通用背景作答。',
     profileFill: '填写问卷',
     profileUpdate: '更新问卷',
+    profileRisk: '三项评估',
     sessions: '会话',
     newChat: '新建对话',
     sessionsEmpty: '还没有历史会话。',
@@ -163,11 +164,12 @@ const COPY = {
     europepmc: 'Search Europe PMC',
     europepmcHint: 'Open medical literature (MEDLINE/PMC). Web of Science has no public API.',
     thinkingPubmed: 'Searching the knowledge base and literature…',
-    profileReady: 'Your health questionnaire is attached (goals, concerns, lifestyle). Replies will use this background.',
-    profileMissing: 'No questionnaire yet — answers will be more generic. Fill it in for a closer fit.',
+    profileReady: 'Your questionnaire and any saved website risk summaries are attached. Device summaries are included if you authorized them.',
+    profileMissing: 'No questionnaire or Phase-1 assessments yet — answers will be more generic.',
     profileError: 'Questionnaire could not be loaded; this session will use general context.',
     profileFill: 'Fill questionnaire',
     profileUpdate: 'Update questionnaire',
+    profileRisk: 'Risk tools',
     sessions: 'Chats',
     newChat: 'New chat',
     sessionsEmpty: 'No previous chats yet.',
@@ -268,11 +270,12 @@ const COPY = {
     europepmc: 'بحث Europe PMC',
     europepmcHint: 'أدبيات طبية مفتوحة. Web of Science يتطلب اشتراكًا مؤسسيًا.',
     thinkingPubmed: 'جارٍ البحث في قاعدة المعرفة والأدبيات…',
-    profileReady: 'تم ربط استبيانك الصحي (الأهداف والاهتمامات ونمط الحياة)، وستُستخدم هذه الخلفية في الرد.',
-    profileMissing: 'لا يوجد استبيان بعد؛ ستكون الإجابات أعم. املأه للحصول على توصيات أقرب لحالتك.',
+    profileReady: 'تم ربط استبيانك وملخصات التقييم المحفوظة على الموقع إن وُجدت.',
+    profileMissing: 'لا يوجد استبيان أو تقييمات بعد؛ ستكون الإجابات أعم.',
     profileError: 'تعذر تحميل الاستبيان؛ ستستخدم هذه الجلسة سياقًا عامًا.',
     profileFill: 'ملء الاستبيان',
     profileUpdate: 'تحديث الاستبيان',
+    profileRisk: 'التقييمات',
     sessions: 'المحادثات',
     newChat: 'محادثة جديدة',
     sessionsEmpty: 'لا توجد محادثات سابقة.',
@@ -715,6 +718,7 @@ export default function Consult() {
                 <Link to="/health-questionnaire">
                   {profileStatus === 'ready' ? t.profileUpdate : t.profileFill}
                 </Link>
+                <Link to="/solutions/risk">{t.profileRisk}</Link>
               </aside>
               ) : null}
               {quota ? (

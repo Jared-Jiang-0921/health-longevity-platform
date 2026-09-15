@@ -33,6 +33,9 @@ const I18N = {
     intakeLegalDoc: '健康数据说明',
     intakeBtn: '填写/更新问卷',
     intakeLegal: '查看健康数据说明',
+    riskTitle: '第一期三个评估',
+    riskLine: '标准会员及以上可在本站完成 China-PAR 十年心血管风险、糖尿病筛查评分、生活方式（简化 LE8 + 基础代谢）。性别、血压、腰围等共用信息只填一次。结果只保存在网站账户，供咨询引用；不连接营养代谢微信小程序。',
+    riskBtn: '开始三项评估',
     contentTitle: '内容资源',
     contentBtn: '进入内容',
     contentDesc: '与咨询并列的内容通道，可进入长寿相关内容与知识库。',
@@ -70,6 +73,9 @@ const I18N = {
     intakeLegalDoc: 'Health Data Notice',
     intakeBtn: 'Fill / Update Questionnaire',
     intakeLegal: 'View Health Data Notice',
+    riskTitle: 'Phase-1 assessments',
+    riskLine: 'Standard members and above: China-PAR 10-year ASCVD risk, diabetes screening scores, and a simplified lifestyle/BMR tool. Saved on this account for consults—not connected to the nutrition mini-program.',
+    riskBtn: 'Open the three tools',
     contentTitle: 'Content Resources',
     contentBtn: 'Open Content',
     contentDesc: 'A content channel alongside consultation—open longevity materials or the knowledge base.',
@@ -107,6 +113,9 @@ const I18N = {
     intakeLegalDoc: 'إشعار البيانات الصحية',
     intakeBtn: 'تعبئة/تحديث الاستبيان',
     intakeLegal: 'عرض إشعار البيانات الصحية',
+    riskTitle: 'تقييمات المرحلة الأولى',
+    riskLine: 'للأعضاء القياسيين فأعلى: China-PAR، فحص السكري، ونمط الحياة. تُحفظ في حساب الموقع للاستشارة، دون ارتباط بالبرنامج المصغر.',
+    riskBtn: 'بدء التقييمات الثلاث',
     contentTitle: 'موارد المحتوى',
     contentBtn: 'دخول المحتوى',
     contentDesc: 'قناة محتوى موازية للاستشارات لفتح مواد طول العمر أو قاعدة المعرفة.',
@@ -173,6 +182,7 @@ export default function Solutions() {
   const t = I18N[lang] || I18N.zh
   const p = getPatterns(lang)
   const { user, loading, refreshUser } = useAuth()
+  const riskAllowed = hasLevelAccess(user?.level, 'standard', { isGuest: !user })
 
   useEffect(() => {
     refreshUser()
@@ -210,6 +220,21 @@ export default function Solutions() {
         <div className="solutions-intake-actions">
           <Link to="/health-questionnaire" className="consult-card-btn">{t.intakeBtn}</Link>
           <Link to={`/legal/health-data?lang=${lang}`} className="solutions-intake-link">{t.intakeLegal}</Link>
+        </div>
+      </section>
+
+      <section className={`solutions-intake-card ${!riskAllowed ? 'consult-card-locked' : ''}`}>
+        <h2>{t.riskTitle}</h2>
+        <p>{t.riskLine}</p>
+        <div className="solutions-intake-actions">
+          {riskAllowed ? (
+            <Link to="/solutions/risk" className="consult-card-btn">{t.riskBtn}</Link>
+          ) : (
+            <>
+              <p className="consult-lock-msg">{p.requiresLevel(MEMBERSHIP_LEVELS.standard.name)}</p>
+              <Link to="/payment?plan=standard_monthly" className="consult-card-btn consult-btn-upgrade">{t.upgrade}</Link>
+            </>
+          )}
         </div>
       </section>
 

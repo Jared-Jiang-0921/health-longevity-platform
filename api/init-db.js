@@ -115,6 +115,20 @@ export default async function handler(req, res) {
     `
     await sql`CREATE INDEX IF NOT EXISTS idx_health_questionnaires_user_id ON health_questionnaires(user_id, created_at DESC)`
     await sql`
+      CREATE TABLE IF NOT EXISTS risk_assessments (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        kind TEXT NOT NULL,
+        input_json JSONB NOT NULL,
+        result_json JSONB NOT NULL,
+        summary_text TEXT NOT NULL,
+        legal_version TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `
+    await sql`CREATE INDEX IF NOT EXISTS idx_risk_assessments_user_kind ON risk_assessments(user_id, kind, created_at DESC)`
+    await sql`
       CREATE TABLE IF NOT EXISTS translation_pdfs (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         title TEXT NOT NULL,
@@ -150,7 +164,7 @@ export default async function handler(req, res) {
     await sql`ALTER TABLE module_assets ADD COLUMN IF NOT EXISTS required_level TEXT NOT NULL DEFAULT 'free'`
     await sql`ALTER TABLE module_assets ADD COLUMN IF NOT EXISTS external_url TEXT`
 
-    return res.status(200).json({ ok: true, message: 'users/orgs/org_members/org_invites/payment_event_logs/health_questionnaires/translation_pdfs/module_assets tables ready' })
+    return res.status(200).json({ ok: true, message: 'users/orgs/org_members/org_invites/payment_event_logs/health_questionnaires/risk_assessments/translation_pdfs/module_assets tables ready' })
   } catch (e) {
     return res.status(500).json({ error: e.message })
   }
