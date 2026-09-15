@@ -2,246 +2,46 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
+import { RISK_ASSESSMENT_COPY } from '../data/riskAssessmentCopy'
+import { RISK_KINDS } from '../lib/riskModels/index'
 import { computeChinaPar } from '../lib/riskModels/chinaPar'
 import { computeDiabetesBundle } from '../lib/riskModels/diabetes'
 import { computeLifestyle } from '../lib/riskModels/lifestyle'
+import { computeFraminghamHypertension } from '../lib/riskModels/hypertension'
+import { computeCaide } from '../lib/riskModels/dementia'
+import { computeParkinson } from '../lib/riskModels/parkinson'
+import { computeOsta } from '../lib/riskModels/osteoporosis'
+import { computeSarcF } from '../lib/riskModels/sarcopenia'
 import {
+  EMPTY_DEM_EXTRA,
   EMPTY_DM_EXTRA,
+  EMPTY_HTN_EXTRA,
   EMPTY_LIFE_EXTRA,
   EMPTY_PAR_EXTRA,
+  EMPTY_PD_EXTRA,
+  EMPTY_SARC_EXTRA,
   EMPTY_SHARED,
   buildChinaParInput,
+  buildDementiaInput,
   buildDiabetesInput,
+  buildHypertensionInput,
   buildLifestyleInput,
+  buildOsteoporosisInput,
+  buildParkinsonInput,
+  buildSarcopeniaInput,
+  extractDemExtra,
   extractDmExtra,
+  extractHtnExtra,
   extractLifeExtra,
   extractParExtra,
+  extractPdExtra,
+  extractSarcExtra,
   hydrateSharedFromLatest,
 } from '../lib/riskModels/sharedProfile'
 import { fetchRiskAssessments, saveRiskAssessment } from '../lib/riskAssessmentsApi'
 import './RiskAssessments.css'
 
-const TOOLS = ['china_par', 'diabetes', 'lifestyle']
-
-const COPY = {
-  zh: {
-    title: '第一期健康风险评估',
-    lead: '标准会员及以上可用。共同问题只问一次；每个评估再问自己的专项问题（疾病风险、衰老风险或生活方式风险）。',
-    back: '返回 AI 长寿师',
-    loginFirst: '请先登录。三项评估仅向标准会员及以上开放，结果写入本站账户供咨询参考。',
-    login: '登录',
-    loading: '正在加载已保存的评估…',
-    noticeTitle: '使用前请确认',
-    notice:
-      '结果只用于健康教育和咨询背景，不能诊断、治疗或处方。高危请尽快就医。本页不连接任何外部小程序或检测实验室。',
-    sharedTitle: '共同问题',
-    sharedLead: '所有风险评估共用：年龄、性别、身高体重、腰围、血压、睡眠、居住地、降压药、吸烟、血糖、每周活动。只填一次，切换评估时会自动带入。',
-    extraTitle: '专项问题',
-    guideTitle: '怎么填',
-    commonTag: '共同问题',
-    specificTag: '专项问题',
-    guideCommon: '标有「共同问题」的区块，所有评估都用，只填一次，切换评估不会再问。',
-    guideSpecific: '标有「专项问题」的区块，只属于当前这项：疾病风险、衰老风险或生活方式风险。',
-    extras: {
-      china_par: {
-        title: '专项问题 · 心血管病风险',
-        lead: '仅 China-PAR 需要：总胆固醇、HDL、心梗/脑卒中家族史。',
-      },
-      diabetes: {
-        title: '专项问题 · 糖尿病风险',
-        lead: '仅糖尿病筛查需要：糖尿病家族史、是否每天吃蔬菜水果。',
-      },
-      lifestyle: {
-        title: '专项问题 · 生活方式风险',
-        lead: '仅生活方式评估需要：饮食质量、日常活动水平、血脂自评。',
-      },
-    },
-    consent: '我已阅读健康数据说明，并同意平台为提供教育评估与咨询摘要处理我提交的健康数据。',
-    save: '保存到本站账户',
-    saving: '保存中…',
-    saved: '已保存。咨询时会带上这段摘要。',
-    saveFail: '保存失败',
-    loadFail: '加载失败',
-    preview: '即时结果',
-    incomplete: '请先完成上方共同问题，再完成本评估的专项问题。',
-    seeDoctor: '当前分层偏高，建议尽快咨询执业医师，不要自行调整处方药。',
-    legal: '查看健康数据说明',
-    tabs: {
-      china_par: '心血管 China-PAR',
-      diabetes: '糖尿病筛查',
-      lifestyle: '生活方式',
-    },
-    fields: {
-      sex: '生理性别',
-      age: '年龄（岁）',
-      sbp: '收缩压（mmHg）',
-      dbp: '舒张压（mmHg）',
-      treated: '近 2 周是否服用降压药',
-      tc: '总胆固醇',
-      hdl: 'HDL-C',
-      waist: '腰围（cm，肋弓与髂嵴中点）',
-      region: '现居住地（长江为界）',
-      urban: '城乡',
-      familyAscvd: '父母或同胞是否有心梗/脑卒中',
-      height: '身高（cm）',
-      weight: '体重（kg）',
-      familyDm: '父母、同胞或子女是否有糖尿病',
-      familyFindrisc: '糖尿病家族史（FINDRISC）',
-      vegetables: '是否每天吃蔬菜水果',
-      diet: '饮食质量（自评）',
-      nicotine: '烟草暴露',
-      sleep: '通常睡眠（小时）',
-      activityMin: '每周中等强度活动（分钟）',
-      activityLevel: '日常活动水平（用于估算消耗）',
-      glucose: '血糖状况（自评/已知）',
-      lipids: '血脂状况（自评/已知）',
-    },
-    yes: '是',
-    no: '否',
-    select: '请选择',
-    male: '男性',
-    female: '女性',
-    north: '北方',
-    south: '南方',
-    urban: '城市',
-    rural: '农村',
-    mmol: 'mmol/L',
-    mgdl: 'mg/dL',
-    familyNone: '无',
-    familySecond: '二级亲属',
-    familyFirst: '一级亲属',
-    dietPoor: '较差',
-    dietFair: '一般',
-    dietGood: '较好',
-    dietExcellent: '很好',
-    nicNever: '从不',
-    nicFormer: '已戒一年以上',
-    nicRecent: '近一年戒烟',
-    nicCurrent: '正在吸烟',
-    actSed: '久坐',
-    actLight: '轻度',
-    actMod: '中等',
-    actActive: '活跃',
-    actVery: '很高',
-    gluNormal: '正常 / 未知但无症状',
-    gluUnknown: '不清楚',
-    gluPre: '糖前期',
-    gluDm: '已诊断糖尿病',
-    lipOpt: '较理想',
-    lipUnknown: '不清楚',
-    lipMid: '临界偏高',
-    lipHigh: '明显升高',
-  },
-  en: {
-    title: 'Phase-1 risk assessments',
-    lead: 'Shared questions are asked once. Each tool then asks only its own disease, aging, or lifestyle items.',
-    back: 'Back to AI Coach',
-    loginFirst: 'Please sign in. These tools require Standard membership or higher.',
-    login: 'Log in',
-    loading: 'Loading saved assessments…',
-    noticeTitle: 'Please read first',
-    notice: 'Educational only. Not a diagnosis. See a clinician if risk is high. This page does not call any mini-program or lab.',
-    sharedTitle: 'Shared questions',
-    sharedLead: 'Used by every assessment: age, sex, height/weight, waist, blood pressure, sleep, region, BP medicine, nicotine, glucose, weekly activity. Asked once and reused when you switch tools.',
-    extraTitle: 'Specific questions',
-    guideTitle: 'How to fill this in',
-    commonTag: 'Shared',
-    specificTag: 'Specific',
-    guideCommon: 'Blocks tagged Shared are used by every assessment and asked only once.',
-    guideSpecific: 'Blocks tagged Specific belong only to the selected disease, aging, or lifestyle risk.',
-    extras: {
-      china_par: {
-        title: 'Specific · cardiovascular risk',
-        lead: 'China-PAR only: total cholesterol, HDL, and family history of MI/stroke.',
-      },
-      diabetes: {
-        title: 'Specific · diabetes risk',
-        lead: 'Diabetes screening only: family history of diabetes and daily vegetables/fruit.',
-      },
-      lifestyle: {
-        title: 'Specific · lifestyle risk',
-        lead: 'Lifestyle only: diet quality, usual activity level, and self-rated lipids.',
-      },
-    },
-    consent: 'I agree that this site may process the health data I enter for educational scoring and consult summaries.',
-    save: 'Save to this account',
-    saving: 'Saving…',
-    saved: 'Saved. Consults can use this summary.',
-    saveFail: 'Save failed',
-    loadFail: 'Load failed',
-    preview: 'Live result',
-    incomplete: 'Finish the shared questions, then this tool’s specific questions.',
-    seeDoctor: 'This band is elevated. Please see a licensed clinician.',
-    legal: 'Health data notice',
-    tabs: {
-      china_par: 'China-PAR',
-      diabetes: 'Diabetes screening',
-      lifestyle: 'Lifestyle',
-    },
-    fields: {
-      sex: 'Sex',
-      age: 'Age (years)',
-      sbp: 'Systolic BP (mmHg)',
-      dbp: 'Diastolic BP (mmHg)',
-      treated: 'Blood-pressure medicine in past 2 weeks',
-      tc: 'Total cholesterol',
-      hdl: 'HDL-C',
-      waist: 'Waist (cm)',
-      region: 'Region (Yangtze as boundary)',
-      urban: 'Urban / rural',
-      familyAscvd: 'Parent or sibling MI / stroke',
-      height: 'Height (cm)',
-      weight: 'Weight (kg)',
-      familyDm: 'First-degree family history of diabetes',
-      familyFindrisc: 'FINDRISC family history',
-      vegetables: 'Vegetables / fruit daily',
-      diet: 'Diet quality',
-      nicotine: 'Nicotine',
-      sleep: 'Sleep hours',
-      activityMin: 'Moderate activity min / week',
-      activityLevel: 'Usual activity (for TDEE)',
-      glucose: 'Glucose status',
-      lipids: 'Lipid status',
-    },
-    yes: 'Yes',
-    no: 'No',
-    select: 'Select',
-    male: 'Male',
-    female: 'Female',
-    north: 'North',
-    south: 'South',
-    urban: 'Urban',
-    rural: 'Rural',
-    mmol: 'mmol/L',
-    mgdl: 'mg/dL',
-    familyNone: 'None',
-    familySecond: '2nd degree',
-    familyFirst: '1st degree',
-    dietPoor: 'Poor',
-    dietFair: 'Fair',
-    dietGood: 'Good',
-    dietExcellent: 'Excellent',
-    nicNever: 'Never',
-    nicFormer: 'Quit >1 year',
-    nicRecent: 'Quit <1 year',
-    nicCurrent: 'Current',
-    actSed: 'Sedentary',
-    actLight: 'Light',
-    actMod: 'Moderate',
-    actActive: 'Active',
-    actVery: 'Very active',
-    gluNormal: 'Normal',
-    gluUnknown: 'Unknown',
-    gluPre: 'Prediabetes',
-    gluDm: 'Diabetes',
-    lipOpt: 'Optimal',
-    lipUnknown: 'Unknown',
-    lipMid: 'Borderline',
-    lipHigh: 'High',
-  },
-}
-
-COPY.ar = COPY.en
+const ALL_TOOLS = RISK_KINDS
 
 function yn(value) {
   if (value === true || value === 'true') return true
@@ -278,6 +78,27 @@ function YesNo({ value, onChange, t }) {
   )
 }
 
+function ScoreSelect({ value, onChange, t, kind = 'difficulty' }) {
+  return (
+    <select value={value === '' || value == null ? '' : String(value)} onChange={(e) => onChange(e.target.value === '' ? '' : Number(e.target.value))}>
+      <option value="">{t.select}</option>
+      {kind === 'falls' ? (
+        <>
+          <option value="0">{t.fallsNone}</option>
+          <option value="1">{t.fallsSome}</option>
+          <option value="2">{t.fallsMany}</option>
+        </>
+      ) : (
+        <>
+          <option value="0">{t.sarcNone}</option>
+          <option value="1">{t.sarcSome}</option>
+          <option value="2">{t.sarcALot}</option>
+        </>
+      )}
+    </select>
+  )
+}
+
 function ResultBox({ title, t, result, extra }) {
   if (!result) {
     return (
@@ -307,16 +128,38 @@ function ResultBox({ title, t, result, extra }) {
   )
 }
 
+function SpecificForm({ t, extra, children, onSave, busy, canSave }) {
+  return (
+    <form
+      className="risk-form risk-form--specific"
+      onSubmit={(e) => {
+        e.preventDefault()
+        onSave()
+      }}
+    >
+      <SectionHead badge={t.specificTag} title={extra.title} lead={extra.lead} variant="specific" />
+      {children}
+      <div className="risk-actions">
+        <button type="submit" className="btn-primary" disabled={busy || !canSave}>{busy ? t.saving : t.save}</button>
+      </div>
+    </form>
+  )
+}
+
 export default function RiskAssessments() {
   const { lang } = useLocale()
-  const t = COPY[lang] || COPY.zh
+  const t = RISK_ASSESSMENT_COPY[lang] || RISK_ASSESSMENT_COPY.zh
   const { user, loading, getToken } = useAuth()
   const [params, setParams] = useSearchParams()
-  const tool = TOOLS.includes(params.get('tool')) ? params.get('tool') : 'china_par'
+  const tool = ALL_TOOLS.includes(params.get('tool')) ? params.get('tool') : 'china_par'
   const [shared, setShared] = useState(EMPTY_SHARED)
   const [par, setPar] = useState(EMPTY_PAR_EXTRA)
   const [dm, setDm] = useState(EMPTY_DM_EXTRA)
   const [life, setLife] = useState(EMPTY_LIFE_EXTRA)
+  const [htn, setHtn] = useState(EMPTY_HTN_EXTRA)
+  const [dem, setDem] = useState(EMPTY_DEM_EXTRA)
+  const [pd, setPd] = useState(EMPTY_PD_EXTRA)
+  const [sarc, setSarc] = useState(EMPTY_SARC_EXTRA)
   const [consent, setConsent] = useState(false)
   const [busy, setBusy] = useState(false)
   const [loadState, setLoadState] = useState('idle')
@@ -345,6 +188,18 @@ export default function RiskAssessments() {
         if (latest.china_par?.input) setPar((prev) => ({ ...prev, ...extractParExtra(latest.china_par.input) }))
         if (latest.diabetes?.input) setDm((prev) => ({ ...prev, ...extractDmExtra(latest.diabetes.input) }))
         if (latest.lifestyle?.input) setLife((prev) => ({ ...prev, ...extractLifeExtra(latest.lifestyle.input) }))
+        if (latest.hypertension?.input) setHtn((prev) => ({ ...prev, ...extractHtnExtra(latest.hypertension.input) }))
+        setDem((prev) => {
+          const extracted = latest.dementia?.input ? extractDemExtra(latest.dementia.input) : {}
+          const parExtra = latest.china_par?.input ? extractParExtra(latest.china_par.input) : {}
+          if (!extracted.tc && parExtra.tc) {
+            extracted.tc = parExtra.tc
+            extracted.tcUnit = parExtra.tcUnit || 'mmol'
+          }
+          return { ...prev, ...extracted }
+        })
+        if (latest.parkinson?.input) setPd((prev) => ({ ...prev, ...extractPdExtra(latest.parkinson.input) }))
+        if (latest.sarcopenia?.input) setSarc((prev) => ({ ...prev, ...extractSarcExtra(latest.sarcopenia.input) }))
         setLoadState('ready')
       })
       .catch((err) => {
@@ -361,9 +216,20 @@ export default function RiskAssessments() {
   const parInput = useMemo(() => buildChinaParInput(shared, par), [shared, par])
   const dmInput = useMemo(() => buildDiabetesInput(shared, dm), [shared, dm])
   const lifeInput = useMemo(() => buildLifestyleInput(shared, life), [shared, life])
+  const htnInput = useMemo(() => buildHypertensionInput(shared, htn), [shared, htn])
+  const demInput = useMemo(() => buildDementiaInput(shared, dem, par), [shared, dem, par])
+  const pdInput = useMemo(() => buildParkinsonInput(shared, pd), [shared, pd])
+  const ostaInput = useMemo(() => buildOsteoporosisInput(shared), [shared])
+  const sarcInput = useMemo(() => buildSarcopeniaInput(shared, sarc), [shared, sarc])
+
   const parResult = useMemo(() => computeChinaPar(parInput), [parInput])
   const dmResult = useMemo(() => computeDiabetesBundle(dmInput), [dmInput])
   const lifeResult = useMemo(() => computeLifestyle(lifeInput), [lifeInput])
+  const htnResult = useMemo(() => computeFraminghamHypertension(htnInput), [htnInput])
+  const demResult = useMemo(() => computeCaide(demInput), [demInput])
+  const pdResult = useMemo(() => computeParkinson(pdInput), [pdInput])
+  const ostaResult = useMemo(() => computeOsta(ostaInput), [ostaInput])
+  const sarcResult = useMemo(() => computeSarcF(sarcInput), [sarcInput])
 
   const setTool = (next) => {
     const nextParams = new URLSearchParams(params)
@@ -534,8 +400,8 @@ export default function RiskAssessments() {
         </label>
       </section>
 
-      <div className="risk-tabs" role="tablist">
-        {TOOLS.map((id) => (
+      <div className="risk-tabs" role="tablist" aria-label={t.title}>
+        {ALL_TOOLS.map((id) => (
           <button
             key={id}
             type="button"
@@ -551,19 +417,7 @@ export default function RiskAssessments() {
 
       {tool === 'china_par' ? (
         <>
-          <form
-            className="risk-form risk-form--specific"
-            onSubmit={(e) => {
-              e.preventDefault()
-              save('china_par', parInput)
-            }}
-          >
-            <SectionHead
-              badge={t.specificTag}
-              title={t.extras.china_par.title}
-              lead={t.extras.china_par.lead}
-              variant="specific"
-            />
+          <SpecificForm t={t} extra={t.extras.china_par} busy={busy} canSave={parResult.ok} onSave={() => save('china_par', parInput)}>
             <div className="risk-grid">
               <Field label={t.fields.tc}>
                 <div className="risk-unit-row">
@@ -587,10 +441,7 @@ export default function RiskAssessments() {
                 <YesNo value={par.familyAscvd} onChange={(v) => setPar({ ...par, familyAscvd: v })} t={t} />
               </Field>
             </div>
-            <div className="risk-actions">
-              <button type="submit" className="btn-primary" disabled={busy || !parResult.ok}>{busy ? t.saving : t.save}</button>
-            </div>
-          </form>
+          </SpecificForm>
           <ResultBox title={t.preview} t={t} result={parResult} extra={parResult.ok ? (
             <div className={`risk-result-hero risk-band-${parResult.band.id}`}>
               <div className="risk-metric">
@@ -609,19 +460,7 @@ export default function RiskAssessments() {
 
       {tool === 'diabetes' ? (
         <>
-          <form
-            className="risk-form risk-form--specific"
-            onSubmit={(e) => {
-              e.preventDefault()
-              save('diabetes', dmInput)
-            }}
-          >
-            <SectionHead
-              badge={t.specificTag}
-              title={t.extras.diabetes.title}
-              lead={t.extras.diabetes.lead}
-              variant="specific"
-            />
+          <SpecificForm t={t} extra={t.extras.diabetes} busy={busy} canSave={dmResult.ok} onSave={() => save('diabetes', dmInput)}>
             <div className="risk-grid">
               <Field label={t.fields.familyDm}>
                 <YesNo
@@ -641,10 +480,7 @@ export default function RiskAssessments() {
                 <YesNo value={dm.dailyVegetables} onChange={(v) => setDm({ ...dm, dailyVegetables: v })} t={t} />
               </Field>
             </div>
-            <div className="risk-actions">
-              <button type="submit" className="btn-primary" disabled={busy || !dmResult.ok}>{busy ? t.saving : t.save}</button>
-            </div>
-          </form>
+          </SpecificForm>
           <ResultBox
             title={t.preview}
             t={t}
@@ -673,19 +509,7 @@ export default function RiskAssessments() {
 
       {tool === 'lifestyle' ? (
         <>
-          <form
-            className="risk-form risk-form--specific"
-            onSubmit={(e) => {
-              e.preventDefault()
-              save('lifestyle', lifeInput)
-            }}
-          >
-            <SectionHead
-              badge={t.specificTag}
-              title={t.extras.lifestyle.title}
-              lead={t.extras.lifestyle.lead}
-              variant="specific"
-            />
+          <SpecificForm t={t} extra={t.extras.lifestyle} busy={busy} canSave={lifeResult.ok} onSave={() => save('lifestyle', lifeInput)}>
             <div className="risk-grid">
               <Field label={t.fields.activityLevel}>
                 <select value={life.activityLevel} onChange={(e) => setLife({ ...life, activityLevel: e.target.value })}>
@@ -714,10 +538,7 @@ export default function RiskAssessments() {
                 </select>
               </Field>
             </div>
-            <div className="risk-actions">
-              <button type="submit" className="btn-primary" disabled={busy || !lifeResult.ok}>{busy ? t.saving : t.save}</button>
-            </div>
-          </form>
+          </SpecificForm>
           <ResultBox
             title={t.preview}
             t={t}
@@ -748,6 +569,205 @@ export default function RiskAssessments() {
                   ))}
                 </ul>
               </>
+            ) : null}
+          />
+        </>
+      ) : null}
+
+      {tool === 'hypertension' ? (
+        <>
+          <SpecificForm t={t} extra={t.extras.hypertension} busy={busy} canSave={htnResult.ok} onSave={() => save('hypertension', htnInput)}>
+            <div className="risk-grid">
+              <Field label={t.fields.parentalHtn}>
+                <select value={htn.parentalHypertension} onChange={(e) => setHtn({ ...htn, parentalHypertension: e.target.value })}>
+                  <option value="">{t.select}</option>
+                  <option value="0">{t.parentalNone}</option>
+                  <option value="1">{t.parentalOne}</option>
+                  <option value="2">{t.parentalBoth}</option>
+                </select>
+              </Field>
+            </div>
+          </SpecificForm>
+          <ResultBox
+            title={t.preview}
+            t={t}
+            result={htnResult}
+            extra={htnResult.ok ? (
+              <div className={`risk-result-hero risk-band-${htnResult.band.id}`}>
+                <div className="risk-metric">
+                  <strong>{htnResult.alreadyHypertensive ? '—' : `${htnResult.percent}%`}</strong>
+                  <span>{htnResult.alreadyHypertensive ? '不再估算新发风险' : '4 年新发高血压'}</span>
+                </div>
+                <div className="risk-metric">
+                  <strong>{htnResult.band.label}</strong>
+                  <span>&lt;5% 低危 · 5–10% 中危 · &gt;10% 高危</span>
+                </div>
+              </div>
+            ) : null}
+          />
+        </>
+      ) : null}
+
+      {tool === 'dementia' ? (
+        <>
+          <SpecificForm t={t} extra={t.extras.dementia} busy={busy} canSave={demResult.ok} onSave={() => save('dementia', demInput)}>
+            <div className="risk-grid">
+              <Field label={t.fields.educationYears}>
+                <input type="number" min="0" max="30" value={dem.educationYears} onChange={(e) => setDem({ ...dem, educationYears: e.target.value })} />
+              </Field>
+              <Field label={t.fields.tc}>
+                <div className="risk-unit-row">
+                  <input type="number" min="1" step="0.1" value={dem.tc} onChange={(e) => setDem({ ...dem, tc: e.target.value })} />
+                  <select value={dem.tcUnit} onChange={(e) => setDem({ ...dem, tcUnit: e.target.value })}>
+                    <option value="mmol">{t.mmol}</option>
+                    <option value="mgdl">{t.mgdl}</option>
+                  </select>
+                </div>
+              </Field>
+            </div>
+          </SpecificForm>
+          <ResultBox
+            title={t.preview}
+            t={t}
+            result={demResult}
+            extra={demResult.ok ? (
+              <div className={`risk-result-hero risk-band-${demResult.band.id}`}>
+                <div className="risk-metric">
+                  <strong>{demResult.score}/15</strong>
+                  <span>CAIDE 评分</span>
+                </div>
+                <div className="risk-metric">
+                  <strong>{demResult.percent}%</strong>
+                  <span>原文 20 年痴呆风险</span>
+                </div>
+                <div className="risk-metric">
+                  <strong>{demResult.band.label}</strong>
+                  <span>切点 ≥9 分</span>
+                </div>
+              </div>
+            ) : null}
+          />
+        </>
+      ) : null}
+
+      {tool === 'parkinson' ? (
+        <>
+          <SpecificForm t={t} extra={t.extras.parkinson} busy={busy} canSave={pdResult.ok} onSave={() => save('parkinson', pdInput)}>
+            <div className="risk-grid">
+              <Field label={t.fields.familyPd}>
+                <YesNo value={pd.familyPd} onChange={(v) => setPd({ ...pd, familyPd: v })} t={t} />
+              </Field>
+              <Field label={t.fields.constipation}>
+                <YesNo value={pd.constipation} onChange={(v) => setPd({ ...pd, constipation: v })} t={t} />
+              </Field>
+              <Field label={t.fields.drinksCoffee}>
+                <YesNo value={pd.drinksCoffee} onChange={(v) => setPd({ ...pd, drinksCoffee: v })} t={t} />
+              </Field>
+              <Field label={t.fields.pesticide}>
+                <YesNo value={pd.pesticide} onChange={(v) => setPd({ ...pd, pesticide: v })} t={t} />
+              </Field>
+              <Field label={t.fields.moodDisorder}>
+                <YesNo value={pd.moodDisorder} onChange={(v) => setPd({ ...pd, moodDisorder: v })} t={t} />
+              </Field>
+              <Field label={t.fields.rbd}>
+                <YesNo value={pd.rbd} onChange={(v) => setPd({ ...pd, rbd: v })} t={t} />
+              </Field>
+              <Field label={t.fields.hyposmia}>
+                <YesNo value={pd.hyposmia} onChange={(v) => setPd({ ...pd, hyposmia: v })} t={t} />
+              </Field>
+            </div>
+          </SpecificForm>
+          <ResultBox
+            title={t.preview}
+            t={t}
+            result={pdResult}
+            extra={pdResult.ok ? (
+              <>
+                <div className={`risk-result-hero risk-band-${pdResult.band.id}`}>
+                  <div className="risk-metric">
+                    <strong>×{pdResult.relativeRisk}</strong>
+                    <span>相对风险倍数</span>
+                  </div>
+                  <div className="risk-metric">
+                    <strong>{pdResult.band.label}</strong>
+                    <span>不是患病概率</span>
+                  </div>
+                </div>
+                <ul className="risk-parts">
+                  {pdResult.parts.filter((row) => row.applied).map((row) => (
+                    <li key={row.id}>{row.name} ×{row.factor}</li>
+                  ))}
+                  {pdResult.prodromalFlags.map((flag) => (
+                    <li key={flag}>{flag}</li>
+                  ))}
+                </ul>
+              </>
+            ) : null}
+          />
+        </>
+      ) : null}
+
+      {tool === 'osteoporosis' ? (
+        <>
+          <SpecificForm t={t} extra={t.extras.osteoporosis} busy={busy} canSave={ostaResult.ok} onSave={() => save('osteoporosis', ostaInput)}>
+            <p className="risk-muted">{t.extras.osteoporosis.lead}</p>
+          </SpecificForm>
+          <ResultBox
+            title={t.preview}
+            t={t}
+            result={ostaResult}
+            extra={ostaResult.ok ? (
+              <div className={`risk-result-hero risk-band-${ostaResult.band.id}`}>
+                <div className="risk-metric">
+                  <strong>{ostaResult.index}</strong>
+                  <span>OSTA 指数</span>
+                </div>
+                <div className="risk-metric">
+                  <strong>{ostaResult.band.label}</strong>
+                  <span>&gt;−1 低危 · −1 至 −4 中危 · &lt;−4 高危</span>
+                </div>
+              </div>
+            ) : null}
+          />
+        </>
+      ) : null}
+
+      {tool === 'sarcopenia' ? (
+        <>
+          <SpecificForm t={t} extra={t.extras.sarcopenia} busy={busy} canSave={sarcResult.ok} onSave={() => save('sarcopenia', sarcInput)}>
+            <div className="risk-grid">
+              <Field label={t.fields.sarcStrength}>
+                <ScoreSelect value={sarc.sarcStrength} onChange={(v) => setSarc({ ...sarc, sarcStrength: v })} t={t} />
+              </Field>
+              <Field label={t.fields.sarcWalking}>
+                <ScoreSelect value={sarc.sarcWalking} onChange={(v) => setSarc({ ...sarc, sarcWalking: v })} t={t} />
+              </Field>
+              <Field label={t.fields.sarcRise}>
+                <ScoreSelect value={sarc.sarcRise} onChange={(v) => setSarc({ ...sarc, sarcRise: v })} t={t} />
+              </Field>
+              <Field label={t.fields.sarcClimb}>
+                <ScoreSelect value={sarc.sarcClimb} onChange={(v) => setSarc({ ...sarc, sarcClimb: v })} t={t} />
+              </Field>
+              <Field label={t.fields.sarcFalls}>
+                <ScoreSelect value={sarc.sarcFalls} onChange={(v) => setSarc({ ...sarc, sarcFalls: v })} t={t} kind="falls" />
+              </Field>
+            </div>
+          </SpecificForm>
+          <ResultBox
+            title={t.preview}
+            t={t}
+            result={sarcResult}
+            extra={sarcResult.ok ? (
+              <div className={`risk-result-hero risk-band-${sarcResult.band.id}`}>
+                <div className="risk-metric">
+                  <strong>{sarcResult.score}/10</strong>
+                  <span>SARC-F</span>
+                </div>
+                <div className="risk-metric">
+                  <strong>{sarcResult.band.label}</strong>
+                  <span>AWGS 2019 切点 ≥4</span>
+                </div>
+              </div>
             ) : null}
           />
         </>

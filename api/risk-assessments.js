@@ -50,7 +50,7 @@ export default async function handler(req, res) {
   if (!userId) return res.status(401).json({ error: '登录已过期' })
   const user = await getUserById(userId)
   if (!user || !canViewContent(user.level, 'standard', { isGuest: false })) {
-    return res.status(403).json({ error: '三项评估仅向标准会员及以上开放' })
+    return res.status(403).json({ error: '风险评估仅向标准会员及以上开放' })
   }
 
   try {
@@ -79,8 +79,9 @@ export default async function handler(req, res) {
         updatedAt: row.updated_at,
       }
     }
-    const summaries = ['china_par', 'diabetes', 'lifestyle']
-      .map((kind) => latest[kind]?.summary)
+    const summaries = Object.values(latest)
+      .sort((a, b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0))
+      .map((row) => row?.summary)
       .filter(Boolean)
     return res.status(200).json({
       latest,
