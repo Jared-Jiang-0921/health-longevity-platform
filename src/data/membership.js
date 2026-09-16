@@ -44,6 +44,7 @@ export const MODULE_ACCESS = {
   /** 至少普通会员（已注册登录）；游客不可看课程 */
   '/health-skills': 'free',
   '/solutions/risk': 'standard',
+  '/solutions/aging': 'standard',
   '/solutions': null,
   '/consult': 'free',
   '/products': null,

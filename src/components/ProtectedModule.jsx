@@ -11,6 +11,8 @@ const COPY = {
     monitorBody: 'AI健康监测需登录后使用，并仅向高级会员开放。',
     riskTitle: '请先登录',
     riskBody: '网站风险评估需登录，且仅向标准会员及以上开放。',
+    agingTitle: '请先登录',
+    agingBody: '网站衰老评估需登录，且仅向标准会员及以上开放。',
     register: '注册会员',
     login: '登录',
     home: '返回首页',
@@ -25,6 +27,8 @@ const COPY = {
     monitorBody: 'AI Health Monitor requires sign-in and a Premium membership.',
     riskTitle: 'Please sign in',
     riskBody: 'Website risk assessments require Standard membership or higher.',
+    agingTitle: 'Please sign in',
+    agingBody: 'Aging clocks require Standard membership or higher.',
     register: 'Register',
     login: 'Login',
     home: 'Back to home',
@@ -39,6 +43,8 @@ const COPY = {
     monitorBody: 'رصد الصحة يتطلب تسجيل الدخول وعضوية مميزة.',
     riskTitle: 'يرجى تسجيل الدخول',
     riskBody: 'تتطلب تقييمات المرحلة الأولى عضوية قياسية أو أعلى.',
+    agingTitle: 'يرجى تسجيل الدخول',
+    agingBody: 'تتطلب تقييمات الشيخوخة عضوية قياسية أو أعلى.',
     register: 'إنشاء حساب',
     login: 'تسجيل الدخول',
     home: 'العودة للرئيسية',
@@ -61,12 +67,13 @@ export default function ProtectedModule({ children }) {
 
   const isMonitor = path === '/health-monitor' || path.startsWith('/health-monitor/')
   const isRisk = path === '/solutions/risk' || path.startsWith('/solutions/risk/')
+  const isAging = path === '/solutions/aging' || path.startsWith('/solutions/aging/')
 
   if (!user) {
     return (
       <div className="page-content page-register-required">
-        <h1>{isMonitor ? t.monitorTitle : isRisk ? t.riskTitle : t.registerTitle}</h1>
-        <p>{isMonitor ? t.monitorBody : isRisk ? t.riskBody : t.registerBody}</p>
+        <h1>{isMonitor ? t.monitorTitle : isAging ? t.agingTitle : isRisk ? t.riskTitle : t.registerTitle}</h1>
+        <p>{isMonitor ? t.monitorBody : isAging ? t.agingBody : isRisk ? t.riskBody : t.registerBody}</p>
         <p className="register-actions">
           <Link to="/register" className="btn-primary">{t.register}</Link>
           <span className="action-sep"> </span>

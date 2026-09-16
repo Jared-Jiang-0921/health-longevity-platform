@@ -297,6 +297,7 @@ export const SEO_NOINDEX_PREFIXES = [
   '/reset-password',
   '/health-questionnaire',
   '/solutions/risk',
+  '/solutions/aging',
   '/health-monitor',
 ]
 

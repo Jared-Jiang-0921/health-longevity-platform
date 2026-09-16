@@ -36,6 +36,9 @@ const I18N = {
     riskTitle: '健康风险评估',
     riskLine: '标准会员及以上可用。共同问题只填一次，再按评估做专项：China-PAR 十年心血管、糖尿病筛查、高血压（Framingham）、痴呆（CAIDE）、帕金森相对风险、骨质疏松（OSTA）、肌少症（SARC-F）、生活方式。结果只保存在网站账户，供咨询引用；不连接营养代谢微信小程序。',
     riskBtn: '开始评估',
+    agingTitle: '衰老评估',
+    agingLine: '标准会员及以上可用。录入血液甲基化报告上的时钟结果：Horvath 与 iCAS 并陈生物学年龄（iCAS 更适合中国人），GrimAge2 看死亡相关风险，DunedinPACE 看衰老速度。本站只解读，不重跑芯片算法，也不连接小程序。',
+    agingBtn: '开始衰老评估',
     contentTitle: '内容资源',
     contentBtn: '进入内容',
     contentDesc: '与咨询并列的内容通道，可进入长寿相关内容与知识库。',
@@ -76,6 +79,9 @@ const I18N = {
     riskTitle: 'Health risk assessments',
     riskLine: 'Standard members and above. Shared questions are asked once, then each tool adds its own items: China-PAR, diabetes screening, Framingham hypertension, CAIDE dementia, Parkinson relative risk, OSTA, SARC-F, and lifestyle. Saved on this account for consults—not connected to the nutrition mini-program.',
     riskBtn: 'Start assessments',
+    agingTitle: 'Aging clocks',
+    agingLine: 'Standard members and above. Enter lab-reported clocks: Horvath and iCAS for biological age (iCAS is marked as better suited to Chinese adults), GrimAge2 for mortality-related age, and DunedinPACE for pace of aging. This site interprets reports; it does not rerun arrays or connect to the mini-program.',
+    agingBtn: 'Start aging assessment',
     contentTitle: 'Content Resources',
     contentBtn: 'Open Content',
     contentDesc: 'A content channel alongside consultation—open longevity materials or the knowledge base.',
@@ -116,6 +122,9 @@ const I18N = {
     riskTitle: 'تقييم المخاطر الصحية',
     riskLine: 'للأعضاء القياسيين فأعلى. أسئلة مشتركة تُسأل مرة واحدة، ثم أدوات China-PAR والسكري وضغط الدم والخرف وباركنسون وهشاشة العظام وضمور العضلات ونمط الحياة. تُحفظ في حساب الموقع للاستشارة، دون ارتباط بالبرنامج المصغر.',
     riskBtn: 'بدء التقييم',
+    agingTitle: 'تقييم الشيخوخة',
+    agingLine: 'للأعضاء القياسيين فأعلى. أدخل نتائج الساعات من تقرير مثيلة الحمض النووي: Horvath وiCAS للعمر البيولوجي (iCAS أنسب للبالغين الصينيين)، GrimAge2 لخطر الوفاة، وDunedinPACE لسرعة الشيخوخة. الموقع يفسر التقرير ولا يعيد حساب الرقاقة.',
+    agingBtn: 'بدء تقييم الشيخوخة',
     contentTitle: 'موارد المحتوى',
     contentBtn: 'دخول المحتوى',
     contentDesc: 'قناة محتوى موازية للاستشارات لفتح مواد طول العمر أو قاعدة المعرفة.',
@@ -229,6 +238,21 @@ export default function Solutions() {
         <div className="solutions-intake-actions">
           {riskAllowed ? (
             <Link to="/solutions/risk" className="consult-card-btn">{t.riskBtn}</Link>
+          ) : (
+            <>
+              <p className="consult-lock-msg">{p.requiresLevel(MEMBERSHIP_LEVELS.standard.name)}</p>
+              <Link to="/payment?plan=standard_monthly" className="consult-card-btn consult-btn-upgrade">{t.upgrade}</Link>
+            </>
+          )}
+        </div>
+      </section>
+
+      <section className={`solutions-intake-card ${!riskAllowed ? 'consult-card-locked' : ''}`}>
+        <h2>{t.agingTitle}</h2>
+        <p>{t.agingLine}</p>
+        <div className="solutions-intake-actions">
+          {riskAllowed ? (
+            <Link to="/solutions/aging" className="consult-card-btn">{t.agingBtn}</Link>
           ) : (
             <>
               <p className="consult-lock-msg">{p.requiresLevel(MEMBERSHIP_LEVELS.standard.name)}</p>
