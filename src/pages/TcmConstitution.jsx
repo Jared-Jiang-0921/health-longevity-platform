@@ -30,14 +30,23 @@ const COPY = {
     scale: ['没有', '很少', '有时', '经常', '总是'],
     consent: '我同意按健康数据告知保存这次自评结果。照片不会被保存。',
     tongueTitle: '舌象对照（可选）',
-    tongueLead: '自然光下伸出舌头，关掉美颜。系统只能建议可见特征，你确认后才进入结果，而且不加分、不减分。',
+    tongueLead: '自然光下伸出舌头，关掉美颜。系统按望诊规范标出可见特征，你核对后才进入对照。对照只用体质标准里写明的舌象组合，不加分、不减分。',
     takePhoto: '拍照或选择照片',
     reading: '正在看照片…',
     confirmTongue: '我确认以上舌象特征，并知道它不改变问卷分数',
     skipTongue: '不做舌象对照',
     colors: { pale: '舌色淡', pink: '舌色淡红', red: '舌色红', dark: '舌色暗' },
     coatings: { 'thin-white': '薄白苔', 'white-greasy': '白腻苔', 'yellow-greasy': '黄腻苔', little: '少苔' },
-    marks: { teeth: '齿痕', cracks: '裂纹', spots: '瘀点' },
+    marks: { teeth: '齿痕', cracks: '裂纹', spots: '瘀点', plump: '舌体胖嫩' },
+    cracksHint: '裂纹可以勾选，只作记录，不参与体质对照。这张舌面照片不判断舌下络脉。',
+    tongueNotes: {
+      'pale-without-plump': '只见舌色淡、未见胖嫩，不对照阳虚质。',
+      'teeth-without-pink': '只见齿痕、舌色不是淡红，不对照气虚质。',
+      'red-without-scanty': '只见舌红、未见少津，不对照阴虚质。',
+      'yellow-without-red': '只见黄腻苔、舌质未见偏红，不对照湿热质。',
+      'cracks-not-compared': '裂纹只作记录，不参与体质对照。',
+      'pink-thin-white': '舌淡红、苔薄白，与平和质和气郁质的常见舌象描述相同。',
+    },
     submit: '生成初步结果',
     submitting: '正在计算结果…',
     redo: '重新填写',
@@ -67,14 +76,23 @@ const COPY = {
     scale: ['Never', 'Rarely', 'Sometimes', 'Often', 'Always'],
     consent: 'I agree to store this self-check under the health-data notice. The photo is not stored.',
     tongueTitle: 'Tongue comparison (optional)',
-    tongueLead: 'Use daylight, stick out your tongue, and turn off beauty filters. Suggested features count only after you confirm them, and they do not change the score.',
+    tongueLead: 'Use daylight, stick out your tongue, and turn off beauty filters. Suggestions follow inspection terms. They count only after you confirm them, and they do not change the score.',
     takePhoto: 'Take or choose a photo',
     reading: 'Reading the photo…',
     confirmTongue: 'I confirm these tongue features, and I know they do not change the score',
     skipTongue: 'Skip tongue comparison',
     colors: { pale: 'Pale', pink: 'Pink-red', red: 'Red', dark: 'Dark' },
     coatings: { 'thin-white': 'Thin white coat', 'white-greasy': 'Greasy white coat', 'yellow-greasy': 'Greasy yellow coat', little: 'Little coating' },
-    marks: { teeth: 'Teeth marks', cracks: 'Cracks', spots: 'Stasis spots' },
+    marks: { teeth: 'Teeth marks', cracks: 'Cracks', spots: 'Stasis spots', plump: 'Plump, tender body' },
+    cracksHint: 'Cracks can be checked and are recorded only. They are not compared with a constitution type. This surface photo is not used for sublingual veins.',
+    tongueNotes: {
+      'pale-without-plump': 'Pale color without a plump body is not compared with yang deficiency.',
+      'teeth-without-pink': 'Teeth marks without a pink-red tongue are not compared with qi deficiency.',
+      'red-without-scanty': 'A red tongue without scant fluid is not compared with yin deficiency.',
+      'yellow-without-red': 'A greasy yellow coat without a red tongue is not compared with damp-heat.',
+      'cracks-not-compared': 'Cracks are recorded only and are not compared with a constitution type.',
+      'pink-thin-white': 'A pink-red tongue with a thin white coat matches the usual description for balanced and qi-stagnation types.',
+    },
     submit: 'Create preliminary result',
     submitting: 'Scoring…',
     redo: 'Start over',
@@ -104,14 +122,23 @@ const COPY = {
     scale: ['أبداً', 'نادراً', 'أحياناً', 'غالباً', 'دائماً'],
     consent: 'أوافق على حفظ هذا التقييم وفق إشعار البيانات الصحية. لن تُحفظ الصورة.',
     tongueTitle: 'مقارنة اللسان (اختيارية)',
-    tongueLead: 'في ضوء النهار، أخرج اللسان وأوقف مرشحات التجميل. السمات تُحتسب بعد تأكيدك فقط، ولا تغيّر الدرجة.',
+    tongueLead: 'في ضوء النهار، أخرج اللسان وأوقف مرشحات التجميل. الاقتراح يتبع مصطلحات المعاينة، ويُعتمد بعد تأكيدك فقط، ولا يغيّر الدرجة.',
     takePhoto: 'التقاط صورة أو اختيارها',
     reading: 'جارٍ قراءة الصورة…',
     confirmTongue: 'أؤكد سمات اللسان هذه، وأعلم أنها لا تغيّر الدرجة',
     skipTongue: 'تجاوز مقارنة اللسان',
     colors: { pale: 'باهت', pink: 'وردي', red: 'أحمر', dark: 'داكن' },
     coatings: { 'thin-white': 'طبقة بيضاء رقيقة', 'white-greasy': 'طبقة بيضاء دهنية', 'yellow-greasy': 'طبقة صفراء دهنية', little: 'طبقة قليلة' },
-    marks: { teeth: 'آثار أسنان', cracks: 'شقوق', spots: 'نقاط ركود' },
+    marks: { teeth: 'آثار أسنان', cracks: 'شقوق', spots: 'نقاط ركود', plump: 'جسم ممتلئ وناعم' },
+    cracksHint: 'يمكن تحديد الشقوق للتسجيل فقط، دون مقارنتها بنمط. صورة سطح اللسان لا تُستخدم لأوردة أسفل اللسان.',
+    tongueNotes: {
+      'pale-without-plump': 'اللون الباهت دون جسم ممتلئ لا يُقارن بنقص اليانغ.',
+      'teeth-without-pink': 'آثار الأسنان دون لسان وردي لا تُقارن بنقص التشي.',
+      'red-without-scanty': 'اللسان الأحمر دون قلة الرطوبة لا يُقارن بنقص الين.',
+      'yellow-without-red': 'الطبقة الصفراء الدهنية دون لسان أحمر لا تُقارن بالرطوبة الحارة.',
+      'cracks-not-compared': 'الشقوق للتسجيل فقط ولا تُقارن بنمط.',
+      'pink-thin-white': 'اللسان الوردي مع طبقة بيضاء رقيقة يوافق الوصف المعتاد للنمط المتوازن وركود التشي.',
+    },
     submit: 'إنشاء النتيجة الأولية',
     submitting: 'جارٍ الحساب…',
     redo: 'إعادة',
@@ -291,7 +318,10 @@ export default function TcmConstitution() {
               {result.tongue.divergent?.length ? (
                 <p>{t.divergent}：{result.tongue.divergent.map((id) => names[id] || id).join('、')}</p>
               ) : null}
-              {!result.tongue.aligned?.length && !result.tongue.divergent?.length ? <p>{t.tongueNeutral}</p> : null}
+              {!result.tongue.aligned?.length && !result.tongue.divergent?.length && !result.tongue.notes?.length ? <p>{t.tongueNeutral}</p> : null}
+              {(result.tongue.notes || []).map((code) => (
+                t.tongueNotes[code] ? <p key={code}>{t.tongueNotes[code]}</p> : null
+              ))}
             </>
           )}
           <p>{saved.summary}</p>
@@ -368,6 +398,7 @@ export default function TcmConstitution() {
                       </label>
                     ))}
                   </div>
+                  <p className="tcm-const-hint">{t.cracksHint}</p>
                   <label>
                     <input type="checkbox" checked={tongueConfirmed} onChange={(e) => setTongueConfirmed(e.target.checked)} />
                     {t.confirmTongue}

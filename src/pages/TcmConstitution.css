@@ -2,7 +2,8 @@
   max-width: var(--content-max);
 }
 
-.tcm-const-lead {
+.tcm-const-lead,
+.tcm-const-hint {
   color: var(--color-text-muted);
   line-height: 1.7;
 }

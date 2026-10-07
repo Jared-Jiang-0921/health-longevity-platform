@@ -11,19 +11,45 @@ const BIASED_IDS = CONSTITUTION_GROUPS.map((group) => group.id).filter((id) => i
 
 export const TONGUE_COLORS = ['pale', 'pink', 'red', 'dark']
 export const TONGUE_COATINGS = ['thin-white', 'white-greasy', 'yellow-greasy', 'little']
-export const TONGUE_MARKS = ['teeth', 'cracks', 'spots']
+export const TONGUE_MARKS = ['teeth', 'cracks', 'spots', 'plump']
 
-const TONGUE_LINKS = [
-  { match: (f) => f.tongueColor === 'pale', types: ['qi-deficiency', 'yang-deficiency'] },
-  { match: (f) => f.tongueColor === 'red', types: ['yin-deficiency'] },
-  { match: (f) => f.tongueColor === 'dark', types: ['blood-stasis'] },
-  { match: (f) => f.coating === 'white-greasy', types: ['phlegm-dampness'] },
-  { match: (f) => f.coating === 'yellow-greasy', types: ['damp-heat'] },
-  { match: (f) => f.coating === 'little', types: ['yin-deficiency'] },
-  { match: (f) => f.marks.includes('teeth'), types: ['qi-deficiency'] },
-  { match: (f) => f.marks.includes('cracks'), types: ['yin-deficiency'] },
-  { match: (f) => f.marks.includes('spots'), types: ['blood-stasis'] },
-]
+/**
+ * 对照只用 ZYYXH/T157-2009 常见表现里写明的舌象组合。
+ * 裂纹可记录，不参与对照。特禀质没有特定舌象。
+ */
+export function tongueComparison(features) {
+  const color = features?.tongueColor || ''
+  const coating = features?.coating || ''
+  const marks = new Set(features?.marks || [])
+  const has = (mark) => marks.has(mark)
+  const supported = []
+  const notes = []
+
+  if (color === 'pink' && has('teeth')) supported.push('qi-deficiency')
+  else if (has('teeth')) notes.push('teeth-without-pink')
+
+  if (color === 'pale' && has('plump')) supported.push('yang-deficiency')
+  else if (color === 'pale') notes.push('pale-without-plump')
+
+  if (color === 'red' && coating === 'little') supported.push('yin-deficiency')
+  else if (color === 'red' && coating !== 'yellow-greasy') notes.push('red-without-scanty')
+
+  if (coating === 'white-greasy') supported.push('phlegm-dampness')
+
+  if (color === 'red' && coating === 'yellow-greasy') supported.push('damp-heat')
+  else if (coating === 'yellow-greasy') notes.push('yellow-without-red')
+
+  if (color === 'dark' || has('spots')) supported.push('blood-stasis')
+
+  const plain = color === 'pink' && coating === 'thin-white' && !has('teeth') && !has('spots') && !has('plump')
+  if (plain) {
+    supported.push('balanced', 'qi-stagnation')
+    notes.push('pink-thin-white')
+  }
+
+  if (has('cracks')) notes.push('cracks-not-compared')
+  return { supported, notes }
+}
 
 function round1(n) {
   return Math.round(n * 10) / 10
@@ -61,23 +87,26 @@ export function normalizeTongue(raw) {
 
 export function compareTongue(features, judgments) {
   if (!features) return null
-  const linked = new Set()
-  for (const rule of TONGUE_LINKS) {
-    if (rule.match(features)) {
-      for (const id of rule.types) linked.add(id)
-    }
-  }
+  const { supported, notes } = tongueComparison(features)
   const aligned = []
   const divergent = []
-  for (const id of linked) {
-    const judgment = judgments[id]
-    if (judgment === 'yes' || judgment === 'tendency') aligned.push(id)
+  for (const id of supported) {
+    const judgment = judgments?.[id]
+    const agrees = id === 'balanced'
+      ? judgment === 'yes' || judgment === 'basic'
+      : judgment === 'yes' || judgment === 'tendency'
+    if (id === 'balanced' || id === 'qi-stagnation') {
+      if (agrees) aligned.push(id)
+      continue
+    }
+    if (agrees) aligned.push(id)
     else divergent.push(id)
   }
   return {
     features,
     aligned,
     divergent,
+    notes,
     changesScore: false,
   }
 }
@@ -137,14 +166,24 @@ export function constitutionSummary(result) {
     .filter((row) => row.judgment !== 'no')
     .map((row) => `${name[row.id] || row.id}${JUDGMENT_ZH[row.judgment] || row.judgment}（转化分 ${row.score}）`)
   const head = lines.length ? lines.join('，') : '九种体质均未达到倾向'
+  const noteZh = {
+    'pale-without-plump': '只见舌色淡、未见胖嫩，不对照阳虚质',
+    'teeth-without-pink': '只见齿痕、舌色不是淡红，不对照气虚质',
+    'red-without-scanty': '只见舌红、未见少津，不对照阴虚质',
+    'yellow-without-red': '只见黄腻苔、舌质未见偏红，不对照湿热质',
+    'cracks-not-compared': '裂纹只作记录，不参与体质对照',
+    'pink-thin-white': '舌淡红、苔薄白，与平和质和气郁质的常见舌象描述相同',
+  }
   let tongue = '未做舌象对照'
   if (result.tongue) {
     const aligned = result.tongue.aligned.map((id) => name[id] || id)
     const divergent = result.tongue.divergent.map((id) => name[id] || id)
+    const notes = (result.tongue.notes || []).map((code) => noteZh[code]).filter(Boolean)
     const parts = []
     if (aligned.length) parts.push(`与问卷同向：${aligned.join('、')}`)
     if (divergent.length) parts.push(`与问卷不一致：${divergent.join('、')}`)
-    tongue = parts.length ? parts.join('；') : '已确认舌象，未见与偏颇体质对应的特征'
+    if (notes.length) parts.push(notes.join('；'))
+    tongue = parts.length ? parts.join('；') : '已确认舌象，未见与体质标准舌象原文对应的组合'
   }
   return `体质自评（教育参考，非辨证）：${head}。舌象对照（不改变问卷分数）：${tongue}。未经当场辨证，不能作为用药依据。`.slice(0, 800)
 }

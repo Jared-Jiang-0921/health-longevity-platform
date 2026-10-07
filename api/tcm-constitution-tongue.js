@@ -75,9 +75,14 @@ export default async function handler(req, res) {
   }
 
   const prompt = [
-    '这是一张舌头照片。只判断可见特征，不要诊断体质，不要开方，不要写剂量。',
-    '只返回 JSON：{"tongueColor":"pale|pink|red|dark","coating":"thin-white|white-greasy|yellow-greasy|little","marks":["teeth","cracks","spots"],"unsure":false,"note":""}',
-    '看不清、不是舌头、或光线明显偏色时，字段留空并把 unsure 设为 true。',
+    '按 GB/T 40665.1-2021《中医四诊操作规范 第1部分：望诊》只判断这张照片里看得见的舌面特征。',
+    '用词按舌象词汇：淡白、淡红、红、青紫，薄白、白腻、黄腻、少苔，以及齿痕、裂纹、瘀点、胖嫩。',
+    '不要判断体质，不要开方，不要写剂量，不要根据舌面照片判断舌下络脉。',
+    '只返回 JSON：{"tongueColor":"pale|pink|red|dark","coating":"thin-white|white-greasy|yellow-greasy|little","marks":["teeth","cracks","spots","plump"],"unsure":false,"note":""}',
+    'tongueColor：淡白或舌色淡=pale；淡红=pink；红或偏红=red；青、紫、紫黯或舌色暗=dark。颜色介于两者之间就留空。',
+    'coating：薄白苔=thin-white；白腻苔=white-greasy；黄腻苔=yellow-greasy；少苔或几乎无苔=little。腻但分不清白或黄就留空。',
+    'marks：舌边齿痕=teeth；裂纹=cracks；舌面瘀点=spots；舌体胖大或胖嫩=plump。没有的不要写。',
+    '看不清、不是舌头、开了美颜、饮食染苔或光线明显偏色时，相关字段留空，并把 unsure 设为 true。',
   ].join('')
 
   const ac = new AbortController()
@@ -98,7 +103,7 @@ export default async function handler(req, res) {
             { type: 'text', text: prompt },
           ],
         }],
-        max_tokens: 300,
+        max_tokens: 400,
       }),
       signal: ac.signal,
     })
@@ -115,7 +120,7 @@ export default async function handler(req, res) {
       ok: true,
       manual: parsed.unsure,
       features: parsed.features,
-      note: parsed.note || (parsed.unsure ? '照片不够清楚，请核对或改选特征。' : '请核对后再确认。确认后的舌象只作对照，不改变问卷分数。'),
+      note: parsed.note || (parsed.unsure ? '照片不够清楚，请对照照片自行选择特征。' : '请对照照片核对舌色、苔、齿痕和胖嫩后再确认。裂纹只作记录。确认后的舌象不改变问卷分数。'),
     })
   } catch {
     return res.status(200).json(emptyFeatures('自动识别超时，请按照片自行选择舌象特征。'))
