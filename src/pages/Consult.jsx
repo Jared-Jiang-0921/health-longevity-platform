@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
 import { hasLevelAccess, MEMBERSHIP_LEVELS } from '../data/membership'
 import { fetchConsultProfile } from '../lib/consultProfile'
+import { takeConstitutionConsultDraft } from '../lib/tcmConstitution/consultDraft'
 import { fetchConsultSessions, clearConsultSessions, deleteConsultSession, renameConsultSession, fetchConsultQuota } from '../lib/consultApi'
 import ChatWindow from '../components/consult/ChatWindow'
 import SessionList from '../components/consult/SessionList'
@@ -374,6 +375,7 @@ export default function Consult() {
   const [clearing, setClearing] = useState(false)
   const [chatNonce, setChatNonce] = useState(0)
   const [quota, setQuota] = useState(null)
+  const [draftSeed, setDraftSeed] = useState('')
 
   const entry = params.get('entry') === 'professional' ? 'professional' : 'general'
   const initialQuery = params.get('q') || ''
@@ -450,6 +452,12 @@ export default function Consult() {
       cancelled = true
     }
   }, [token, allowed])
+
+  useEffect(() => {
+    if (!allowed) return
+    const draft = takeConstitutionConsultDraft()
+    if (draft) setDraftSeed(draft)
+  }, [allowed])
 
   useEffect(() => {
     if (!token || !allowed) {
@@ -746,6 +754,7 @@ export default function Consult() {
                   lang={lang}
                   entry={entry}
                   initialQuery={initialQuery}
+                  initialDraft={draftSeed}
                   rtl={rtl}
                   copy={chatCopy}
                   profile={profile}

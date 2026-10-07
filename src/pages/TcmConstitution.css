@@ -94,3 +94,20 @@
   margin-top: 0;
   font-weight: var(--font-weight-semibold);
 }
+
+.tcm-const-consult {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.tcm-const-draft {
+  margin: 0;
+  white-space: pre-wrap;
+  line-height: 1.7;
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  background: var(--color-surface-muted, rgba(0, 0, 0, 0.04));
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+}

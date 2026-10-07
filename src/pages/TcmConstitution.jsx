@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
 import { CONSTITUTION_GROUPS } from '../data/tcmConstitutionSurvey'
@@ -14,6 +14,7 @@ import {
   saveTcmConstitution,
   suggestTongueFeatures,
 } from '../lib/tcmConstitutionApi'
+import { constitutionConsultDraft, saveConstitutionConsultDraft } from '../lib/tcmConstitution/consultDraft'
 import './TcmConstitution.css'
 
 const SCALE = [1, 2, 3, 4, 5]
@@ -67,6 +68,10 @@ const COPY = {
     score: '转化分',
     judgment: { yes: '是', basic: '基本是', tendency: '倾向', no: '否' },
     cardLink: '查看调养要点',
+    consultHint: '可以直接复制下面这段，填写到 AI 长寿师。发送后会按这份体质自评给出调养建议。建议只供教育参考，不能作为用药依据。',
+    copyResult: '复制这段',
+    copied: '已复制',
+    fillConsult: '填写到 AI 长寿师',
     error: '暂时没有完成',
   },
   en: {
@@ -117,6 +122,10 @@ const COPY = {
     score: 'Converted score',
     judgment: { yes: 'Yes', basic: 'Basically yes', tendency: 'Tendency', no: 'No' },
     cardLink: 'Care notes',
+    consultHint: 'You can copy the text below into AI Coach. After you send it, the coach gives lifestyle care suggestions from this self-check. Those suggestions are education only and cannot be used as a basis for medicine.',
+    copyResult: 'Copy text',
+    copied: 'Copied',
+    fillConsult: 'Fill in AI Coach',
     error: 'Could not finish',
   },
   ar: {
@@ -167,6 +176,10 @@ const COPY = {
     score: 'الدرجة المحوّلة',
     judgment: { yes: 'نعم', basic: 'نعم إلى حد كبير', tendency: 'ميل', no: 'لا' },
     cardLink: 'ملاحظات العناية',
+    consultHint: 'يمكنك نسخ النص أدناه ووضعه في مدرب الصحة. بعد الإرسال يعطي اقتراحات عناية من هذا التقييم. الاقتراحات تعليمية ولا تصلح أساساً للدواء.',
+    copyResult: 'نسخ النص',
+    copied: 'تم النسخ',
+    fillConsult: 'تعبئة مدرب الصحة',
     error: 'تعذر الإكمال',
   },
 }
@@ -204,6 +217,8 @@ async function compressImage(file) {
 export default function TcmConstitution() {
   const { lang } = useLocale()
   const { getToken } = useAuth()
+  const navigate = useNavigate()
+  const [copied, setCopied] = useState(false)
   const t = COPY[lang] || COPY.zh
   const [answers, setAnswers] = useState({})
   const [redFlagNow, setRedFlagNow] = useState(null)
@@ -355,6 +370,24 @@ export default function TcmConstitution() {
   }
 
   const result = saved?.result
+  const consultText = constitutionConsultDraft(saved?.summary, lang)
+
+  async function copyConsultText() {
+    if (!consultText) return
+    try {
+      await navigator.clipboard.writeText(consultText)
+      setCopied(true)
+    } catch {
+      setCopied(false)
+    }
+  }
+
+  function fillConsult() {
+    if (!consultText) return
+    saveConstitutionConsultDraft(saved?.summary, lang)
+    copyConsultText()
+    navigate('/consult')
+  }
 
   return (
     <div className="page-tcm-constitution page-content">
@@ -400,6 +433,16 @@ export default function TcmConstitution() {
             </>
           )}
           <p>{saved.summary}</p>
+          {consultText ? (
+            <div className="tcm-const-consult">
+              <p>{t.consultHint}</p>
+              <pre className="tcm-const-draft">{consultText}</pre>
+              <div className="tcm-const-photo-actions">
+                <button type="button" onClick={copyConsultText}>{copied ? t.copied : t.copyResult}</button>
+                <button type="button" className="btn-primary" onClick={fillConsult}>{t.fillConsult}</button>
+              </div>
+            </div>
+          ) : null}
           <button type="button" className="btn-primary" onClick={() => setSaved(null)}>{t.redo}</button>
         </section>
       ) : (

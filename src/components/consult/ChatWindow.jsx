@@ -86,6 +86,7 @@ export default function ChatWindow({
   lang,
   entry,
   initialQuery,
+  initialDraft,
   rtl,
   copy,
   profile,
@@ -113,6 +114,8 @@ export default function ChatWindow({
   const bootRef = useRef(false)
   const skipReloadRef = useRef(false)
   const fileRef = useRef(null)
+  const inputRef = useRef(null)
+  const draftAppliedRef = useRef(false)
   const sessionRef = useRef(sessionId)
   sessionRef.current = sessionId
   const recRef = useRef(null)
@@ -366,6 +369,14 @@ export default function ChatWindow({
       abortRef.current = null
     }
   }
+
+  useEffect(() => {
+    const text = String(initialDraft || '').trim()
+    if (!text || draftAppliedRef.current) return
+    draftAppliedRef.current = true
+    setInput(text)
+    inputRef.current?.focus()
+  }, [initialDraft])
 
   useEffect(() => {
     if (bootRef.current) return
@@ -725,6 +736,7 @@ export default function ChatWindow({
                 : (copy.speech || '语音')}
           </button>
           <textarea
+            ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={copy.placeholder}
