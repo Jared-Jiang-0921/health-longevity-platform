@@ -296,6 +296,7 @@ export const SEO_NOINDEX_PREFIXES = [
   '/forgot-password',
   '/reset-password',
   '/health-questionnaire',
+  '/tcm-prevention/constitution',
   '/solutions/risk',
   '/solutions/aging',
   '/health-monitor',

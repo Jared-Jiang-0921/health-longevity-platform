@@ -95,8 +95,8 @@ const HINTS = {
       lead: '治未病正式资料按会员等级开放；栏目规划示例与管理员上传区不对游客及其他会员展示。',
       tiers: {
         free: '模块介绍与定位说明',
-        standard: '中草药单药、经典处方等全部治未病库',
-        premium: '全部治未病内容与专属扩展资料',
+        standard: '初步体质辨识（标准会员及以上），以及中草药单药、经典处方',
+        premium: '含标准会员的全部内容，另有专属扩展资料',
       },
     },
     en: {
@@ -104,8 +104,8 @@ const HINTS = {
       lead: 'Preventive TCM library unlocks by membership. Planning samples and admin upload UI are hidden from guests and members.',
       tiers: {
         free: 'Module intro and positioning',
-        standard: 'Full herb and classic-formula library',
-        premium: 'Full library plus exclusive extensions',
+        standard: 'Preliminary constitution check (Standard and above), plus herbs and formulas',
+        premium: 'Everything in Standard, plus exclusive extensions',
       },
     },
     ar: {
@@ -113,7 +113,7 @@ const HINTS = {
       lead: 'مكتبة الطب الوقائي حسب العضوية. عينات التخطيط وواجهة الرفع مخفية عن الزوار والأعضاء.',
       tiers: {
         free: 'مقدمة الوحدة وتحديد الموقع',
-        standard: 'مكتبة الأعشاب والوصفات الكلاسيكية كاملة',
+        standard: 'مكتبة الأعشاب والوصفات، مع التمييز الأولي لنمط الجسم',
         premium: 'المكتبة كاملة مع امتدادات حصرية',
       },
     },

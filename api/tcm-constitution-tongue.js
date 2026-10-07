@@ -1,0 +1,125 @@
+/**
+ * 舌象照片只返回可见特征建议，不保存图片，不计算体质分数。
+ * POST /api/tcm-constitution-tongue { mediaType, data }
+ */
+import { verifyToken, getUserById } from '../lib/auth.js'
+import { canViewContent } from '../lib/contentAccess.js'
+import { TONGUE_COATINGS, TONGUE_COLORS, TONGUE_MARKS } from '../src/lib/tcmConstitution/score.js'
+
+const BASE = (
+  process.env.DASHSCOPE_BASE_URL ||
+  'https://dashscope.aliyuncs.com/compatible-mode/v1'
+).replace(/\/$/, '')
+const MODEL = process.env.VISION_MODEL || 'qwen-vl-plus'
+const MAX_DATA_CHARS = 1_800_000
+
+function getToken(req) {
+  const auth = req.headers.authorization
+  return auth?.startsWith('Bearer ') ? auth.slice(7) : null
+}
+
+function emptyFeatures(note) {
+  return {
+    ok: true,
+    manual: true,
+    features: { tongueColor: '', coating: '', marks: [] },
+    note,
+  }
+}
+
+function parseFeatures(text) {
+  const raw = String(text || '')
+  const start = raw.indexOf('{')
+  const end = raw.lastIndexOf('}')
+  if (start < 0 || end <= start) return null
+  try {
+    const json = JSON.parse(raw.slice(start, end + 1))
+    const tongueColor = TONGUE_COLORS.includes(json.tongueColor) ? json.tongueColor : ''
+    const coating = TONGUE_COATINGS.includes(json.coating) ? json.coating : ''
+    const marks = Array.isArray(json.marks)
+      ? [...new Set(json.marks.filter((mark) => TONGUE_MARKS.includes(mark)))]
+      : []
+    return {
+      features: { tongueColor, coating, marks },
+      unsure: json.unsure === true || (!tongueColor && !coating && !marks.length),
+      note: String(json.note || '').slice(0, 200),
+    }
+  } catch {
+    return null
+  }
+}
+
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST')
+    return res.status(405).json({ error: 'Method not allowed' })
+  }
+  const token = getToken(req)
+  if (!token) return res.status(401).json({ error: '未登录' })
+  const userId = await verifyToken(token)
+  if (!userId) return res.status(401).json({ error: '登录已过期' })
+  const user = await getUserById(userId)
+  if (!user || !canViewContent(user.level, 'standard', { isGuest: false })) {
+    return res.status(403).json({ error: '体质辨识仅向标准会员及以上开放' })
+  }
+
+  const mediaType = String(req.body?.mediaType || '')
+  const data = String(req.body?.data || '')
+  if (!/^image\/(jpeg|png|webp)$/.test(mediaType) || data.length < 32 || data.length > MAX_DATA_CHARS) {
+    return res.status(400).json({ error: '请上传一张清晰的舌头照片' })
+  }
+
+  const key = process.env.DASHSCOPE_API_KEY || process.env.BAILIAN_API_KEY || ''
+  if (!key) {
+    return res.status(200).json(emptyFeatures('当前无法自动识别，请按照片自行选择舌象特征。'))
+  }
+
+  const prompt = [
+    '这是一张舌头照片。只判断可见特征，不要诊断体质，不要开方，不要写剂量。',
+    '只返回 JSON：{"tongueColor":"pale|pink|red|dark","coating":"thin-white|white-greasy|yellow-greasy|little","marks":["teeth","cracks","spots"],"unsure":false,"note":""}',
+    '看不清、不是舌头、或光线明显偏色时，字段留空并把 unsure 设为 true。',
+  ].join('')
+
+  const ac = new AbortController()
+  const timer = setTimeout(() => ac.abort(), 25000)
+  try {
+    const resp = await fetch(`${BASE}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${key}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image_url', image_url: { url: `data:${mediaType};base64,${data}` } },
+            { type: 'text', text: prompt },
+          ],
+        }],
+        max_tokens: 300,
+      }),
+      signal: ac.signal,
+    })
+    if (!resp.ok) {
+      return res.status(200).json(emptyFeatures('自动识别没有成功，请按照片自行选择舌象特征。'))
+    }
+    const json = await resp.json()
+    const text = json.choices?.[0]?.message?.content || ''
+    const parsed = parseFeatures(text)
+    if (!parsed) {
+      return res.status(200).json(emptyFeatures('自动识别没有成功，请按照片自行选择舌象特征。'))
+    }
+    return res.status(200).json({
+      ok: true,
+      manual: parsed.unsure,
+      features: parsed.features,
+      note: parsed.note || (parsed.unsure ? '照片不够清楚，请核对或改选特征。' : '请核对后再确认。确认后的舌象只作对照，不改变问卷分数。'),
+    })
+  } catch {
+    return res.status(200).json(emptyFeatures('自动识别超时，请按照片自行选择舌象特征。'))
+  } finally {
+    clearTimeout(timer)
+  }
+}

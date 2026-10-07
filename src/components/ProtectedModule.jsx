@@ -13,6 +13,8 @@ const COPY = {
     riskBody: '网站风险评估需登录，且仅向标准会员及以上开放。',
     agingTitle: '请先登录',
     agingBody: '网站衰老评估需登录，且仅向标准会员及以上开放。',
+    constitutionTitle: '请先登录',
+    constitutionBody: '初步体质辨识需登录，并向标准会员及以上开放。',
     register: '注册会员',
     login: '登录',
     home: '返回首页',
@@ -29,6 +31,8 @@ const COPY = {
     riskBody: 'Website risk assessments require Standard membership or higher.',
     agingTitle: 'Please sign in',
     agingBody: 'Aging clocks require Standard membership or higher.',
+    constitutionTitle: 'Please sign in',
+    constitutionBody: 'The constitution check requires sign-in and Standard membership or higher.',
     register: 'Register',
     login: 'Login',
     home: 'Back to home',
@@ -45,6 +49,8 @@ const COPY = {
     riskBody: 'تتطلب تقييمات المرحلة الأولى عضوية قياسية أو أعلى.',
     agingTitle: 'يرجى تسجيل الدخول',
     agingBody: 'تتطلب تقييمات الشيخوخة عضوية قياسية أو أعلى.',
+    constitutionTitle: 'يرجى تسجيل الدخول',
+    constitutionBody: 'التمييز الأولي لنمط الجسم يتطلب تسجيل الدخول وعضوية قياسية أو أعلى.',
     register: 'إنشاء حساب',
     login: 'تسجيل الدخول',
     home: 'العودة للرئيسية',
@@ -68,12 +74,13 @@ export default function ProtectedModule({ children }) {
   const isMonitor = path === '/health-monitor' || path.startsWith('/health-monitor/')
   const isRisk = path === '/solutions/risk' || path.startsWith('/solutions/risk/')
   const isAging = path === '/solutions/aging' || path.startsWith('/solutions/aging/')
+  const isConstitution = path === '/tcm-prevention/constitution' || path.startsWith('/tcm-prevention/constitution/')
 
   if (!user) {
     return (
       <div className="page-content page-register-required">
-        <h1>{isMonitor ? t.monitorTitle : isAging ? t.agingTitle : isRisk ? t.riskTitle : t.registerTitle}</h1>
-        <p>{isMonitor ? t.monitorBody : isAging ? t.agingBody : isRisk ? t.riskBody : t.registerBody}</p>
+        <h1>{isMonitor ? t.monitorTitle : isConstitution ? t.constitutionTitle : isAging ? t.agingTitle : isRisk ? t.riskTitle : t.registerTitle}</h1>
+        <p>{isMonitor ? t.monitorBody : isConstitution ? t.constitutionBody : isAging ? t.agingBody : isRisk ? t.riskBody : t.registerBody}</p>
         <p className="register-actions">
           <Link to="/register" className="btn-primary">{t.register}</Link>
           <span className="action-sep"> </span>

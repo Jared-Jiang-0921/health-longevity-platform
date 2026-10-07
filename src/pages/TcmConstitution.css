@@ -1,0 +1,76 @@
+.page-tcm-constitution {
+  max-width: var(--content-max);
+}
+
+.tcm-const-lead {
+  color: var(--color-text-muted);
+  line-height: 1.7;
+}
+
+.tcm-const-form,
+.tcm-const-result {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.tcm-const-form fieldset {
+  border: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+.tcm-const-form legend {
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--space-3);
+}
+
+.tcm-const-q p {
+  margin: 0 0 var(--space-2);
+}
+
+.tcm-const-scale,
+.tcm-const-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.tcm-const-scale label,
+.tcm-const-choices label,
+.tcm-const-form > fieldset > label,
+.tcm-const-consent {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: var(--font-size-sm);
+}
+
+.tcm-const-file input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+.tcm-const-preview {
+  display: block;
+  width: min(240px, 100%);
+  border-radius: var(--radius-md);
+  margin: var(--space-3) 0;
+}
+
+.tcm-const-stop {
+  color: var(--color-danger, #9b2c2c);
+  line-height: 1.6;
+}
+
+.tcm-const-scores {
+  padding-left: 1.1rem;
+}
+
+.tcm-const-saved {
+  margin-top: 0;
+  font-weight: var(--font-weight-semibold);
+}

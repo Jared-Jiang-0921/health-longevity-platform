@@ -19,6 +19,7 @@ const Products = lazy(() => import('./pages/Products'))
 const ProductDetail = lazy(() => import('./pages/ProductDetail'))
 const LongevityNews = lazy(() => import('./pages/LongevityNews'))
 const TCMPrevention = lazy(() => import('./pages/TCMPrevention'))
+const TcmConstitution = lazy(() => import('./pages/TcmConstitution'))
 const TranslationOpportunities = lazy(() => import('./pages/TranslationOpportunities'))
 const Login = lazy(() => import('./pages/Login'))
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'))
@@ -78,6 +79,7 @@ export default function App() {
           <Route path="/products" element={<ProtectedModule><Products /></ProtectedModule>} />
           <Route path="/products/:id" element={<ProtectedModule><ProductDetail /></ProtectedModule>} />
           <Route path="/tcm-prevention" element={<ProtectedModule><WithModuleAssets moduleKey="tcm-prevention"><TCMPrevention /></WithModuleAssets></ProtectedModule>} />
+          <Route path="/tcm-prevention/constitution" element={<ProtectedModule><TcmConstitution /></ProtectedModule>} />
           <Route path="/longevity-news" element={<ProtectedModule><WithModuleAssets moduleKey="longevity-news"><LongevityNews /></WithModuleAssets></ProtectedModule>} />
           <Route path="/translation-opportunities" element={<ProtectedModule><WithModuleAssets moduleKey="translation-opportunities"><TranslationOpportunities /></WithModuleAssets></ProtectedModule>} />
           <Route path="/login" element={<Login />} />

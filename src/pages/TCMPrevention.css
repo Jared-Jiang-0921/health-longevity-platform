@@ -76,6 +76,10 @@
   line-height: 1.7;
 }
 
+.tcm-constitution-action {
+  margin: 0 0 var(--space-4);
+}
+
 .tcm-constitution-source {
   margin-bottom: var(--space-5);
   font-size: var(--font-size-sm);

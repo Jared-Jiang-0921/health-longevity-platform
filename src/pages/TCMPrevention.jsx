@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { TCM_CONSTITUTION_SOURCE, TCM_CONSTITUTIONS } from '../data/tcmConstitutions'
 import { TCM_HERBS, TCM_PRESCRIPTIONS } from '../data/tcmPrevention'
 import { getTcmPreventionModuleCopy } from '../data/tcmPreventionModuleI18n'
@@ -83,6 +84,9 @@ export default function TCMPrevention() {
             </p>
           </div>
           <p className="tcm-constitution-lead">{mod.constitutionLead}</p>
+          <p className="tcm-constitution-action">
+            <Link to="/tcm-prevention/constitution" className="btn-primary">{mod.constitutionStart}</Link>
+          </p>
           <p className="tcm-constitution-source">{localeText(TCM_CONSTITUTION_SOURCE, lang)}</p>
           <div className="tcm-grid tcm-grid--constitutions">
             {TCM_CONSTITUTIONS.map((item) => (

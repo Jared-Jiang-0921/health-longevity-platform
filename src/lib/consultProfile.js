@@ -37,11 +37,12 @@ export async function fetchConsultProfile(token, { timeoutMs = 3000 } = {}) {
   const timer = setTimeout(() => ac.abort(), timeoutMs)
   const headers = { Authorization: `Bearer ${token}` }
   try {
-    const [qRes, snapRes, riskRes, agingRes] = await Promise.all([
+    const [qRes, snapRes, riskRes, agingRes, tcmRes] = await Promise.all([
       fetch('/api/health-questionnaire', { headers, signal: ac.signal }),
       fetch('/api/health-monitor/snapshot', { headers, signal: ac.signal }).catch(() => null),
       fetch('/api/risk-assessments', { headers, signal: ac.signal }).catch(() => null),
       fetch('/api/aging-assessments', { headers, signal: ac.signal }).catch(() => null),
+      fetch('/api/tcm-constitution', { headers, signal: ac.signal }).catch(() => null),
     ])
     if (!qRes.ok && qRes.status !== 401) {
       // 问卷失败仍尝试设备摘要
@@ -62,6 +63,11 @@ export async function fetchConsultProfile(token, { timeoutMs = 3000 } = {}) {
       const aging = await agingRes.json().catch(() => ({}))
       const agingSummary = String(aging.agingSummary || '').trim().slice(0, FIELD_MAX)
       if (agingSummary) profile.agingSummary = agingSummary
+    }
+    if (tcmRes && tcmRes.ok) {
+      const tcm = await tcmRes.json().catch(() => ({}))
+      const constitutionSummary = String(tcm.constitutionSummary || '').trim().slice(0, FIELD_MAX)
+      if (constitutionSummary) profile.constitutionSummary = constitutionSummary
     }
     const has = Object.keys(profile).length > 0
     return {
