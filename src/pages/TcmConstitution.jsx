@@ -68,7 +68,7 @@ const COPY = {
     score: '转化分',
     judgment: { yes: '是', basic: '基本是', tendency: '倾向', no: '否' },
     cardLink: '查看调养要点',
-    consultHint: '可以直接复制下面这段，填写到 AI 长寿师。发送后会按这份体质自评给出调养建议。建议只供教育参考，不能作为用药依据。',
+    consultHint: '可以直接复制下面这段，填写到 AI 长寿师的专业咨询。发送后会给出调养建议，并列出相关经典方剂和单药作对照。这些内容仅供参考，并非确诊。体质是否成立、选用哪首方、以及药量多少，都需要就医后由执业医师当面确定。',
     copyResult: '复制这段',
     copied: '已复制',
     fillConsult: '填写到 AI 长寿师',
@@ -122,7 +122,7 @@ const COPY = {
     score: 'Converted score',
     judgment: { yes: 'Yes', basic: 'Basically yes', tendency: 'Tendency', no: 'No' },
     cardLink: 'Care notes',
-    consultHint: 'You can copy the text below into AI Coach. After you send it, the coach gives lifestyle care suggestions from this self-check. Those suggestions are education only and cannot be used as a basis for medicine.',
+    consultHint: 'Copy the text below into the professional AI Coach. After you send it, you get lifestyle suggestions plus classical formulas and single herbs as references. They are for study only, not a confirmed diagnosis. Whether the constitution applies, which formula to choose, and what dose to take must be decided in person by a licensed clinician.',
     copyResult: 'Copy text',
     copied: 'Copied',
     fillConsult: 'Fill in AI Coach',
@@ -176,7 +176,7 @@ const COPY = {
     score: 'الدرجة المحوّلة',
     judgment: { yes: 'نعم', basic: 'نعم إلى حد كبير', tendency: 'ميل', no: 'لا' },
     cardLink: 'ملاحظات العناية',
-    consultHint: 'يمكنك نسخ النص أدناه ووضعه في مدرب الصحة. بعد الإرسال يعطي اقتراحات عناية من هذا التقييم. الاقتراحات تعليمية ولا تصلح أساساً للدواء.',
+    consultHint: 'انسخ النص أدناه إلى الاستشارة المهنية. بعد الإرسال تظهر اقتراحات نمط الحياة مع وصفات كلاسيكية وأعشاب مفردة للمرجعية. ليست تشخيصاً مؤكداً. ثبوت النمط واختيار الوصفة ومقدار الجرعة يحددها طبيب مرخص بعد المعاينة.',
     copyResult: 'نسخ النص',
     copied: 'تم النسخ',
     fillConsult: 'تعبئة مدرب الصحة',
@@ -386,7 +386,7 @@ export default function TcmConstitution() {
     if (!consultText) return
     saveConstitutionConsultDraft(saved?.summary, lang)
     copyConsultText()
-    navigate('/consult')
+    navigate('/consult?entry=professional')
   }
 
   return (
