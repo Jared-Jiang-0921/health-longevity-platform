@@ -4,6 +4,7 @@
  */
 import { verifyToken, getUserById } from '../lib/auth.js'
 import { canViewContent } from '../lib/contentAccess.js'
+import { parseApiJsonBody } from '../lib/apiBody.js'
 import { TONGUE_COATINGS, TONGUE_COLORS, TONGUE_MARKS } from '../src/lib/tcmConstitution/score.js'
 
 const BASE = (
@@ -63,8 +64,10 @@ export default async function handler(req, res) {
     return res.status(403).json({ error: '体质辨识仅向标准会员及以上开放' })
   }
 
-  const mediaType = String(req.body?.mediaType || '')
-  const data = String(req.body?.data || '')
+  const body = parseApiJsonBody(req, res)
+  if (!body) return
+  const mediaType = String(body.mediaType || '')
+  const data = String(body.data || '')
   if (!/^image\/(jpeg|png|webp)$/.test(mediaType) || data.length < 32 || data.length > MAX_DATA_CHARS) {
     return res.status(400).json({ error: '请上传一张清晰的舌头照片' })
   }

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
@@ -31,7 +31,11 @@ const COPY = {
     consent: '我同意按健康数据告知保存这次自评结果。照片不会被保存。',
     tongueTitle: '舌象对照（可选）',
     tongueLead: '自然光下伸出舌头，关掉美颜。系统按望诊规范标出可见特征，你核对后才进入对照。对照只用体质标准里写明的舌象组合，不加分、不减分。',
-    takePhoto: '拍照或选择照片',
+    openCamera: '打开摄像头',
+    choosePhoto: '选择照片',
+    shoot: '拍摄',
+    closeCamera: '关闭摄像头',
+    cameraDenied: '没有打开摄像头。可以改用选择照片。',
     reading: '正在看照片…',
     confirmTongue: '我确认以上舌象特征，并知道它不改变问卷分数',
     skipTongue: '不做舌象对照',
@@ -77,7 +81,11 @@ const COPY = {
     consent: 'I agree to store this self-check under the health-data notice. The photo is not stored.',
     tongueTitle: 'Tongue comparison (optional)',
     tongueLead: 'Use daylight, stick out your tongue, and turn off beauty filters. Suggestions follow inspection terms. They count only after you confirm them, and they do not change the score.',
-    takePhoto: 'Take or choose a photo',
+    openCamera: 'Open camera',
+    choosePhoto: 'Choose a photo',
+    shoot: 'Capture',
+    closeCamera: 'Close camera',
+    cameraDenied: 'The camera did not open. You can choose a photo instead.',
     reading: 'Reading the photo…',
     confirmTongue: 'I confirm these tongue features, and I know they do not change the score',
     skipTongue: 'Skip tongue comparison',
@@ -123,7 +131,11 @@ const COPY = {
     consent: 'أوافق على حفظ هذا التقييم وفق إشعار البيانات الصحية. لن تُحفظ الصورة.',
     tongueTitle: 'مقارنة اللسان (اختيارية)',
     tongueLead: 'في ضوء النهار، أخرج اللسان وأوقف مرشحات التجميل. الاقتراح يتبع مصطلحات المعاينة، ويُعتمد بعد تأكيدك فقط، ولا يغيّر الدرجة.',
-    takePhoto: 'التقاط صورة أو اختيارها',
+    openCamera: 'فتح الكاميرا',
+    choosePhoto: 'اختيار صورة',
+    shoot: 'التقاط',
+    closeCamera: 'إغلاق الكاميرا',
+    cameraDenied: 'لم تُفتح الكاميرا. يمكنك اختيار صورة بدلاً من ذلك.',
     reading: 'جارٍ قراءة الصورة…',
     confirmTongue: 'أؤكد سمات اللسان هذه، وأعلم أنها لا تغيّر الدرجة',
     skipTongue: 'تجاوز مقارنة اللسان',
@@ -207,6 +219,9 @@ export default function TcmConstitution() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [saved, setSaved] = useState(null)
+  const [cameraOn, setCameraOn] = useState(false)
+  const videoRef = useRef(null)
+  const streamRef = useRef(null)
 
   useEffect(() => {
     const token = getToken()
@@ -231,9 +246,27 @@ export default function TcmConstitution() {
     setMarks((prev) => (prev.includes(mark) ? prev.filter((item) => item !== mark) : [...prev, mark]))
   }
 
-  async function onPhoto(event) {
-    const file = event.target.files?.[0]
-    event.target.value = ''
+  function stopCamera() {
+    const stream = streamRef.current
+    streamRef.current = null
+    stream?.getTracks().forEach((track) => track.stop())
+    setCameraOn(false)
+  }
+
+  useEffect(() => () => {
+    streamRef.current?.getTracks().forEach((track) => track.stop())
+  }, [])
+
+  useEffect(() => {
+    const video = videoRef.current
+    const stream = streamRef.current
+    if (!cameraOn || !video || !stream) return undefined
+    video.srcObject = stream
+    video.play().catch(() => {})
+    return undefined
+  }, [cameraOn])
+
+  async function useImageFile(file) {
     if (!file) return
     setError('')
     setTongueConfirmed(false)
@@ -253,6 +286,48 @@ export default function TcmConstitution() {
     } finally {
       setReadingPhoto(false)
     }
+  }
+
+  function onPhoto(event) {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (file) useImageFile(file)
+  }
+
+  async function openCamera() {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setError(t.cameraDenied)
+      return
+    }
+    setError('')
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: { facingMode: { ideal: 'environment' } },
+      })
+      streamRef.current = stream
+      setCameraOn(true)
+    } catch {
+      setError(t.cameraDenied)
+    }
+  }
+
+  async function shoot() {
+    const video = videoRef.current
+    if (!video) return
+    if (!video.videoWidth) {
+      await new Promise((resolve) => {
+        video.onloadedmetadata = () => resolve()
+      })
+    }
+    if (!video.videoWidth) return
+    const canvas = document.createElement('canvas')
+    canvas.width = video.videoWidth
+    canvas.height = video.videoHeight
+    canvas.getContext('2d').drawImage(video, 0, 0)
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.92))
+    stopCamera()
+    if (blob) useImageFile(new File([blob], 'tongue.jpg', { type: 'image/jpeg' }))
   }
 
   async function onSubmit(event) {
@@ -366,10 +441,22 @@ export default function TcmConstitution() {
             <fieldset className="content-card content-card--padded">
               <legend>{t.tongueTitle}</legend>
               <p>{t.tongueLead}</p>
-              <label className="btn-primary tcm-const-file">
-                {readingPhoto ? t.reading : t.takePhoto}
-                <input type="file" accept="image/*" capture="environment" onChange={onPhoto} disabled={readingPhoto} />
-              </label>
+              <div className="tcm-const-photo-actions">
+                <button type="button" className="btn-primary" onClick={openCamera} disabled={readingPhoto || cameraOn}>{t.openCamera}</button>
+                <label className="btn-primary tcm-const-file">
+                  {readingPhoto ? t.reading : t.choosePhoto}
+                  <input type="file" accept="image/*" onChange={onPhoto} disabled={readingPhoto} />
+                </label>
+              </div>
+              {cameraOn ? (
+                <div className="tcm-const-camera-wrap">
+                  <video ref={videoRef} className="tcm-const-camera" autoPlay playsInline muted />
+                  <div className="tcm-const-photo-actions">
+                    <button type="button" className="btn-primary" onClick={shoot}>{t.shoot}</button>
+                    <button type="button" onClick={stopCamera}>{t.closeCamera}</button>
+                  </div>
+                </div>
+              ) : null}
               {preview ? <img className="tcm-const-preview" src={preview} alt="" /> : null}
               {tongueNote ? <p>{tongueNote}</p> : null}
               {tongueOn ? (

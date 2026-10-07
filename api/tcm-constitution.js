@@ -8,6 +8,7 @@ import { verifyToken, getUserById } from '../lib/auth.js'
 import { canViewContent } from '../lib/contentAccess.js'
 import { sql } from '../lib/db.js'
 import { SITE_LEGAL } from '../src/data/siteLegal.js'
+import { parseApiJsonBody } from '../lib/apiBody.js'
 import { constitutionSummary, scoreConstitution } from '../src/lib/tcmConstitution/score.js'
 
 let tableReady = false
@@ -91,7 +92,8 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
-    const body = req.body || {}
+    const body = parseApiJsonBody(req, res)
+    if (!body) return
     if (body.consentHealthData !== true) {
       return res.status(400).json({ error: '提交前请先同意健康数据告知' })
     }

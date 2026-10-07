@@ -47,6 +47,25 @@
   font-size: var(--font-size-sm);
 }
 
+.tcm-const-photo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.tcm-const-camera {
+  display: block;
+  width: min(320px, 100%);
+  border-radius: var(--radius-md);
+  background: #111;
+  margin: var(--space-3) 0;
+}
+
+.tcm-const-file {
+  position: relative;
+}
+
 .tcm-const-file input {
   position: absolute;
   width: 1px;
