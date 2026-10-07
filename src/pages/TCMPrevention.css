@@ -1,70 +1,6 @@
 .page-tcm-prevention {
-  max-width: var(--content-narrow);
-}
-
-/* —— 治未病视觉 Banner —— */
-.tcm-hero-banner {
-  position: relative;
-  height: 400px;
-  margin: calc(-1 * var(--space-8)) calc(-1 * var(--space-6)) var(--space-8);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-md);
-}
-
-.tcm-hero-banner picture.tcm-hero-banner-bg,
-.tcm-hero-banner picture.tcm-hero-banner-bg img {
-  position: absolute;
-  inset: 0;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-}
-
-.tcm-hero-banner-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    105deg,
-    rgba(255, 255, 255, 0.92) 0%,
-    rgba(255, 255, 255, 0.78) 42%,
-    rgba(240, 253, 250, 0.55) 100%
-  );
-}
-
-.tcm-hero-banner-content {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  height: 100%;
-  padding: 2rem 2.25rem;
-  max-width: 28rem;
-}
-
-.tcm-hero-banner-content h1 {
-  margin: 0 0 0.75rem;
-  font-size: clamp(1.75rem, 4vw, 2.25rem);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--color-text);
-  line-height: 1.2;
-}
-
-.tcm-hero-banner-line {
-  margin: 0;
-  font-size: clamp(1rem, 2vw, 1.125rem);
-  line-height: 1.65;
-  color: var(--color-text-secondary);
-  font-weight: 500;
-}
-
-.tcm-hero-banner-line + .tcm-hero-banner-line {
-  margin-top: 0.25rem;
-  color: var(--color-accent);
+  max-width: var(--content-max);
 }
 
 .tcm-page-title {
@@ -86,126 +22,128 @@
   border: 0;
 }
 
-@media (max-width: 640px) {
-  .tcm-hero-banner {
-    height: min(400px, 72vw);
-    margin-left: calc(-1 * var(--space-4));
-    margin-right: calc(-1 * var(--space-4));
-    border-radius: var(--radius-md);
-  }
-
-  .tcm-hero-banner-content {
-    padding: 1.5rem 1.25rem;
-  }
-}
-
 .tcm-differentiation {
+  margin: 0 0 var(--space-3);
   color: var(--color-text-muted);
+  line-height: 1.7;
 }
 
-.tcm-section-title {
-  /* page-section-title */
-}
-
-.tcm-columns {
-  margin-bottom: 1rem;
-}
-
-.tcm-table-wrap {
-  overflow-x: auto;
-  border-radius: 10px;
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-}
-
-.tcm-columns-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.875rem;
-}
-
-.tcm-columns-table th,
-.tcm-columns-table td {
-  padding: 0.6rem 0.8rem;
-  text-align: left;
-  vertical-align: top;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.tcm-columns-table th {
-  background: var(--color-primary-muted);
-  font-weight: 600;
-}
-
-.tcm-columns-table tr:last-child td {
-  border-bottom: none;
-}
-
-.tcm-columns-table td:first-child {
-  font-weight: 500;
-  width: 7.5rem;
-  color: var(--color-text);
-}
-
-@media (max-width: 520px) {
-  .tcm-columns-table td:first-child {
-    width: 6rem;
-  }
-}
-
-.tcm-bridge {
-  margin: 1rem 0 0;
-  font-size: 0.82rem;
-  line-height: 1.55;
-  color: var(--color-text-muted);
-}
-
-.tcm-tabs {
-  margin-bottom: var(--space-5);
-}
-
-.tcm-section h2 {
-  font-size: 1.1rem;
-  color: var(--color-text-muted);
-  margin-bottom: 1rem;
-}
-
-.tcm-card h3 {
-  font-size: 1.15rem;
-  margin: 0 0 0.75rem;
-  color: var(--color-primary);
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.tcm-card dl {
-  margin: 0;
-  display: grid;
-  gap: 0.5rem;
-}
-
-.tcm-card dt {
-  font-size: 0.8rem;
-  color: var(--color-text-muted);
-  margin: 0;
-  font-weight: 600;
-}
-
-.tcm-card dd {
-  margin: 0 0 0 0;
-  font-size: 0.9rem;
-  color: var(--color-text);
-  line-height: 1.5;
-}
-
-.tcm-card dd:last-child {
+.page-tcm-prevention .tcm-positioning {
   margin-bottom: 0;
 }
 
-.herb-card dt::before {
-  content: '';
+.tcm-toolbar {
+  margin: 0 0 var(--space-5);
 }
 
-.prescription-card dd {
-  padding-left: 0;
+.page-tcm-prevention .tcm-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--space-2);
+  margin-bottom: 0;
+  overflow-x: auto;
+  padding-bottom: var(--space-1);
+  scrollbar-width: thin;
+}
+
+.tcm-list-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-4);
+}
+
+.tcm-list-heading h2 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  line-height: var(--line-height-tight);
+}
+
+.tcm-list-heading p {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.tcm-constitution-lead,
+.tcm-constitution-source {
+  margin: 0 0 var(--space-4);
+  color: var(--color-text-muted);
+  line-height: 1.7;
+}
+
+.tcm-constitution-source {
+  margin-bottom: var(--space-5);
+  font-size: var(--font-size-sm);
+}
+
+.tcm-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+  align-items: stretch;
+}
+
+.tcm-grid--constitutions {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.constitution-card.is-reference {
+  box-shadow: inset 3px 0 0 var(--color-primary);
+}
+
+.tcm-card {
+  min-width: 0;
+  height: 100%;
+}
+
+.tcm-card h3 {
+  font-size: 1.1rem;
+  margin: 0 0 var(--space-3);
+  color: var(--color-primary);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tcm-dl {
+  margin: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.tcm-dl > div {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.tcm-dl dt {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin: 0;
+  font-weight: 600;
+}
+
+.tcm-dl dd {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-text);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 960px) {
+  .tcm-grid--constitutions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .tcm-grid,
+  .tcm-grid--constitutions {
+    grid-template-columns: 1fr;
+  }
 }
