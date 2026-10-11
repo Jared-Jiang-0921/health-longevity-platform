@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
@@ -39,9 +39,9 @@ export default function HealthQuestionnaire() {
   const { lang } = useLocale()
   const p = getPatterns(lang)
   const t = {
-    zh: { loadFail: '问卷加载失败', submitFail: '提交失败', saved: '问卷已保存，可继续进入 AI 长寿方案师或后续人工评估。', loadingQ: '正在加载问卷…', title: '健康问卷与敏感健康数据同意', loginFirst: '请先登录后填写问卷。', login: '登录', lead: '用于生成更贴近个人情况的健康建议，也便于后续专业/人工咨询快速了解背景。', back: '返回 AI 长寿方案师', confirmTitle: '填写前请确认', age: '年龄范围', sex: '性别/生理性别', region: '所在国家/地区', goals: '您当前最希望达成的健康目标', concerns: '您当前最关注的问题或症状', history: '既往病史 / 诊断 / 手术史', meds: '正在使用的药物或补充剂', allergies: '过敏史 / 不耐受', life: '生活方式概况', sleep: '睡眠情况', select: '请选择', save: '保存问卷', saving: '保存中…', viewZh: '查看中文健康数据说明', consentHealth: '我已阅读并同意 Health Information & Questionnaire Notice，并同意平台为提供健康建议/服务处理我提交的敏感健康数据。', consentPlan: '我同意平台基于本问卷生成个性化建议、分层方案或人工咨询前置摘要。', consentContact: '我同意平台就本问卷相关服务通过邮箱与我联系。' },
-    en: { loadFail: 'Failed to load questionnaire', submitFail: 'Submit failed', saved: 'Questionnaire saved. You can continue to the AI Longevity Coach or human consultation.', loadingQ: 'Loading questionnaire…', title: 'Health Questionnaire & Sensitive Data Consent', loginFirst: 'Please login first to complete the questionnaire.', login: 'Login', lead: 'Used to generate more personalized health suggestions and speed up professional consultation.', back: 'Back to AI Longevity Coach', confirmTitle: 'Please confirm before filling', age: 'Age range', sex: 'Sex', region: 'Country/Region', goals: 'Your primary health goals', concerns: 'Current concerns or symptoms', history: 'Medical history / diagnosis / surgery', meds: 'Current medications/supplements', allergies: 'Allergies / intolerance', life: 'Lifestyle overview', sleep: 'Sleep status', select: 'Please select', save: 'Save Questionnaire', saving: 'Saving…', viewZh: 'View Chinese health-data notice', consentHealth: 'I have read and agree to the Health Information & Questionnaire Notice, and consent to processing of my submitted sensitive health data for services.', consentPlan: 'I agree that the platform may generate personalized suggestions, stratified plans, or consultation summaries based on this questionnaire.', consentContact: 'I agree to be contacted by email regarding services related to this questionnaire.' },
-    ar: { loadFail: 'فشل تحميل الاستبيان', submitFail: 'فشل الإرسال', saved: 'تم حفظ الاستبيان. يمكنك متابعة مدرب طول العمر بالذكاء الاصطناعي أو الاستشارة البشرية.', loadingQ: 'جار تحميل الاستبيان…', title: 'استبيان الصحة وموافقة البيانات الحساسة', loginFirst: 'يرجى تسجيل الدخول أولاً لملء الاستبيان.', login: 'تسجيل الدخول', lead: 'يساعد في تقديم توصيات صحية أكثر تخصيصًا وتسريع الاستشارة.', back: 'العودة إلى مدرب طول العمر بالذكاء الاصطناعي', confirmTitle: 'يرجى التأكيد قبل التعبئة', age: 'الفئة العمرية', sex: 'الجنس', region: 'الدولة/المنطقة', goals: 'أهدافك الصحية الرئيسية', concerns: 'الأعراض أو المشكلات الحالية', history: 'التاريخ الطبي/التشخيص/الجراحة', meds: 'الأدوية/المكملات الحالية', allergies: 'الحساسية/عدم التحمل', life: 'نمط الحياة', sleep: 'حالة النوم', select: 'يرجى الاختيار', save: 'حفظ الاستبيان', saving: 'جار الحفظ…', viewZh: 'عرض النسخة الصينية لإشعار البيانات', consentHealth: 'لقد قرأت ووافقت على إشعار المعلومات الصحية والاستبيان، وأوافق على معالجة بياناتي الصحية الحساسة المقدمة ضمن هذا النموذج.', consentPlan: 'أوافق على أن تنشئ المنصة توصيات مخصصة أو خططًا مرحلية أو ملخصًا قبل الاستشارة بناءً على هذا الاستبيان.', consentContact: 'أوافق على التواصل معي عبر البريد الإلكتروني بشأن الخدمات المرتبطة بهذا الاستبيان.' },
+    zh: { loadFail: '问卷加载失败', submitFail: '提交失败', failTitle: '保存失败', savedTitle: '问卷已保存成功', saved: '可返回 AI 长寿师继续咨询，或继续修改后再次保存。', errGoals: '请填写您的健康目标', errConcerns: '请填写当前最关注的问题', errConsent: '提交前请先同意健康数据告知', loadingQ: '正在加载问卷…', title: '健康问卷与敏感健康数据同意', loginFirst: '请先登录后填写问卷。', login: '登录', lead: '用于生成更贴近个人情况的健康建议，也便于后续专业/人工咨询快速了解背景。', back: '返回 AI 长寿方案师', confirmTitle: '填写前请确认', age: '年龄范围', sex: '性别/生理性别', region: '所在国家/地区', goals: '您当前最希望达成的健康目标', concerns: '您当前最关注的问题或症状', history: '既往病史 / 诊断 / 手术史', meds: '正在使用的药物或补充剂', allergies: '过敏史 / 不耐受', life: '生活方式概况', sleep: '睡眠情况', select: '请选择', save: '保存问卷', saving: '保存中…', viewZh: '查看中文健康数据说明', consentHealth: '我已阅读并同意 Health Information & Questionnaire Notice，并同意平台为提供健康建议/服务处理我提交的敏感健康数据。', consentPlan: '我同意平台基于本问卷生成个性化建议、分层方案或人工咨询前置摘要。', consentContact: '我同意平台就本问卷相关服务通过邮箱与我联系。' },
+    en: { loadFail: 'Failed to load questionnaire', submitFail: 'Submit failed', failTitle: 'Save failed', savedTitle: 'Questionnaire saved', saved: 'You can return to the AI Longevity Coach, or edit and save again.', errGoals: 'Please enter your health goals', errConcerns: 'Please enter your current concerns', errConsent: 'Please agree to the health-data notice before submitting', loadingQ: 'Loading questionnaire…', title: 'Health Questionnaire & Sensitive Data Consent', loginFirst: 'Please login first to complete the questionnaire.', login: 'Login', lead: 'Used to generate more personalized health suggestions and speed up professional consultation.', back: 'Back to AI Longevity Coach', confirmTitle: 'Please confirm before filling', age: 'Age range', sex: 'Sex', region: 'Country/Region', goals: 'Your primary health goals', concerns: 'Current concerns or symptoms', history: 'Medical history / diagnosis / surgery', meds: 'Current medications/supplements', allergies: 'Allergies / intolerance', life: 'Lifestyle overview', sleep: 'Sleep status', select: 'Please select', save: 'Save Questionnaire', saving: 'Saving…', viewZh: 'View Chinese health-data notice', consentHealth: 'I have read and agree to the Health Information & Questionnaire Notice, and consent to processing of my submitted sensitive health data for services.', consentPlan: 'I agree that the platform may generate personalized suggestions, stratified plans, or consultation summaries based on this questionnaire.', consentContact: 'I agree to be contacted by email regarding services related to this questionnaire.' },
+    ar: { loadFail: 'فشل تحميل الاستبيان', submitFail: 'فشل الإرسال', failTitle: 'فشل الحفظ', savedTitle: 'تم حفظ الاستبيان', saved: 'يمكنك العودة إلى مدرب طول العمر بالذكاء الاصطناعي، أو التعديل ثم الحفظ مرة أخرى.', errGoals: 'يرجى إدخال أهدافك الصحية', errConcerns: 'يرجى إدخال المشكلات الحالية', errConsent: 'يرجى الموافقة على إشعار البيانات الصحية قبل الإرسال', loadingQ: 'جار تحميل الاستبيان…', title: 'استبيان الصحة وموافقة البيانات الحساسة', loginFirst: 'يرجى تسجيل الدخول أولاً لملء الاستبيان.', login: 'تسجيل الدخول', lead: 'يساعد في تقديم توصيات صحية أكثر تخصيصًا وتسريع الاستشارة.', back: 'العودة إلى مدرب طول العمر بالذكاء الاصطناعي', confirmTitle: 'يرجى التأكيد قبل التعبئة', age: 'الفئة العمرية', sex: 'الجنس', region: 'الدولة/المنطقة', goals: 'أهدافك الصحية الرئيسية', concerns: 'الأعراض أو المشكلات الحالية', history: 'التاريخ الطبي/التشخيص/الجراحة', meds: 'الأدوية/المكملات الحالية', allergies: 'الحساسية/عدم التحمل', life: 'نمط الحياة', sleep: 'حالة النوم', select: 'يرجى الاختيار', save: 'حفظ الاستبيان', saving: 'جار الحفظ…', viewZh: 'عرض النسخة الصينية لإشعار البيانات', consentHealth: 'لقد قرأت ووافقت على إشعار المعلومات الصحية والاستبيان، وأوافق على معالجة بياناتي الصحية الحساسة المقدمة ضمن هذا النموذج.', consentPlan: 'أوافق على أن تنشئ المنصة توصيات مخصصة أو خططًا مرحلية أو ملخصًا قبل الاستشارة بناءً على هذا الاستبيان.', consentContact: 'أوافق على التواصل معي عبر البريد الإلكتروني بشأن الخدمات المرتبطة بهذا الاستبيان.' },
   }[lang || 'zh']
   const { user, loading, getToken } = useAuth()
   const [form, setForm] = useState(INITIAL_FORM)
@@ -49,6 +49,8 @@ export default function HealthQuestionnaire() {
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const [latestAt, setLatestAt] = useState('')
+  const statusRef = useRef(null)
+  const goalsRef = useRef(null)
 
   const loggedIn = useMemo(() => Boolean(user && getToken()), [getToken, user])
 
@@ -92,6 +94,11 @@ export default function HealthQuestionnaire() {
     }
   }, [getToken, loggedIn])
 
+  useEffect(() => {
+    if (!message && !error) return
+    statusRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [message, error])
+
   const onChange = (key) => (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value
     setForm((prev) => ({ ...prev, [key]: value }))
@@ -99,9 +106,22 @@ export default function HealthQuestionnaire() {
 
   const submit = async (e) => {
     e.preventDefault()
-    setBusy(true)
     setError('')
     setMessage('')
+    if (!String(form.goals || '').trim()) {
+      goalsRef.current?.focus()
+      goalsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      return
+    }
+    if (!String(form.concerns || '').trim()) {
+      setError(t.errConcerns)
+      return
+    }
+    if (!form.consentHealthData) {
+      setError(t.errConsent)
+      return
+    }
+    setBusy(true)
     try {
       const res = await fetch('/api/health-questionnaire', {
         method: 'POST',
@@ -116,7 +136,13 @@ export default function HealthQuestionnaire() {
       setLatestAt(data.createdAt || new Date().toISOString())
       setMessage(t.saved)
     } catch (err) {
-      setError(err.message || t.submitFail)
+      const msg = err.message || t.submitFail
+      if (msg === t.errGoals || /健康目标/.test(msg)) {
+        goalsRef.current?.focus()
+        goalsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        return
+      }
+      setError(msg)
     } finally {
       setBusy(false)
     }
@@ -164,6 +190,12 @@ export default function HealthQuestionnaire() {
         <p className="health-questionnaire-muted">
           {p.legalVersion(SITE_LEGAL.lastUpdated)} {latestAt ? `· ${p.latestSavedAt(formatTime(latestAt))}` : ''}
         </p>
+        {message ? (
+          <div className="health-questionnaire-status health-questionnaire-status--ok" role="status">
+            <strong>{t.savedTitle}</strong>
+            <p>{message}</p>
+          </div>
+        ) : null}
       </section>
 
       <form className="health-questionnaire-form" onSubmit={submit}>
@@ -198,7 +230,13 @@ export default function HealthQuestionnaire() {
 
         <label>
           <span>{t.goals}</span>
-          <textarea value={form.goals} onChange={onChange('goals')} rows={4} placeholder="例如：体重管理、改善睡眠、提高运动恢复、管理血糖/血脂等" />
+          <textarea
+            ref={goalsRef}
+            value={form.goals}
+            onChange={onChange('goals')}
+            rows={4}
+            placeholder="例如：体重管理、改善睡眠、提高运动恢复、管理血糖/血脂等"
+          />
         </label>
 
         <label>
@@ -250,8 +288,20 @@ export default function HealthQuestionnaire() {
           </label>
         </div>
 
-        {error ? <p className="health-questionnaire-error">{error}</p> : null}
-        {message ? <p className="health-questionnaire-success">{message}</p> : null}
+        {error || message ? (
+          <div
+            ref={statusRef}
+            className={`health-questionnaire-status ${error ? 'health-questionnaire-status--error' : 'health-questionnaire-status--ok'}`}
+            role="status"
+            aria-live="polite"
+          >
+            <strong>{error ? t.failTitle : t.savedTitle}</strong>
+            <p>{error || message}</p>
+            {message ? (
+              <Link to="/solutions" className="health-questionnaire-status-link">{t.back}</Link>
+            ) : null}
+          </div>
+        ) : null}
 
         <div className="health-questionnaire-actions">
           <button type="submit" className="btn-primary" disabled={busy}>
