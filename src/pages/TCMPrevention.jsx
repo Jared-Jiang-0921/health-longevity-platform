@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { TCM_CONSTITUTION_SOURCE, TCM_CONSTITUTIONS } from '../data/tcmConstitutions'
 import { TCM_HERBS, TCM_PRESCRIPTIONS } from '../data/tcmPrevention'
+import { TCM_FOOD_BASIS, TCM_LATE_SUMMER, TCM_LATE_SUMMER_RECIPES, TCM_SEASON_PRINCIPLE, TCM_SEASON_RECIPES, TCM_SEASON_SOURCE, TCM_SEASONS } from '../data/tcmSeasons'
 import { getTcmPreventionModuleCopy } from '../data/tcmPreventionModuleI18n'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
@@ -10,6 +11,7 @@ import ModulePageHero from '../components/ModulePageHero'
 import './TCMPrevention.css'
 
 const TAB_CONSTITUTION = 'constitution'
+const TAB_SEASONS = 'seasons'
 const TAB_HERBS = 'herbs'
 const TAB_PRESCRIPTIONS = 'prescriptions'
 
@@ -17,6 +19,25 @@ function localeText(field, lang) {
   if (!field) return ''
   if (lang === 'en' || lang === 'ar') return field[lang] || field.zh
   return field.zh
+}
+
+function SeasonRecipes({ recipes, lang, label }) {
+  if (!recipes?.length) return null
+  return (
+    <div className="season-recipes">
+      <h4>{label}</h4>
+      <ol>
+        {recipes.map((recipe) => (
+          <li key={localeText(recipe.name, 'zh')}>
+            <p className="season-recipe-name">{localeText(recipe.name, lang)}</p>
+            <p className="season-from">{localeText(recipe.from, lang)}</p>
+            <p>{localeText(recipe.method, lang)}</p>
+            <p>{localeText(recipe.place, lang)}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  )
 }
 
 export default function TCMPrevention() {
@@ -49,6 +70,15 @@ export default function TCMPrevention() {
             onClick={() => setActiveTab(TAB_CONSTITUTION)}
           >
             {mod.constitution}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === TAB_SEASONS}
+            className={activeTab === TAB_SEASONS ? 'active' : ''}
+            onClick={() => setActiveTab(TAB_SEASONS)}
+          >
+            {mod.season}
           </button>
           <button
             type="button"
@@ -112,6 +142,109 @@ export default function TCMPrevention() {
               </article>
             ))}
           </div>
+        </section>
+      )}
+
+      {activeTab === TAB_SEASONS && (
+        <section className="tcm-section" role="tabpanel">
+          <div className="tcm-list-heading">
+            <h2>{mod.seasonH2}</h2>
+            <p>{mod.seasonCount}</p>
+          </div>
+          <p className="tcm-constitution-lead">{mod.seasonLead}</p>
+          <p className="tcm-constitution-source">{localeText(TCM_SEASON_SOURCE, lang)}</p>
+          <p className="tcm-constitution-source">{localeText(TCM_FOOD_BASIS, lang)}</p>
+          <article className="tcm-card season-card content-card content-card--padded" data-season="principle">
+            <h3>{localeText(TCM_SEASON_PRINCIPLE.title, lang)}</h3>
+            <dl className="tcm-dl">
+              <div>
+                <dt>{mod.dtClassic}</dt>
+                <dd>
+                  <span className="season-from">{localeText(TCM_SEASON_PRINCIPLE.classicFrom, lang)}</span>
+                  {localeText(TCM_SEASON_PRINCIPLE.classic, lang)}
+                </dd>
+              </div>
+              <div>
+                <dt>{mod.dtStandard}</dt>
+                <dd>
+                  <span className="season-from">{localeText(TCM_SEASON_PRINCIPLE.standardFrom, lang)}</span>
+                  {localeText(TCM_SEASON_PRINCIPLE.standard, lang)}
+                </dd>
+              </div>
+              <div>
+                <dt>{mod.dtNote}</dt>
+                <dd>{localeText(TCM_SEASON_PRINCIPLE.note, lang)}</dd>
+              </div>
+            </dl>
+          </article>
+          <div className="tcm-grid tcm-grid--seasons">
+            {TCM_SEASONS.map((item) => (
+              <article key={item.id} className="tcm-card season-card content-card content-card--padded" data-season={item.id}>
+                <h3>
+                  <span className="season-mark">{localeText(item.name, lang)}</span>
+                  <span className="season-organ">{localeText(item.organ, lang)}</span>
+                </h3>
+                <dl className="tcm-dl">
+                  <div>
+                    <dt>{mod.dtClassic}</dt>
+                    <dd>
+                      <span className="season-from">{localeText(item.classicFrom, lang)}</span>
+                      {localeText(item.classic, lang)}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>{mod.dtStandard}</dt>
+                    <dd>
+                      <span className="season-from">{localeText(item.standardFrom, lang)}</span>
+                      {localeText(item.standard, lang)}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>{mod.dtNote}</dt>
+                    <dd>{localeText(item.note, lang)}</dd>
+                  </div>
+                  <div>
+                    <dt>{mod.dtSafety}</dt>
+                    <dd>{localeText(item.caution, lang)}</dd>
+                  </div>
+                </dl>
+                <SeasonRecipes recipes={TCM_SEASON_RECIPES[item.id]} lang={lang} label={mod.dtRecipes} />
+              </article>
+            ))}
+          </div>
+          <article className="tcm-card season-card season-card--late content-card content-card--padded" data-season="late-summer">
+            <h3>
+              <span className="season-mark">{localeText(TCM_LATE_SUMMER.name, lang)}</span>
+              <span className="season-organ">{localeText(TCM_LATE_SUMMER.organ, lang)}</span>
+            </h3>
+            <dl className="tcm-dl">
+              {TCM_LATE_SUMMER.classic.map((row) => (
+                <div key={localeText(row.from, 'zh')}>
+                  <dt>{mod.dtClassic}</dt>
+                  <dd>
+                    <span className="season-from">{localeText(row.from, lang)}</span>
+                    {localeText(row.text, lang)}
+                  </dd>
+                </div>
+              ))}
+              <div>
+                <dt>{mod.dtStandard}</dt>
+                <dd>
+                  <span className="season-from">{localeText(TCM_LATE_SUMMER.standardFrom, lang)}</span>
+                  {localeText(TCM_LATE_SUMMER.standard, lang)}
+                </dd>
+              </div>
+              <div>
+                <dt>{mod.dtNote}</dt>
+                <dd>{localeText(TCM_LATE_SUMMER.note, lang)}</dd>
+              </div>
+              <div>
+                <dt>{mod.dtSafety}</dt>
+                <dd>{localeText(TCM_LATE_SUMMER.caution, lang)}</dd>
+              </div>
+            </dl>
+            <SeasonRecipes recipes={TCM_LATE_SUMMER_RECIPES} lang={lang} label={mod.dtRecipes} />
+          </article>
         </section>
       )}
 
