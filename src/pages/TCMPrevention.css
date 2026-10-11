@@ -101,7 +101,8 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.tcm-grid--seasons {
+.tcm-grid--seasons,
+.tcm-grid--diet {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-top: var(--space-5);
 }
@@ -220,7 +221,8 @@
 
 @media (max-width: 960px) {
   .tcm-grid--constitutions,
-  .tcm-grid--seasons {
+  .tcm-grid--seasons,
+  .tcm-grid--diet {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -228,7 +230,8 @@
 @media (max-width: 720px) {
   .tcm-grid,
   .tcm-grid--constitutions,
-  .tcm-grid--seasons {
+  .tcm-grid--seasons,
+  .tcm-grid--diet {
     grid-template-columns: 1fr;
   }
 }

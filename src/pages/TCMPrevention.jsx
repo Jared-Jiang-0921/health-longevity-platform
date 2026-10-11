@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { TCM_CONSTITUTION_SOURCE, TCM_CONSTITUTIONS } from '../data/tcmConstitutions'
 import { TCM_HERBS, TCM_PRESCRIPTIONS } from '../data/tcmPrevention'
+import { TCM_DIET_SOURCE, TCM_DIET_TOPICS } from '../data/tcmDiet'
 import { TCM_FOOD_BASIS, TCM_LATE_SUMMER, TCM_LATE_SUMMER_RECIPES, TCM_SEASON_PRINCIPLE, TCM_SEASON_RECIPES, TCM_SEASON_SOURCE, TCM_SEASONS } from '../data/tcmSeasons'
 import { getTcmPreventionModuleCopy } from '../data/tcmPreventionModuleI18n'
 import { useAuth } from '../context/AuthContext'
@@ -12,6 +13,7 @@ import './TCMPrevention.css'
 
 const TAB_CONSTITUTION = 'constitution'
 const TAB_SEASONS = 'seasons'
+const TAB_DIET = 'diet'
 const TAB_HERBS = 'herbs'
 const TAB_PRESCRIPTIONS = 'prescriptions'
 
@@ -79,6 +81,15 @@ export default function TCMPrevention() {
             onClick={() => setActiveTab(TAB_SEASONS)}
           >
             {mod.season}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === TAB_DIET}
+            className={activeTab === TAB_DIET ? 'active' : ''}
+            onClick={() => setActiveTab(TAB_DIET)}
+          >
+            {mod.diet}
           </button>
           <button
             type="button"
@@ -245,6 +256,47 @@ export default function TCMPrevention() {
             </dl>
             <SeasonRecipes recipes={TCM_LATE_SUMMER_RECIPES} lang={lang} label={mod.dtRecipes} />
           </article>
+        </section>
+      )}
+
+      {activeTab === TAB_DIET && (
+        <section className="tcm-section" role="tabpanel">
+          <div className="tcm-list-heading">
+            <h2>{mod.dietH2}</h2>
+            <p>{mod.dietCount}</p>
+          </div>
+          <p className="tcm-constitution-lead">{mod.dietLead}</p>
+          <p className="tcm-constitution-source">{localeText(TCM_DIET_SOURCE, lang)}</p>
+          <p className="tcm-constitution-action">
+            <button type="button" className="btn-primary" onClick={() => setActiveTab(TAB_SEASONS)}>{mod.dietToSeasons}</button>
+          </p>
+          <div className="tcm-grid tcm-grid--diet">
+            {TCM_DIET_TOPICS.map((item) => (
+              <article key={item.id} className="tcm-card content-card content-card--padded">
+                <h3>{localeText(item.name, lang)}</h3>
+                <dl className="tcm-dl">
+                  <div>
+                    <dt>{mod.dtClassic}</dt>
+                    <dd>
+                      <span className="season-from">{localeText(item.classicFrom, lang)}</span>
+                      {localeText(item.classic, lang)}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>{mod.dtStandard}</dt>
+                    <dd>
+                      <span className="season-from">{localeText(item.standardFrom, lang)}</span>
+                      {localeText(item.standard, lang)}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>{mod.dtNote}</dt>
+                    <dd>{localeText(item.note, lang)}</dd>
+                  </div>
+                </dl>
+              </article>
+            ))}
+          </div>
         </section>
       )}
 
