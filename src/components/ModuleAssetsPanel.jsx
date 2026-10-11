@@ -6,7 +6,6 @@ import { CATEGORIES, COURSES, getCourseById } from '../data/courses'
 import { getSeriesTitlesForCategory, getCanonicalSeriesSubtopic } from '../data/healthSkillsSeries'
 import { LONGEVITY_NEWS_COLUMN_LABELS } from '../data/longevityNewsColumns'
 import { PRODUCT_CATEGORIES, getProductById } from '../data/products'
-import ProductCatalogAdmin from './ProductCatalogAdmin'
 import ContentLockNotice from './ContentLockNotice'
 import ModuleAccessHint from './ModuleAccessHint'
 import { shouldShowMembershipBadge } from '../data/membership'
@@ -969,10 +968,6 @@ export default function ModuleAssetsPanel({ moduleKey }) {
             })}
           </ul>
         </>
-      ) : null}
-
-      {isAdmin && moduleKey === 'products' ? (
-        <ProductCatalogAdmin getToken={getToken} />
       ) : null}
 
       {isAdmin ? (

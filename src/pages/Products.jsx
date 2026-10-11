@@ -11,7 +11,9 @@ import '../styles/membership-badge.css'
 import { pickCatalogLocale } from '../lib/productCatalogLocale'
 import ProductCatalogImage from '../components/ProductCatalogImage'
 import ProductEvidenceWorkbench from '../components/ProductEvidenceWorkbench'
+import ProductCatalogAdmin from '../components/ProductCatalogAdmin'
 import ModuleAccessHint from '../components/ModuleAccessHint'
+import ModulePageHero from '../components/ModulePageHero'
 import './Products.css'
 
 function formatPriceSymbol(currency) {
@@ -105,10 +107,11 @@ export default function Products() {
 
   return (
     <div className="page-products">
-      <section className="products-header">
-        <h1>{ev.title}</h1>
-        <p className="products-lead">{ev.lead}</p>
+      <ModulePageHero path="/products" title={ev.title}>
+        <p className="module-page-hero-line">{ev.lead}</p>
+      </ModulePageHero>
 
+      <section className="products-header">
         <ProductEvidenceWorkbench />
 
         <aside className="products-role-disclaimer page-callout page-callout--warn" role="note">
@@ -122,8 +125,6 @@ export default function Products() {
           <h2 id="products-intl-reg" className="products-reg-heading">{ev.intlTitle}</h2>
           <p>{ev.intlBody}</p>
         </section>
-
-        {isAdmin ? null : <ModuleAccessHint moduleKey="products" />}
       </section>
 
       <section className="categories">
@@ -202,6 +203,9 @@ export default function Products() {
           })}
         </div>
       </section>
+
+      {isAdmin ? null : <ModuleAccessHint moduleKey="products" className="module-access-hint--page-end" />}
+      {isAdmin ? <ProductCatalogAdmin getToken={getToken} /> : null}
     </div>
   )
 }

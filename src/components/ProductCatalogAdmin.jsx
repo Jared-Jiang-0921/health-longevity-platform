@@ -13,6 +13,15 @@ const LEVEL_OPTIONS = [
   { value: 'premium', label: '高级会员' },
 ]
 
+const ORIGIN_REGION_OPTIONS = [
+  { value: 'CN', label: '中国 CN（蓝帽子/器械）' },
+  { value: 'US', label: '美国 US' },
+  { value: 'AU', label: '澳洲 AU' },
+  { value: 'EU', label: '欧盟 EU' },
+  { value: 'JP', label: '日本 JP' },
+  { value: 'KR', label: '韩国 KR' },
+]
+
 export default function ProductCatalogAdmin({ getToken }) {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
@@ -31,6 +40,8 @@ export default function ProductCatalogAdmin({ getToken }) {
   const [currency, setCurrency] = useState('CNY')
   const [unit, setUnit] = useState('瓶')
   const [requiredLevel, setRequiredLevel] = useState('public')
+  const [approvalNo, setApprovalNo] = useState('')
+  const [originRegion, setOriginRegion] = useState('CN')
   const [galleryFiles, setGalleryFiles] = useState([])
   const [skus, setSkus] = useState([emptySku()])
 
@@ -131,6 +142,8 @@ export default function ProductCatalogAdmin({ getToken }) {
           galleryImages,
           skus: normalizeSkusPayload(skus),
           requiredLevel,
+          approvalNo: approvalNo.trim(),
+          originRegion,
         }),
       })
       const data = await res.json().catch(() => ({}))
@@ -147,6 +160,8 @@ export default function ProductCatalogAdmin({ getToken }) {
       setGalleryFiles([])
       setSkus([emptySku()])
       setRequiredLevel('public')
+      setApprovalNo('')
+      setOriginRegion('CN')
       await loadItems()
     } catch (err) {
       setError(err.message || '上架失败')
@@ -177,6 +192,8 @@ export default function ProductCatalogAdmin({ getToken }) {
         currency: s.currency || '',
       })) : [emptySku()],
       requiredLevel: adminLevelValue(it.required_level),
+      approvalNo: it.approval_no || '',
+      originRegion: it.origin_region || 'CN',
     })
     setError('')
     setHint('')
@@ -214,6 +231,8 @@ export default function ProductCatalogAdmin({ getToken }) {
         unit: editForm.unit.trim() || '件',
         skus: normalizeSkusPayload(editForm.skus),
         requiredLevel: editForm.requiredLevel,
+        approvalNo: String(editForm.approvalNo || '').trim(),
+        originRegion: editForm.originRegion || 'CN',
       }
       if (editGalleryFiles.length) {
         payload.galleryImages = await filesToGalleryPayload(editGalleryFiles)
@@ -260,7 +279,7 @@ export default function ProductCatalogAdmin({ getToken }) {
     <section className="product-catalog-admin">
       <h4 className="product-catalog-admin-title">长寿产品证据库 · 商品上架</h4>
       <p className="product-catalog-admin-note">
-        支持<strong>多图</strong>、<strong>中英文标题/介绍/产地</strong>、<strong>规格 SKU</strong>（可选单价覆盖）。未标注等级时<strong>游客可看正文</strong>；可选标准/高级会员专属。证据 PDF 仍用下方「模块资料」上传。
+        支持<strong>多图</strong>、<strong>中英文标题/介绍/产地</strong>、<strong>规格 SKU</strong>（可选单价覆盖）。填写<strong>批准文号 + 监管辖区</strong>后，详情页会向 AI 助选服务拉取官方核验证据卡（两边产品库不合库）。未标注等级时<strong>游客可看正文</strong>；可选标准/高级会员专属。证据 PDF 仍用下方「模块资料」上传。
       </p>
 
       {loading ? <p className="product-catalog-admin-muted">加载中…</p> : null}
@@ -301,6 +320,22 @@ export default function ProductCatalogAdmin({ getToken }) {
             <span>可见会员等级</span>
             <select value={requiredLevel} onChange={(e) => setRequiredLevel(e.target.value)}>
               {LEVEL_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+          </label>
+          <label className="product-catalog-admin-span2">
+            <span>批准/备案文号</span>
+            <input
+              value={approvalNo}
+              onChange={(e) => setApprovalNo(e.target.value)}
+              placeholder="如 国食健注G20250101 / AUST L 12345"
+            />
+          </label>
+          <label>
+            <span>监管辖区</span>
+            <select value={originRegion} onChange={(e) => setOriginRegion(e.target.value)}>
+              {ORIGIN_REGION_OPTIONS.map((o) => (
                 <option key={o.value} value={o.value}>{o.label}</option>
               ))}
             </select>
@@ -434,6 +469,25 @@ export default function ProductCatalogAdmin({ getToken }) {
                         ))}
                       </select>
                     </label>
+                    <label className="product-catalog-admin-span2">
+                      <span>批准/备案文号</span>
+                      <input
+                        value={editForm.approvalNo}
+                        onChange={(e) => setEditForm((f) => ({ ...f, approvalNo: e.target.value }))}
+                        placeholder="如 国食健注G20250101"
+                      />
+                    </label>
+                    <label>
+                      <span>监管辖区</span>
+                      <select
+                        value={editForm.originRegion}
+                        onChange={(e) => setEditForm((f) => ({ ...f, originRegion: e.target.value }))}
+                      >
+                        {ORIGIN_REGION_OPTIONS.map((o) => (
+                          <option key={o.value} value={o.value}>{o.label}</option>
+                        ))}
+                      </select>
+                    </label>
                   </div>
                   <label className="product-catalog-admin-full">
                     <span>介绍（中文）</span>
@@ -522,6 +576,9 @@ export default function ProductCatalogAdmin({ getToken }) {
                         <span className="product-catalog-admin-pill">{it.currency} {it.price_amount} / {it.unit}</span>
                         <span className="product-catalog-admin-pill">{it.gallery_count || 0} 图</span>
                         <span className="product-catalog-admin-pill">SKU {(it.skus || []).length}</span>
+                        {it.approval_no ? (
+                          <span className="product-catalog-admin-pill">{it.approval_no}</span>
+                        ) : null}
                       </div>
                     </div>
                   </div>

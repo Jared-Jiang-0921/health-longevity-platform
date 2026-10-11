@@ -25,6 +25,17 @@ const ALLOWED_IMG_MIME = new Set([
 ])
 
 const CATEGORY_IDS = new Set(['supplement', 'equipment', 'food', 'care'])
+const ORIGIN_REGIONS = new Set(['CN', 'US', 'AU', 'EU', 'JP', 'KR'])
+
+function normalizeApprovalNo(raw) {
+  return String(raw || '').trim().slice(0, 64)
+}
+
+function normalizeOriginRegion(raw, fallback = 'CN') {
+  const v = String(raw || '').trim().toUpperCase()
+  if (ORIGIN_REGIONS.has(v)) return v
+  return fallback
+}
 
 async function ensureSchema() {
   await sql`
@@ -53,6 +64,8 @@ async function ensureSchema() {
   await sql`ALTER TABLE product_catalog ADD COLUMN IF NOT EXISTS origin_en VARCHAR(240)`
   await sql`ALTER TABLE product_catalog ADD COLUMN IF NOT EXISTS gallery_json JSONB NOT NULL DEFAULT '[]'::jsonb`
   await sql`ALTER TABLE product_catalog ADD COLUMN IF NOT EXISTS skus_json JSONB NOT NULL DEFAULT '[]'::jsonb`
+  await sql`ALTER TABLE product_catalog ADD COLUMN IF NOT EXISTS approval_no VARCHAR(64)`
+  await sql`ALTER TABLE product_catalog ADD COLUMN IF NOT EXISTS origin_region VARCHAR(8)`
 
   await sql`
     UPDATE product_catalog SET title_zh = COALESCE(NULLIF(TRIM(title_zh), ''), title)
@@ -155,6 +168,8 @@ function rowToItem(row, viewer) {
     gallery_count: gallery.length,
     skus,
     has_image: gallery.length > 0,
+    approval_no: row.approval_no || '',
+    origin_region: row.origin_region || 'CN',
     created_at: row.created_at,
     updated_at: row.updated_at,
   }
@@ -292,6 +307,8 @@ async function handlePost(req, res) {
 
   const skus = normalizeSkuPayload(body)
   const requiredLevel = normalizeContentLevelForStorage(body.requiredLevel ?? body.required_level ?? 'public')
+  const approvalNo = normalizeApprovalNo(body.approvalNo ?? body.approval_no)
+  const originRegion = normalizeOriginRegion(body.originRegion ?? body.origin_region, 'CN')
 
   const rows = await sql`
     INSERT INTO product_catalog (
@@ -302,7 +319,8 @@ async function handlePost(req, res) {
       price_amount, currency, unit,
       gallery_json, skus_json,
       image_stored_name, image_mime, image_file_name,
-      required_level
+      required_level,
+      approval_no, origin_region
     ) VALUES (
       ${id}, ${category},
       ${titleZh}, ${titleZh}, ${titleEn || null},
@@ -313,7 +331,8 @@ async function handlePost(req, res) {
       ${gallery[0]?.stored_name || null},
       ${gallery[0]?.mime || null},
       ${gallery[0]?.file_name || null},
-      ${requiredLevel}
+      ${requiredLevel},
+      ${approvalNo || null}, ${originRegion}
     )
     RETURNING *
   `
@@ -375,6 +394,14 @@ async function handlePatch(req, res) {
     body.requiredLevel != null || body.required_level != null
       ? normalizeContentLevelForStorage(body.requiredLevel ?? body.required_level)
       : normalizeContentLevelForStorage(ex.required_level)
+  const approvalNo =
+    body.approvalNo != null || body.approval_no != null
+      ? normalizeApprovalNo(body.approvalNo ?? body.approval_no)
+      : String(ex.approval_no || '').trim()
+  const originRegion =
+    body.originRegion != null || body.origin_region != null
+      ? normalizeOriginRegion(body.originRegion ?? body.origin_region, ex.origin_region || 'CN')
+      : normalizeOriginRegion(ex.origin_region, 'CN')
 
   const rows = await sql`
     UPDATE product_catalog SET
@@ -397,6 +424,8 @@ async function handlePatch(req, res) {
       image_mime = ${gallery[0]?.mime || null},
       image_file_name = ${gallery[0]?.file_name || null},
       required_level = ${requiredLevel},
+      approval_no = ${approvalNo || null},
+      origin_region = ${originRegion},
       updated_at = NOW()
     WHERE id = ${id}
     RETURNING *

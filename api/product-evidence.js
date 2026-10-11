@@ -23,6 +23,21 @@ function normalizeRegion(raw) {
   return ORIGIN_REGIONS.has(v) ? v : 'CN'
 }
 
+function assistUnreachableMessage(e) {
+  if (e?.name === 'AbortError') return '核验超时，请稍后重试'
+  const code = e?.cause?.code || e?.code || ''
+  const msg = String(e?.message || '')
+  if (
+    code === 'ECONNREFUSED' ||
+    code === 'ENOTFOUND' ||
+    code === 'ECONNRESET' ||
+    /fetch failed|ECONNREFUSED|ENOTFOUND/i.test(msg)
+  ) {
+    return '核验服务未连通：助选接口当前没有在跑。请启动 AI 助选服务后再查。'
+  }
+  return msg || '证据卡加载失败'
+}
+
 async function callAssist({ approvalNo, productName, originRegion, adText, category }) {
   const headers = { 'Content-Type': 'application/json' }
   const key = String(process.env.ASSIST_EVIDENCE_KEY || '').trim()
@@ -131,15 +146,15 @@ async function handleGet(req, res) {
 export default async function handler(req, res) {
   const method = String(req.method || '').toUpperCase()
   try {
-    if (method === 'POST') return handlePost(req, res)
-    if (method === 'GET') return handleGet(req, res)
+    if (method === 'POST') return await handlePost(req, res)
+    if (method === 'GET') return await handleGet(req, res)
     res.setHeader('Allow', 'GET, POST')
     return res.status(405).json({ error: 'Method not allowed' })
   } catch (e) {
     const aborted = e?.name === 'AbortError'
     console.error('product-evidence proxy error', e)
     return res.status(aborted ? 504 : 502).json({
-      error: aborted ? '核验超时，请稍后重试' : e?.message || '证据卡加载失败',
+      error: assistUnreachableMessage(e),
     })
   }
 }
