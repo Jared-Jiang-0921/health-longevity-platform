@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { TCM_CONSTITUTION_SOURCE, TCM_CONSTITUTIONS } from '../data/tcmConstitutions'
-import { TCM_HERBS, TCM_PRESCRIPTIONS } from '../data/tcmPrevention'
+import { TCM_HERB_SOURCE, TCM_HERBS, TCM_PRESCRIPTIONS, TCM_RX_SOURCE } from '../data/tcmPrevention'
 import { TCM_DIET_SOURCE, TCM_DIET_TOPICS } from '../data/tcmDiet'
 import { TCM_EMOTION_SOURCE, TCM_EMOTION_TOPICS } from '../data/tcmEmotion'
 import { TCM_MOVEMENT_SOURCE, TCM_MOVEMENT_TOPICS } from '../data/tcmMovement'
@@ -484,37 +484,35 @@ export default function TCMPrevention() {
       )}
 
       {activeTab === TAB_HERBS && (
-        <section className="tcm-section">
+        <section className="tcm-section" role="tabpanel">
           <div className="tcm-list-heading">
             <h2>{mod.herbsH2}</h2>
-            <p>
-              {lang === 'en'
-                ? `${TCM_HERBS.length} herbs`
-                : lang === 'ar'
-                  ? `${TCM_HERBS.length}`
-                  : `${TCM_HERBS.length} 味`}
-            </p>
+            <p>{mod.herbsCount}</p>
           </div>
-          <div className="tcm-grid">
+          <p className="tcm-constitution-lead">{mod.herbsLead}</p>
+          <p className="tcm-constitution-source">{localeText(TCM_HERB_SOURCE, lang)}</p>
+          <div className="tcm-grid tcm-grid--herbs">
             {TCM_HERBS.map((herb) => (
               <article key={herb.id} className="tcm-card herb-card content-card content-card--padded">
-                <h3>{herb.name}</h3>
+                <h3>{localeText(herb.title, lang)}</h3>
                 <dl className="tcm-dl">
                   <div>
-                    <dt>{mod.dtProperty}</dt>
-                    <dd>{herb.property}</dd>
+                    <dt>{herb.classicKind === 'boundary' ? mod.dtBoundary : mod.dtClassic}</dt>
+                    <dd>
+                      <span className="season-from">{localeText(herb.classicFrom, lang)}</span>
+                      {localeText(herb.classic, lang)}
+                    </dd>
                   </div>
                   <div>
-                    <dt>{mod.dtEfficacy}</dt>
-                    <dd>{herb.efficacy}</dd>
+                    <dt>{mod.dtStandard}</dt>
+                    <dd>
+                      <span className="season-from">{localeText(herb.standardFrom, lang)}</span>
+                      {localeText(herb.standard, lang)}
+                    </dd>
                   </div>
                   <div>
-                    <dt>{mod.dtSuitableFor}</dt>
-                    <dd>{herb.suitableFor}</dd>
-                  </div>
-                  <div>
-                    <dt>{mod.dtCaution}</dt>
-                    <dd>{herb.caution}</dd>
+                    <dt>{mod.dtNote}</dt>
+                    <dd>{localeText(herb.note, lang)}</dd>
                   </div>
                 </dl>
               </article>
@@ -524,33 +522,35 @@ export default function TCMPrevention() {
       )}
 
       {activeTab === TAB_PRESCRIPTIONS && (
-        <section className="tcm-section">
+        <section className="tcm-section" role="tabpanel">
           <div className="tcm-list-heading">
             <h2>{mod.rxH2}</h2>
-            <p>
-              {lang === 'en'
-                ? `${TCM_PRESCRIPTIONS.length} formulas`
-                : lang === 'ar'
-                  ? `${TCM_PRESCRIPTIONS.length}`
-                  : `${TCM_PRESCRIPTIONS.length} 首`}
-            </p>
+            <p>{mod.rxCount}</p>
           </div>
-          <div className="tcm-grid">
+          <p className="tcm-constitution-lead">{mod.rxLead}</p>
+          <p className="tcm-constitution-source">{localeText(TCM_RX_SOURCE, lang)}</p>
+          <div className="tcm-grid tcm-grid--herbs">
             {TCM_PRESCRIPTIONS.map((rx) => (
               <article key={rx.id} className="tcm-card prescription-card content-card content-card--padded">
-                <h3>{rx.name}</h3>
+                <h3>{localeText(rx.title, lang)}</h3>
                 <dl className="tcm-dl">
                   <div>
-                    <dt>{mod.dtEfficacy}</dt>
-                    <dd>{rx.efficacy}</dd>
+                    <dt>{mod.dtClassic}</dt>
+                    <dd>
+                      <span className="season-from">{localeText(rx.classicFrom, lang)}</span>
+                      {localeText(rx.classic, lang)}
+                    </dd>
                   </div>
                   <div>
-                    <dt>{mod.dtSuitableFor}</dt>
-                    <dd>{rx.suitableFor}</dd>
+                    <dt>{mod.dtStandard}</dt>
+                    <dd>
+                      <span className="season-from">{localeText(rx.standardFrom, lang)}</span>
+                      {localeText(rx.standard, lang)}
+                    </dd>
                   </div>
                   <div>
-                    <dt>{mod.dtSource}</dt>
-                    <dd>{rx.source}</dd>
+                    <dt>{mod.dtNote}</dt>
+                    <dd>{localeText(rx.note, lang)}</dd>
                   </div>
                 </dl>
               </article>

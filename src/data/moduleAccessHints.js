@@ -94,8 +94,8 @@ const HINTS = {
       title: '本模块内容分级',
       lead: '治未病正式资料按会员等级开放；栏目规划示例与管理员上传区不对游客及其他会员展示。',
       tiers: {
-        free: '模块介绍，以及九种体质、四季养生、饮食调养、情志调摄、中医运动、中西医对照教育卡片',
-        standard: '初步体质辨识（标准会员及以上），以及中草药单药、经典处方',
+        free: '模块介绍，以及九种体质、四季养生、饮食调养、情志调摄、中医运动、中西医对照、中草药单药、经典处方教育卡片',
+        standard: '初步体质辨识（标准会员及以上）',
         premium: '含标准会员的全部内容，另有专属扩展资料',
       },
     },
@@ -103,8 +103,8 @@ const HINTS = {
       title: 'Content by membership',
       lead: 'Preventive TCM library unlocks by membership. Planning samples and admin upload UI are hidden from guests and members.',
       tiers: {
-        free: 'Module intro, plus constitution, seasonal, diet, mind–emotion, movement, and East–West education cards',
-        standard: 'Preliminary constitution check (Standard and above), plus herbs and formulas',
+        free: 'Module intro, plus constitution, seasonal, diet, mind–emotion, movement, East–West, herb, and formula education cards',
+        standard: 'Preliminary constitution check (Standard and above)',
         premium: 'Everything in Standard, plus exclusive extensions',
       },
     },
@@ -112,8 +112,8 @@ const HINTS = {
       title: 'المحتوى حسب العضوية',
       lead: 'مكتبة الطب الوقائي حسب العضوية. عينات التخطيط وواجهة الرفع مخفية عن الزوار والأعضاء.',
       tiers: {
-        free: 'مقدمة الوحدة، مع بطاقات الأنماط والفصول والغذاء والمزاج والحركة والجسر',
-        standard: 'مكتبة الأعشاب والوصفات، مع التمييز الأولي لنمط الجسم',
+        free: 'مقدمة الوحدة، مع بطاقات الأنماط والفصول والغذاء والمزاج والحركة والجسر والأعشاب والوصفات',
+        standard: 'التمييز الأولي لنمط الجسم (من العضوية القياسية فما فوق)',
         premium: 'المكتبة كاملة مع امتدادات حصرية',
       },
     },

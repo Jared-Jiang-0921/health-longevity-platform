@@ -279,9 +279,9 @@ export const TCM_SEASON_RECIPES = {
         ar: 'استخدم أوراق الغوجي الغضة الجديدة واطبخها كعصيدة الأقحوان. الكتاب يقول فقط «جيدة أيضاً» بلا مقدار منفصل.',
       },
       {
-        zh: '同样取春天的嫩叶。枸杞子在食药物质目录里，嫩叶是传统蔬菜。本站枸杞子条写明：脾虚便溏者慎用，外邪实热者不宜。',
-        en: 'These are spring leaves too. Goji fruit is on the food-medicine list, and the young leaf is a traditional vegetable. This site’s goji note says: be careful with a weak spleen and loose stools, and do not use it in an external heat illness.',
-        ar: 'هذه أوراق ربيعية أيضاً. ثمر الغوجي في قائمة الغذاء والدواء، والورق الغض خضار تقليدي. ملاحظة الموقع: الحذر عند ضعف الطحال والبراز اللين، ولا يُستخدم في مرض حراري ظاهر.',
+        zh: '同样取春天的嫩叶。枸杞子在食药物质目录里，嫩叶是传统蔬菜。单药页写明：习惯上脾虚便溏、外邪实热少用，这不是药典注意项。',
+        en: 'These are spring leaves too. Goji fruit is on the food-medicine list, and the young leaf is a traditional vegetable. The herb page says people customarily go easy with a weak spleen and loose stools, or in an external heat illness. That is not a pharmacopoeia caution line.',
+        ar: 'هذه أوراق ربيعية أيضاً. ثمر الغوجي في قائمة الغذاء والدواء، والورق الغض خضار تقليدي. صفحة العشبة تقول إن العادة التخفيف عند ضعف الطحال والبراز اللين أو المرض الحراري الظاهر. هذا ليس بند حذر في الدستور.',
       },
     ),
     recipe(
@@ -293,9 +293,9 @@ export const TCM_SEASON_RECIPES = {
         ar: 'اطبخ الغوجي مع الأرز عصيدة. الكتاب يذكر نسبة قديمة، ولا ننسخها هنا كحصتك.',
       },
       {
-        zh: '书中没有规定只在春天吃。枸杞子归肝、肾经，本站按春季对应肝，放在这里作示例。脾虚便溏、外邪实热不宜。',
-        en: 'The book does not limit this to spring. Goji enters the liver and kidney channels, so this site places it in spring as an example beside the liver season. Skip it with a weak spleen and loose stools, or in an external heat illness.',
-        ar: 'الكتاب لا يحصره في الربيع. الغوجي يدخل قناتي الكبد والكلية، لذا يضعه الموقع في الربيع كمثال. تجنّبه عند ضعف الطحال والبراز اللين أو المرض الحراري الظاهر.',
+        zh: '书中没有规定只在春天吃。枸杞子归肝、肾经，本站按春季对应肝，放在这里作示例。习惯上脾虚便溏、外邪实热少用，这不是药典注意项。',
+        en: 'The book does not limit this to spring. Goji enters the liver and kidney channels, so this site places it in spring as an example beside the liver season. People customarily go easy with a weak spleen and loose stools, or in an external heat illness. That is not a pharmacopoeia caution line.',
+        ar: 'الكتاب لا يحصره في الربيع. الغوجي يدخل قناتي الكبد والكلية، لذا يضعه الموقع في الربيع كمثال. العادة التخفيف عند ضعف الطحال والبراز اللين أو المرض الحراري الظاهر. هذا ليس بند حذر في الدستور.',
       },
     ),
   ],
@@ -397,9 +397,9 @@ export const TCM_SEASON_RECIPES = {
         ar: 'اطحن اليام الصيني واطبخه مع الأرز. الكتاب يذكر نسبة أربعة إلى ستة و«يقوي الأصل السفلي كثيراً». النسبة ليست حصتك. عصيدة أخرى في الكتاب تضيف لحم الضأن وتقول إنها تعالج الضعف والحرارة العظمية، وهي غير مدرجة.',
       },
       {
-        zh: '书中没有规定只在冬天吃。山药归脾、肺、肾经，本站按冬季封藏、对应肾，放在这里。湿盛中满或有实邪时慎用，见本站山药条。「甚补下元」是书中的话，不是给你的补肾结论。',
-        en: 'The book does not limit this to winter. Yam enters the spleen, lung, and kidney channels, so this site places it in winter beside the kidney season. Be careful with marked damp fullness or an excess condition; see this site’s yam note. “Supplements the lower source” is the book’s phrase, not a judgment that your kidney needs tonifying.',
-        ar: 'الكتاب لا يحصره في الشتاء. اليام يدخل الطحال والرئة والكلية، لذا يضعه الموقع في الشتاء. الحذر عند امتلاء رطب واضح أو حالة امتلاء؛ انظر ملاحظة اليام في الموقع. عبارة التقوية كلام الكتاب لا حكماً على كليتك.',
+        zh: '书中没有规定只在冬天吃。山药归脾、肺、肾经，本站按冬季封藏、对应肾，放在这里。湿盛中满或有实邪时少用，见本站山药条，那不是药典注意项。「甚补下元」是书中的话，不是给你的补肾结论。',
+        en: 'The book does not limit this to winter. Yam enters the spleen, lung, and kidney channels, so this site places it in winter beside the kidney season. Go easy with marked damp fullness or an excess condition; see this site’s yam note. That reminder is not a pharmacopoeia caution line. “Supplements the lower source” is the book’s phrase, not a judgment that your kidney needs tonifying.',
+        ar: 'الكتاب لا يحصره في الشتاء. اليام يدخل الطحال والرئة والكلية، لذا يضعه الموقع في الشتاء. خفف عند امتلاء رطب واضح أو حالة امتلاء؛ انظر ملاحظة اليام. هذا التنبيه ليس بند حذر في الدستور. عبارة التقوية كلام الكتاب لا حكماً على كليتك.',
       },
     ),
     recipe(
