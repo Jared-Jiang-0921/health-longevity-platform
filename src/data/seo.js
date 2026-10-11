@@ -299,7 +299,6 @@ export const SEO_NOINDEX_PREFIXES = [
   '/tcm-prevention/constitution',
   '/solutions/risk',
   '/solutions/aging',
-  '/health-monitor',
 ]
 
 export function findSeoPage(pathname) {

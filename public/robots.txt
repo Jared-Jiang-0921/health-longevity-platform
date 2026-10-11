@@ -9,6 +9,5 @@ Disallow: /favorites
 Disallow: /forgot-password
 Disallow: /reset-password
 Disallow: /health-questionnaire
-Disallow: /health-monitor
 
 Sitemap: https://www.healthlongevity.cn/sitemap.xml

@@ -1,5 +1,5 @@
 /**
- * 将主站健康问卷与设备监测摘要映射为咨询请求里的 profile 字段。
+ * 将主站健康问卷、风险评估、衰老评估与体质辨识摘要映射为咨询请求里的 profile 字段。
  */
 
 const FIELD_MAX = 800
@@ -37,23 +37,17 @@ export async function fetchConsultProfile(token, { timeoutMs = 3000 } = {}) {
   const timer = setTimeout(() => ac.abort(), timeoutMs)
   const headers = { Authorization: `Bearer ${token}` }
   try {
-    const [qRes, snapRes, riskRes, agingRes, tcmRes] = await Promise.all([
+    const [qRes, riskRes, agingRes, tcmRes] = await Promise.all([
       fetch('/api/health-questionnaire', { headers, signal: ac.signal }),
-      fetch('/api/health-monitor/snapshot', { headers, signal: ac.signal }).catch(() => null),
       fetch('/api/risk-assessments', { headers, signal: ac.signal }).catch(() => null),
       fetch('/api/aging-assessments', { headers, signal: ac.signal }).catch(() => null),
       fetch('/api/tcm-constitution', { headers, signal: ac.signal }).catch(() => null),
     ])
     if (!qRes.ok && qRes.status !== 401) {
-      // 问卷失败仍尝试设备摘要
+      // 问卷失败仍尝试其他摘要
     }
     const data = qRes.ok ? await qRes.json().catch(() => ({})) : {}
     const profile = mapSubmissionToProfile(data.submission) || {}
-    if (snapRes && snapRes.ok) {
-      const snap = await snapRes.json().catch(() => ({}))
-      const summary = String(snap.summaryText || '').trim().slice(0, FIELD_MAX)
-      if (summary) profile.deviceSummary = summary
-    }
     if (riskRes && riskRes.ok) {
       const risk = await riskRes.json().catch(() => ({}))
       const riskSummary = String(risk.riskSummary || '').trim().slice(0, FIELD_MAX)

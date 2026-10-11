@@ -52,7 +52,6 @@ export const MODULE_ACCESS = {
   /** 最低标准会员；高级会员同样可用 */
   '/tcm-prevention/constitution': 'standard',
   '/tcm-prevention': null,
-  '/health-monitor': 'premium',
   '/translation-opportunities': null,
   '/favorites': null,
 }
