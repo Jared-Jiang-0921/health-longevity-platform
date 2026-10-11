@@ -102,7 +102,8 @@
 }
 
 .tcm-grid--seasons,
-.tcm-grid--diet {
+.tcm-grid--diet,
+.tcm-grid--emotion {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-top: var(--space-5);
 }
@@ -222,7 +223,8 @@
 @media (max-width: 960px) {
   .tcm-grid--constitutions,
   .tcm-grid--seasons,
-  .tcm-grid--diet {
+  .tcm-grid--diet,
+  .tcm-grid--emotion {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -231,7 +233,8 @@
   .tcm-grid,
   .tcm-grid--constitutions,
   .tcm-grid--seasons,
-  .tcm-grid--diet {
+  .tcm-grid--diet,
+  .tcm-grid--emotion {
     grid-template-columns: 1fr;
   }
 }
