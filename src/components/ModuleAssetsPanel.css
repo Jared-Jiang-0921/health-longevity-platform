@@ -12,16 +12,6 @@
   font-size: 1.05rem;
 }
 
-.module-assets-debug {
-  margin: 0 0 0.65rem;
-  padding: 0.38rem 0.62rem;
-  border-radius: 8px;
-  font-size: 0.78rem;
-  color: var(--color-text-muted);
-  border: 1px dashed color-mix(in srgb, var(--color-primary) 32%, var(--color-border));
-  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
-}
-
 .module-assets-list {
   margin: 0;
   padding-left: 0;
@@ -143,10 +133,18 @@
 .module-assets-image,
 .module-assets-media {
   display: block;
-  width: min(100%, 560px);
+  width: 100%;
+  max-width: 720px;
   margin: 0.5rem 0;
   border-radius: 8px;
   border: 1px solid var(--color-border);
+}
+
+video.module-assets-media {
+  aspect-ratio: 16 / 9;
+  height: auto;
+  object-fit: contain;
+  background: #000;
 }
 
 .module-assets-pill {

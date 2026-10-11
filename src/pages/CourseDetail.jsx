@@ -124,9 +124,7 @@ export default function CourseDetail() {
         <p className="course-desc">{course.desc}</p>
         {isAdmin ? (
           <p className="course-methodology">{methodologyLine}</p>
-        ) : (
-          <ModuleAccessHint moduleKey="health-skills" />
-        )}
+        ) : null}
       </header>
 
       <section className="course-detail-content">
@@ -155,6 +153,8 @@ export default function CourseDetail() {
           </Link>
         )}
       </section>
+
+      {isAdmin ? null : <ModuleAccessHint moduleKey="health-skills" className="module-access-hint--page-end" />}
     </div>
   )
 }

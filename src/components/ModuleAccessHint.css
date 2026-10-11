@@ -46,6 +46,11 @@
   margin-top: var(--space-3);
 }
 
+.module-access-hint--page-end {
+  margin-top: var(--space-8);
+  margin-bottom: var(--space-6);
+}
+
 .membership-free {
   border-color: var(--color-border);
   color: var(--color-text-muted);

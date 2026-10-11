@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { getCourseById, CATEGORIES } from '../data/courses'
+import { assetMatchesCourseSeries } from '../data/healthSkillsSeries'
 import { getHealthSkillsContentApproach } from '../data/healthSkillsContentApproach'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
@@ -9,6 +10,7 @@ import { getMembershipLevelLabel } from '../i18n/terms'
 import { hasLevelAccess, shouldShowMembershipBadge } from '../data/membership'
 import ContentLockNotice from '../components/ContentLockNotice'
 import ModuleAccessHint from '../components/ModuleAccessHint'
+import { moduleAssetUrl } from '../lib/moduleAssetUrl'
 import '../styles/membership-badge.css'
 import './CourseLearn.css'
 
@@ -32,7 +34,33 @@ export default function CourseLearn() {
   const [editingModuleIdx, setEditingModuleIdx] = useState(-1)
   const [editDraft, setEditDraft] = useState({ title: '', duration: '', content: '', videoUrl: '', embedUrl: '' })
   const [activeIndex, setActiveIndex] = useState(0)
-  const activeModule = modules[Math.min(activeIndex, Math.max(modules.length - 1, 0))]
+  const [uploads, setUploads] = useState([])
+
+  const extraLessons = useMemo(() => {
+    if (!course) return []
+    const categoryLabel = CATEGORIES.find((c) => c.id === course.category)?.label || ''
+    return uploads
+      .filter((item) => assetMatchesCourseSeries(item, course, categoryLabel))
+      .sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+      .map((item) => ({
+        type: String(item.mime_type || '').startsWith('video/') ? 'video' : 'file',
+        title: item.title,
+        duration: '',
+        videoUrl: String(item.mime_type || '').startsWith('video/')
+          ? moduleAssetUrl(item.id, getToken())
+          : '',
+        fileUrl: moduleAssetUrl(item.id, getToken()),
+        canView: item.can_view !== false,
+        requiredLevel: item.required_level,
+        fromUpload: true,
+      }))
+  }, [uploads, course, getToken])
+
+  const playlist = useMemo(
+    () => [...modules.map((m) => ({ ...m, fromUpload: false })), ...extraLessons],
+    [modules, extraLessons],
+  )
+  const activeModule = playlist[Math.min(activeIndex, Math.max(playlist.length - 1, 0))]
 
   if (!course) {
     return (
@@ -85,6 +113,25 @@ export default function CourseLearn() {
     loadModules()
     return () => { cancelled = true }
   }, [course?.id])
+
+  useEffect(() => {
+    if (!course?.id) return undefined
+    let cancelled = false
+    const token = getToken()
+    ;(async () => {
+      try {
+        const res = await fetch(`/api/module-assets?module=health-skills&ts=${Date.now()}`, {
+          cache: 'no-store',
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        })
+        const data = await res.json().catch(() => ({}))
+        if (!cancelled && res.ok) setUploads(Array.isArray(data.items) ? data.items : [])
+      } catch {
+        if (!cancelled) setUploads([])
+      }
+    })()
+    return () => { cancelled = true }
+  }, [course?.id, getToken])
 
   async function saveModules(nextModules) {
     if (!isAdmin || !course?.id) return
@@ -164,7 +211,7 @@ export default function CourseLearn() {
     )
   }
 
-  if (!modulesLoading && modules.length === 0) {
+  if (!modulesLoading && playlist.length === 0) {
     return (
       <div className="page-content">
         <p>{ui.noData}</p>
@@ -180,9 +227,7 @@ export default function CourseLearn() {
         <h1>{course.title}</h1>
         {isAdmin ? (
           <p className="learn-methodology">{methodologyLine}</p>
-        ) : (
-          <ModuleAccessHint moduleKey="health-skills" />
-        )}
+        ) : null}
       </div>
 
       <div className="learn-layout">
@@ -192,8 +237,8 @@ export default function CourseLearn() {
           {modulesError ? <p className="video-missing">{modulesError}</p> : null}
           {modulesHint ? <p className="video-duration">{modulesHint}</p> : null}
           <ul className="module-list">
-            {modules.map((mod, idx) => (
-              <li key={idx}>
+            {playlist.map((mod, idx) => (
+              <li key={mod.fromUpload ? `up-${idx}` : idx}>
                 <button
                   type="button"
                   className={idx === activeIndex ? 'active' : ''}
@@ -203,7 +248,7 @@ export default function CourseLearn() {
                   <span className="module-title">{mod.title}</span>
                   {mod.duration && <span className="module-duration">{mod.duration}</span>}
                 </button>
-                {isAdmin ? (
+                {isAdmin && !mod.fromUpload ? (
                   <div className="module-admin-actions">
                     <button type="button" onClick={() => startEditModule(idx)}>
                       {lang === 'en' ? 'Edit' : lang === 'ar' ? 'تعديل' : '编辑'}
@@ -219,7 +264,21 @@ export default function CourseLearn() {
         </aside>
 
         <main className="learn-main">
-          {activeModule.type === 'video' ? (
+          {!activeModule ? null : activeModule.fromUpload && activeModule.canView === false ? (
+            <section className="learn-document">
+              <h2>{activeModule.title}</h2>
+              <ContentLockNotice requiredLevel={activeModule.requiredLevel} user={user} />
+            </section>
+          ) : activeModule.type === 'file' ? (
+            <section className="learn-document">
+              <h2>{activeModule.title}</h2>
+              <p>
+                <a href={activeModule.fileUrl} target="_blank" rel="noreferrer">
+                  {lang === 'en' ? 'Open file' : lang === 'ar' ? 'فتح' : '打开资料'}
+                </a>
+              </p>
+            </section>
+          ) : activeModule.type === 'video' ? (
             <section className="learn-video">
               <h2>{activeModule.title}</h2>
               {activeModule.videoUrl ? (
@@ -277,6 +336,8 @@ export default function CourseLearn() {
           </div>
         </section>
       ) : null}
+
+      {isAdmin ? null : <ModuleAccessHint moduleKey="health-skills" className="module-access-hint--page-end" />}
     </div>
   )
 }

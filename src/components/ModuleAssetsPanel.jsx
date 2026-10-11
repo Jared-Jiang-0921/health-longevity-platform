@@ -2,17 +2,57 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { matchPath, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
-import { CATEGORIES, COURSES, getCourseById } from '../data/courses'
-import { getSeriesTitlesForCategory, getCanonicalSeriesSubtopic } from '../data/healthSkillsSeries'
-import { LONGEVITY_NEWS_COLUMN_LABELS } from '../data/longevityNewsColumns'
-import { PRODUCT_CATEGORIES, getProductById } from '../data/products'
+import { CATEGORIES, getCourseById } from '../data/courses'
+import { getCanonicalSeriesSubtopic } from '../data/healthSkillsSeries'
+import {
+  getModuleAssetFieldLabels,
+  getModuleAssetSubcategories,
+  getModuleAssetSubtopics,
+} from '../data/moduleAssetTaxonomy'
 import ContentLockNotice from './ContentLockNotice'
-import ModuleAccessHint from './ModuleAccessHint'
 import { shouldShowMembershipBadge } from '../data/membership'
 import { fileToBase64 } from '../lib/fileBase64'
 import { adminLevelValue } from '../lib/contentLevelAdmin'
 import { moduleAssetUrl } from '../lib/moduleAssetUrl'
 import './ModuleAssetsPanel.css'
+
+function notifyModuleAssetsUpdated(moduleKey) {
+  window.dispatchEvent(new CustomEvent('module-assets-updated', { detail: { module: moduleKey } }))
+}
+
+/** 批量导入：每行「标题 | https://...」或「标题 https://...」 */
+function parseBulkLinkLines(text) {
+  const rows = []
+  const errors = []
+  String(text || '').split(/\r?\n/).forEach((raw, idx) => {
+    const line = raw.trim()
+    if (!line || line.startsWith('#')) return
+    let title = ''
+    let url = ''
+    if (line.includes('|')) {
+      const parts = line.split('|').map((s) => s.trim()).filter(Boolean)
+      url = parts[parts.length - 1] || ''
+      title = parts.slice(0, -1).join(' | ')
+    } else {
+      const m = line.match(/^(.*?)(https?:\/\/\S+)\s*$/i)
+      if (m) {
+        title = m[1].trim()
+        url = m[2].trim()
+      }
+    }
+    const n = idx + 1
+    if (!url || !/^https?:\/\//i.test(url)) {
+      errors.push(`第 ${n} 行：缺少有效链接`)
+      return
+    }
+    if (!title) {
+      errors.push(`第 ${n} 行：缺少标题`)
+      return
+    }
+    rows.push({ title: title.slice(0, 200), url: url.slice(0, 2000) })
+  })
+  return { rows, errors }
+}
 
 function uploadErrorMessage(err, t, lang) {
   const msg = String(err?.message || '')
@@ -40,23 +80,7 @@ function isVideo(mime) {
 }
 
 function getSubcategoryOptions(moduleKey) {
-  const courseCategories = CATEGORIES.filter((c) => c.id !== 'all').map((c) => c.label)
-  const productCategories = PRODUCT_CATEGORIES.filter((c) => c.id !== 'all').map((c) => c.label)
-  const map = {
-    'health-skills': courseCategories,
-    products: productCategories,
-    // 与页面现有结构/文案尽量一一对应
-    'longevity-news': LONGEVITY_NEWS_COLUMN_LABELS,
-    'tcm-prevention': ['中草药单药', '经典处方'],
-    'translation-opportunities': ['长寿产业趋势', '技术转化雷达', '商业模式拆解', '产品机会库', '创业风险提示'],
-    solutions: ['专业健康长寿咨询', '自我健康促进咨询', '内容资源', '健康问卷与评估'],
-    'health-questionnaire': ['基础信息', '健康目标与关注', '病史与用药', '生活方式', '法律同意'],
-    favorites: ['长寿知识技能收藏', '产品收藏', '资讯收藏', '精选推荐'],
-    payment: ['会员套餐', '支付指引', '账单与发票', '退款与售后'],
-    account: ['账号资料', '安全设置', '双因素认证', '登录与设备'],
-    tax: ['税务说明', '税率规则', '申报模板', '地区政策'],
-  }
-  return map[moduleKey] || ['通用资料', '教程', '案例', '下载文件']
+  return getModuleAssetSubcategories(moduleKey)
 }
 
 function normalizeSubcategoryValue(moduleKey, rawValue) {
@@ -65,10 +89,6 @@ function normalizeSubcategoryValue(moduleKey, rawValue) {
 
   if (moduleKey === 'health-skills') {
     const hit = CATEGORIES.find((c) => c.id === value || c.label === value)
-    return hit?.label || value
-  }
-  if (moduleKey === 'products') {
-    const hit = PRODUCT_CATEGORIES.find((c) => c.id === value || c.label === value)
     return hit?.label || value
   }
   return value
@@ -126,19 +146,7 @@ function resolveSubmitSubtopic(moduleKey, subcategoryValue, rawSubtopic) {
 }
 
 function getSubtopicOptions(moduleKey, subcategoryLabel) {
-  const label = String(subcategoryLabel || '').trim()
-  if (!label) return []
-  if (moduleKey === 'health-skills') {
-    const category = CATEGORIES.find((c) => c.label === label || c.id === label)
-    if (!category) return []
-    const courseTitles = COURSES
-      .filter((course) => course.category === category.id)
-      .map((course) => course.title)
-    return getSeriesTitlesForCategory(category.id, courseTitles)
-  }
-  if (moduleKey === 'products') return ['产品详情资料']
-  if (moduleKey === 'longevity-news') return ['文章']
-  return []
+  return getModuleAssetSubtopics(moduleKey, subcategoryLabel)
 }
 
 function mergeSubtopicOptions(moduleKey, subcategoryLabel, baseOptions, items) {
@@ -168,6 +176,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
   const [file, setFile] = useState(null)
   const [externalUrl, setExternalUrl] = useState('')
   const [uploadMode, setUploadMode] = useState(() => (moduleKey === 'longevity-news' ? 'link' : 'file'))
+  const [bulkText, setBulkText] = useState('')
   const [error, setError] = useState('')
   const [hint, setHint] = useState('')
   const [editingId, setEditingId] = useState('')
@@ -220,17 +229,6 @@ export default function ModuleAssetsPanel({ moduleKey }) {
         subtopic: course.title || '',
       }
     }
-    if (moduleKey === 'products') {
-      const m = matchPath('/products/:id', location.pathname)
-      if (!m?.params?.id) return null
-      const product = getProductById(m.params.id)
-      if (!product) return null
-      const category = PRODUCT_CATEGORIES.find((c) => c.id === product.category)
-      return {
-        subcategory: category?.label || '',
-        subtopic: '产品详情资料',
-      }
-    }
     return null
   }, [moduleKey, location.pathname])
   const visibleItems = useMemo(() => {
@@ -254,7 +252,8 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     const fromPreset = getSubtopicOptions(moduleKey, activeSubcategory)
     return Array.from(new Set([...fromItems, ...fromPreset])).filter((t) => t && t !== '待归类')
   }, [moduleKey, activeSubcategory, items, isAdmin])
-  const t = useMemo(() => ({
+  const t = useMemo(() => {
+    const pack = {
     zh: {
       section: '模块资料',
       empty: '暂无资料。',
@@ -265,7 +264,12 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       externalUrl: '文章链接（微信公众号等）',
       externalUrlPh: 'https://mp.weixin.qq.com/...',
       externalUrlRequired: '请填写 http/https 链接',
-      linkHint: '适合公众号文章：填标题、摘要与原文链接即可，无需上传文件。',
+      linkHint: '适合公众号文章：填标题与原文链接即可。请把研究主题写进标题（如 NMN、衰老时钟），本站会自动抽出关键词做成检索卡片；微信全文无法嵌进本站。',
+      uploadModeBulk: '批量导入',
+      bulkHint: '每行一篇。格式：文章标题 | https://mp.weixin.qq.com/s/……  栏目与会员等级用下面的下拉框统一设置。',
+      bulkPh: '睡眠与长寿：最新综述怎么读 | https://mp.weixin.qq.com/s/xxxx\nNMN 争议观察 | https://mp.weixin.qq.com/s/yyyy',
+      bulkEmpty: '请粘贴至少一行「标题 | 链接」。',
+      bulkResult: (ok, fail) => `完成：成功 ${ok} 篇${fail ? `，失败 ${fail} 篇` : ''}。`,
       openLink: '打开原文',
       linkTag: '外链',
       title: '标题',
@@ -304,7 +308,6 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       subcategoryContent: '按亚类查看资料',
       subtopicContent: '再选择二层分类后显示材料',
       emptySubtopic: '请选择二层分类查看对应资料',
-      debugMapping: '当前映射',
     },
     en: {
       section: 'Module Assets',
@@ -316,7 +319,12 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       externalUrl: 'Article URL (WeChat etc.)',
       externalUrlPh: 'https://mp.weixin.qq.com/...',
       externalUrlRequired: 'Please enter an http/https URL',
-      linkHint: 'For WeChat posts: title, summary, and original URL—no file needed.',
+      linkHint: 'For WeChat posts: title, summary, and original URL—no file needed. Full articles cannot be embedded; readers open the original.',
+      uploadModeBulk: 'Bulk import',
+      bulkHint: 'One article per line: Title | https://mp.weixin.qq.com/s/…  Column and membership use the dropdowns below.',
+      bulkPh: 'Sleep and longevity | https://mp.weixin.qq.com/s/xxxx',
+      bulkEmpty: 'Paste at least one “title | URL” line.',
+      bulkResult: (ok, fail) => `Done: ${ok} published${fail ? `, ${fail} failed` : ''}.`,
       openLink: 'Open original',
       linkTag: 'Link',
       title: 'Title',
@@ -354,7 +362,6 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       subcategoryContent: 'Browse by subcategory',
       subtopicContent: 'Select a second-level category to view materials',
       emptySubtopic: 'Please select a second-level category',
-      debugMapping: 'Current Mapping',
     },
     ar: {
       section: 'ملفات الوحدة',
@@ -366,7 +373,12 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       externalUrl: 'رابط المقال',
       externalUrlPh: 'https://mp.weixin.qq.com/...',
       externalUrlRequired: 'يرجى إدخال رابط http/https',
-      linkHint: 'لمقالات WeChat: العنوان والملخص والرابط دون ملف.',
+      linkHint: 'لمقالات WeChat: العنوان والملخص والرابط دون ملف. لا يمكن تضمين المقال كاملاً.',
+      uploadModeBulk: 'استيراد جماعي',
+      bulkHint: 'سطر لكل مقال: العنوان | https://mp.weixin.qq.com/s/…',
+      bulkPh: 'النوم وطول العمر | https://mp.weixin.qq.com/s/xxxx',
+      bulkEmpty: 'الصق سطرًا واحدًا على الأقل: عنوان | رابط.',
+      bulkResult: (ok, fail) => `تم: نُشر ${ok}${fail ? ` وفشل ${fail}` : ''}.`,
       openLink: 'فتح الأصل',
       linkTag: 'رابط',
       title: 'العنوان',
@@ -404,9 +416,18 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       subcategoryContent: 'تصفح حسب التصنيف الفرعي',
       subtopicContent: 'اختر تصنيفًا فرعيًا أدق لعرض المواد',
       emptySubtopic: 'يرجى اختيار التصنيف الأدق',
-      debugMapping: 'التعيين الحالي',
     },
-  }[lang] || {}), [lang])
+    }
+    const base = pack[lang] || pack.zh
+    const fields = getModuleAssetFieldLabels(moduleKey, lang)
+    return {
+      ...base,
+      subcategory: fields.subcategory,
+      subtopic: fields.subtopic,
+      subcategoryContent: fields.subcategoryContent,
+      seriesHint: fields.hint || '',
+    }
+  }, [lang, moduleKey])
 
   async function loadItems() {
     setLoading(true)
@@ -434,9 +455,14 @@ export default function ModuleAssetsPanel({ moduleKey }) {
 
   useEffect(() => {
     setPinnedSelection(null)
+    if (!isAdmin) {
+      setItems([])
+      setLoading(false)
+      return
+    }
     loadItems()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [moduleKey])
+  }, [moduleKey, isAdmin])
 
   useEffect(() => {
     setPinnedSelection(null)
@@ -534,11 +560,72 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     setError('')
     setHint('')
     if (!isAdmin) return
-    if (!title.trim()) {
+    if (uploadMode !== 'bulk' && !title.trim()) {
       setError(t.titleRequired || t.invalid)
       return
     }
     const useLink = uploadMode === 'link' || (moduleKey === 'longevity-news' && !file && externalUrl.trim())
+    if (uploadMode === 'bulk') {
+      const parsed = parseBulkLinkLines(bulkText)
+      if (!parsed.rows.length) {
+        setError(parsed.errors[0] || t.bulkEmpty)
+        return
+      }
+      const submittedSubcategory = normalizeSubcategoryValue(moduleKey, subcategory.trim() || 'general')
+      const submittedSubtopic = resolveSubmitSubtopic(moduleKey, submittedSubcategory, subtopic) || '文章'
+      setSubmitting(true)
+      try {
+        const token = getToken()
+        let ok = 0
+        let fail = parsed.errors.length
+        const uploaded = []
+        for (const row of parsed.rows) {
+          try {
+            const res = await fetch('/api/module-assets', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+              },
+              body: JSON.stringify({
+                module: moduleKey,
+                title: row.title,
+                summary: '',
+                subcategory: submittedSubcategory,
+                subtopic: submittedSubtopic,
+                requiredLevel,
+                externalUrl: row.url,
+              }),
+            })
+            const data = await res.json().catch(() => ({}))
+            if (!res.ok) throw new Error(data.error || t.uploadFail)
+            ok += 1
+            if (data?.item?.id) uploaded.push(normalizeAssetItem(moduleKey, data.item))
+          } catch {
+            fail += 1
+          }
+        }
+        if (uploaded.length) {
+          setItems((prev) => {
+            const rest = prev.filter((it) => !uploaded.some((u) => u.id === it.id))
+            return [...uploaded, ...rest]
+          })
+        }
+        setBulkText('')
+        setPinnedSelection({ subcategory: submittedSubcategory, subtopic: submittedSubtopic })
+        setActiveSubcategory(submittedSubcategory)
+        setActiveSubtopic(submittedSubtopic)
+        setHint(typeof t.bulkResult === 'function' ? t.bulkResult(ok, fail) : t.uploadOk)
+        if (parsed.errors.length) setError(parsed.errors.slice(0, 5).join('；'))
+        notifyModuleAssetsUpdated(moduleKey)
+        await loadItems()
+      } catch (err) {
+        setError(uploadErrorMessage(err, t, lang))
+      } finally {
+        setSubmitting(false)
+      }
+      return
+    }
     if (useLink) {
       const url = externalUrl.trim()
       if (!url) {
@@ -589,6 +676,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
         setSubtopic('')
         setRequiredLevel('public')
         setHint(t.uploadOk)
+        notifyModuleAssetsUpdated(moduleKey)
         await loadItems()
       } catch (err) {
         setError(uploadErrorMessage(err, t, lang))
@@ -655,6 +743,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
       setRequiredLevel('public')
       setFile(null)
       setHint(t.uploadOk)
+      notifyModuleAssetsUpdated(moduleKey)
       await loadItems()
     } catch (err) {
       setError(uploadErrorMessage(err, t, lang))
@@ -757,21 +846,126 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     }
   }
 
-  /** 资讯正式阅读由 LongevityNewsFeed 承担，非管理员不重复展示资料区 */
-  if (!isAdmin && moduleKey === 'longevity-news') return null
+  if (!isAdmin) return null
 
-  const pageHasAccessHint = [
-    'health-skills',
-    'products',
-    'tcm-prevention',
-    'translation-opportunities',
-  ].includes(moduleKey)
+  const uploadForm = (
+        <form className="module-assets-upload" onSubmit={onSubmit}>
+          <h4>{t.uploadTitle}</h4>
+          {moduleKey === 'longevity-news' ? (
+            <div className="module-assets-subtabs-row" style={{ marginBottom: '0.75rem' }}>
+              <button
+                type="button"
+                className={`module-assets-subtab ${uploadMode === 'link' ? 'active' : ''}`}
+                onClick={() => setUploadMode('link')}
+              >
+                {t.uploadModeLink}
+              </button>
+              <button
+                type="button"
+                className={`module-assets-subtab ${uploadMode === 'file' ? 'active' : ''}`}
+                onClick={() => setUploadMode('file')}
+              >
+                {t.uploadModeFile}
+              </button>
+              <button
+                type="button"
+                className={`module-assets-subtab ${uploadMode === 'bulk' ? 'active' : ''}`}
+                onClick={() => setUploadMode('bulk')}
+              >
+                {t.uploadModeBulk}
+              </button>
+            </div>
+          ) : null}
+          {uploadMode === 'link' ? (
+            <p className="module-assets-hint">{t.linkHint}</p>
+          ) : null}
+          {uploadMode === 'bulk' ? (
+            <>
+              <p className="module-assets-hint">{t.bulkHint}</p>
+              <label>
+                <span>{t.uploadModeBulk}</span>
+                <textarea
+                  rows={8}
+                  value={bulkText}
+                  onChange={(e) => setBulkText(e.target.value)}
+                  placeholder={t.bulkPh}
+                />
+              </label>
+            </>
+          ) : (
+            <>
+          <label>
+            <span>{t.title}</span>
+            <input value={title} onChange={(e) => setTitle(e.target.value)} />
+          </label>
+          <label>
+            <span>{t.summary}</span>
+            <textarea rows={3} value={summary} onChange={(e) => setSummary(e.target.value)} />
+          </label>
+          {uploadMode === 'link' || moduleKey === 'longevity-news' ? (
+            <label>
+              <span>{t.externalUrl}</span>
+              <input
+                value={externalUrl}
+                onChange={(e) => setExternalUrl(e.target.value)}
+                placeholder={t.externalUrlPh}
+              />
+            </label>
+          ) : null}
+            </>
+          )}
+          <label>
+            <span>{t.subcategory}</span>
+            <select value={subcategory} onChange={(e) => setSubcategory(e.target.value)}>
+              {subcategoryOptions.map((opt) => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
+          </label>
+          {t.seriesHint ? (
+            <p className="module-assets-hint module-assets-series-hint">{t.seriesHint}</p>
+          ) : null}
+          <label>
+            <span>{t.subtopic}</span>
+            <select value={subtopic} onChange={(e) => setSubtopic(e.target.value)} disabled={!subtopicOptions.length}>
+              {!subtopicOptions.length ? <option value="">-</option> : null}
+              {subtopicOptions.map((opt) => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            <span>{t.requiredLevel}</span>
+            <select value={requiredLevel} onChange={(e) => setRequiredLevel(e.target.value)}>
+              <option value="public">{t.levelTag?.public || 'public'}</option>
+              <option value="standard">{t.levelTag?.standard || 'standard'}</option>
+              <option value="premium">{t.levelTag?.premium || 'premium'}</option>
+            </select>
+          </label>
+          {uploadMode === 'file' ? (
+            <label>
+              <span>{t.choose}</span>
+              <input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} />
+            </label>
+          ) : null}
+          {error ? <p className="module-assets-error">{error}</p> : null}
+          {hint ? <p className="module-assets-hint">{hint}</p> : null}
+          <button type="submit" className="btn-primary" disabled={submitting}>
+            {submitting
+              ? t.uploading
+              : uploadMode === 'link'
+                ? t.uploadModeLink
+                : uploadMode === 'bulk'
+                  ? t.uploadModeBulk
+                  : t.upload}
+          </button>
+        </form>
+  )
 
-  if (!isAdmin && !loading && !items.length) {
-    if (pageHasAccessHint) return null
+  if (moduleKey === 'health-skills') {
     return (
-      <section className="module-assets-panel">
-        <ModuleAccessHint moduleKey={moduleKey} />
+      <section className="module-assets-panel module-assets-panel--upload-only">
+        {uploadForm}
       </section>
     )
   }
@@ -780,18 +974,6 @@ export default function ModuleAssetsPanel({ moduleKey }) {
     <section className="module-assets-panel">
       {loading ? <p className="module-assets-muted">{t.loading}</p> : null}
       <h3>{t.section}</h3>
-      {isAdmin ? (
-        <p className="module-assets-debug">
-          <strong>{t.debugMapping}:</strong> module=`{moduleKey}` / subcategory=`{activeSubcategory || '-'}`
-          {' '} / subtopic=`{activeSubtopic || '-'}`
-        </p>
-      ) : null}
-      {isAdmin ? (
-        <p className="module-assets-debug">
-          items={items.length} / matched={visibleItems.length}
-          {items[0] ? ` / latest=${items[0].subcategory || '-'} > ${items[0].subtopic || '-'}` : ''}
-        </p>
-      ) : null}
       {isAdmin && !loading && !items.length ? <p className="module-assets-muted">{t.empty}</p> : null}
       {availableSubcategories.length ? (
         <>
@@ -970,89 +1152,7 @@ export default function ModuleAssetsPanel({ moduleKey }) {
         </>
       ) : null}
 
-      {isAdmin ? (
-        <form className="module-assets-upload" onSubmit={onSubmit}>
-          <h4>{t.uploadTitle}</h4>
-          {moduleKey === 'longevity-news' ? (
-            <div className="module-assets-subtabs-row" style={{ marginBottom: '0.75rem' }}>
-              <button
-                type="button"
-                className={`module-assets-subtab ${uploadMode === 'link' ? 'active' : ''}`}
-                onClick={() => setUploadMode('link')}
-              >
-                {t.uploadModeLink}
-              </button>
-              <button
-                type="button"
-                className={`module-assets-subtab ${uploadMode === 'file' ? 'active' : ''}`}
-                onClick={() => setUploadMode('file')}
-              >
-                {t.uploadModeFile}
-              </button>
-            </div>
-          ) : null}
-          {uploadMode === 'link' ? (
-            <p className="module-assets-hint">{t.linkHint}</p>
-          ) : null}
-          <label>
-            <span>{t.title}</span>
-            <input value={title} onChange={(e) => setTitle(e.target.value)} />
-          </label>
-          <label>
-            <span>{t.summary}</span>
-            <textarea rows={3} value={summary} onChange={(e) => setSummary(e.target.value)} />
-          </label>
-          {uploadMode === 'link' || moduleKey === 'longevity-news' ? (
-            <label>
-              <span>{t.externalUrl}</span>
-              <input
-                value={externalUrl}
-                onChange={(e) => setExternalUrl(e.target.value)}
-                placeholder={t.externalUrlPh}
-              />
-            </label>
-          ) : null}
-          <label>
-            <span>{t.subcategory}</span>
-            <select value={subcategory} onChange={(e) => setSubcategory(e.target.value)}>
-              {subcategoryOptions.map((opt) => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
-            </select>
-          </label>
-          {moduleKey === 'health-skills' ? (
-            <p className="module-assets-hint module-assets-series-hint">{t.seriesHint}</p>
-          ) : null}
-          <label>
-            <span>{t.subtopic}</span>
-            <select value={subtopic} onChange={(e) => setSubtopic(e.target.value)} disabled={!subtopicOptions.length}>
-              {!subtopicOptions.length ? <option value="">-</option> : null}
-              {subtopicOptions.map((opt) => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
-            </select>
-          </label>
-          <label>
-            <span>{t.requiredLevel}</span>
-            <select value={requiredLevel} onChange={(e) => setRequiredLevel(e.target.value)}>
-              <option value="public">{t.levelTag?.public || 'public'}</option>
-              <option value="standard">{t.levelTag?.standard || 'standard'}</option>
-              <option value="premium">{t.levelTag?.premium || 'premium'}</option>
-            </select>
-          </label>
-          {uploadMode === 'file' ? (
-            <label>
-              <span>{t.choose}</span>
-              <input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} />
-            </label>
-          ) : null}
-          {error ? <p className="module-assets-error">{error}</p> : null}
-          {hint ? <p className="module-assets-hint">{hint}</p> : null}
-          <button type="submit" className="btn-primary" disabled={submitting}>
-            {submitting ? t.uploading : (uploadMode === 'link' ? t.uploadModeLink : t.upload)}
-          </button>
-        </form>
-      ) : null}
+      {uploadForm}
     </section>
   )
 }

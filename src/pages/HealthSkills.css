@@ -1,31 +1,92 @@
 .page-health-skills {
-  /* 布局与标题：page-chrome.css */
+  width: 100%;
+  max-width: var(--content-max);
 }
 
 .health-skills-header p + p {
   margin-top: var(--space-3);
 }
 
-.categories {
-  margin-bottom: var(--space-5);
+.health-skills-toolbar {
+  margin: 0 0 var(--space-6);
+}
+
+.health-skills-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--space-2);
+  margin-bottom: 0;
+  overflow-x: auto;
+  padding-bottom: var(--space-1);
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.health-skills-tabs button {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .course-list {
-  margin-top: 1rem;
+  margin-top: 0;
+}
+
+.course-list-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-4);
+}
+
+.course-list-heading h2 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  line-height: var(--line-height-tight);
+}
+
+.course-list-heading p {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.course-list-empty {
+  margin: 0;
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.course-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+  align-items: stretch;
 }
 
 .course-meta {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.75rem;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
 }
 
 .btn-favorite-icon {
+  flex-shrink: 0;
   background: none;
   border: none;
   color: var(--color-text-muted);
   font-size: 1rem;
+  line-height: 1;
   cursor: pointer;
   padding: 0.2rem;
 }
@@ -36,51 +97,100 @@
 }
 
 .course-category {
+  min-width: 0;
   font-size: 0.75rem;
+  line-height: 1.4;
   color: var(--color-primary);
   background: var(--color-primary-muted);
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-sm);
 }
 
 .course-badge-series {
   font-weight: 600;
 }
 
-.course-duration {
+.course-duration,
+.course-level {
   font-size: 0.75rem;
   color: var(--color-text-muted);
 }
 
-.course-card h3 {
-  font-size: 1rem;
-  margin: 0 0 0.5rem;
-  color: var(--color-text);
+.course-card {
+  min-width: 0;
+  height: 100%;
 }
 
-.course-card p {
+.course-card h3 {
+  font-size: 1.05rem;
+  margin: 0 0 var(--space-2);
+  color: var(--color-text);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.course-card-desc {
   font-size: 0.875rem;
   color: var(--color-text-muted);
-  margin: 0 0 0.75rem;
-  line-height: 1.5;
+  margin: 0 0 var(--space-3);
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.course-card-lessons {
+  flex: 1;
+  list-style: none;
+  margin: 0 0 var(--space-4);
+  padding: 0.65rem 0.75rem;
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-subtle);
+}
+
+.course-card-lessons li {
+  position: relative;
+  padding: 0.2rem 0 0.2rem 0.9rem;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--color-text);
+  overflow-wrap: anywhere;
+}
+
+.course-card-lessons li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.65rem;
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: var(--color-primary);
+}
+
+.course-card-lessons-more {
+  color: var(--color-text-muted) !important;
 }
 
 .course-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 0.75rem;
+  gap: var(--space-3);
+  margin-top: auto;
+  padding-top: var(--space-3);
   border-top: 1px solid var(--color-border-subtle);
-  gap: 0.5rem;
-  flex-wrap: wrap;
 }
 
-.course-level {
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
+.course-footer-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
 }
 
 .btn-learn {
+  flex-shrink: 0;
   font-size: 0.875rem;
   color: var(--color-primary);
   font-weight: 500;
@@ -88,4 +198,17 @@
 
 .btn-learn:hover {
   color: var(--color-primary-hover);
+}
+
+@media (max-width: 720px) {
+  .course-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .health-skills-tabs {
+    margin-left: calc(-1 * var(--space-1));
+    margin-right: calc(-1 * var(--space-1));
+    padding-left: var(--space-1);
+    padding-right: var(--space-1);
+  }
 }
