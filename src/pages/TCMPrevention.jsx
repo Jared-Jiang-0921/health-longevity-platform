@@ -4,6 +4,7 @@ import { TCM_CONSTITUTION_SOURCE, TCM_CONSTITUTIONS } from '../data/tcmConstitut
 import { TCM_HERBS, TCM_PRESCRIPTIONS } from '../data/tcmPrevention'
 import { TCM_DIET_SOURCE, TCM_DIET_TOPICS } from '../data/tcmDiet'
 import { TCM_EMOTION_SOURCE, TCM_EMOTION_TOPICS } from '../data/tcmEmotion'
+import { TCM_MOVEMENT_SOURCE, TCM_MOVEMENT_TOPICS } from '../data/tcmMovement'
 import { TCM_FOOD_BASIS, TCM_LATE_SUMMER, TCM_LATE_SUMMER_RECIPES, TCM_SEASON_PRINCIPLE, TCM_SEASON_RECIPES, TCM_SEASON_SOURCE, TCM_SEASONS } from '../data/tcmSeasons'
 import { getTcmPreventionModuleCopy } from '../data/tcmPreventionModuleI18n'
 import { useAuth } from '../context/AuthContext'
@@ -16,6 +17,7 @@ const TAB_CONSTITUTION = 'constitution'
 const TAB_SEASONS = 'seasons'
 const TAB_DIET = 'diet'
 const TAB_EMOTION = 'emotion'
+const TAB_MOVEMENT = 'movement'
 const TAB_HERBS = 'herbs'
 const TAB_PRESCRIPTIONS = 'prescriptions'
 
@@ -101,6 +103,15 @@ export default function TCMPrevention() {
             onClick={() => setActiveTab(TAB_EMOTION)}
           >
             {mod.emotion}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === TAB_MOVEMENT}
+            className={activeTab === TAB_MOVEMENT ? 'active' : ''}
+            onClick={() => setActiveTab(TAB_MOVEMENT)}
+          >
+            {mod.movement}
           </button>
           <button
             type="button"
@@ -338,6 +349,62 @@ export default function TCMPrevention() {
                       {localeText(item.standard, lang)}
                     </dd>
                   </div>
+                  {item.modern ? (
+                    <div>
+                      <dt>{mod.dtModern}</dt>
+                      <dd>
+                        <span className="season-from">{localeText(item.modernFrom, lang)}</span>
+                        {localeText(item.modern, lang)}
+                      </dd>
+                    </div>
+                  ) : null}
+                  <div>
+                    <dt>{mod.dtNote}</dt>
+                    <dd>{localeText(item.note, lang)}</dd>
+                  </div>
+                </dl>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {activeTab === TAB_MOVEMENT && (
+        <section className="tcm-section" role="tabpanel">
+          <div className="tcm-list-heading">
+            <h2>{mod.movementH2}</h2>
+            <p>{mod.movementCount}</p>
+          </div>
+          <p className="tcm-constitution-lead">{mod.movementLead}</p>
+          <p className="tcm-constitution-source">{localeText(TCM_MOVEMENT_SOURCE, lang)}</p>
+          <div className="tcm-grid tcm-grid--movement">
+            {TCM_MOVEMENT_TOPICS.map((item) => (
+              <article key={item.id} className="tcm-card content-card content-card--padded">
+                <h3>{localeText(item.name, lang)}</h3>
+                <dl className="tcm-dl">
+                  <div>
+                    <dt>{item.classicKind === 'boundary' ? mod.dtBoundary : mod.dtClassic}</dt>
+                    <dd>
+                      <span className="season-from">{localeText(item.classicFrom, lang)}</span>
+                      {localeText(item.classic, lang)}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>{mod.dtStandard}</dt>
+                    <dd>
+                      <span className="season-from">{localeText(item.standardFrom, lang)}</span>
+                      {localeText(item.standard, lang)}
+                    </dd>
+                  </div>
+                  {item.routine ? (
+                    <div>
+                      <dt>{mod.dtRoutine}</dt>
+                      <dd>
+                        <span className="season-from">{localeText(item.routineFrom, lang)}</span>
+                        {localeText(item.routine, lang)}
+                      </dd>
+                    </div>
+                  ) : null}
                   {item.modern ? (
                     <div>
                       <dt>{mod.dtModern}</dt>
