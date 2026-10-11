@@ -36,17 +36,6 @@ export const TCM_HERBS = [
     id: 'huangqi',
     name: '黄芪',
     title: { zh: '黄芪', en: 'Astragalus root', ar: 'جذر الهوانغ تشي' },
-    classicKind: 'boundary',
-    classicFrom: {
-      zh: '《内经》没有黄芪专条',
-      en: 'The Neijing has no astragalus monograph',
-      ar: 'لا دراسة للهوانغ تشي في الكلاسيكيات',
-    },
-    classic: {
-      zh: '不要把药典的「补气升阳、固表止汗」写成《素问》里的原句。它可以和体质识别里气虚质的教育卡片一起读，那是对照，不是测出气虚就吃黄芪。',
-      en: 'Do not write the pharmacopoeia’s “raise qi and secure the exterior” back into Suwen as an original line. It can be read beside the qi-deficiency education card. That is comparison. A qi-deficiency score is not an instruction to take astragalus.',
-      ar: 'لا تُعد «رفع تشي وتثبيت الخارج» إلى سوين كأنها جملة أصلية. يمكن قراءتها بجانب بطاقة نقص تشي. هذه مقارنة. درجة نقص تشي ليست أمراً بتناول الهوانغ تشي.',
-    },
     standardFrom: {
       zh: '《中国药典》2025年版一部 · 黄芪',
       en: 'Chinese Pharmacopoeia 2025, volume 1 · Astragalus',
@@ -58,26 +47,15 @@ export const TCM_HERBS = [
       ar: 'حلو، دافئ قليلاً. يدخل قناتي الرئة والطحال. الدراسة تسرد رفع تشي وتثبيت الخارج ووقف التعرق وتخفيف التورم وغيرها، لحالات تسميها مثل نقص تشي والتعرق التلقائي وهبوط تشي الوسط. المقدار المدون 9–30 غ. جمل «يُستخدم لـ» نطاق الدراسة، وليست حكماً عليك.',
     },
     note: {
-      zh: `${NOT_A_DOSE.zh}2023年第9号公告把黄芪列入食药物质，要求适量；婴幼儿、孕妇、乳母和慢性病用药者先问医师。表实有热、腹胀便结时，不要自行拿黄芪进补；这是本站的提醒，不是上面药典正文里的注意项。${NOT_RX.zh}`,
-      en: `${NOT_A_DOSE.en} The 2023 announcement lists astragalus as a food-medicine substance, for moderate use. Infants, pregnancy, lactation, and people on long-term medicine should ask a physician first. If there is an exterior excess with fever, or abdominal fullness and hard stools, do not start astragalus on your own as a tonic. That reminder is this site’s. It is not a caution line in the monograph quoted above. ${NOT_RX.en}`,
-      ar: `${NOT_A_DOSE.ar} إعلان 2023 يدرج الهوانغ تشي مادة غذاء ودواء، باعتدال. الرضع والحمل والإرضاع ومن يستخدم دواءً مزمناً يسألون طبيباً أولاً. عند امتلاء الخارج مع حمى، أو امتلاء البطن وبراز صلب، لا تبدأ الهوانغ تشي من تلقاء نفسك كمقوٍ. هذا تنبيه الموقع، وليس بند حذر في الدراسة المقتبسة. ${NOT_RX.ar}`,
+      zh: `${NOT_A_DOSE.zh}2023年第9号公告把黄芪列入食药物质，要求适量；婴幼儿、孕妇、乳母和慢性病用药者先问医师。表实有热、腹胀便结时，不要自行拿黄芪进补；这是本站的提醒，不是上面药典正文里的注意项。可以和体质识别里气虚质的教育卡片一起读，那是对照，不是测出气虚就吃黄芪。${NOT_RX.zh}`,
+      en: `${NOT_A_DOSE.en} The 2023 announcement lists astragalus as a food-medicine substance, for moderate use. Infants, pregnancy, lactation, and people on long-term medicine should ask a physician first. If there is an exterior excess with fever, or abdominal fullness and hard stools, do not start astragalus on your own as a tonic. That reminder is this site’s. It is not a caution line in the monograph quoted above. It can be read beside the qi-deficiency education card. That is comparison. A qi-deficiency score is not an instruction to take astragalus. ${NOT_RX.en}`,
+      ar: `${NOT_A_DOSE.ar} إعلان 2023 يدرج الهوانغ تشي مادة غذاء ودواء، باعتدال. الرضع والحمل والإرضاع ومن يستخدم دواءً مزمناً يسألون طبيباً أولاً. عند امتلاء الخارج مع حمى، أو امتلاء البطن وبراز صلب، لا تبدأ الهوانغ تشي من تلقاء نفسك كمقوٍ. هذا تنبيه الموقع، وليس بند حذر في الدراسة المقتبسة. يمكن قراءتها بجانب بطاقة نقص تشي. هذه مقارنة. درجة نقص تشي ليست أمراً بتناول الهوانغ تشي. ${NOT_RX.ar}`,
     },
   },
   {
     id: 'dangshen',
     name: '党参',
     title: { zh: '党参', en: 'Codonopsis root', ar: 'جذر الدانغ شين' },
-    classicKind: 'boundary',
-    classicFrom: {
-      zh: '《内经》没有党参专条',
-      en: 'The Neijing has no codonopsis monograph',
-      ar: 'لا دراسة للدانغ شين في الكلاسيكيات',
-    },
-    classic: {
-      zh: '党参是后世常用的补气药，不能写成《内经》已经点名的药。它也不是人参的无条件替身。',
-      en: 'Codonopsis is a later qi-supplementing medicinal. It cannot be written as a drug the Neijing already named. It is also not an unconditional substitute for ginseng.',
-      ar: 'الدانغ شين دواء لاحق لتكملة تشي. لا يُكتب كأن الكلاسيكيات سمّته. وهو ليس بديلاً غير مشروط للجينسنغ.',
-    },
     standardFrom: {
       zh: '《中国药典》2025年版一部 · 党参',
       en: 'Chinese Pharmacopoeia 2025, volume 1 · Codonopsis',
@@ -89,26 +67,15 @@ export const TCM_HERBS = [
       ar: 'حلو، متعادل. يدخل قناتي الطحال والرئة. يقوي الطحال وينفع الرئة ويغذي الدم ويولد السوائل. الدراسة تسمي نقص تشي الطحال والرئة وضعف الشهية والسعال المتعب ونقص تشي والدم وغيرها. المقدار المدون 9–30 غ. الحذر: لا يُستخدم مع الفيراترم.',
     },
     note: {
-      zh: `${NOT_A_DOSE.zh}2023年第9号公告把党参列入食药物质，要求和黄芪相同：适量；婴幼儿、孕妇、乳母和慢性病用药者先问医师。咳嗽气喘加重、痰中带血，去就医，不要自行用党参顶过去。${NOT_RX.zh}`,
-      en: `${NOT_A_DOSE.en} The 2023 announcement lists codonopsis as a food-medicine substance on the same terms as astragalus: moderate use, and infants, pregnancy, lactation, and people on long-term medicine ask a physician first. If cough and wheeze worsen, or there is blood in the sputum, seek care. Do not use codonopsis on your own to push through that. ${NOT_RX.en}`,
-      ar: `${NOT_A_DOSE.ar} إعلان 2023 يدرج الدانغ شين كالهوانغ تشي: باعتدال، والرضع والحمل والإرضاع ومن يستخدم دواءً مزمناً يسألون طبيباً. إن اشتد السعال أو ظهر دم في البلغم، اطلب الرعاية. لا تستخدم الدانغ شين وحدك لتجاوز ذلك. ${NOT_RX.ar}`,
+      zh: `${NOT_A_DOSE.zh}2023年第9号公告把党参列入食药物质，要求和黄芪相同：适量；婴幼儿、孕妇、乳母和慢性病用药者先问医师。它不是人参的无条件替身。咳嗽气喘加重、痰中带血，去就医，不要自行用党参顶过去。${NOT_RX.zh}`,
+      en: `${NOT_A_DOSE.en} The 2023 announcement lists codonopsis as a food-medicine substance on the same terms as astragalus: moderate use, and infants, pregnancy, lactation, and people on long-term medicine ask a physician first. It is not an unconditional substitute for ginseng. If cough and wheeze worsen, or there is blood in the sputum, seek care. Do not use codonopsis on your own to push through that. ${NOT_RX.en}`,
+      ar: `${NOT_A_DOSE.ar} إعلان 2023 يدرج الدانغ شين كالهوانغ تشي: باعتدال، والرضع والحمل والإرضاع ومن يستخدم دواءً مزمناً يسألون طبيباً. وهو ليس بديلاً غير مشروط للجينسنغ. إن اشتد السعال أو ظهر دم في البلغم، اطلب الرعاية. لا تستخدم الدانغ شين وحدك لتجاوز ذلك. ${NOT_RX.ar}`,
     },
   },
   {
     id: 'gouqi',
     name: '枸杞子',
     title: { zh: '枸杞子', en: 'Goji fruit', ar: 'ثمر الغوجي' },
-    classicKind: 'boundary',
-    classicFrom: {
-      zh: '《内经》没有枸杞子专条',
-      en: 'The Neijing has no goji monograph',
-      ar: 'لا دراسة لثمر الغوجي في الكلاسيكيات',
-    },
-    classic: {
-      zh: '四季页的枸杞粥来自《遵生八笺》，是食物示例。那一页不把这味药写成治眼病的方。',
-      en: 'The goji porridge on the seasons page comes from Eight Discourses on Living Well. It is a food example. That page does not turn this fruit into a formula for eye disease.',
-      ar: 'عصيدة الغوجي في صفحة الفصول من الخطابات الثمانية. هي مثال غذائي. تلك الصفحة لا تجعل الثمر وصفة لمرض العين.',
-    },
     standardFrom: {
       zh: '《中国药典》2025年版一部 · 枸杞子；卫法监发〔2002〕51号',
       en: 'Chinese Pharmacopoeia 2025, volume 1 · Goji; 2002 food-medicine list',
@@ -120,26 +87,15 @@ export const TCM_HERBS = [
       ar: 'حلو، متعادل. يدخل قناتي الكبد والكلية. الدراسة تقول إنه يغذي الكبد والكلية وينفع الجوهر والعين، لحالات تسميها مثل ألم الخصر والركبة والدوار وطنين الأذن وضعف البصر. المقدار المدون 6–12 غ. هذه الدراسة كما رُاجعت بلا بند حذر منفصل. الغوجي في قائمة 2002 للمواد التي هي غذاء ودواء معاً.',
     },
     note: {
-      zh: `${NOT_A_DOSE.zh}习惯上脾虚便溏、外邪实热少用；这不是药典这一条的注意项，四季页的枸杞粥仍保留这句提醒。目昏加重、腰膝酸痛持续，要就医核对，不要只加枸杞。${NOT_RX.zh}`,
-      en: `${NOT_A_DOSE.en} By custom, people go easy when the spleen is weak with loose stools, or when an external heat illness is present. That is not a caution line in this monograph. The goji porridge on the seasons page still keeps the reminder. If dim vision worsens or the waist and knees keep aching, seek care. Do not only add goji. ${NOT_RX.en}`,
-      ar: `${NOT_A_DOSE.ar} بالعادة يُخفف عند ضعف الطحال مع براز لين، أو عند مرض حراري ظاهر. هذا ليس بند حذر في الدراسة. عصيدة الغوجي في الفصول تُبقي التنبيه. إن اشتد ضعف البصر أو استمر ألم الخصر والركبة، اطلب الرعاية. لا تكتفِ بإضافة الغوجي. ${NOT_RX.ar}`,
+      zh: `${NOT_A_DOSE.zh}习惯上脾虚便溏、外邪实热少用；这不是药典这一条的注意项，四季页的枸杞粥仍保留这句提醒。那碗粥来自《遵生八笺》，是食物示例，不把这味药写成治眼病的方。目昏加重、腰膝酸痛持续，要就医核对，不要只加枸杞。${NOT_RX.zh}`,
+      en: `${NOT_A_DOSE.en} By custom, people go easy when the spleen is weak with loose stools, or when an external heat illness is present. That is not a caution line in this monograph. The goji porridge on the seasons page still keeps the reminder. That porridge comes from Eight Discourses on Living Well. It is a food example, not a formula for eye disease. If dim vision worsens or the waist and knees keep aching, seek care. Do not only add goji. ${NOT_RX.en}`,
+      ar: `${NOT_A_DOSE.ar} بالعادة يُخفف عند ضعف الطحال مع براز لين، أو عند مرض حراري ظاهر. هذا ليس بند حذر في الدراسة. عصيدة الغوجي في الفصول تُبقي التنبيه. تلك العصيدة من الخطابات الثمانية، مثال غذائي، وليست وصفة لمرض العين. إن اشتد ضعف البصر أو استمر ألم الخصر والركبة، اطلب الرعاية. لا تكتفِ بإضافة الغوجي. ${NOT_RX.ar}`,
     },
   },
   {
     id: 'shanyao',
     name: '山药',
     title: { zh: '山药', en: 'Chinese yam', ar: 'اليام الصيني' },
-    classicKind: 'boundary',
-    classicFrom: {
-      zh: '《内经》没有山药专条',
-      en: 'The Neijing has no Chinese-yam monograph',
-      ar: 'لا دراسة لليام في الكلاسيكيات',
-    },
-    classic: {
-      zh: '四季页的山药粥用的是《遵生八笺》里的食物做法。书中「甚补下元」是那本书的话，不是给你的补肾结论。',
-      en: 'The yam porridge on the seasons page follows the food method in Eight Discourses. “Greatly supplements the lower source” is that book’s sentence. It is not a conclusion that your kidney needs supplementing.',
-      ar: 'عصيدة اليام في الفصول تتبع طريقة الطعام في الخطابات الثمانية. «تكمل المصدر السفلي بقوة» جملة ذلك الكتاب. ليست خلاصة أن كليتك تحتاج تكملة.',
-    },
     standardFrom: {
       zh: '《中国药典》2025年版一部 · 山药；卫法监发〔2002〕51号',
       en: 'Chinese Pharmacopoeia 2025, volume 1 · Chinese yam; 2002 list',
@@ -151,26 +107,15 @@ export const TCM_HERBS = [
       ar: 'حلو، متعادل. يدخل قنوات الطحال والرئة والكلية. الدراسة تسرد تقوية الطحال والمعدة وتوليد السوائل ونفع الرئة وتثبيت الجوهر، لحالات تسميها مثل ضعف الشهية من نقص الطحال والإسهال الطويل. اليام المحمص بالنخالة يُذكر لضعف الطحال والبراز اللين والإفراز الزائد. المقدار المدون 15–30 غ. اليام في قائمة 2002.',
     },
     note: {
-      zh: `${NOT_A_DOSE.zh}湿盛中满或有实邪时少用；这是本站山药条的提醒，不是药典这一条的注意项。喘咳、久泻、尿频要就医核对。${NOT_RX.zh}`,
-      en: `${NOT_A_DOSE.en} Go easy when dampness is abundant with fullness, or when there is an excess pathogen. That is this site’s yam reminder. It is not a caution line in this monograph. Wheeze with cough, long diarrhea, or frequent urine needs a clinician to check. ${NOT_RX.en}`,
-      ar: `${NOT_A_DOSE.ar} خفف عند كثرة الرطوبة مع الامتلاء، أو عند وجود عامل ضار زائد. هذا تنبيه الموقع لليام، وليس بند حذر في الدراسة. السعال مع الأزيز أو الإسهال الطويل أو كثرة البول يحتاج فحص طبيب. ${NOT_RX.ar}`,
+      zh: `${NOT_A_DOSE.zh}湿盛中满或有实邪时少用；这是本站山药条的提醒，不是药典这一条的注意项。四季页的山药粥里，「甚补下元」是《遵生八笺》的话，不是给你的补肾结论。喘咳、久泻、尿频要就医核对。${NOT_RX.zh}`,
+      en: `${NOT_A_DOSE.en} Go easy when dampness is abundant with fullness, or when there is an excess pathogen. That is this site’s yam reminder. It is not a caution line in this monograph. In the yam porridge on the seasons page, “greatly supplements the lower source” is a sentence from Eight Discourses. It is not a conclusion that your kidney needs supplementing. Wheeze with cough, long diarrhea, or frequent urine needs a clinician to check. ${NOT_RX.en}`,
+      ar: `${NOT_A_DOSE.ar} خفف عند كثرة الرطوبة مع الامتلاء، أو عند وجود عامل ضار زائد. هذا تنبيه الموقع لليام، وليس بند حذر في الدراسة. في عصيدة اليام بصفحة الفصول، «تكمل المصدر السفلي بقوة» جملة من الخطابات الثمانية، وليست خلاصة أن كليتك تحتاج تكملة. السعال مع الأزيز أو الإسهال الطويل أو كثرة البول يحتاج فحص طبيب. ${NOT_RX.ar}`,
     },
   },
   {
     id: 'fuling',
     name: '茯苓',
     title: { zh: '茯苓', en: 'Poria', ar: 'فولينغ' },
-    classicKind: 'boundary',
-    classicFrom: {
-      zh: '《内经》没有茯苓专条',
-      en: 'The Neijing has no poria monograph',
-      ar: 'لا دراسة للفولينغ في الكلاسيكيات',
-    },
-    classic: {
-      zh: '茯苓常出现在四君子汤、逍遥散、地黄丸里。那些方的句子见经典处方，不在这里合成「你该吃茯苓」。',
-      en: 'Poria often appears in Four Gentlemen Decoction, Free and Easy Wanderer Powder, and the Rehmannia pill. Those books’ sentences are on the formulas tab. They are not combined here into “you should take poria.”',
-      ar: 'الفولينغ يرد كثيراً في حساء الرجال الأربعة ومسحوق التجوال الحر وحبة الريهمانيا. جمل تلك الكتب في صفحة الوصفات. لا تُجمع هنا إلى «ينبغي أن تتناول الفولينغ».',
-    },
     standardFrom: {
       zh: '《中国药典》2020年版一部 · 茯苓；卫法监发〔2002〕51号',
       en: 'Chinese Pharmacopoeia 2020, volume 1 · Poria; 2002 list',
@@ -182,26 +127,15 @@ export const TCM_HERBS = [
       ar: 'هذه المادة رُوجعت على دستور 2020. لا تُعرض كمراجعة كلمة كلمة لدستور 2025. حلو وخفيف، متعادل. يدخل قنوات القلب والرئة والطحال والكلية. يدر الرطوبة ويقوي الطحال ويهدئ القلب. الدراسة تسمي قلة البول مع التورم والبلغم مع الدوار والخفقان وضعف الشهية والبراز اللين واضطراب النوم. المقدار المدون 10–15 غ. الفولينغ في قائمة 2002.',
     },
     note: {
-      zh: `${NOT_A_DOSE.zh}水肿突然加重、胸闷喘、尿很少，按病去就医，不要自行加茯苓利水。${NOT_RX.zh}`,
-      en: `${NOT_A_DOSE.en} If swelling suddenly worsens, there is chest tightness and wheeze, or urine becomes very scanty, seek care for an illness. Do not add poria on your own to drive water out. ${NOT_RX.en}`,
-      ar: `${NOT_A_DOSE.ar} إن اشتد التورم فجأة، أو ضاق الصدر مع أزيز، أو قلّ البول جداً، اطلب الرعاية لمرض. لا تضف الفولينغ وحدك لإدرار الماء. ${NOT_RX.ar}`,
+      zh: `${NOT_A_DOSE.zh}它常出现在四君子汤、逍遥散、地黄丸里。那些方的句子在经典处方，不在这里合成「你该吃茯苓」。水肿突然加重、胸闷喘、尿很少，按病去就医，不要自行加茯苓利水。${NOT_RX.zh}`,
+      en: `${NOT_A_DOSE.en} It often appears in Four Gentlemen Decoction, Free and Easy Wanderer Powder, and the Rehmannia pill. Those books’ sentences are on the formulas tab. They are not combined here into “you should take poria.” If swelling suddenly worsens, there is chest tightness and wheeze, or urine becomes very scanty, seek care for an illness. Do not add poria on your own to drive water out. ${NOT_RX.en}`,
+      ar: `${NOT_A_DOSE.ar} يرد كثيراً في حساء الرجال الأربعة ومسحوق التجوال الحر وحبة الريهمانيا. جمل تلك الكتب في صفحة الوصفات، ولا تُجمع هنا إلى «ينبغي أن تتناول الفولينغ». إن اشتد التورم فجأة، أو ضاق الصدر مع أزيز، أو قلّ البول جداً، اطلب الرعاية لمرض. لا تضف الفولينغ وحدك لإدرار الماء. ${NOT_RX.ar}`,
     },
   },
   {
     id: 'juhua',
     name: '菊花',
     title: { zh: '菊花', en: 'Chrysanthemum flower', ar: 'زهرة الأقحوان' },
-    classicKind: 'boundary',
-    classicFrom: {
-      zh: '《内经》没有菊花专条',
-      en: 'The Neijing has no chrysanthemum monograph',
-      ar: 'لا دراسة للأقحوان في الكلاسيكيات',
-    },
-    classic: {
-      zh: '四季页的菊苗粥用的是甘菊嫩叶，书中写「清目宁心」。那是粥，不是这一味干花的药典主治。',
-      en: 'The chrysanthemum-shoot porridge on the seasons page uses tender sweet-chrysanthemum leaves. The book says it clears the eyes and calms the heart. That is a porridge. It is not the pharmacopoeia indication for this dried flower.',
-      ar: 'عصيدة براعم الأقحوان في الفصول تستخدم أوراقاً غضة. الكتاب يقول إنها تصفي العين وتهدئ القلب. تلك عصيدة. ليست استطباب الدستور لهذه الزهرة المجففة.',
-    },
     standardFrom: {
       zh: '《中国药典》2025年版一部 · 菊花；卫法监发〔2002〕51号',
       en: 'Chinese Pharmacopoeia 2025, volume 1 · Chrysanthemum; 2002 list',
@@ -213,9 +147,9 @@ export const TCM_HERBS = [
       ar: 'حلو ومر، بارد قليلاً. يدخل قناتي الرئة والكبد. الدراسة تسرد تبديد الريح وتصفية الحر وتهدئة الكبد وإضاءة العين، لحالات تسميها مثل برد الريح والحر والصداع والدوار واحمرار العين المؤلم. المقدار المدون 5–10 غ. الأقحوان في قائمة 2002.',
     },
     note: {
-      zh: `${NOT_A_DOSE.zh}气虚胃寒、食少泄泻少用；这是本站四季菊苗粥里已有的提醒，不把它写成药典注意项。目赤肿痛、疮痈，要就医，不要只泡菊花。${NOT_RX.zh}`,
-      en: `${NOT_A_DOSE.en} Go easy with a cold, weak stomach and poor appetite with loose stools. That reminder is already on the seasons page for the shoot porridge. It is not written here as a pharmacopoeia caution line. Red, swollen, painful eyes, or sores and abscesses, need care. Do not only steep chrysanthemum. ${NOT_RX.en}`,
-      ar: `${NOT_A_DOSE.ar} خفف عند برودة المعدة وضعفها مع قلة الأكل والبراز اللين. هذا التنبيه موجود في عصيدة البراعم. لا يُكتب هنا كبند حذر في الدستور. العين الحمراء المتورمة المؤلمة أو القروح تحتاج رعاية. لا تكتفِ بنقع الأقحوان. ${NOT_RX.ar}`,
+      zh: `${NOT_A_DOSE.zh}气虚胃寒、食少泄泻少用；这是本站四季菊苗粥里已有的提醒，不把它写成药典注意项。那碗粥用的是甘菊嫩叶，书中写「清目宁心」，不是这一味干花的主治。目赤肿痛、疮痈，要就医，不要只泡菊花。${NOT_RX.zh}`,
+      en: `${NOT_A_DOSE.en} Go easy with a cold, weak stomach and poor appetite with loose stools. That reminder is already on the seasons page for the shoot porridge. It is not written here as a pharmacopoeia caution line. That porridge uses tender leaves. The book says it clears the eyes and calms the heart. That is not the indication for this dried flower. Red, swollen, painful eyes, or sores and abscesses, need care. Do not only steep chrysanthemum. ${NOT_RX.en}`,
+      ar: `${NOT_A_DOSE.ar} خفف عند برودة المعدة وضعفها مع قلة الأكل والبراز اللين. هذا التنبيه موجود في عصيدة البراعم. لا يُكتب هنا كبند حذر في الدستور. تلك العصيدة تستخدم أوراقاً غضة، والكتاب يقول إنها تصفي العين وتهدئ القلب. هذا ليس استطباب الزهرة المجففة. العين الحمراء المتورمة المؤلمة أو القروح تحتاج رعاية. لا تكتفِ بنقع الأقحوان. ${NOT_RX.ar}`,
     },
   },
 ]

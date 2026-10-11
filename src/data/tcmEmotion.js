@@ -211,18 +211,7 @@ export const TCM_EMOTION_TOPICS = [
   },
   {
     id: 'help',
-    classicKind: 'boundary',
     name: { zh: '何时求助', en: 'When to ask for help', ar: 'متى تطلب المساعدة' },
-    classicFrom: {
-      zh: '病名不能回写进《内经》',
-      en: 'The disease name is not written back into the Neijing',
-      ar: 'اسم المرض لا يُعاد كتابته في الكلاسيكيات',
-    },
-    classic: {
-      zh: '《素问》没有「抑郁障碍」这个病名。上面的情志和气机，不能代替今天的诊断。',
-      en: 'Suwen has no disease name “depressive disorder.” The emotion and qi lines above cannot stand in for a present-day diagnosis.',
-      ar: 'ليس في «سوين» اسم مرض «اضطراب اكتئابي». سطور الانفعال وتشي أعلاه لا تغني عن تشخيص اليوم.',
-    },
     standardFrom: {
       zh: 'T/CACM 1067—2018 · 3.4.1.1 情志复',
       en: 'T/CACM 1067—2018 · 3.4.1.1 relapse due to emotional disorder',
@@ -244,9 +233,9 @@ export const TCM_EMOTION_TOPICS = [
       ar: 'توضح المنظمة أن نوبة الاكتئاب تختلف عن تقلب المزاج العادي. المزاج المنخفض، أو فقدان الاهتمام والمتعة بالأنشطة، يكون معظم اليوم وكل يوم تقريباً، ولأسبوعين على الأقل. وكثيراً ما يتغير معه النوم أو الشهية أو الطاقة أو التركيز. أفكار الموت أو الانتحار تحتاج مساعدة فورية.',
     },
     note: {
-      zh: '有伤害自己或他人的想法，或正在这样做，拨打 120，或到最近的急诊。情绪上需要有人听，可拨打国家卫生健康委设置的全国统一心理援助热线 12356（国卫医政函〔2024〕259号）。热线提供心理健康教育和危机时的支持；持续的问题仍要到医疗机构面诊。本页不判断读者有没有抑郁，也不提供药物或疗程。',
-      en: 'If there are thoughts of harming yourself or someone else, or that is already happening, call the local emergency number or go to the nearest emergency department. In China, the medical emergency number is 120. If you need someone to listen, the National Health Commission’s national psychological-support line is 12356 (NHC medical-administration letter 〔2024〕 No. 259). The line offers mental-health education and support in a crisis. A problem that continues still needs an in-person visit. This page does not decide whether the reader has depression, and it offers no medicine or course of treatment.',
-      ar: 'إن وُجدت أفكار بإيذاء النفس أو الغير، أو كان ذلك يحدث، اتصل برقم الطوارئ المحلي أو اذهب إلى أقرب طوارئ. في الصين رقم الطوارئ الطبية 120. إن احتجت إلى من يسمع، فخط الدعم النفسي الوطني للجنة الصحة الوطنية هو 12356. الخط للتعليم والدعم في الأزمة. المشكلة المستمرة تحتاج زيارة حضورية. هذه الصفحة لا تقرر إن كان القارئ مكتئباً، ولا تقدم دواء أو مساراً علاجياً.',
+      zh: '《素问》没有「抑郁障碍」这个病名。有伤害自己或他人的想法，或正在这样做，拨打 120，或到最近的急诊。情绪上需要有人听，可拨打国家卫生健康委设置的全国统一心理援助热线 12356（国卫医政函〔2024〕259号）。热线提供心理健康教育和危机时的支持；持续的问题仍要到医疗机构面诊。本页不判断读者有没有抑郁，也不提供药物或疗程。',
+      en: 'Suwen has no disease name “depressive disorder.” If there are thoughts of harming yourself or someone else, or that is already happening, call the local emergency number or go to the nearest emergency department. In China, the medical emergency number is 120. If you need someone to listen, the National Health Commission’s national psychological-support line is 12356 (NHC medical-administration letter 〔2024〕 No. 259). The line offers mental-health education and support in a crisis. A problem that continues still needs an in-person visit. This page does not decide whether the reader has depression, and it offers no medicine or course of treatment.',
+      ar: 'ليس في «سوين» اسم مرض «اضطراب اكتئابي». إن وُجدت أفكار بإيذاء النفس أو الغير، أو كان ذلك يحدث، اتصل برقم الطوارئ المحلي أو اذهب إلى أقرب طوارئ. في الصين رقم الطوارئ الطبية 120. إن احتجت إلى من يسمع، فخط الدعم النفسي الوطني للجنة الصحة الوطنية هو 12356. الخط للتعليم والدعم في الأزمة. المشكلة المستمرة تحتاج زيارة حضورية. هذه الصفحة لا تقرر إن كان القارئ مكتئباً، ولا تقدم دواء أو مساراً علاجياً.',
     },
   },
 ]

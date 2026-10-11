@@ -47,17 +47,6 @@ export const TCM_MOVEMENT_TOPICS = [
   {
     id: 'baduanjin',
     name: { zh: '八段锦', en: 'Baduanjin', ar: 'بادوانجين' },
-    classicKind: 'boundary',
-    classicFrom: {
-      zh: '这个名字不在《内经》里',
-      en: 'This name is not in the Neijing',
-      ar: 'هذا الاسم ليس في الكلاسيكيات',
-    },
-    classic: {
-      zh: '《素问》和《灵枢》没有「八段锦」。它是后来流传的导引功法，不能把八个式名回写成《内经》的原文。',
-      en: 'Suwen and Lingshu do not contain “Baduanjin.” It is a later daoyin method. The eight titles cannot be written back into the Neijing as original lines.',
-      ar: '«سوين» و«لينغ شو» لا يحتويان «بادوانجين». هي طريقة توجيه لاحقة. لا تُعاد عناوينها الثمانية إلى الكلاسيكيات كأنها نص أصلي.',
-    },
     standardFrom: {
       zh: 'T/CACM 1067—2018 · 4.8.2.5 八段锦',
       en: 'T/CACM 1067—2018 · 4.8.2.5 Baduanjin',
@@ -79,25 +68,14 @@ export const TCM_MOVEMENT_TOPICS = [
       ar: 'هذا روتين وقوف أُعد للتعليم العام من مركز تشي غونغ الصحي. ليس المدرسة الوحيدة في المعيار. عناوين الكتاب الثمانية تبدأ برفع اليدين للسماء، ثم فتح القوس، ثم رفع ذراع واحدة، ثم النظر إلى الخلف، ثم هز الرأس والذيل، ثم الوصول إلى القدمين، ثم قبض القبضة، ثم سبع هزات خلف الظهر. في صفحة الإدارة بتاريخ 6 مارس 2013 يختلف حرفان في العنوانين الثاني والسابع. هذا الموقع لا يعيد كتابة الحركات من ذلك. أسماء الأحشاء في العناوين تسميات تقليدية للروتين، وليست وعداً بعلاج أعضاء القارئ.',
     },
     note: {
-      zh: '动作、遍数和呼吸以这本教材或会教这套的人为准。本页不把图解改写成口令，也不把书里可能出现的停闭呼吸抄出来让人照做。北派马步对膝盖负担更明显，膝痛就不要往下蹲。',
-      en: 'The movements, repetitions, and breathing follow that book or a person who teaches this routine. This page does not turn the illustrations into commands, and it does not copy any breath-holding cues the book may contain for people to imitate. The northern horse stance loads the knees more. If the knee hurts, do not sink down.',
-      ar: 'الحركات والتكرار والتنفس تتبع ذلك الكتاب أو من يدرّس هذا الروتين. هذه الصفحة لا تحوّل الرسوم إلى أوامر، ولا تنسخ حبس النفس إن ورد في الكتاب ليقلده الناس. وقفة الحصان الشمالية تحمّل الركبة أكثر. إن وجع الركبة فلا تنزل للأسفل.',
+      zh: '《素问》和《灵枢》没有「八段锦」，八个式名不能回写成经文。动作、遍数和呼吸以这本教材或会教这套的人为准。本页不把图解改写成口令，也不把书里可能出现的停闭呼吸抄出来让人照做。北派马步对膝盖负担更明显，膝痛就不要往下蹲。',
+      en: 'Suwen and Lingshu do not contain “Baduanjin,” and the eight titles cannot be written back into those books. The movements, repetitions, and breathing follow that book or a person who teaches this routine. This page does not turn the illustrations into commands, and it does not copy any breath-holding cues the book may contain for people to imitate. The northern horse stance loads the knees more. If the knee hurts, do not sink down.',
+      ar: '«سوين» و«لينغ شو» لا يحتويان «بادوانجين»، ولا تُعاد العناوين الثمانية إلى هذين الكتابين. الحركات والتكرار والتنفس تتبع ذلك الكتاب أو من يدرّس هذا الروتين. هذه الصفحة لا تحوّل الرسوم إلى أوامر، ولا تنسخ حبس النفس إن ورد في الكتاب ليقلده الناس. وقفة الحصان الشمالية تحمّل الركبة أكثر. إن وجع الركبة فلا تنزل للأسفل.',
     },
   },
   {
     id: 'taiji',
     name: { zh: '太极拳', en: 'Taijiquan', ar: 'تاي تشي' },
-    classicKind: 'boundary',
-    classicFrom: {
-      zh: '这个名字不在《内经》里',
-      en: 'This name is not in the Neijing',
-      ar: 'هذا الاسم ليس في الكلاسيكيات',
-    },
-    classic: {
-      zh: '《内经》没有「太极拳」，也没有某一套拳架。阴阳是书里的思想，不能据此把后来的拳式写成《内经》原文。',
-      en: 'The Neijing has neither “Taijiquan” nor a boxing form. Yin and yang are ideas in the book. They do not turn a later form into an original Neijing line.',
-      ar: 'ليس في الكلاسيكيات «تاي تشي» ولا روتين ملاكمة. الين واليانغ فكرة في الكتاب، ولا يجعلان روتيناً لاحقاً نصاً أصلياً.',
-    },
     standardFrom: {
       zh: 'T/CACM 1067—2018 · 4.8.2.7 太极拳',
       en: 'T/CACM 1067—2018 · 4.8.2.7 Taijiquan',
@@ -119,25 +97,14 @@ export const TCM_MOVEMENT_TOPICS = [
       ar: 'أُدرجت عام 2020 في القائمة التمثيلية للتراث الثقافي غير المادي للبشرية، العنصر 00424، بترشيح من الصين. هذا اعتراف ثقافي لا تجربة فعالية طبية. يذكر الترشيح عدة مدارس وأيضاً تمرين الدفع باليدين بين شخصين. هذه الصفحة لا تعلّم روتين مدرسة ولا الدفع باليدين.',
     },
     note: {
-      zh: '后来用于普及的简化套路，不在团体标准里，本页也不逐式教。练的时候膝盖不要超过脚尖去硬蹲；膝痛就把架子抬高，痛不缓解就停。不要把它当成打架，也不要当成已经开好的治疗。',
-      en: 'Later short forms made for wide teaching are not in the group standard, and this page does not teach them move by move. Do not force the knee past the toes into a hard squat. If the knee hurts, raise the stance; if the pain does not ease, stop. It is not a fight, and it is not a treatment already prescribed.',
-      ar: 'الروتينات المختصرة اللاحقة للتعليم الواسع ليست في المعيار، وهذه الصفحة لا تعلّمها حركة حركة. لا تدفع الركبة أمام أصابع القدم في قرفصاء قاسٍ. إن وجعت الركبة فارفع الوقفة، وإن لم يهدأ الوجع فتوقف. ليست قتالاً وليست علاجاً موصوفاً سلفاً.',
+      zh: '《内经》没有「太极拳」。后来用于普及的简化套路，不在团体标准里，本页也不逐式教。练的时候膝盖不要超过脚尖去硬蹲；膝痛就把架子抬高，痛不缓解就停。不要把它当成打架，也不要当成已经开好的治疗。',
+      en: 'The Neijing has no “Taijiquan.” Later short forms made for wide teaching are not in the group standard, and this page does not teach them move by move. Do not force the knee past the toes into a hard squat. If the knee hurts, raise the stance; if the pain does not ease, stop. It is not a fight, and it is not a treatment already prescribed.',
+      ar: 'ليس في الكلاسيكيات «تاي تشي». الروتينات المختصرة اللاحقة للتعليم الواسع ليست في المعيار، وهذه الصفحة لا تعلّمها حركة حركة. لا تدفع الركبة أمام أصابع القدم في قرفصاء قاسٍ. إن وجعت الركبة فارفع الوقفة، وإن لم يهدأ الوجع فتوقف. ليست قتالاً وليست علاجاً موصوفاً سلفاً.',
     },
   },
   {
     id: 'standing',
     name: { zh: '站桩', en: 'Standing practice', ar: 'الوقوف الساكن' },
-    classicKind: 'boundary',
-    classicFrom: {
-      zh: '《内经》没有单独的站桩功',
-      en: 'The Neijing has no separate standing practice',
-      ar: 'لا وقوف ساكن مستقل في الكلاسيكيات',
-    },
-    classic: {
-      zh: '《内经》没有「站桩」这个功名，也没有写站几分钟、两脚距离多少。静静站着不能从书里推出一个时间表。',
-      en: 'The Neijing has no method named “standing practice,” and it does not say how many minutes to stand or how far apart the feet should be. Standing quietly cannot be turned into a timetable taken from the book.',
-      ar: 'ليس في الكلاسيكيات اسم «الوقوف الساكن»، ولا دقائق ولا مسافة بين القدمين. الوقوف بهدوء لا يُستخرج منه جدول زمني من الكتاب.',
-    },
     standardFrom: {
       zh: 'T/CACM 1067—2018 · 4.8.2.3 强壮功 · 注',
       en: 'T/CACM 1067—2018 · 4.8.2.3 health-promotion exercise, note',
@@ -149,9 +116,9 @@ export const TCM_MOVEMENT_TOPICS = [
       ar: 'حاشية «تمرين تعزيز الصحة» تقول «مثل الجلوس متربعاً والوقوف الساكن». الوقوف هنا مثال على وضع ساكن إلى جانب الجلوس. المعيار لا يحدد المدة ولا ثني الركبة ولا إن كانت الذراعان تحملان كرة.',
     },
     note: {
-      zh: '旁边要有能扶的东西，地面要稳。头晕、眼前发黑、膝痛或心慌，就停下坐下。不要憋气，也不要把某一种桩法当成治病的处方。',
-      en: 'Have something nearby to hold, and stand on a stable floor. If you feel dizzy, your vision darkens, the knee hurts, or the heart races, stop and sit down. Do not hold the breath, and do not take one style of standing as a prescription for disease.',
-      ar: 'ليكن بجانبك ما تستند إليه، والأرض ثابتة. إن حدث دوار أو أظلمت الرؤية أو وجعت الركبة أو تسارع القلب، توقف واجلس. لا تحبس النفس، ولا تجعل أسلوباً واحداً من الوقوف وصفة لمرض.',
+      zh: '《内经》没有「站桩」这个功名，也没有写站几分钟。旁边要有能扶的东西，地面要稳。头晕、眼前发黑、膝痛或心慌，就停下坐下。不要憋气，也不要把某一种桩法当成治病的处方。',
+      en: 'The Neijing has no method named “standing practice,” and it does not say how many minutes to stand. Have something nearby to hold, and stand on a stable floor. If you feel dizzy, your vision darkens, the knee hurts, or the heart races, stop and sit down. Do not hold the breath, and do not take one style of standing as a prescription for disease.',
+      ar: 'ليس في الكلاسيكيات اسم «الوقوف الساكن»، ولا دقائق للوقوف. ليكن بجانبك ما تستند إليه، والأرض ثابتة. إن حدث دوار أو أظلمت الرؤية أو وجعت الركبة أو تسارع القلب، توقف واجلس. لا تحبس النفس، ولا تجعل أسلوباً واحداً من الوقوف وصفة لمرض.',
     },
   },
   {
@@ -196,17 +163,6 @@ export const TCM_MOVEMENT_TOPICS = [
   {
     id: 'stop',
     name: { zh: '何时停下', en: 'When to stop', ar: 'متى تتوقف' },
-    classicKind: 'boundary',
-    classicFrom: {
-      zh: '不把式名写成治疗',
-      en: 'Titles are not turned into treatment',
-      ar: 'العناوين لا تُحوَّل إلى علاج',
-    },
-    classic: {
-      zh: '式名里的「理三焦」「去心火」「固肾腰」「百病消」，以及太极拳「内外兼修」，都不是《内经》开给读者的治法。出现不舒服，不能靠把动作做完来代替就医。',
-      en: '“Regulate the triple burner,” “remove heart fire,” “firm the kidney and waist,” “dispel the hundred illnesses,” and Taijiquan’s “cultivate inside and outside” are not treatments the Neijing prescribed for the reader. If something feels wrong, finishing the movement does not replace medical care.',
-      ar: '«تنظيم الحارق الثلاثي» و«إزالة نار القلب» و«تثبيت الكلية والخصر» و«إزالة المئة مرض» و«التهذيب الداخلي والخارجي» في التاي تشي ليست علاجات وصفها الكتاب للقارئ. إن شعر الإنسان بسوء، فإنهاء الحركة لا يغني عن الرعاية الطبية.',
-    },
     standardFrom: {
       zh: 'T/CACM 1067—2018 · 4.8 运动调养',
       en: 'T/CACM 1067—2018 · 4.8 regulating by sport',
@@ -218,9 +174,9 @@ export const TCM_MOVEMENT_TOPICS = [
       ar: 'غاية التنظيم بالرياضة تقوية الجسم ودعم طول العمر. لا يقول بالممارسة القسرية أثناء المرض، ولا باستخدام وقفة الحصان أو الوقوف الساكن للتعامل مع ألم الصدر أو علامات السكتة.',
     },
     note: {
-      zh: '练的时候出现胸痛、突然喘不上气、头晕、眼前发黑、单侧无力或说话不清，马上停下。胸痛、单侧无力、说话不清，按急症就医，可拨打 120。关节一阵一阵的锐痛不要硬撑。不要憋气。孕期、刚做完手术，或血压、心脏病还不稳定，开始前先问医师。本页不替代康复训练处方。',
-      en: 'Stop at once if practice brings chest pain, sudden shortness of breath, dizziness, darkening vision, weakness on one side, or unclear speech. Chest pain, one-sided weakness, or unclear speech needs emergency care. In China the medical emergency number is 120. Do not push through sharp joint pain. Do not hold the breath. In pregnancy, just after surgery, or while blood pressure or heart disease is still unstable, ask a physician before starting. This page does not replace a rehabilitation prescription.',
-      ar: 'توقف فوراً إن ظهر ألم صدر أو ضيق نفس مفاجئ أو دوار أو إظلام الرؤية أو ضعف في جانب واحد أو كلام غير واضح. ألم الصدر والضعف في جانب واحد والكلام غير الواضح يحتاج طوارئ. في الصين رقم الطوارئ الطبية 120. لا تواصل مع ألم مفصل حاد. لا تحبس النفس. في الحمل، أو بعد الجراحة مباشرة، أو حين يكون ضغط الدم أو مرض القلب غير مستقر، اسأل طبيباً قبل البدء. هذه الصفحة لا تغني عن وصفة إعادة التأهيل.',
+      zh: '式名里的「理三焦」「去心火」「固肾腰」「百病消」，不是《内经》开给读者的治法。练的时候出现胸痛、突然喘不上气、头晕、眼前发黑、单侧无力或说话不清，马上停下。胸痛、单侧无力、说话不清，按急症就医，可拨打 120。关节一阵一阵的锐痛不要硬撑。不要憋气。孕期、刚做完手术，或血压、心脏病还不稳定，开始前先问医师。本页不替代康复训练处方。',
+      en: '“Regulate the triple burner,” “remove heart fire,” “firm the kidney and waist,” and “dispel the hundred illnesses” are not treatments the Neijing prescribed for the reader. Stop at once if practice brings chest pain, sudden shortness of breath, dizziness, darkening vision, weakness on one side, or unclear speech. Chest pain, one-sided weakness, or unclear speech needs emergency care. In China the medical emergency number is 120. Do not push through sharp joint pain. Do not hold the breath. In pregnancy, just after surgery, or while blood pressure or heart disease is still unstable, ask a physician before starting. This page does not replace a rehabilitation prescription.',
+      ar: '«تنظيم الحارق الثلاثي» و«إزالة نار القلب» و«تثبيت الكلية والخصر» و«إزالة المئة مرض» ليست علاجات وصفها الكتاب للقارئ. توقف فوراً إن ظهر ألم صدر أو ضيق نفس مفاجئ أو دوار أو إظلام الرؤية أو ضعف في جانب واحد أو كلام غير واضح. ألم الصدر والضعف في جانب واحد والكلام غير الواضح يحتاج طوارئ. في الصين رقم الطوارئ الطبية 120. لا تواصل مع ألم مفصل حاد. لا تحبس النفس. في الحمل، أو بعد الجراحة مباشرة، أو حين يكون ضغط الدم أو مرض القلب غير مستقر، اسأل طبيباً قبل البدء. هذه الصفحة لا تغني عن وصفة إعادة التأهيل.',
     },
   },
 ]

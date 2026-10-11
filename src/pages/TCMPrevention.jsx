@@ -346,13 +346,15 @@ export default function TCMPrevention() {
               <article key={item.id} className="tcm-card content-card content-card--padded">
                 <h3>{localeText(item.name, lang)}</h3>
                 <dl className="tcm-dl">
-                  <div>
-                    <dt>{item.classicKind === 'boundary' ? mod.dtBoundary : mod.dtClassic}</dt>
-                    <dd>
-                      <span className="season-from">{localeText(item.classicFrom, lang)}</span>
-                      {localeText(item.classic, lang)}
-                    </dd>
-                  </div>
+                  {item.classic ? (
+                    <div>
+                      <dt>{mod.dtClassic}</dt>
+                      <dd>
+                        <span className="season-from">{localeText(item.classicFrom, lang)}</span>
+                        {localeText(item.classic, lang)}
+                      </dd>
+                    </div>
+                  ) : null}
                   <div>
                     <dt>{mod.dtStandard}</dt>
                     <dd>
@@ -393,13 +395,15 @@ export default function TCMPrevention() {
               <article key={item.id} className="tcm-card content-card content-card--padded">
                 <h3>{localeText(item.name, lang)}</h3>
                 <dl className="tcm-dl">
-                  <div>
-                    <dt>{item.classicKind === 'boundary' ? mod.dtBoundary : mod.dtClassic}</dt>
-                    <dd>
-                      <span className="season-from">{localeText(item.classicFrom, lang)}</span>
-                      {localeText(item.classic, lang)}
-                    </dd>
-                  </div>
+                  {item.classic ? (
+                    <div>
+                      <dt>{mod.dtClassic}</dt>
+                      <dd>
+                        <span className="season-from">{localeText(item.classicFrom, lang)}</span>
+                        {localeText(item.classic, lang)}
+                      </dd>
+                    </div>
+                  ) : null}
                   <div>
                     <dt>{mod.dtStandard}</dt>
                     <dd>
@@ -449,13 +453,15 @@ export default function TCMPrevention() {
               <article key={item.id} className="tcm-card content-card content-card--padded">
                 <h3>{localeText(item.name, lang)}</h3>
                 <dl className="tcm-dl">
-                  <div>
-                    <dt>{item.classicKind === 'boundary' ? mod.dtBoundary : mod.dtClassic}</dt>
-                    <dd>
-                      <span className="season-from">{localeText(item.classicFrom, lang)}</span>
-                      {localeText(item.classic, lang)}
-                    </dd>
-                  </div>
+                  {item.classic ? (
+                    <div>
+                      <dt>{mod.dtClassic}</dt>
+                      <dd>
+                        <span className="season-from">{localeText(item.classicFrom, lang)}</span>
+                        {localeText(item.classic, lang)}
+                      </dd>
+                    </div>
+                  ) : null}
                   <div>
                     <dt>{mod.dtStandard}</dt>
                     <dd>
@@ -496,13 +502,15 @@ export default function TCMPrevention() {
               <article key={herb.id} className="tcm-card herb-card content-card content-card--padded">
                 <h3>{localeText(herb.title, lang)}</h3>
                 <dl className="tcm-dl">
-                  <div>
-                    <dt>{herb.classicKind === 'boundary' ? mod.dtBoundary : mod.dtClassic}</dt>
-                    <dd>
-                      <span className="season-from">{localeText(herb.classicFrom, lang)}</span>
-                      {localeText(herb.classic, lang)}
-                    </dd>
-                  </div>
+                  {herb.classic ? (
+                    <div>
+                      <dt>{mod.dtClassic}</dt>
+                      <dd>
+                        <span className="season-from">{localeText(herb.classicFrom, lang)}</span>
+                        {localeText(herb.classic, lang)}
+                      </dd>
+                    </div>
+                  ) : null}
                   <div>
                     <dt>{mod.dtStandard}</dt>
                     <dd>

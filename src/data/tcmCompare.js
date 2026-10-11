@@ -87,11 +87,10 @@ export const TCM_COMPARE_TOPICS = [
   {
     id: 'whole',
     name: { zh: '整体观', en: 'Seeing the whole', ar: 'رؤية الكل' },
-    classicKind: 'boundary',
     classicFrom: {
-      zh: '这个词不在《内经》里',
-      en: 'This word is not in the Neijing',
-      ar: 'هذه الكلمة ليست في الكلاسيكيات',
+      zh: '《素问·宝命全形论》',
+      en: 'Suwen, Preserving Life and the Body Whole',
+      ar: 'سوين، حفظ الحياة وكمال الشكل',
     },
     classic: {
       zh: '《内经》没有「整体观」四个字。《素问·宝命全形论》写的是「人以天地之气生，四时之法成。」人由天地之气生成，生活的节律跟着四时。这是联系，不是一次就能看完全身的方法。',
@@ -146,17 +145,6 @@ export const TCM_COMPARE_TOPICS = [
   {
     id: 'levels',
     name: { zh: '三级预防', en: 'Three levels of prevention', ar: 'مستويات الوقاية الثلاثة' },
-    classicKind: 'boundary',
-    classicFrom: {
-      zh: '《内经》没有这三层的名称',
-      en: 'The Neijing has no names for these three levels',
-      ar: 'لا أسماء لهذه المستويات الثلاثة في الكلاسيكيات',
-    },
-    classic: {
-      zh: '一级预防、二级预防、三级预防，不是《内经》或团体标准里的词。不能把它们回写成治未病的原文。',
-      en: 'Primary, secondary, and tertiary prevention are not terms in the Neijing or in the group standard. They cannot be written back as the original wording of treating disease before it arises.',
-      ar: 'الوقاية الأولية والثانوية والثالثية ليست مصطلحات في الكلاسيكيات ولا في المعيار الجماعي. لا تُعاد كتابتها كأنها النص الأصلي للوقاية قبل المرض.',
-    },
     standardFrom: {
       zh: '不能把标准的三句话当成这三层',
       en: 'The standard’s three sentences are not these three levels',
@@ -178,25 +166,14 @@ export const TCM_COMPARE_TOPICS = [
       ar: 'يقول المسرد إن الوقاية الأولية تتجه إلى عوامل خطر مشتركة لأمراض كثيرة، مثل التبغ والكحول والسمنة وارتفاع ضغط الدم، لمنع حدوث الاضطراب من البداية، وقد تشمل تغيير ظروف بيئية واجتماعية تزيد هذه المخاطر. والثانوية تتجه إلى الاكتشاف المبكر لمرض موجود، لوقف تقدمه أو تأخيره وآثاره، مثل الفحص والفحوص الصحية الدورية. والثالثية عموماً إدارة مرض مستقر وإعادة تأهيله، لتقليل التدهور والمضاعفات، مثل تثقيف المريض والعلاج الطبيعي.',
     },
     note: {
-      zh: '可以这样看，但不要逐条等同：一级预防更接近「发生之前」，不过它举的是烟草和血压这些危险因素，不是体质分数。二级预防和「已病防变」都强调趁早，但筛查不是《内经》的方法。三级预防包含长期管理和康复；「病瘥防复」只讲痊愈后不要再发生，范围更窄。本页不开筛查单，也不把康复训练写成处方。',
-      en: 'They can be read side by side, but not matched line for line. Primary prevention is closer to “before it occurs,” yet its examples are risks such as tobacco and blood pressure, not a constitution score. Secondary prevention and “prevent change once disease exists” both stress acting early, but screening is not a Neijing method. Tertiary prevention includes long-term management and rehabilitation; “prevent relapse after recovery” only says do not let it happen again, which is narrower. This page orders no screening and does not write rehabilitation as a prescription.',
-      ar: 'يمكن قراءتهما جنباً إلى جنب، لا مطابقة سطر بسطر. الوقاية الأولية أقرب إلى «قبل الحدوث»، لكن أمثلتها مخاطر كالتبغ وضغط الدم، لا درجة نمط الجسم. والثانوية و«منع التغير بعد المرض» كلتاهما تؤكدان المبادرة، لكن الفحص ليس طريقة من الكلاسيكيات. والثالثية تشمل الإدارة الطويلة وإعادة التأهيل؛ و«منع الانتكاس بعد الشفاء» يقول فقط ألا يتكرر، وهو أضيق. هذه الصفحة لا تطلب فحصاً ولا تكتب إعادة التأهيل كوصفة.',
+      zh: '一级预防、二级预防、三级预防不是《内经》里的词。可以这样看，但不要逐条等同：一级预防更接近「发生之前」，不过它举的是烟草和血压这些危险因素，不是体质分数。二级预防和「已病防变」都强调趁早，但筛查不是《内经》的方法。三级预防包含长期管理和康复；「病瘥防复」只讲痊愈后不要再发生，范围更窄。本页不开筛查单，也不把康复训练写成处方。',
+      en: 'Primary, secondary, and tertiary prevention are not terms in the Neijing. They can be read side by side, but not matched line for line. Primary prevention is closer to “before it occurs,” yet its examples are risks such as tobacco and blood pressure, not a constitution score. Secondary prevention and “prevent change once disease exists” both stress acting early, but screening is not a Neijing method. Tertiary prevention includes long-term management and rehabilitation; “prevent relapse after recovery” only says do not let it happen again, which is narrower. This page orders no screening and does not write rehabilitation as a prescription.',
+      ar: 'الوقاية الأولية والثانوية والثالثية ليست مصطلحات في الكلاسيكيات. يمكن قراءتها جنباً إلى جنب، لا مطابقة سطر بسطر. الوقاية الأولية أقرب إلى «قبل الحدوث»، لكن أمثلتها مخاطر كالتبغ وضغط الدم، لا درجة نمط الجسم. والثانوية و«منع التغير بعد المرض» كلتاهما تؤكدان المبادرة، لكن الفحص ليس طريقة من الكلاسيكيات. والثالثية تشمل الإدارة الطويلة وإعادة التأهيل؛ و«منع الانتكاس بعد الشفاء» يقول فقط ألا يتكرر، وهو أضيق. هذه الصفحة لا تطلب فحصاً ولا تكتب إعادة التأهيل كوصفة.',
     },
   },
   {
     id: 'limit',
     name: { zh: '对照的限度', en: 'Limit of the comparison', ar: 'حد المقارنة' },
-    classicKind: 'boundary',
-    classicFrom: {
-      zh: '本站不把对照收成处方',
-      en: 'This site does not turn the comparison into a prescription',
-      ar: 'هذا الموقع لا يحوّل المقارنة إلى وصفة',
-    },
-    classic: {
-      zh: '上面的句子各自有出处。放在一起，是为了看它们说了什么、没说什么。不能加成「你属于某一证，从今天起按某一法调养」。',
-      en: 'Each sentence above has its own source. Putting them together is for seeing what they say and what they do not say. They do not add up to “you belong to this pattern, so from today follow this method.”',
-      ar: 'كل جملة أعلاه لها مصدرها. جمعها لرؤية ما تقوله وما لا تقوله. لا تجمع إلى «أنت من هذا النمط، فمن اليوم اتبع هذه الطريقة».',
-    },
     standardFrom: {
       zh: 'T/CACM 1067—2018 的适用范围',
       en: 'What T/CACM 1067—2018 says it applies to',
@@ -208,9 +185,9 @@ export const TCM_COMPARE_TOPICS = [
       ar: 'يقول المعيار إنه يعرّف مصطلحات الوقاية في الطب الصيني، للتعليم والبحث والرعاية والخدمات الصحية والتبادل. تعريف المصطلحات ليس إتمام تمييز النمط لقارئ واحد.',
     },
     note: {
-      zh: '体质、四季、饮食、情志和运动那些页，仍是分项的教育材料，不在这里收成一张个人方案。胸痛、一侧无力、说话不清、喘不上气或大出血，停下并按急症就医，可拨打 120。已经在治的病，药不要因为看了对照就自行停掉或改量。',
-      en: 'The pages on constitution, seasons, diet, emotion, and movement stay separate educational material. They are not gathered here into one personal plan. For chest pain, weakness on one side, unclear speech, inability to breathe, or heavy bleeding, stop and get emergency care. In China the medical emergency number is 120. If a disease is already being treated, do not stop or change a medicine on your own because of this comparison.',
-      ar: 'صفحات النمط والفصول والغذاء والانفعال والحركة تبقى مادة تعليمية منفصلة، ولا تُجمع هنا في خطة شخصية. عند ألم الصدر أو ضعف جانب أو كلام غير واضح أو عجز عن التنفس أو نزف شديد، توقف واطلب الطوارئ. في الصين رقم الطوارئ الطبية 120. إن كان مرض يُعالَج بالفعل، فلا توقف الدواء أو تغير مقداره من تلقاء نفسك بسبب هذه المقارنة.',
+      zh: '不能加成「你属于某一证，从今天起按某一法调养」。体质、四季、饮食、情志和运动那些页，仍是分项的教育材料，不在这里收成一张个人方案。胸痛、一侧无力、说话不清、喘不上气或大出血，停下并按急症就医，可拨打 120。已经在治的病，药不要因为看了对照就自行停掉或改量。',
+      en: 'They do not add up to “you belong to this pattern, so from today follow this method.” The pages on constitution, seasons, diet, emotion, and movement stay separate educational material. They are not gathered here into one personal plan. For chest pain, weakness on one side, unclear speech, inability to breathe, or heavy bleeding, stop and get emergency care. In China the medical emergency number is 120. If a disease is already being treated, do not stop or change a medicine on your own because of this comparison.',
+      ar: 'لا تجمع إلى «أنت من هذا النمط، فمن اليوم اتبع هذه الطريقة». صفحات النمط والفصول والغذاء والانفعال والحركة تبقى مادة تعليمية منفصلة، ولا تُجمع هنا في خطة شخصية. عند ألم الصدر أو ضعف جانب أو كلام غير واضح أو عجز عن التنفس أو نزف شديد، توقف واطلب الطوارئ. في الصين رقم الطوارئ الطبية 120. إن كان مرض يُعالَج بالفعل، فلا توقف الدواء أو تغير مقداره من تلقاء نفسك بسبب هذه المقارنة.',
     },
   },
 ]
