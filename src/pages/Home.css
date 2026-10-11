@@ -287,7 +287,15 @@
 .home-stats {
   max-width: 72rem;
   margin: 0 auto;
-  padding: var(--space-6) clamp(1.5rem, 4vw, 2.5rem) var(--space-16);
+  padding: var(--space-6) clamp(1.5rem, 4vw, 2.5rem) var(--space-8);
+}
+
+.page-home .module-access-hint--page-end {
+  max-width: 72rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(1.5rem, 4vw, 2.5rem);
+  padding-right: clamp(1.5rem, 4vw, 2.5rem);
 }
 
 .home-stats-grid {

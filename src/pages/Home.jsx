@@ -184,15 +184,7 @@ export default function Home() {
             </div>
           </div>
         </section>
-      ) : (
-        <section className="home-today" aria-labelledby="home-today-heading">
-          <header className="home-section-header">
-            <h2 id="home-today-heading">{copy.todayTitle}</h2>
-            <p className="home-curated-note">{copy.todayCurated}</p>
-          </header>
-          <ModuleAccessHint moduleKey="home" />
-        </section>
-      )}
+      ) : null}
 
       {/* Steps */}
       <section className="home-steps" aria-labelledby="home-steps-heading">
@@ -246,12 +238,16 @@ export default function Home() {
         <div className="home-stats-grid">
           {HOME_STATS.map((stat) => (
             <article key={stat.id} className="home-stat-card">
-              <p className="home-stat-value">{stat.value}</p>
+              <p className="home-stat-value">
+                {typeof stat.value === 'object' ? (stat.value[lang] || stat.value.zh) : stat.value}
+              </p>
               <p className="home-stat-label">{stat.label[lang] || stat.label.zh}</p>
             </article>
           ))}
         </div>
       </section>
+
+      {isAdmin ? null : <ModuleAccessHint moduleKey="home" className="module-access-hint--page-end" />}
     </div>
   )
 }

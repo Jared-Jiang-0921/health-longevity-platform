@@ -1,25 +1,30 @@
 /** 首页静态内容（中文为主；EN/AR 为简化占位） */
 
+/**
+ * 长寿科学观察站数字：来自生产 Qdrant（2026-08-28）
+ * consult_zh 387,899 片段 / 1,072 书目
+ * consult_en 531,726 片段 / 294 书目
+ */
 export const HOME_STATS = [
   {
-    id: 'studies',
-    value: '12,856+',
-    label: { zh: '已收录研究', en: 'Studies indexed', ar: 'دراسات مفهرسة' },
+    id: 'books',
+    value: { zh: '1,366', en: '1,366', ar: '1,366' },
+    label: { zh: '入库书目', en: 'Works indexed', ar: 'أعمال مفهرسة' },
   },
   {
-    id: 'evidence',
-    value: '3,200+',
-    label: { zh: '证据条目', en: 'Evidence entries', ar: 'مداخل أدلة' },
+    id: 'passages',
+    value: { zh: '91.9万', en: '919,000+', ar: '919,000+' },
+    label: { zh: '知识片段', en: 'Knowledge passages', ar: 'مقاطع معرفية' },
   },
   {
-    id: 'plans',
-    value: '1,680+',
-    label: { zh: '健康方案', en: 'Health plans', ar: 'خطط صحية' },
+    id: 'zh-corpus',
+    value: { zh: '38.8万', en: '388,000+', ar: '388,000+' },
+    label: { zh: '中文知识库', en: 'Chinese corpus', ar: 'المدونة الصينية' },
   },
   {
-    id: 'daily',
-    value: '24+',
-    label: { zh: '每日更新', en: 'Daily updates', ar: 'تحديثات يومية' },
+    id: 'en-corpus',
+    value: { zh: '53.2万', en: '532,000+', ar: '532,000+' },
+    label: { zh: '英文知识库', en: 'English corpus', ar: 'المدونة الإنجليزية' },
   },
 ]
 
@@ -36,20 +41,6 @@ export const HOME_MODULES = [
       zh: ['健康画像', '可解释建议', '就医提示'],
       en: ['Health profile', 'Explainable', 'Care prompts'],
       ar: ['صورة صحية', 'قابل للتفسير', 'تنبيهات'],
-    },
-  },
-  {
-    path: '/health-skills',
-    title: { zh: '长寿知识技能', en: 'Health Skills', ar: 'مهارات طول العمر' },
-    intro: {
-      zh: '将循证医学与生活方式干预拆解为可学可练的结构：知识卡片、实操清单、证据等级、适用人群与风险提示。覆盖睡眠、代谢、运动、营养等主题，支持系列课程与视频学习。',
-      en: 'Structured learning—cards, checklists, evidence grades, audience fit, and risk notes—on sleep, metabolism, exercise, and nutrition, with courses and video series.',
-      ar: 'تعلم منظم ببطاقات وقوائم ودرجات أدلة حول النوم والتمثيل والحركة والتغذية.',
-    },
-    chips: {
-      zh: ['系列课程', '证据等级', '实操清单'],
-      en: ['Course series', 'Evidence grade', 'Checklists'],
-      ar: ['دورات', 'أدلة', 'قوائم'],
     },
   },
   {
@@ -84,6 +75,20 @@ export const HOME_MODULES = [
       zh: '教育/生活方式信息，不替代诊疗',
       en: 'Education only—not medical care',
       ar: 'تعليمي فقط',
+    },
+  },
+  {
+    path: '/health-skills',
+    title: { zh: '长寿知识技能', en: 'Health Skills', ar: 'مهارات طول العمر' },
+    intro: {
+      zh: '将循证医学与生活方式干预拆解为可学可练的结构：知识卡片、实操清单、证据等级、适用人群与风险提示。覆盖睡眠、代谢、运动、营养等主题，支持系列课程与视频学习。',
+      en: 'Structured learning—cards, checklists, evidence grades, audience fit, and risk notes—on sleep, metabolism, exercise, and nutrition, with courses and video series.',
+      ar: 'تعلم منظم ببطاقات وقوائم ودرجات أدلة حول النوم والتمثيل والحركة والتغذية.',
+    },
+    chips: {
+      zh: ['系列课程', '证据等级', '实操清单'],
+      en: ['Course series', 'Evidence grade', 'Checklists'],
+      ar: ['دورات', 'أدلة', 'قوائم'],
     },
   },
   {
@@ -187,7 +192,7 @@ export function getHomeCopy(lang) {
     modulesTitle: '六大服务模块',
     modulesLead: '每项模块均配有专属封面与主要内容介绍，点击进入对应能力',
     statsTitle: '长寿科学观察站',
-    statsLead: '持续追踪研究、证据与方案，数据驱动决策',
+    statsLead: '数字来自已入库知识库（中英文），随收录更新',
     moduleEnter: '进入模块',
     todayTitle: '今日更新',
     todayCurated: '编辑精选 · 非实时推送',
@@ -224,7 +229,7 @@ export function getHomeCopy(lang) {
     modulesTitle: 'Six service modules',
     modulesLead: 'Each module has a cover image and a main introduction—tap to explore',
     statsTitle: 'Longevity Science Observatory',
-    statsLead: 'Tracking research, evidence, and plans at a glance',
+    statsLead: 'Counts from the indexed Chinese and English knowledge base',
     moduleEnter: 'Enter module',
     todayTitle: 'Updates',
     todayCurated: 'Editor’s picks · not live feed',
