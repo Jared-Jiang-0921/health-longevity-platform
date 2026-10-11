@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useLocale } from '../context/LocaleContext'
+import PasswordField from '../components/PasswordField'
 import { getUi } from '../i18n/ui'
 import { getMessages } from '../i18n/messages'
 import './Auth.css'
@@ -82,8 +83,7 @@ export default function ResetPassword() {
         <form onSubmit={handleSubmit} noValidate>
           <label>
             <span>{t.pwd}</span>
-            <input
-              type="password"
+            <PasswordField
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="new-password"
@@ -91,8 +91,7 @@ export default function ResetPassword() {
           </label>
           <label>
             <span>{t.confirm}</span>
-            <input
-              type="password"
+            <PasswordField
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
               autoComplete="new-password"

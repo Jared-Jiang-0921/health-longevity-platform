@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
-import { MEMBERSHIP_LEVELS } from '../data/membership'
 import { getMembershipLevelLabel } from '../i18n/terms'
+import AccountMemberAdmin from './AccountMemberAdmin'
 import './Account.css'
 
 function formatExpires(iso) {
@@ -178,7 +178,7 @@ function AccountTotpSection({ user, getToken, refreshUser }) {
 export default function Account() {
   const { lang } = useLocale()
   const T = {
-    zh: { title: '会员信息', loading: '加载中…', needLogin: '请先登录后查看。', login: '登录', refresh: '刷新', name: '昵称', email: '登录邮箱', level: '会员等级', expires: '有效期至', hint: '支付成功后若未更新，请点击「刷新」或重新登录。升级会员请前往' },
+    zh: { title: '会员信息', loading: '加载中…', needLogin: '请先登录后查看。', login: '登录', refresh: '刷新', name: '昵称', email: '登录账号', level: '会员等级', expires: '有效期至', hint: '支付成功后若未更新，请点击「刷新」或重新登录。升级会员请前往' },
     en: { title: 'Account', loading: 'Loading…', needLogin: 'Please login first.', login: 'Login', refresh: 'Refresh', name: 'Name', email: 'Email', level: 'Membership', expires: 'Expires at', hint: 'If payment status is not updated, click refresh or login again. Upgrade at ' },
     ar: { title: 'الحساب', loading: 'جار التحميل…', needLogin: 'يرجى تسجيل الدخول أولاً.', login: 'تسجيل الدخول', refresh: 'تحديث', name: 'الاسم', email: 'البريد الإلكتروني', level: 'العضوية', expires: 'تاريخ الانتهاء', hint: 'إذا لم يتم تحديث الحالة بعد الدفع، اضغط تحديث أو سجّل الدخول مجددًا. للترقية انتقل إلى ' },
   }
@@ -222,7 +222,7 @@ export default function Account() {
   }
 
   return (
-    <div className="page-content account-page">
+    <div className={`page-content account-page${user.site_admin ? ' account-page--admin' : ''}`}>
       <div className="account-toolbar">
         <h1>{t.title}</h1>
         <button type="button" className="btn-refresh" onClick={() => refreshUser()}>
@@ -256,6 +256,8 @@ export default function Account() {
       </p>
 
       <AccountTotpSection user={user} getToken={getToken} refreshUser={refreshUser} />
+
+      {user.site_admin ? <AccountMemberAdmin getToken={getToken} /> : null}
     </div>
   )
 }

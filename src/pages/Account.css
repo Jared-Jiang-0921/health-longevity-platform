@@ -145,3 +145,122 @@
   font-size: 0.88rem;
   color: var(--color-text-muted);
 }
+
+.account-page--admin {
+  max-width: 960px;
+}
+
+.account-member-admin {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.account-member-admin-title {
+  font-size: 1.1rem;
+  margin: 0 0 0.5rem;
+}
+
+.account-member-admin-modes {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.account-member-admin-mode {
+  padding: 0.4rem 0.85rem;
+  font-size: 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.account-member-admin-mode.is-active {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+.account-member-admin-form,
+.account-member-admin-search {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.account-member-admin-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.account-member-admin-form input,
+.account-member-admin-form select,
+.account-member-admin-search input {
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.account-member-admin-form .span-2,
+.account-member-admin-actions.span-2,
+.account-member-admin-presets.span-2 {
+  grid-column: span 2;
+}
+
+.account-member-admin-search {
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+}
+
+.account-member-admin-presets {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.account-member-admin-presets button {
+  padding: 0.25rem 0.55rem;
+  font-size: 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.account-member-admin-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.account-member-admin-error {
+  color: #b42318;
+  font-size: 0.88rem;
+}
+
+@media (max-width: 720px) {
+  .account-member-admin-form,
+  .account-member-admin-search {
+    grid-template-columns: 1fr;
+  }
+
+  .account-member-admin-form .span-2,
+  .account-member-admin-actions.span-2,
+  .account-member-admin-presets.span-2 {
+    grid-column: span 1;
+  }
+}
