@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
 import { getTranslationOpportunitiesModuleCopy } from '../data/translationOpportunitiesModuleI18n'
 import ModuleAccessHint from '../components/ModuleAccessHint'
+import ModulePageHero from '../components/ModulePageHero'
 
 export default function TranslationOpportunities() {
   const { lang } = useLocale()
@@ -11,10 +12,12 @@ export default function TranslationOpportunities() {
   const mod = getTranslationOpportunitiesModuleCopy(lang)
 
   return (
-    <div className="page-content page-translation-opportunities">
+    <div className="page-translation-opportunities">
+      <ModulePageHero path="/translation-opportunities" title={mod.title}>
+        <p className="module-page-hero-line">{mod.audience}</p>
+      </ModulePageHero>
+
       <section className="opportunities-header">
-        <h1>{mod.title}</h1>
-        <p className="opportunities-audience">{mod.audience}</p>
         <p className="opportunities-core">{mod.core}</p>
 
         {isAdmin ? (
@@ -46,16 +49,16 @@ export default function TranslationOpportunities() {
               <p className="opportunities-monetization-body">{mod.monetizationBody}</p>
             </section>
           </>
-        ) : (
-          <ModuleAccessHint moduleKey="translation-opportunities" />
-        )}
+        ) : null}
       </section>
 
       {isAdmin ? (
         <section className="opportunities-body">
           <p className="opportunities-assets-note">{mod.assetsNote}</p>
         </section>
-      ) : null}
+      ) : (
+        <ModuleAccessHint moduleKey="translation-opportunities" className="module-access-hint--page-end" />
+      )}
     </div>
   )
 }

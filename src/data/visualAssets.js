@@ -128,6 +128,7 @@ export const MODULE_PATH_TO_VISUAL_KEY = {
   '/tcm-prevention': 'tcm-prevention',
   '/longevity-news': 'longevity-news',
   '/translation-opportunities': 'translation-opportunities',
+  '/consult': 'ai-longevity-coach',
 }
 
 /**

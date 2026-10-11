@@ -1,5 +1,6 @@
 .page-translation-opportunities {
-  max-width: 720px;
+  width: 100%;
+  max-width: var(--content-max);
 }
 
 .opportunities-header h1 {

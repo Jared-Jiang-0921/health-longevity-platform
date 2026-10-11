@@ -7,6 +7,7 @@
 .page-products,
 .page-longevity-news,
 .page-tcm-prevention,
+.page-translation-opportunities,
 .page-solutions,
 .page-my-favorites,
 .page-course-detail,
@@ -15,8 +16,6 @@
   max-width: var(--content-max);
 }
 
-.page-longevity-news,
-.page-tcm-prevention,
 .page-content {
   max-width: var(--content-narrow);
 }
@@ -29,6 +28,7 @@
 .tcm-header,
 .opportunities-header,
 .health-questionnaire-header,
+.risk-page-header,
 .course-detail-header,
 .learn-header,
 .product-detail-header {
@@ -45,6 +45,7 @@
 .tcm-header::after,
 .opportunities-header::after,
 .health-questionnaire-header::after,
+.risk-page-header::after,
 .course-detail-header::after,
 .learn-header::after,
 .product-detail-header::after {
@@ -83,7 +84,7 @@
 .page-lead,
 .health-skills-header > p:not(.health-skills-methodology):not(.page-callout),
 .products-header > p,
-.news-header > p:not(.news-caveat),
+.news-header > p,
 .tcm-header > p:not(.tcm-positioning):not(.tcm-differentiation),
 .opportunities-audience,
 .opportunities-core,
@@ -133,8 +134,7 @@
   color: var(--color-text);
 }
 
-.page-callout--info,
-.news-caveat {
+.page-callout--info {
   border-left-color: var(--color-primary);
   background: var(--color-info-muted);
 }
@@ -228,25 +228,19 @@
 
 /* —— 内页表格 —— */
 .products-table-wrap,
-.news-table-wrap,
-.tcm-table-wrap,
-.solutions-table-wrap {
+.news-table-wrap {
   border-color: var(--color-border);
   background: var(--color-surface);
   box-shadow: var(--shadow-sm);
 }
 
 .products-scoring-table th,
-.news-columns-table th,
-.tcm-columns-table th,
-.solutions-features-table th {
+.news-columns-table th {
   background: var(--color-primary-muted);
   color: var(--color-text);
 }
 
 .products-scoring-table td,
-.news-columns-table td,
-.tcm-columns-table td,
-.solutions-features-table td {
+.news-columns-table td {
   border-color: var(--color-border);
 }
