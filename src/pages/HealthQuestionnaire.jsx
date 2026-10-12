@@ -109,8 +109,8 @@ export default function HealthQuestionnaire() {
     setError('')
     setMessage('')
     if (!String(form.goals || '').trim()) {
+      setError(t.errGoals)
       goalsRef.current?.focus()
-      goalsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
       return
     }
     if (!String(form.concerns || '').trim()) {
@@ -136,13 +136,7 @@ export default function HealthQuestionnaire() {
       setLatestAt(data.createdAt || new Date().toISOString())
       setMessage(t.saved)
     } catch (err) {
-      const msg = err.message || t.submitFail
-      if (msg === t.errGoals || /健康目标/.test(msg)) {
-        goalsRef.current?.focus()
-        goalsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        return
-      }
-      setError(msg)
+      setError(err.message || t.submitFail)
     } finally {
       setBusy(false)
     }

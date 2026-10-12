@@ -1,5 +1,6 @@
 import { verifyToken } from '../lib/auth.js'
 import { sql } from '../lib/db.js'
+import { parseApiJsonBody } from '../lib/apiBody.js'
 import { SITE_LEGAL } from '../src/data/siteLegal.js'
 
 function getToken(req) {
@@ -77,7 +78,9 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
-    const payload = normalizePayload(req.body)
+    const body = parseApiJsonBody(req, res)
+    if (!body) return
+    const payload = normalizePayload(body)
     const error = validatePayload(payload)
     if (error) {
       return res.status(400).json({ error })
