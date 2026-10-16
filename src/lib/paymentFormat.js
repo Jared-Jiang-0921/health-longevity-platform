@@ -50,12 +50,12 @@ function convertFromBaseMinor(baseMinorAmount, targetCurrency) {
   return Math.round(targetMajor * minorFactor(targetCurrency))
 }
 
-export function formatPlanPrice(baseMinorAmount, targetCurrency) {
+export function formatPlanPrice(baseMinorAmount, targetCurrency, approxLabel = '约') {
   const convertedMinor = convertFromBaseMinor(baseMinorAmount, targetCurrency)
   if (convertedMinor == null) {
     const baseAmount = Number(baseMinorAmount) / minorFactor(PAYMENT_BASE_CURRENCY)
     const baseDecimals = minorFactor(PAYMENT_BASE_CURRENCY) === 1 ? 0 : 2
-    return `约 ${PAYMENT_BASE_CURRENCY} ${baseAmount.toFixed(baseDecimals)}`
+    return `${approxLabel} ${PAYMENT_BASE_CURRENCY} ${baseAmount.toFixed(baseDecimals)}`
   }
   const amount = Number(convertedMinor) / minorFactor(targetCurrency)
   const decimals = minorFactor(targetCurrency) === 1 ? 0 : 2

@@ -86,6 +86,154 @@ export const LONGEVITY_NEWS_ARTICLES = [
   },
 ]
 
+const ARTICLE_I18N = {
+  en: {
+    'ln-static-1': {
+      title: 'Senolytics: what early human studies do and do not show',
+      summary:
+        'Some small human studies have looked at changes in aging-related markers and physical measures with regimens such as dasatinib plus quercetin. The evidence is still preliminary: samples are small, and most endpoints are surrogates. That is not enough to call these drugs anti-aging medicines.',
+      takeaways: [
+        'Look first at the design: randomized, controlled, and whether the endpoint matters clinically',
+        'Headlines about “reversing aging” usually overreach',
+        'Any personal use of a drug needs a licensed clinician. This site does not prescribe',
+      ],
+      sourceNote: 'Search terms: senolytics human trial dasatinib quercetin (PubMed)',
+    },
+    'ln-static-2': {
+      title: 'How to grade a longevity paper: mechanism, observation, intervention',
+      summary:
+        'Sort a paper into three layers: (1) a cell or animal mechanism; (2) an association in people; (3) a human intervention trial. Only layer 3, with a solid endpoint, is close to a discussion of clinical meaning. The first two at most say the question is worth more study.',
+      takeaways: [
+        'Association is not causation. Observational studies are open to confounding',
+        'A better biomarker is not the same as a better hard endpoint, such as disease or death',
+        'Default wording here: current research suggests a possible link, and higher-quality clinical evidence is still needed',
+      ],
+      sourceNote: 'Methods background: the evidence pyramid and trial phases (public teaching pages / Cochrane)',
+    },
+    'ln-static-3': {
+      title: 'NMN, NR, and the “NAD+ boost” story: where the evidence is thin',
+      summary:
+        'Nicotinamide mononucleotide (NMN) and nicotinamide riboside (NR) are discussed in animal work and early human studies for effects on NAD+ metabolism. Open questions include human dose, long-term safety, whether functional endpoints such as fitness or metabolic-disease outcomes replicate, and whether marketing goes past the evidence.',
+      takeaways: [
+        'Raising NAD+ is not proof of a longer healthy human life',
+        'Prefer registered trials and independent replication over a single company press release',
+        'Pregnancy, chronic illness, and people already on medicines should ask a clinician first',
+      ],
+      sourceNote: 'Search: nicotinamide riboside OR NMN clinical trial (PubMed / ClinicalTrials.gov)',
+    },
+    'ln-static-4': {
+      title: 'How to follow aging and longevity trials on ClinicalTrials.gov',
+      summary:
+        'A public registry can show whether a trial is recruiting, what the primary endpoint is, and whether a results summary exists. Search combinations such as aging, senescence, longevity, and rapamycin, and keep the NCT number so you can check for updates.',
+      takeaways: [
+        'Ongoing is not the same as proven effective',
+        'Read the primary endpoint and the sample size before the press coverage',
+        'Until results are published, do not treat the registry page as evidence of benefit',
+      ],
+      sourceNote: 'ClinicalTrials.gov',
+    },
+    'ln-static-5': {
+      title: 'Reading a guideline update: who it applies to, evidence grade, local use',
+      summary:
+        'Health-authority and society guidelines usually guide public-health and clinical pathways more than a single frontier paper does. They are still limited by region, population, and how often they are updated. Note the strength of the recommendation, the quality of the evidence, and whether your local regulator or society has adopted it.',
+      takeaways: [
+        'A guideline is a path for a population. It does not replace care for one person',
+        'Moving a guideline across countries needs a check on access and regulation',
+        'This column will follow publicly retrievable updates from authoritative bodies',
+      ],
+      sourceNote: 'Example entry: the WHO guidelines library (public)',
+    },
+  },
+  ar: {
+    'ln-static-1': {
+      title: 'إزالة الخلايا الهرمة: ماذا تُظهر الدراسات البشرية المبكرة وماذا لا تُظهر',
+      summary:
+        'رصدت بعض الدراسات البشرية الصغيرة تغيّر واسمات مرتبطة بالشيخوخة ومقاييس بدنية مع نظم مثل داساتينيب مع كيرسيتين. الدليل ما زال أوليًا: العينات صغيرة، وأكثر النهايات بديلة. هذا لا يكفي لاستنتاج أنها أدوية مضادة للشيخوخة.',
+      takeaways: [
+        'انظر أولًا إلى التصميم: عشوائي، وله شاهد، وهل النهاية مهمة سريريًا',
+        'عناوين «عكس الشيخوخة» غالبًا تبالغ',
+        'أي استخدام شخصي لدواء يحتاج طبيبًا مرخّصًا. هذا الموقع لا يصف دواء',
+      ],
+      sourceNote: 'كلمات البحث: senolytics human trial dasatinib quercetin (PubMed)',
+    },
+    'ln-static-2': {
+      title: 'كيف تُقدّر ورقة عن طول العمر: آلية، ملاحظة، تدخل',
+      summary:
+        'رتّب الورقة في ثلاث طبقات: (1) آلية في خلية أو حيوان؛ (2) ارتباط في البشر؛ (3) تجربة تدخل على البشر. الطبقة الثالثة فقط، مع نهاية صلبة، تقترب من نقاش المعنى السريري. الطبقتان الأوليان تقولان على الأكثر إن السؤال يستحق مزيدًا من البحث.',
+      takeaways: [
+        'الارتباط ليس سببية. الدراسات الرصدية عرضة للخلط',
+        'تحسّن واسم حيوي ليس تحسّن نهاية صلبة مثل المرض أو الوفاة',
+        'الصياغة هنا: البحث الحالي يشير إلى صلة ممكنة، وما زال يلزم دليل سريري أعلى جودة',
+      ],
+      sourceNote: 'خلفية المنهج: هرم الأدلة ومراحل التجارب (صفحات تعليمية عامة / Cochrane)',
+    },
+    'ln-static-3': {
+      title: 'NMN وNR وقصة «رفع NAD+»: أين يرقّ الدليل',
+      summary:
+        'يُناقش أحادي نيوكليوتيد النيكوتيناميد (NMN) وريبوزيد النيكوتيناميد (NR) في عمل حيواني ودراسات بشرية مبكرة لأثرهما على أيض NAD+. الأسئلة المفتوحة: الجرعة البشرية، والسلامة طويلة الأمد، وهل تتكرر النهايات الوظيفية مثل اللياقة أو حصائل المرض الأيضي، وهل يجاوز التسويق الدليل.',
+      takeaways: [
+        'رفع NAD+ ليس دليلًا على عمر بشري صحي أطول',
+        'فضّل التجارب المسجّلة والتكرار المستقل على بيان شركة واحد',
+        'الحمل والمرض المزمن ومن يتناول دواءً يسأل الطبيب أولًا',
+      ],
+      sourceNote: 'بحث: nicotinamide riboside OR NMN clinical trial (PubMed / ClinicalTrials.gov)',
+    },
+    'ln-static-4': {
+      title: 'كيف تتابع تجارب الشيخوخة وطول العمر على ClinicalTrials.gov',
+      summary:
+        'يُظهر سجل عام ما إذا كانت التجربة تجنّد، وما النهاية الأولية، وهل يوجد ملخص نتائج. ابحث بتركيبات مثل aging وsenescence وlongevity وrapamycin، واحتفظ برقم NCT لمراجعة التحديث.',
+      takeaways: [
+        '«جارية» ليست «ثبتت فعاليتها»',
+        'اقرأ النهاية الأولية وحجم العينة قبل التغطية الصحفية',
+        'قبل نشر النتائج، لا تعامل صفحة التسجيل كدليل على الفائدة',
+      ],
+      sourceNote: 'ClinicalTrials.gov',
+    },
+    'ln-static-5': {
+      title: 'قراءة تحديث إرشادي: لمن ينطبق، ودرجة الدليل، والاستخدام المحلي',
+      summary:
+        'إرشادات الجهات الصحية والجمعيات توجه عادة مسار الصحة العامة والعيادة أكثر من ورقة واحدة. لكنها تبقى محدودة بالمنطقة والسكان ودورة التحديث. دوّن قوة التوصية وجودة الدليل، وهل تبنّتها جهة التنظيم أو الجمعية حيث تعيش.',
+      takeaways: [
+        'الإرشاد مسار لجماعة. لا يغني عن رعاية شخص بعينه',
+        'نقل إرشاد بين البلدان يحتاج فحص الإتاحة والتنظيم',
+        'سيتابع هذا العمود التحديثات العلنية من جهات موثوقة',
+      ],
+      sourceNote: 'مدخل مثال: مكتبة إرشادات منظمة الصحة العالمية (علنية)',
+    },
+  },
+}
+
 export function getLongevityNewsArticles() {
   return LONGEVITY_NEWS_ARTICLES.slice()
+}
+
+export function articleDisplay(article, lang = 'zh') {
+  if (!article) return { title: '', summary: '', takeaways: [], sourceNote: '', zhOnly: false }
+  const key = lang === 'en' || lang === 'ar' ? lang : 'zh'
+  if (key === 'zh') {
+    return {
+      title: article.title || '',
+      summary: article.summary || '',
+      takeaways: article.takeaways || [],
+      sourceNote: article.sourceNote || '',
+      zhOnly: false,
+    }
+  }
+  const pack = ARTICLE_I18N[key]?.[article.id]
+  if (!pack) {
+    return {
+      title: article.title || '',
+      summary: article.summary || '',
+      takeaways: article.takeaways || [],
+      sourceNote: article.sourceNote || '',
+      zhOnly: true,
+    }
+  }
+  return {
+    title: pack.title || article.title || '',
+    summary: pack.summary || article.summary || '',
+    takeaways: pack.takeaways || article.takeaways || [],
+    sourceNote: pack.sourceNote || article.sourceNote || '',
+    zhOnly: false,
+  }
 }

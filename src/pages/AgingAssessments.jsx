@@ -38,6 +38,11 @@ function Field({ label, children }) {
   )
 }
 
+function phrase(t, text) {
+  if (text == null || text === '') return ''
+  return t.phrases?.[text] || text
+}
+
 function ResultBox({ title, t, result, extra }) {
   if (!result) {
     return (
@@ -51,7 +56,7 @@ function ResultBox({ title, t, result, extra }) {
     return (
       <section className="risk-result">
         <h2>{title}</h2>
-        <p className="risk-muted">{result.error}</p>
+        <p className="risk-muted">{phrase(t, result.error)}</p>
       </section>
     )
   }
@@ -60,7 +65,7 @@ function ResultBox({ title, t, result, extra }) {
       <h2>{title}</h2>
       {extra}
       {result.band?.adviseClinician ? <p className="risk-muted">{t.seeDoctor}</p> : null}
-      <p className="risk-muted">{result.disclaimer}</p>
+      <p className="risk-muted">{phrase(t, result.disclaimer)}</p>
     </section>
   )
 }
@@ -367,26 +372,26 @@ export default function AgingAssessments() {
                 </div>
                 <div className="risk-metric">
                   <strong>{currentResult.deltaPct >= 0 ? `+${currentResult.deltaPct}%` : `${currentResult.deltaPct}%`}</strong>
-                  <span>相对每年老一年</span>
+                  <span>{t.result.versusYear}</span>
                 </div>
                 <div className="risk-metric">
-                  <strong>{currentResult.band.label}</strong>
-                  <span>&lt;0.97 偏慢 · 0.97–1.03 接近 · ≥1.10 偏快</span>
+                  <strong>{phrase(t, currentResult.band.label)}</strong>
+                  <span>{t.result.paceBands}</span>
                 </div>
               </>
             ) : (
               <>
                 <div className="risk-metric">
                   <strong>{currentResult.clockAge}</strong>
-                  <span>{tool === 'grimage2' ? 'GrimAge2（岁）' : '时钟年龄（岁）'}</span>
+                  <span>{tool === 'grimage2' ? t.result.grimageYears : t.result.clockYears}</span>
                 </div>
                 <div className="risk-metric">
                   <strong>{currentResult.accel >= 0 ? `+${currentResult.accel}` : String(currentResult.accel)}</strong>
-                  <span>相对日历年龄 {currentResult.chronologicalAge} 岁</span>
+                  <span>{t.result.versusAge(currentResult.chronologicalAge)}</span>
                 </div>
                 <div className="risk-metric">
-                  <strong>{currentResult.band.label}</strong>
-                  <span>|Δ|&lt;5 接近 · 5–10 轻度 · ≥10 明显</span>
+                  <strong>{phrase(t, currentResult.band.label)}</strong>
+                  <span>{t.result.yearBands}</span>
                 </div>
               </>
             )}

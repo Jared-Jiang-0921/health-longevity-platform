@@ -6,10 +6,10 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { HOME_MODULES, getHomeCopy } from '../../src/data/homePageContent.js'
-import { getLongevityNewsArticles } from '../../src/data/longevityNewsArticles.js'
-import { LONGEVITY_NEWS_COLUMNS } from '../../src/data/longevityNewsColumns.js'
+import { articleDisplay, getLongevityNewsArticles } from '../../src/data/longevityNewsArticles.js'
+import { LONGEVITY_NEWS_COLUMNS, columnDisplayLabel } from '../../src/data/longevityNewsColumns.js'
 import { SEO_LANGS, SEO_PAGES, SITE_ORIGIN, absoluteUrl } from '../../src/data/seo.js'
-import { toNewsSearchCard } from '../../src/lib/longevityNewsCard.js'
+import { extractLongevityKeywords, newsCardExcerpt, toNewsSearchCard } from '../../src/lib/longevityNewsCard.js'
 import { langSpec, renderHeadSnippet, resolveSeo } from '../../src/lib/seoDocument.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -93,26 +93,62 @@ async function loadLongevityNewsCards() {
   return [...uploads, ...staticCards].filter((card) => card.title)
 }
 
+function hasChinese(value) {
+  return /[\u4e00-\u9fff]/.test(String(value || ''))
+}
+
+function displayKeywords(title, summary, lang) {
+  const found = extractLongevityKeywords(title, summary)
+  if (!lang || lang === 'zh') return found
+  const fallback = lang === 'ar' ? 'بحث طول العمر' : 'longevity research'
+  return found
+    .map((term) => (term === '长寿研究' ? fallback : term))
+    .filter((term) => !hasChinese(term))
+}
+
+function presentNewsCard(card, lang) {
+  const article = getLongevityNewsArticles().find((item) => item.id === card.id)
+  if (article) {
+    const view = articleDisplay(article, lang)
+    return {
+      ...card,
+      title: view.title,
+      excerpt: newsCardExcerpt(view.summary),
+      keywords: displayKeywords(view.title, view.summary, lang),
+      columnLabel: columnDisplayLabel(card.column, lang),
+      zhOnly: view.zhOnly,
+    }
+  }
+  const zhOnly = lang !== 'zh' && hasChinese(`${card.title || ''} ${card.excerpt || ''}`)
+  return {
+    ...card,
+    keywords: displayKeywords(card.title, card.excerpt || card.summary, lang),
+    columnLabel: columnDisplayLabel(card.column, lang) || card.column,
+    zhOnly,
+  }
+}
+
 function newsJsonLd(lang, cards) {
   const canonical = absoluteUrl(lang, '/longevity-news')
-  const keywords = [...new Set(cards.flatMap((card) => card.keywords))].slice(0, 48)
+  const shownCards = cards.slice(0, 200).map((card) => presentNewsCard(card, lang))
+  const keywords = [...new Set(shownCards.flatMap((card) => card.keywords || []))].slice(0, 48)
   return {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     name: lang === 'zh' ? '前沿医学资讯检索卡片' : 'Longevity insight cards',
     url: canonical,
     numberOfItems: cards.length,
-    itemListElement: cards.slice(0, 200).map((card, index) => ({
+    itemListElement: shownCards.map((shown, index) => ({
       '@type': 'ListItem',
       position: index + 1,
       item: {
         '@type': 'Article',
-        headline: card.title,
-        keywords: card.keywords.join(', '),
-        description: card.excerpt || card.title,
-        url: `${canonical}#${encodeURIComponent(card.id)}`,
+        headline: shown.title,
+        keywords: (shown.keywords || []).join(', '),
+        description: shown.excerpt || shown.title,
+        url: `${canonical}#${encodeURIComponent(shown.id)}`,
         isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
-        ...(card.url ? { isBasedOn: card.url } : {}),
+        ...(shown.url ? { isBasedOn: shown.url } : {}),
       },
     })),
     ...(keywords.length ? { keywords: keywords.join(', ') } : {}),
@@ -126,21 +162,23 @@ function newsBody(lang, cards) {
   for (const card of cards) {
     const label = card.column || '其他'
     if (!grouped.has(label)) grouped.set(label, [])
-    grouped.get(label).push(card)
+    grouped.get(label).push(presentNewsCard(card, lang))
   }
+  const keywordLabel = lang === 'en' ? 'Keywords' : lang === 'ar' ? 'كلمات مفتاحية' : '关键词'
   const sections = []
   for (const [label, items] of grouped) {
     if (!items.length) continue
     const articles = items
       .map((card) => {
         const kws = card.keywords.length
-          ? `<p>关键词：${escapeHtml(card.keywords.join('、'))}</p>`
+          ? `<p>${escapeHtml(keywordLabel)}: ${escapeHtml(card.keywords.join(', '))}</p>`
           : ''
         const excerpt = card.excerpt ? `<p>${escapeHtml(card.excerpt)}</p>` : ''
-        return `<article id="${escapeHtml(card.id)}"><h3>${escapeHtml(card.title)}</h3>${kws}${excerpt}</article>`
+        const onlyZh = card.zhOnly ? `<p>${escapeHtml(lang === 'ar' ? 'هذا المحتوى بالصينية فقط' : 'This item is in Chinese only')}</p>` : ''
+        return `<article id="${escapeHtml(card.id)}"><h3>${escapeHtml(card.title)}</h3>${onlyZh}${kws}${excerpt}</article>`
       })
       .join('')
-    sections.push(`<section><h2>${escapeHtml(label)}</h2>${articles}</section>`)
+    sections.push(`<section><h2>${escapeHtml(columnDisplayLabel(label, lang))}</h2>${articles}</section>`)
   }
   return `<h1>${escapeHtml(seo.title)}</h1><p>${escapeHtml(seo.description)}</p>${moduleIntro('/longevity-news', lang)}${sections.join('')}`
 }

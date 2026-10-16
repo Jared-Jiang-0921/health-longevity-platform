@@ -10,6 +10,7 @@ import { getUi } from '../i18n/ui'
 import ContentLockNotice from '../components/ContentLockNotice'
 import '../styles/membership-badge.css'
 import { pickCatalogLocale, pickSkuLocale } from '../lib/productCatalogLocale'
+import { categoryDisplayLabel, hasChinese, productChrome, staticProductDisplay, unitDisplay } from '../data/productLocale'
 import ProductCatalogGallery from '../components/ProductCatalogGallery'
 import './ProductDetail.css'
 
@@ -26,6 +27,7 @@ export default function ProductDetail() {
   const ui = getUi(lang)
   const { user, getToken } = useAuth()
   const ev = getProductsEvidenceCopy(lang)
+  const chrome = productChrome(lang)
   const t = {
     zh: {
       notFound: '未找到该产品',
@@ -99,6 +101,9 @@ export default function ProductDetail() {
   const product = catalogRow
     ? (() => {
         const loc = pickCatalogLocale(catalogRow, lang)
+        const unit = unitDisplay(catalogRow.unit || '件', lang)
+        const skus = catalogRow.skus || []
+        const skuZh = skus.some((sku) => hasChinese(pickSkuLocale(sku, lang)))
         return {
           id: catalogRow.id,
           title: loc.title,
@@ -106,23 +111,29 @@ export default function ProductDetail() {
           price: Number(catalogRow.price_amount),
           currency: catalogRow.currency || 'CNY',
           desc: loc.desc,
-          unit: catalogRow.unit || '件',
+          unit,
           origin: loc.origin,
           catalog: true,
           gallery_count: catalogRow.gallery_count || 0,
-          skus: catalogRow.skus || [],
+          skus,
+          zhOnly: Boolean(loc.zhOnly) || skuZh || (lang !== 'zh' && hasChinese(unit)),
         }
       })()
     : staticProduct
-      ? {
-          ...staticProduct,
-          title: staticProduct.title,
-          desc: staticProduct.desc,
-          origin: '',
-          catalog: false,
-          gallery_count: 0,
-          skus: [],
-        }
+      ? (() => {
+          const view = staticProductDisplay(staticProduct, lang)
+          return {
+            ...staticProduct,
+            title: view.title,
+            desc: view.desc,
+            unit: view.unit,
+            origin: '',
+            catalog: false,
+            gallery_count: 0,
+            skus: [],
+            zhOnly: view.zhOnly,
+          }
+        })()
       : null
 
   if (catalogLoading && !product) {
@@ -153,8 +164,8 @@ export default function ProductDetail() {
 
       <aside className="product-detail-notice" role="note">
         <p className="product-detail-notice-strong">{ev.roleDisclaimer}</p>
-        <p><strong>{ev.cnRegTitle}：</strong>{ev.cnRegBody}</p>
-        <p><strong>{ev.intlTitle}：</strong>{ev.intlBody}</p>
+        <p><strong>{ev.cnRegTitle}{chrome.sep}</strong>{ev.cnRegBody}</p>
+        <p><strong>{ev.intlTitle}{chrome.sep}</strong>{ev.intlBody}</p>
       </aside>
 
       <div className="product-detail-card">
@@ -167,19 +178,20 @@ export default function ProductDetail() {
         ) : null}
 
         <div className="product-detail-header">
-          <span className="product-category-tag">{category?.label}</span>
-          {product.catalog ? <span className="product-badge-managed product-detail-badge">上架商品</span> : null}
+          <span className="product-category-tag">{categoryDisplayLabel(category?.id || product.category, lang)}</span>
+          {product.catalog ? <span className="product-badge-managed product-detail-badge">{chrome.listedLong}</span> : null}
           {showBadge ? (
             <span className={`membership-badge membership-${catalogRow?.content_level || requiredLevel}`}>
               {getMembershipLevelLabel(catalogRow?.content_level || requiredLevel, lang)}
             </span>
           ) : null}
           <h1>{product.title}</h1>
+          {product.zhOnly ? <p className="product-zh-only">{chrome.zhOnly}</p> : null}
           {canView ? (
             <>
               <p className="product-desc">{product.desc}</p>
               {product.origin ? (
-                <p className="product-detail-origin"><strong>{t.origin}：</strong>{product.origin}</p>
+                <p className="product-detail-origin"><strong>{t.origin}{chrome.sep}</strong>{product.origin}</p>
               ) : null}
             </>
           ) : (
@@ -207,7 +219,7 @@ export default function ProductDetail() {
                       <td>
                         {sku.price != null && Number.isFinite(Number(sku.price))
                           ? `${formatPriceSymbol(sku.currency || product.currency)}${sku.price}`
-                          : (lang === 'zh' ? '同基础价' : 'Base')}
+                          : chrome.samePrice}
                       </td>
                     </tr>
                   ))}
@@ -223,7 +235,7 @@ export default function ProductDetail() {
               <span className="price">{formatPriceSymbol(product.currency)}{product.price}</span>
               <span className="unit">/{product.unit}</span>
               {product.skus?.length ? (
-                <span className="product-detail-base-note">{lang === 'zh' ? '（基础标价；SKU 可能有单独定价）' : '(Base price; SKU may override)'}</span>
+                <span className="product-detail-base-note">{chrome.baseNote}</span>
               ) : null}
             </div>
 

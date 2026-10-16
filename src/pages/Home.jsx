@@ -20,8 +20,16 @@ import {
 import ModuleAccessHint from '../components/ModuleAccessHint'
 import './Home.css'
 
-function EvidenceChip({ grade }) {
-  return <span className="home-chip home-chip--evidence">证据 {grade}</span>
+function homeField(value, lang) {
+  if (value && typeof value === 'object') {
+    const key = lang === 'en' || lang === 'ar' ? lang : 'zh'
+    return value[key] || value.zh || ''
+  }
+  return value || ''
+}
+
+function EvidenceChip({ grade, label }) {
+  return <span className="home-chip home-chip--evidence">{label} {grade}</span>
 }
 
 export default function Home() {
@@ -152,10 +160,10 @@ export default function Home() {
                       <Link to="/longevity-news" className="home-today-link">
                         {item.title}
                       </Link>
-                      <EvidenceChip grade={item.evidence} />
+                      <EvidenceChip grade={item.evidence} label={copy.evidenceLabel} />
                     </div>
                     <span className="home-today-source">{item.source}</span>
-                    <p>{item.summary}</p>
+                    <p>{homeField(item.summary, lang)}</p>
                   </li>
                 ))}
               </ul>
@@ -167,16 +175,16 @@ export default function Home() {
                   <li key={item.id} className="home-today-item">
                     <div className="home-today-item-head">
                       <Link to="/products" className="home-today-link">
-                        {item.name}
+                        {homeField(item.name, lang)}
                       </Link>
-                      <EvidenceChip grade={item.evidence} />
+                      <EvidenceChip grade={item.evidence} label={copy.evidenceLabel} />
                     </div>
                     <p className="home-today-meta">
-                      <span>适用：{item.audience}</span>
+                      <span>{copy.appliesLabel}{homeField(item.audience, lang)}</span>
                     </p>
                     <p className="home-today-risk">
-                      <span className="home-today-risk-label">注意</span>
-                      {item.risk}
+                      <span className="home-today-risk-label">{copy.cautionLabel}</span>
+                      {homeField(item.risk, lang)}
                     </p>
                   </li>
                 ))}

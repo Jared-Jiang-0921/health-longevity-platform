@@ -8,7 +8,8 @@ import { shouldShowMembershipBadge } from '../data/membership'
 import { getMembershipLevelLabel } from '../i18n/terms'
 import { getUi } from '../i18n/ui'
 import '../styles/membership-badge.css'
-import { pickCatalogLocale } from '../lib/productCatalogLocale'
+import { pickCatalogLocale, pickSkuLocale } from '../lib/productCatalogLocale'
+import { categoryDisplayLabel, hasChinese, productChrome, staticProductDisplay, unitDisplay } from '../data/productLocale'
 import ProductCatalogImage from '../components/ProductCatalogImage'
 import ProductEvidenceWorkbench from '../components/ProductEvidenceWorkbench'
 import ProductCatalogAdmin from '../components/ProductCatalogAdmin'
@@ -31,6 +32,7 @@ export default function Products() {
   const ui = getUi(lang)
   const ev = getProductsEvidenceCopy(lang)
   const originLabel = { zh: '产地', en: 'Origin', ar: 'المنشأ' }[lang] || '产地'
+  const chrome = productChrome(lang)
 
   const [activeCategory, setActiveCategory] = useState(PRODUCT_CATEGORIES[0]?.id || 'supplement')
   const [catalogItems, setCatalogItems] = useState([])
@@ -63,6 +65,8 @@ export default function Products() {
       .filter((row) => row.category === activeCategory)
       .map((row) => {
         const loc = pickCatalogLocale(row, lang)
+        const unit = unitDisplay(row.unit || '件', lang)
+        const skuZh = (row.skus || []).some((sku) => hasChinese(pickSkuLocale(sku, lang)))
         return {
           id: row.id,
           title: loc.title,
@@ -70,7 +74,7 @@ export default function Products() {
           price: Number(row.price_amount),
           currency: row.currency || 'CNY',
           desc: loc.desc,
-          unit: row.unit || '件',
+          unit,
           origin: loc.origin,
           catalog: true,
           gallery_count: row.gallery_count || 0,
@@ -78,18 +82,24 @@ export default function Products() {
           can_view: row.can_view !== false,
           required_level: row.required_level,
           content_level: row.content_level,
+          zhOnly: Boolean(loc.zhOnly) || skuZh || (lang !== 'zh' && hasChinese(unit)),
         }
       })
     const staticList = isAdmin
-      ? PRODUCTS.filter((p) => p.category === activeCategory).map((p) => ({
-          ...p,
-          title: p.title,
-          desc: p.desc,
-          origin: '',
-          catalog: false,
-          gallery_count: 0,
-          skus: [],
-        }))
+      ? PRODUCTS.filter((p) => p.category === activeCategory).map((p) => {
+          const view = staticProductDisplay(p, lang)
+          return {
+            ...p,
+            title: view.title,
+            desc: view.desc,
+            unit: view.unit,
+            origin: '',
+            catalog: false,
+            gallery_count: 0,
+            skus: [],
+            zhOnly: view.zhOnly,
+          }
+        })
       : []
     return [...fromDb, ...staticList]
   }, [catalogItems, activeCategory, lang, isAdmin])
@@ -129,13 +139,13 @@ export default function Products() {
 
       <section className="categories">
         <div className="category-tabs">
-          {PRODUCT_CATEGORIES.map(({ id, label }) => (
+          {PRODUCT_CATEGORIES.map(({ id }) => (
             <button
               key={id}
               className={activeCategory === id ? 'active' : ''}
               onClick={() => setActiveCategory(id)}
             >
-              {label}
+              {categoryDisplayLabel(id, lang)}
             </button>
           ))}
         </div>
@@ -164,8 +174,8 @@ export default function Products() {
               </div>
               <div className="product-info">
                 <span className="product-category">
-                  {PRODUCT_CATEGORIES.find((c) => c.id === product.category)?.label}
-                  {product.catalog ? <span className="product-badge-managed"> 上架</span> : null}
+                  {categoryDisplayLabel(product.category, lang)}
+                  {product.catalog ? <span className="product-badge-managed"> {chrome.listed}</span> : null}
                   {showBadge ? (
                     <span className={`membership-badge membership-${badgeLevel}`}>
                       {getMembershipLevelLabel(badgeLevel, lang)}
@@ -173,6 +183,7 @@ export default function Products() {
                   ) : null}
                 </span>
                 <h3>{product.title}</h3>
+                {product.zhOnly ? <p className="product-zh-only">{chrome.zhOnly}</p> : null}
                 {canView ? (
                   <>
                     <p>{product.desc}</p>

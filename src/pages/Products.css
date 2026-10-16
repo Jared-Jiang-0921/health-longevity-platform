@@ -146,6 +146,12 @@
   background: var(--color-primary-muted);
 }
 
+.product-zh-only {
+  margin: 0.35rem 0 0;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
 .product-badge-managed {
   margin-left: 0.35rem;
   font-size: 0.68rem;

@@ -99,6 +99,15 @@ function ScoreSelect({ value, onChange, t, kind = 'difficulty' }) {
   )
 }
 
+function phrase(t, text) {
+  if (text == null || text === '') return ''
+  const mapped = t.phrases?.[text]
+  if (mapped) return mapped
+  const age = String(text).match(/^年龄需在 (\d+)[–-](\d+) 岁$/)
+  if (age && typeof t.ageRange === 'function') return t.ageRange(age[1], age[2])
+  return text
+}
+
 function ResultBox({ title, t, result, extra }) {
   if (!result) {
     return (
@@ -112,7 +121,7 @@ function ResultBox({ title, t, result, extra }) {
     return (
       <section className="risk-result">
         <h2>{title}</h2>
-        <p className="risk-muted">{result.error}</p>
+        <p className="risk-muted">{phrase(t, result.error)}</p>
       </section>
     )
   }
@@ -123,7 +132,7 @@ function ResultBox({ title, t, result, extra }) {
       {result.adviseClinician || result.band?.adviseClinician ? (
         <p className="risk-muted">{t.seeDoctor}</p>
       ) : null}
-      <p className="risk-muted">{result.disclaimer}</p>
+      <p className="risk-muted">{phrase(t, result.disclaimer)}</p>
     </section>
   )
 }
@@ -446,11 +455,11 @@ export default function RiskAssessments() {
             <div className={`risk-result-hero risk-band-${parResult.band.id}`}>
               <div className="risk-metric">
                 <strong>{parResult.percent}%</strong>
-                <span>10 年 ASCVD</span>
+                <span>{t.result.ascvd10}</span>
               </div>
               <div className="risk-metric">
-                <strong>{parResult.band.label}</strong>
-                <span>&lt;5% 低危 · 5–9.9% 中危 · ≥10% 高危</span>
+                <strong>{phrase(t, parResult.band.label)}</strong>
+                <span>{t.result.parBands}</span>
               </div>
             </div>
           ) : null}
@@ -490,16 +499,16 @@ export default function RiskAssessments() {
                 <div className="risk-result-hero">
                   <div className={`risk-metric ${dmResult.china.high ? 'risk-band-high' : 'risk-band-low'}`}>
                     <strong>{dmResult.china.score}</strong>
-                    <span>中国评分 / 51（切点 25）</span>
+                    <span>{t.result.chinaScore}</span>
                   </div>
                   <div className={`risk-metric ${dmResult.findrisc.high ? 'risk-band-intermediate' : 'risk-band-low'}`}>
                     <strong>{dmResult.findrisc.score}</strong>
-                    <span>FINDRISC / 26</span>
+                    <span>{t.result.findriscScore}</span>
                   </div>
                 </div>
                 <ul className="risk-parts">
-                  <li>{dmResult.china.name}：{dmResult.china.band}</li>
-                  <li>{dmResult.findrisc.name}：{dmResult.findrisc.band}</li>
+                  <li>{phrase(t, dmResult.china.name)}{t.result.sep}{phrase(t, dmResult.china.band)}</li>
+                  <li>{phrase(t, dmResult.findrisc.name)}{t.result.sep}{phrase(t, dmResult.findrisc.band)}</li>
                 </ul>
               </>
             ) : null}
@@ -548,24 +557,24 @@ export default function RiskAssessments() {
                 <div className="risk-result-hero">
                   <div className={`risk-metric risk-band-${lifeResult.le8 >= 80 ? 'low' : lifeResult.le8 >= 50 ? 'intermediate' : 'high'}`}>
                     <strong>{lifeResult.le8}</strong>
-                    <span>简化 LE8 / 100 · {lifeResult.le8Band.label}</span>
+                    <span>{t.result.le8(phrase(t, lifeResult.le8Band.label))}</span>
                   </div>
                   <div className={`risk-metric risk-band-${lifeResult.bmiBand.id}`}>
                     <strong>{lifeResult.bmi}</strong>
-                    <span>BMI · {lifeResult.bmiBand.label}</span>
+                    <span>{t.result.bmi(phrase(t, lifeResult.bmiBand.label))}</span>
                   </div>
                   <div className="risk-metric">
                     <strong>{lifeResult.energy.bmr}</strong>
-                    <span>BMR kcal</span>
+                    <span>{t.result.bmr}</span>
                   </div>
                   <div className="risk-metric">
                     <strong>{lifeResult.energy.tdee}</strong>
-                    <span>TDEE kcal</span>
+                    <span>{t.result.tdee}</span>
                   </div>
                 </div>
                 <ul className="risk-parts">
                   {lifeResult.components.map((row) => (
-                    <li key={row.id}>{row.name} {row.score}</li>
+                    <li key={row.id}>{phrase(t, row.name)} {row.score}</li>
                   ))}
                 </ul>
               </>
@@ -596,11 +605,11 @@ export default function RiskAssessments() {
               <div className={`risk-result-hero risk-band-${htnResult.band.id}`}>
                 <div className="risk-metric">
                   <strong>{htnResult.alreadyHypertensive ? '—' : `${htnResult.percent}%`}</strong>
-                  <span>{htnResult.alreadyHypertensive ? '不再估算新发风险' : '4 年新发高血压'}</span>
+                  <span>{htnResult.alreadyHypertensive ? t.result.htnStop : t.result.htnIncident}</span>
                 </div>
                 <div className="risk-metric">
-                  <strong>{htnResult.band.label}</strong>
-                  <span>&lt;5% 低危 · 5–10% 中危 · &gt;10% 高危</span>
+                  <strong>{phrase(t, htnResult.band.label)}</strong>
+                  <span>{t.result.htnBands}</span>
                 </div>
               </div>
             ) : null}
@@ -634,15 +643,15 @@ export default function RiskAssessments() {
               <div className={`risk-result-hero risk-band-${demResult.band.id}`}>
                 <div className="risk-metric">
                   <strong>{demResult.score}/15</strong>
-                  <span>CAIDE 评分</span>
+                  <span>{t.result.caideScore}</span>
                 </div>
                 <div className="risk-metric">
                   <strong>{demResult.percent}%</strong>
-                  <span>原文 20 年痴呆风险</span>
+                  <span>{t.result.caideRisk}</span>
                 </div>
                 <div className="risk-metric">
-                  <strong>{demResult.band.label}</strong>
-                  <span>切点 ≥9 分</span>
+                  <strong>{phrase(t, demResult.band.label)}</strong>
+                  <span>{t.result.caideCut}</span>
                 </div>
               </div>
             ) : null}
@@ -686,19 +695,19 @@ export default function RiskAssessments() {
                 <div className={`risk-result-hero risk-band-${pdResult.band.id}`}>
                   <div className="risk-metric">
                     <strong>×{pdResult.relativeRisk}</strong>
-                    <span>相对风险倍数</span>
+                    <span>{t.result.rrMultiple}</span>
                   </div>
                   <div className="risk-metric">
-                    <strong>{pdResult.band.label}</strong>
-                    <span>不是患病概率</span>
+                    <strong>{phrase(t, pdResult.band.label)}</strong>
+                    <span>{t.result.notProbability}</span>
                   </div>
                 </div>
                 <ul className="risk-parts">
                   {pdResult.parts.filter((row) => row.applied).map((row) => (
-                    <li key={row.id}>{row.name} ×{row.factor}</li>
+                    <li key={row.id}>{phrase(t, row.name)} ×{row.factor}</li>
                   ))}
                   {pdResult.prodromalFlags.map((flag) => (
-                    <li key={flag}>{flag}</li>
+                    <li key={flag}>{phrase(t, flag)}</li>
                   ))}
                 </ul>
               </>
@@ -720,11 +729,11 @@ export default function RiskAssessments() {
               <div className={`risk-result-hero risk-band-${ostaResult.band.id}`}>
                 <div className="risk-metric">
                   <strong>{ostaResult.index}</strong>
-                  <span>OSTA 指数</span>
+                  <span>{t.result.ostaIndex}</span>
                 </div>
                 <div className="risk-metric">
-                  <strong>{ostaResult.band.label}</strong>
-                  <span>&gt;−1 低危 · −1 至 −4 中危 · &lt;−4 高危</span>
+                  <strong>{phrase(t, ostaResult.band.label)}</strong>
+                  <span>{t.result.ostaBands}</span>
                 </div>
               </div>
             ) : null}
@@ -764,8 +773,8 @@ export default function RiskAssessments() {
                   <span>SARC-F</span>
                 </div>
                 <div className="risk-metric">
-                  <strong>{sarcResult.band.label}</strong>
-                  <span>AWGS 2019 切点 ≥4</span>
+                  <strong>{phrase(t, sarcResult.band.label)}</strong>
+                  <span>{t.result.sarcCut}</span>
                 </div>
               </div>
             ) : null}

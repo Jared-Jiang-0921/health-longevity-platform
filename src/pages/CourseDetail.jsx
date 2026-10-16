@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { getCourseById, CATEGORIES } from '../data/courses'
+import { categoryDisplayLabel, courseDisplay } from '../data/courseLocale'
 import { getHealthSkillsContentApproach } from '../data/healthSkillsContentApproach'
 import { useFavorites } from '../hooks/useFavorites'
 import { useAuth } from '../context/AuthContext'
@@ -65,6 +66,7 @@ export default function CourseDetail() {
   }
 
   const category = CATEGORIES.find((c) => c.id === course.category)
+  const view = courseDisplay(course, lang)
   const methodologyLine = getHealthSkillsContentApproach(lang)
   const favorite = isFavorite(course.id)
   const requiredMembership = course.requiredMembership
@@ -89,13 +91,13 @@ export default function CourseDetail() {
       <div className="page-content page-course-detail">
         <Link to="/health-skills" className="back-link">← {t.back}</Link>
         <header className="course-detail-header">
-          <h1>{course.title}</h1>
+          <h1>{view.title}</h1>
           {showBadge ? (
             <span className={`membership-badge membership-${requiredMembership}`}>
               {getMembershipLevelLabel(requiredMembership, lang)}
             </span>
           ) : null}
-          <p className="course-desc">{course.desc}</p>
+          <p className="course-desc">{view.desc}</p>
         </header>
         <ContentLockNotice requiredLevel={requiredMembership} user={user} />
         <p><Link to="/health-skills">{t.back}</Link></p>
@@ -109,19 +111,19 @@ export default function CourseDetail() {
 
       <header className="course-detail-header">
         <div className="course-detail-meta">
-          <span className="course-category-tag">{category?.label}</span>
-          <span className="course-duration">{course.duration}</span>
-          <span className="course-level">{course.level}</span>
+          <span className="course-category-tag">{categoryDisplayLabel(category, lang)}</span>
+          <span className="course-duration">{view.duration}</span>
+          <span className="course-level">{view.level}</span>
         </div>
         <div className="course-title-row">
-          <h1>{course.title}</h1>
+          <h1>{view.title}</h1>
           {showBadge ? (
             <span className={`membership-badge membership-${requiredMembership}`}>
               {getMembershipLevelLabel(requiredMembership, lang)}
             </span>
           ) : null}
         </div>
-        <p className="course-desc">{course.desc}</p>
+        <p className="course-desc">{view.desc}</p>
         {isAdmin ? (
           <p className="course-methodology">{methodologyLine}</p>
         ) : null}
@@ -129,7 +131,7 @@ export default function CourseDetail() {
 
       <section className="course-detail-content">
         <h2>{t.intro}</h2>
-        <p>{course.content}</p>
+        <p>{view.content}</p>
       </section>
 
       <CourseSeriesVideos course={course} />

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { getCourseById, CATEGORIES } from '../data/courses'
+import { courseDisplay, moduleDisplay } from '../data/courseLocale'
 import { assetMatchesCourseSeries } from '../data/healthSkillsSeries'
 import { getHealthSkillsContentApproach } from '../data/healthSkillsContentApproach'
 import { useAuth } from '../context/AuthContext'
@@ -61,6 +62,9 @@ export default function CourseLearn() {
     [modules, extraLessons],
   )
   const activeModule = playlist[Math.min(activeIndex, Math.max(playlist.length - 1, 0))]
+  const shownActive = !activeModule || activeModule.fromUpload
+    ? activeModule
+    : { ...activeModule, ...moduleDisplay(activeModule, lang) }
 
   if (!course) {
     return (
@@ -71,6 +75,7 @@ export default function CourseLearn() {
     )
   }
 
+  const view = courseDisplay(course, lang)
   const requiredMembership = course.requiredMembership
   const allowed = hasLevelAccess(user?.level, requiredMembership, { isGuest: !user })
   const showBadge = shouldShowMembershipBadge(requiredMembership)
@@ -199,7 +204,7 @@ export default function CourseLearn() {
   if (!allowed) {
     return (
       <div className="page-content page-course-learn">
-        <h1>{course.title}</h1>
+        <h1>{view.title}</h1>
         {showBadge ? (
           <span className={`membership-badge membership-${requiredMembership}`}>
             {getMembershipLevelLabel(requiredMembership, lang)}
@@ -224,7 +229,7 @@ export default function CourseLearn() {
     <div className="page-course-learn">
       <div className="learn-header">
         <Link to={`/health-skills/${id}`} className="back-link">← {t.back}</Link>
-        <h1>{course.title}</h1>
+        <h1>{view.title}</h1>
         {isAdmin ? (
           <p className="learn-methodology">{methodologyLine}</p>
         ) : null}
@@ -237,7 +242,9 @@ export default function CourseLearn() {
           {modulesError ? <p className="video-missing">{modulesError}</p> : null}
           {modulesHint ? <p className="video-duration">{modulesHint}</p> : null}
           <ul className="module-list">
-            {playlist.map((mod, idx) => (
+            {playlist.map((mod, idx) => {
+              const shown = mod.fromUpload ? mod : { ...mod, ...moduleDisplay(mod, lang) }
+              return (
               <li key={mod.fromUpload ? `up-${idx}` : idx}>
                 <button
                   type="button"
@@ -245,7 +252,7 @@ export default function CourseLearn() {
                   onClick={() => setActiveIndex(idx)}
                 >
                   <span className="module-type">{mod.type === 'video' ? '▶' : '📄'}</span>
-                  <span className="module-title">{mod.title}</span>
+                  <span className="module-title">{shown.title}</span>
                   {mod.duration && <span className="module-duration">{mod.duration}</span>}
                 </button>
                 {isAdmin && !mod.fromUpload ? (
@@ -259,44 +266,45 @@ export default function CourseLearn() {
                   </div>
                 ) : null}
               </li>
-            ))}
+              )
+            })}
           </ul>
         </aside>
 
         <main className="learn-main">
-          {!activeModule ? null : activeModule.fromUpload && activeModule.canView === false ? (
+          {!shownActive ? null : shownActive.fromUpload && shownActive.canView === false ? (
             <section className="learn-document">
-              <h2>{activeModule.title}</h2>
-              <ContentLockNotice requiredLevel={activeModule.requiredLevel} user={user} />
+              <h2>{shownActive.title}</h2>
+              <ContentLockNotice requiredLevel={shownActive.requiredLevel} user={user} />
             </section>
-          ) : activeModule.type === 'file' ? (
+          ) : shownActive.type === 'file' ? (
             <section className="learn-document">
-              <h2>{activeModule.title}</h2>
+              <h2>{shownActive.title}</h2>
               <p>
-                <a href={activeModule.fileUrl} target="_blank" rel="noreferrer">
+                <a href={shownActive.fileUrl} target="_blank" rel="noreferrer">
                   {lang === 'en' ? 'Open file' : lang === 'ar' ? 'فتح' : '打开资料'}
                 </a>
               </p>
             </section>
-          ) : activeModule.type === 'video' ? (
+          ) : shownActive.type === 'video' ? (
             <section className="learn-video">
-              <h2>{activeModule.title}</h2>
-              {activeModule.videoUrl ? (
+              <h2>{shownActive.title}</h2>
+              {shownActive.videoUrl ? (
                 <div className="video-wrapper video-wrapper-native">
                   <video
                     controls
                     playsInline
                     preload="metadata"
-                    src={activeModule.videoUrl}
+                    src={shownActive.videoUrl}
                   >
                     {t.notSupport}
                   </video>
                 </div>
-              ) : activeModule.embedUrl ? (
+              ) : shownActive.embedUrl ? (
                 <div className="video-wrapper">
                   <iframe
-                    title={activeModule.title}
-                    src={activeModule.embedUrl}
+                    title={shownActive.title}
+                    src={shownActive.embedUrl}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                   />
@@ -304,14 +312,14 @@ export default function CourseLearn() {
               ) : (
                 <p className="video-missing">{t.noVideo}</p>
               )}
-              {activeModule.duration && (
-                <p className="video-duration">{t.duration}{activeModule.duration}</p>
+              {shownActive.duration && (
+                <p className="video-duration">{t.duration}{shownActive.duration}</p>
               )}
             </section>
           ) : (
             <section className="learn-document">
-              <h2>{activeModule.title}</h2>
-              <div className="document-content">{activeModule.content}</div>
+              <h2>{shownActive.title}</h2>
+              <div className="document-content">{shownActive.content}</div>
             </section>
           )}
         </main>

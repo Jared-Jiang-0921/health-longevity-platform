@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useFavorites } from '../hooks/useFavorites'
-import { getCourseById, CATEGORIES } from '../data/courses'
+import { getCourseById } from '../data/courses'
+import { categoryDisplayLabel, courseDisplay } from '../data/courseLocale'
 import { shouldShowMembershipBadge } from '../data/membership'
 import { useLocale } from '../context/LocaleContext'
 import { getUi } from '../i18n/ui'
@@ -35,7 +36,9 @@ export default function MyFavorites() {
         <p className="subtitle">{t.count} {courses.length} {t.lessons}</p>
       </header>
       <div className="favorites-grid content-card-grid">
-        {courses.map((course) => (
+        {courses.map((course) => {
+          const view = courseDisplay(course, lang)
+          return (
           <article key={course.id} className="favorite-card content-card content-card--padded">
             {(() => {
               const requiredMembership = course.requiredMembership
@@ -48,7 +51,7 @@ export default function MyFavorites() {
             })()}
             <div className="favorite-meta">
               <span className="course-category">
-                {CATEGORIES.find((c) => c.id === course.category)?.label}
+                {categoryDisplayLabel(course.category, lang)}
               </span>
               <button
                 type="button"
@@ -59,8 +62,8 @@ export default function MyFavorites() {
                 ♥ {t.unfav}
               </button>
             </div>
-            <h3>{course.title}</h3>
-            <p>{course.desc}</p>
+            <h3>{view.title}</h3>
+            <p>{view.desc}</p>
             <div className="favorite-actions">
               <Link to={`/health-skills/${course.id}`}>{ui.details}</Link>
               <Link to={`/health-skills/${course.id}/learn`} className="btn-learn">
@@ -68,7 +71,8 @@ export default function MyFavorites() {
               </Link>
             </div>
           </article>
-        ))}
+          )
+        })}
       </div>
     </div>
   )

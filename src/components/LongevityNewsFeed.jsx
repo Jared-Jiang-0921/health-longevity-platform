@@ -4,10 +4,11 @@ import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
 import {
   LONGEVITY_NEWS_COLUMNS,
+  columnDisplayLabel,
   getLongevityNewsColumn,
   getLongevityNewsColumnBlurb,
 } from '../data/longevityNewsColumns'
-import { getLongevityNewsArticles } from '../data/longevityNewsArticles'
+import { articleDisplay, getLongevityNewsArticles } from '../data/longevityNewsArticles'
 import { hasLevelAccess, shouldShowMembershipBadge } from '../data/membership'
 import { extractLongevityKeywords, newsCardExcerpt } from '../lib/longevityNewsCard'
 import { getMembershipLevelLabel } from '../i18n/terms'
@@ -22,6 +23,19 @@ function isVideo(mime) {
 
 function isImage(mime) {
   return String(mime || '').startsWith('image/')
+}
+
+function hasChinese(value) {
+  return /[\u4e00-\u9fff]/.test(String(value || ''))
+}
+
+function displayKeywords(title, summary, lang) {
+  const found = extractLongevityKeywords(title, summary)
+  if (!lang || lang === 'zh') return found
+  const fallback = lang === 'ar' ? 'بحث طول العمر' : 'longevity research'
+  return found
+    .map((term) => (term === '长寿研究' ? fallback : term))
+    .filter((term) => !hasChinese(term))
 }
 
 function kindLabel(kind, t) {
@@ -62,6 +76,9 @@ export default function LongevityNewsFeed() {
       link: '微信原文',
       editorial: '编辑稿',
       openWechat: '打开微信原文',
+      zhOnly: '此条仅有中文',
+      wechatSource: '原文在微信公众号，完整内容以微信页面为准。',
+      sourceSep: '：',
       login: '登录后阅读',
       upgrade: '升级后阅读',
       count: (n) => `${n} 篇`,
@@ -81,6 +98,9 @@ export default function LongevityNewsFeed() {
       link: 'Original',
       editorial: 'Editorial',
       openWechat: 'Open original',
+      zhOnly: 'This item is in Chinese only',
+      wechatSource: 'The full text is on WeChat. This card only files the topic.',
+      sourceSep: ': ',
       login: 'Log in to read',
       upgrade: 'Upgrade to read',
       count: (n) => `${n}`,
@@ -100,8 +120,11 @@ export default function LongevityNewsFeed() {
       link: 'الأصل',
       editorial: 'تحريري',
       openWechat: 'فتح الأصل',
-      login: 'سجّل لل قراءة',
-      upgrade: 'رقِّ ل القراءة',
+      zhOnly: 'هذا المحتوى بالصينية فقط',
+      wechatSource: 'النص الكامل على WeChat. هذه البطاقة للموضوع فقط.',
+      sourceSep: ': ',
+      login: 'سجّل الدخول للقراءة',
+      upgrade: 'رقّ العضوية للقراءة',
       count: (n) => `${n}`,
     },
   }[lang || 'zh']
@@ -151,20 +174,24 @@ export default function LongevityNewsFeed() {
   const entries = useMemo(() => {
     const staticOnes = getLongevityNewsArticles()
       .filter((a) => a.column === activeColumn)
-      .map((a) => ({
-        kind: 'editorial',
-        id: a.id,
-        title: a.title,
-        summary: a.summary,
-        takeaways: a.takeaways || [],
-        keywords: extractLongevityKeywords(a.title, a.summary),
-        excerpt: newsCardExcerpt(a.summary),
-        sourceNote: a.sourceNote || '',
-        url: a.url || '',
-        publishedAt: a.publishedAt || '',
-        requiredLevel: a.requiredMembership || columnMeta?.requiredLevel || 'free',
-        canView: hasLevelAccess(user?.level, a.requiredMembership || 'free', { isGuest: !user }),
-      }))
+      .map((a) => {
+        const view = articleDisplay(a, lang)
+        return {
+          kind: 'editorial',
+          id: a.id,
+          title: view.title,
+          summary: view.summary,
+          takeaways: view.takeaways,
+          keywords: displayKeywords(view.title, view.summary, lang),
+          excerpt: newsCardExcerpt(view.summary),
+          sourceNote: view.sourceNote,
+          zhOnly: view.zhOnly,
+          url: a.url || '',
+          publishedAt: a.publishedAt || '',
+          requiredLevel: a.requiredMembership || columnMeta?.requiredLevel || 'free',
+          canView: hasLevelAccess(user?.level, a.requiredMembership || 'free', { isGuest: !user }),
+        }
+      })
 
     const uploadOnes = uploads
       .filter((item) => String(item.subcategory || '').trim() === activeColumn)
@@ -178,9 +205,10 @@ export default function LongevityNewsFeed() {
           title: item.title,
           summary: item.summary || '',
           excerpt: newsCardExcerpt(item.summary),
-          keywords: extractLongevityKeywords(item.title, item.summary),
+          keywords: displayKeywords(item.title, item.summary, lang),
           takeaways: [],
-          sourceNote: isLink ? '原文在微信公众号，完整内容以微信页面为准。' : '',
+          zhOnly: lang !== 'zh' && hasChinese(`${item.title || ''} ${item.summary || ''}`),
+          sourceNote: isLink ? t.wechatSource : '',
           url: extUrl,
           publishedAt: item.created_at ? String(item.created_at).slice(0, 10) : '',
           requiredLevel: item.content_level || item.required_level || columnMeta?.requiredLevel || 'free',
@@ -192,7 +220,7 @@ export default function LongevityNewsFeed() {
       .sort((a, b) => String(b.publishedAt).localeCompare(String(a.publishedAt)))
 
     return [...uploadOnes, ...staticOnes]
-  }, [activeColumn, uploads, user, columnMeta])
+  }, [activeColumn, uploads, user, columnMeta, lang, t.wechatSource])
 
   const active = entries.find((e) => e.id === activeId) || null
 
@@ -218,6 +246,7 @@ export default function LongevityNewsFeed() {
           ) : null}
         </div>
         <h3 className="ln-card-title">{item.title}</h3>
+        {item.zhOnly ? <p className="ln-zh-only">{t.zhOnly}</p> : null}
         {item.keywords?.length ? (
           <ul className="ln-keywords" aria-label={t.keywords}>
             {item.keywords.map((kw) => (
@@ -254,7 +283,7 @@ export default function LongevityNewsFeed() {
               className={`ln-col ${activeColumn === col.label ? 'is-active' : ''}`}
               onClick={() => setActiveColumn(col.label)}
             >
-              <span className="ln-col-name">{col.label}</span>
+              <span className="ln-col-name">{columnDisplayLabel(col, lang)}</span>
               <span className="ln-col-count">{t.count(columnCounts[col.label] || 0)}</span>
               {shouldShowMembershipBadge(col.requiredLevel) ? (
                 <span className={`membership-badge membership-${col.requiredLevel}`}>
@@ -281,6 +310,7 @@ export default function LongevityNewsFeed() {
             {active.publishedAt ? ` · ${formatDate(active.publishedAt)}` : ''}
           </p>
           <h2 className="ln-essay-title">{active.title}</h2>
+          {active.zhOnly ? <p className="ln-zh-only">{t.zhOnly}</p> : null}
           {!active.canView ? (
             <ContentLockNotice requiredLevel={active.rawRequired || active.requiredLevel} user={user} />
           ) : (
@@ -306,7 +336,7 @@ export default function LongevityNewsFeed() {
                 </div>
               ) : null}
               {active.sourceNote ? (
-                <p className="ln-muted">{t.source}：{active.sourceNote}</p>
+                <p className="ln-muted">{t.source}{t.sourceSep}{active.sourceNote}</p>
               ) : null}
               {active.url ? (
                 <a href={active.url} target="_blank" rel="noopener noreferrer" className="ln-wechat">
@@ -346,7 +376,7 @@ export default function LongevityNewsFeed() {
       ) : (
         <>
           <div className="ln-list-heading">
-            <h2>{activeColumn}</h2>
+            <h2>{columnDisplayLabel(activeColumn, lang)}</h2>
             <p>{t.count(entries.length)}</p>
           </div>
           {!loading && !entries.length ? (

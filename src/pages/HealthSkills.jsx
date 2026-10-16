@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { CATEGORIES, COURSES } from '../data/courses'
+import { categoryDisplayLabel, courseDisplay, moduleDisplay } from '../data/courseLocale'
 import { assetMatchesCourseSeries } from '../data/healthSkillsSeries'
 import { getHealthSkillsContentApproach } from '../data/healthSkillsContentApproach'
 import { useFavorites } from '../hooks/useFavorites'
@@ -85,7 +86,7 @@ export default function HealthSkills() {
       .filter((item) => assetMatchesCourseSeries(item, course, categoryLabel))
       .sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
     if (uploaded.length) return uploaded.map((item) => item.title)
-    return (course.modules || []).map((mod) => mod.title).filter(Boolean)
+    return (course.modules || []).map((mod) => moduleDisplay(mod, lang).title).filter(Boolean)
   }
 
   useEffect(() => {
@@ -113,14 +114,14 @@ export default function HealthSkills() {
 
       <section className="health-skills-toolbar" aria-label={lang === 'en' ? 'Course categories' : lang === 'ar' ? 'فئات الدورات' : '课程分类'}>
         <div className="category-tabs health-skills-tabs">
-          {CATEGORIES.map(({ id, label }) => (
+          {CATEGORIES.map(({ id }) => (
             <button
               key={id}
               type="button"
               className={activeCategory === id ? 'active' : ''}
               onClick={() => setActiveCategory(id)}
             >
-              {label}
+              {categoryDisplayLabel(id, lang)}
             </button>
           ))}
         </div>
@@ -129,7 +130,7 @@ export default function HealthSkills() {
       <section className="course-list">
         <div className="course-list-heading">
           <h2>
-            {CATEGORIES.find((c) => c.id === activeCategory)?.label}
+            {categoryDisplayLabel(activeCategory, lang)}
           </h2>
           <p>
             {lang === 'en'
@@ -148,11 +149,12 @@ export default function HealthSkills() {
               const requiredMembership = course.requiredMembership
               const showBadge = shouldShowMembershipBadge(requiredMembership)
               const lessons = lessonsForCourse(course)
+              const view = courseDisplay(course, lang)
               return (
                 <article key={course.id} className="course-card content-card content-card--padded">
                   <div className="course-meta">
                     <span className="course-category">
-                      {CATEGORIES.find((c) => c.id === course.category)?.label}
+                      {categoryDisplayLabel(course.category, lang)}
                       {course.videoSeries ? (
                         <span className="course-badge-series"> · {t.series}</span>
                       ) : null}
@@ -166,8 +168,8 @@ export default function HealthSkills() {
                       {favorite ? '♥' : '♡'}
                     </button>
                   </div>
-                  <h3>{course.title}</h3>
-                  <p className="course-card-desc">{course.desc}</p>
+                  <h3>{view.title}</h3>
+                  <p className="course-card-desc">{view.desc}</p>
                   {lessons.length ? (
                     <ul className="course-card-lessons">
                       {lessons.slice(0, 3).map((title) => (
@@ -189,10 +191,10 @@ export default function HealthSkills() {
                         <span className="course-duration">
                           {course.videoSeries ? t.epCount(lessons.length) : t.lessonCount(lessons.length)}
                         </span>
-                      ) : course.duration ? (
-                        <span className="course-duration">{course.duration}</span>
+                      ) : view.duration ? (
+                        <span className="course-duration">{view.duration}</span>
                       ) : null}
-                      <span className="course-level">{course.level}</span>
+                      <span className="course-level">{view.level}</span>
                     </div>
                     <Link to={`/health-skills/${course.id}`} className="btn-learn">
                       {course.videoSeries ? t.openBook : ui.learn}

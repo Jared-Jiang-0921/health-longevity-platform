@@ -77,6 +77,14 @@ export const AGING_ASSESSMENT_COPY = {
     select: '请选择',
     male: '男性',
     female: '女性',
+    result: {
+      versusYear: '相对每年老一年',
+      paceBands: '<0.97 偏慢 · 0.97–1.03 接近 · ≥1.10 偏快',
+      grimageYears: 'GrimAge2（岁）',
+      clockYears: '时钟年龄（岁）',
+      versusAge: (age) => `相对日历年龄 ${age} 岁`,
+      yearBands: '|Δ|<5 接近 · 5–10 轻度 · ≥10 明显',
+    },
   },
 }
 
@@ -144,6 +152,33 @@ AGING_ASSESSMENT_COPY.en = {
   select: 'Select',
   male: 'Male',
   female: 'Female',
+  phrases: {
+    '明显偏高': 'Clearly higher',
+    '轻度偏高': 'Mildly higher',
+    '明显偏低': 'Clearly lower',
+    '轻度偏低': 'Mildly lower',
+    '与日历年龄接近': 'Near calendar age',
+    '衰老偏快': 'Faster aging',
+    '略快于参照': 'Slightly faster than the reference',
+    '衰老偏慢': 'Slower aging',
+    '略慢于参照': 'Slightly slower than the reference',
+    '接近每年老一年': 'Near one year per year',
+    '请选择生理性别': 'Select sex',
+    '请填写 18–110 岁日历年龄（与检测时一致）': 'Enter calendar age at the blood draw (18–110)',
+    '未知衰老评估类型': 'Unknown aging assessment',
+    '请填写实验室报告上的 DunedinPACE（常见约 0.6–1.5）': 'Enter DunedinPACE from the lab report (often about 0.6–1.5)',
+    '请填写实验室报告上的时钟年龄（岁）': 'Enter the clock age from the lab report (years)',
+    '仅供健康教育。结果来自你录入的实验室报告，本站不重跑甲基化算法，不能诊断、预测个体死亡或指导处方。': 'Educational only. The figure is the one you entered from a lab report. This site does not rerun the methylation algorithm, and it cannot diagnose, predict an individual death, or guide a prescription.',
+  },
+  result: {
+    ...AGING_ASSESSMENT_COPY.zh.result,
+    versusYear: 'Versus one year of aging per calendar year',
+    paceBands: '<0.97 slower · 0.97–1.03 near · ≥1.10 faster',
+    grimageYears: 'GrimAge2 (years)',
+    clockYears: 'Clock age (years)',
+    versusAge: (age) => `Versus calendar age ${age}`,
+    yearBands: '|Δ|<5 near · 5–10 mild · ≥10 marked',
+  },
 }
 
 AGING_ASSESSMENT_COPY.ar = AGING_ASSESSMENT_COPY.en

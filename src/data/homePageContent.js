@@ -127,44 +127,80 @@ export const HOME_TODAY_FRONTIER = [
     title: 'Senolytic drugs reduce biomarkers of aging in humans',
     source: 'Nature Medicine',
     evidence: 'B',
-    summary: '早期人体试验显示衰老细胞清除与炎症指标改善相关，尚不足以作为临床常规推荐。',
+    summary: {
+      zh: '早期人体试验显示衰老细胞清除与炎症指标改善相关，尚不足以作为临床常规推荐。',
+      en: 'Early human trials link senescent-cell clearance with changes in inflammatory markers. That is not enough for routine clinical use.',
+      ar: 'تجارب بشرية مبكرة تربط إزالة الخلايا الهرمة بتغيّر واسمات الالتهاب. هذا لا يكفي للاستخدام السريري الروتيني.',
+    },
   },
   {
     id: 2,
     title: 'Intermittent fasting and cardiovascular outcomes: 5-year follow-up',
     source: 'Lancet Healthy Longevity',
     evidence: 'C',
-    summary: '观察性队列提示时间限制进食与心血管事件关联，需更多随机对照验证。',
+    summary: {
+      zh: '观察性队列提示时间限制进食与心血管事件关联，需更多随机对照验证。',
+      en: 'An observational cohort suggests a link between time-restricted eating and cardiovascular events. More randomized trials are needed.',
+      ar: 'تشير مجموعة رصدية إلى صلة بين تقييد وقت الأكل وحوادث القلب والأوعية. يلزم مزيد من التجارب العشوائية.',
+    },
   },
   {
     id: 3,
     title: 'Gut microbiome and longevity: meta-analysis of centenarian cohorts',
     source: 'Cell',
     evidence: 'B',
-    summary: '百岁老人菌群特征具一致性，但因果与干预路径仍待明确。',
+    summary: {
+      zh: '百岁老人菌群特征具一致性，但因果与干预路径仍待明确。',
+      en: 'Centenarian microbiome patterns look consistent, but cause and any intervention path are still unclear.',
+      ar: 'سمات ميكروبيوم المعمرين تبدو متسقة، لكن السببية ومسار أي تدخل ما زالا غير واضحين.',
+    },
   },
 ]
 
 export const HOME_HOT_EVIDENCE = [
   {
     id: 1,
-    name: '维生素 D3 + K2',
-    audience: '日照不足、骨骼健康关注者',
-    risk: '高钙血症、抗凝用药者需咨询医生',
+    name: { zh: '维生素 D3 + K2', en: 'Vitamin D3 + K2', ar: 'فيتامين D3 + K2' },
+    audience: {
+      zh: '日照不足、骨骼健康关注者',
+      en: 'People with little sun who are watching bone health',
+      ar: 'من قلّ تعرضهم للشمس ويهتمون بصحة العظام',
+    },
+    risk: {
+      zh: '高钙血症、抗凝用药者需咨询医生',
+      en: 'People with high blood calcium, or on anticoagulants, should ask a clinician',
+      ar: 'فرط كالسيوم الدم أو من يتناول مضاد تخثر يسأل الطبيب',
+    },
     evidence: 'B',
   },
   {
     id: 2,
-    name: 'Omega-3 鱼油',
-    audience: '心血管与认知健康关注者',
-    risk: '抗凝/手术前后需评估出血风险',
+    name: { zh: 'Omega-3 鱼油', en: 'Omega-3 fish oil', ar: 'زيت السمك أوميغا-3' },
+    audience: {
+      zh: '心血管与认知健康关注者',
+      en: 'People watching cardiovascular and cognitive health',
+      ar: 'من يهتم بصحة القلب والأوعية والإدراك',
+    },
+    risk: {
+      zh: '抗凝/手术前后需评估出血风险',
+      en: 'Bleeding risk should be reviewed around anticoagulants or surgery',
+      ar: 'يُراجع خطر النزف مع مضادات التخثر أو حول الجراحة',
+    },
     evidence: 'A',
   },
   {
     id: 3,
-    name: '间歇性断食（16:8）',
-    audience: '代谢健康、体重管理者',
-    risk: '糖尿病、妊娠、进食障碍不适用；需个体化',
+    name: { zh: '间歇性断食（16:8）', en: 'Time-restricted eating (16:8)', ar: 'الأكل المقيّد بالوقت (16:8)' },
+    audience: {
+      zh: '代谢健康、体重管理者',
+      en: 'People managing metabolic health or weight',
+      ar: 'من يدير الصحة الأيضية أو الوزن',
+    },
+    risk: {
+      zh: '糖尿病、妊娠、进食障碍不适用；需个体化',
+      en: 'Not for diabetes, pregnancy, or eating disorders; needs an individual plan',
+      ar: 'لا يناسب السكري أو الحمل أو اضطرابات الأكل؛ يحتاج خطة فردية',
+    },
     evidence: 'C',
   },
 ]
@@ -198,6 +234,9 @@ export function getHomeCopy(lang) {
     todayCurated: '编辑精选 · 非实时推送',
     todayFrontier: '今日前沿',
     todayHot: '热门证据条目',
+    evidenceLabel: '证据',
+    appliesLabel: '适用：',
+    cautionLabel: '注意',
     stepsTitle: '三步上手',
     steps: [
       { title: '选择目标', desc: '睡眠 / 代谢 / 运动 / 认知 / 体检解读' },
@@ -235,6 +274,9 @@ export function getHomeCopy(lang) {
     todayCurated: 'Editor’s picks · not live feed',
     todayFrontier: 'Frontier highlights',
     todayHot: 'Popular evidence entries',
+    evidenceLabel: 'Evidence',
+    appliesLabel: 'For: ',
+    cautionLabel: 'Note',
     stepsTitle: 'Get started in 3 steps',
     steps: [
       { title: 'Choose a goal', desc: 'Sleep, metabolism, exercise, cognition, labs' },
@@ -244,7 +286,17 @@ export function getHomeCopy(lang) {
     stepNote: 'Reports, favorites, and plans require sign-in',
     welcome: 'Welcome',
   }
-  const ar = { ...en, welcome: 'مرحبًا' }
+  const ar = {
+    ...en,
+    welcome: 'مرحبًا',
+    todayTitle: 'تحديثات اليوم',
+    todayCurated: 'اختيار تحريري · ليس بثًا مباشرًا',
+    todayFrontier: 'أبرز المستجدات',
+    todayHot: 'مدخلات أدلة شائعة',
+    evidenceLabel: 'دليل',
+    appliesLabel: 'لمن: ',
+    cautionLabel: 'تنبيه',
+  }
   if (lang === 'en') return en
   if (lang === 'ar') return ar
   return zh
