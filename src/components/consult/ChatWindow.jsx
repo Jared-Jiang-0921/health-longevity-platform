@@ -96,6 +96,7 @@ export default function ChatWindow({
   onQuota,
   quotaRemaining,
   quotaUnlimited,
+  unlimitedUploads = false,
 }) {
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
@@ -409,7 +410,10 @@ export default function ChatWindow({
       for (const file of files) {
         try {
           const item = await fileToAttachment(file, copy)
-          if (!canAddAttachment(next, item)) {
+          if (!canAddAttachment(next, item, {
+            unlimitedImages: unlimitedUploads,
+            unlimitedPdfs: unlimitedUploads,
+          })) {
             limitHit = true
             break
           }

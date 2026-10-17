@@ -99,6 +99,7 @@ const COPY = {
     filePrefix: '健康咨询',
     attach: '上传',
     attachHint: '最多 5 张图片（JPG/PNG，iPhone HEIC 需先转格式）；最多 3 个文档（PDF/Word/TXT，每个不超过 5MB）。点「语音」录音转文字。资料仅供参考，不能替代医生。',
+    attachHintAdmin: '图片和 PDF 不限张数（JPG/PNG，iPhone HEIC 需先转格式）。Word/TXT 仍最多 3 个，每个文档不超过 5MB。点「语音」录音转文字。资料仅供参考，不能替代医生。',
     attachDefault: '请结合我上传的资料，给出健康参考建议。',
     attachTooLarge: '文档请控制在 5MB 以内；图片过大请先压缩或换一张更清晰的照片。',
     attachHeic: '这是 iPhone 的 HEIC 格式，目前无法直接识别。请在「设置 → 相机 → 格式」选「兼容性最高」，或用相册导出为 JPG/PNG 后再上传。',
@@ -108,6 +109,7 @@ const COPY = {
     attachOldDoc: '旧版 .doc 请另存为 .docx 或 PDF。',
     attachUnsupported: '支持 JPG/PNG/WebP、PDF、Word（.docx）和 TXT。iPhone 照片请不要用 HEIC。',
     attachLimit: '最多 5 张图片和 3 份文档（每份文档不超过 5MB）。',
+    attachLimitAdmin: 'Word 和 TXT 仍最多 3 份（每份不超过 5MB）。',
     attachRemove: '移除',
     speech: '语音',
     speechHint: '点「语音」开始录音，再说一遍问题，再点一次结束。请允许本站使用麦克风。',
@@ -206,6 +208,7 @@ const COPY = {
     filePrefix: 'health-consult',
     attach: 'Attach',
     attachHint: 'Up to 5 images (JPG/PNG; convert iPhone HEIC first) and 3 documents (PDF/Word/TXT, ≤5MB each). Tap Voice to record, then tap again to transcribe. For reference only — not medical care.',
+    attachHintAdmin: 'No limit on the number of images or PDFs (JPG/PNG; convert iPhone HEIC first). Word/TXT still up to 3 files, each ≤5MB. Tap Voice to record, then tap again to transcribe. For reference only — not medical care.',
     attachDefault: 'Please review the files I uploaded and give general health guidance.',
     attachTooLarge: 'Keep each document under 5MB; compress large photos before uploading.',
     attachHeic: 'HEIC photos cannot be read here. On iPhone: Settings → Camera → Formats → Most Compatible, or export as JPG/PNG from Photos.',
@@ -215,6 +218,7 @@ const COPY = {
     attachOldDoc: 'Please re-save .doc files as .docx or PDF.',
     attachUnsupported: 'Supported: JPG/PNG/WebP, PDF, Word (.docx), and TXT. Please convert HEIC photos first.',
     attachLimit: 'Up to 5 images and 3 documents (≤5MB each).',
+    attachLimitAdmin: 'Word and TXT are still limited to 3 files (≤5MB each).',
     attachRemove: 'Remove',
     speech: 'Voice',
     speechHint: 'Tap Voice to start recording, then tap again to stop and transcribe. Allow microphone access for this site.',
@@ -313,6 +317,7 @@ const COPY = {
     filePrefix: 'استشارة-صحية',
     attach: 'رفع',
     attachHint: 'حتى 5 صور (JPG/PNG؛ حوّل HEIC أولاً) و3 مستندات (PDF/Word/TXT، ≤5MB لكل ملف). اضغط «صوت» للتسجيل ثم مرة أخرى للتحويل. للمراجعة فقط وليس بديلاً عن الطبيب.',
+    attachHintAdmin: 'لا حد لعدد الصور أو ملفات PDF (JPG/PNG؛ حوّل HEIC أولاً). Word/TXT ما زالا حتى 3 ملفات، وكل مستند ≤5MB. اضغط «صوت» للتسجيل ثم مرة أخرى للتحويل. للمراجعة فقط وليس بديلاً عن الطبيب.',
     attachDefault: 'يرجى مراجعة الملفات المرفقة وإعطاء إرشادات صحية عامة.',
     attachTooLarge: 'أبقِ كل مستند أقل من 5MB؛ اضغط الصور الكبيرة قبل الرفع.',
     attachHeic: 'لا يمكن قراءة صور HEIC هنا. على iPhone: الإعدادات → الكاميرا → الصيغ → الأكثر توافقًا، أو صدّر الصورة كـ JPG/PNG.',
@@ -322,6 +327,7 @@ const COPY = {
     attachOldDoc: 'احفظ ملفات .doc كـ .docx أو PDF.',
     attachUnsupported: 'المدعوم: JPG/PNG/WebP وPDF وWord (.docx) وTXT. حوّل صور HEIC أولاً.',
     attachLimit: 'حتى 5 صور و3 مستندات (≤5MB لكل مستند).',
+    attachLimitAdmin: 'Word وTXT ما زالا حتى 3 ملفات (≤5MB لكل ملف).',
     attachRemove: 'إزالة',
     speech: 'صوت',
     speechHint: 'اضغط «صوت» لبدء التسجيل، ثم اضغط مرة أخرى للتوقف والتحويل إلى نص. اسمح لهذا الموقع باستخدام الميكروفون.',
@@ -523,7 +529,7 @@ export default function Consult() {
       docFooter: t.docFooter,
       filePrefix: t.filePrefix,
       attach: t.attach,
-      attachHint: t.attachHint,
+      attachHint: user?.site_admin ? t.attachHintAdmin : t.attachHint,
       attachDefault: t.attachDefault,
       attachTooLarge: t.attachTooLarge,
       attachHeic: t.attachHeic,
@@ -532,7 +538,7 @@ export default function Consult() {
       attachEmptyDoc: t.attachEmptyDoc,
       attachOldDoc: t.attachOldDoc,
       attachUnsupported: t.attachUnsupported,
-      attachLimit: t.attachLimit,
+      attachLimit: user?.site_admin ? t.attachLimitAdmin : t.attachLimit,
       attachRemove: t.attachRemove,
       speech: t.speech,
       speechHint: t.speechHint,
@@ -547,7 +553,7 @@ export default function Consult() {
       thinkingUpload: t.thinkingUpload,
       quotaExceeded: t.quotaExceeded,
     }),
-    [t, disclaimer],
+    [t, disclaimer, user?.site_admin],
   )
 
   function setEntry(next) {
@@ -767,6 +773,7 @@ export default function Consult() {
                   onQuota={setQuota}
                   quotaRemaining={quota?.unlimited ? null : quota?.remaining}
                   quotaUnlimited={Boolean(quota?.unlimited)}
+                  unlimitedUploads={Boolean(user?.site_admin)}
                 />
               )}
             </>

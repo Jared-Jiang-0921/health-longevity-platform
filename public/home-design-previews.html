@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>首页设计方向预览 · 长健星图</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --surface: #fff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --blue: #1a6fd4;
+      --teal: #14b8a6;
+      --green: #22c55e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Noto Sans SC", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 24px 16px 48px; }
+    h1 { font-size: 1.5rem; margin: 0 0 8px; }
+    .lead { color: var(--muted); margin: 0 0 20px; font-size: 0.95rem; }
+    .nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+    .nav a {
+      padding: 8px 14px;
+      border-radius: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--blue);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    .nav a:hover { border-color: var(--blue); }
+    .scheme {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 32px;
+      overflow: hidden;
+    }
+    .scheme-head {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: #f8fafc;
+    }
+    .scheme-head h2 { margin: 0 0 6px; font-size: 1.15rem; }
+    .scheme-head p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .mock {
+      padding: 16px;
+      background: #e8eef5;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .mock-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      border-radius: 8px 8px 0 0;
+    }
+    .mock-logo { width: 80px; height: 20px; background: var(--blue); border-radius: 4px; opacity: 0.9; }
+    .mock-nav { flex: 1; height: 8px; max-width: 120px; margin-left: auto; background: var(--border); border-radius: 4px; }
+    .mock-body { background: var(--surface); border: 1px solid var(--border); border-top: none; border-radius: 0 0 8px 8px; padding: 12px; min-height: 200px; }
+    /* A */
+    .a-hero { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .a-hero-copy .line { height: 10px; background: #cbd5e1; border-radius: 2px; margin-bottom: 6px; }
+    .a-hero-copy .line.w90 { width: 90%; }
+    .a-hero-copy .line.w70 { width: 70%; }
+    .a-cta { display: flex; gap: 6px; margin-top: 8px; }
+    .a-cta .pri { padding: 6px 12px; background: var(--blue); color: #fff; border-radius: 4px; font-size: 10px; }
+    .a-cta .sec { padding: 6px 12px; border: 1px solid var(--border); border-radius: 4px; font-size: 10px; }
+    .a-cockpit { min-height: 100px; background: #e2e8f0; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: var(--muted); }
+    .a-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .a-card { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+    .a-card-img { height: 48px; background: #cbd5e1; }
+    .a-card-t { padding: 6px; }
+    .a-card-t .l { height: 6px; background: #e2e8f0; border-radius: 2px; margin-bottom: 4px; width: 70%; }
+    .a-stats { margin-top: 12px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center; }
+    .a-stats b { display: block; color: var(--blue); font-size: 13px; }
+    /* B */
+    .b-hero { text-align: center; padding: 16px 24px 12px; }
+    .b-hero .title { height: 14px; width: 75%; margin: 0 auto 8px; background: #94a3b8; border-radius: 2px; }
+    .b-hero .sub { height: 8px; width: 55%; margin: 0 auto 10px; background: #e2e8f0; border-radius: 2px; }
+    .b-evidence { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 10px; border-top: 3px solid var(--blue); border-bottom: 1px solid var(--border); text-align: center; }
+    .b-strip { height: 56px; margin: 10px 0; background: #e2e8f0; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+    .b-list .row { display: grid; grid-template-columns: 1fr 64px; gap: 10px; padding: 10px 0; border-top: 1px solid var(--border); }
+    .b-list .thumb { background: #cbd5e1; border-radius: 4px; min-height: 40px; }
+    /* C */
+    .c-panel { border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 12px; background: #f8fafc; }
+    .c-panel h3 { margin: 0 0 10px; font-size: 11px; color: var(--muted); }
+    .c-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
+    .c-metric { padding: 8px; background: var(--surface); border-top: 2px solid var(--blue); border-radius: 4px; text-align: center; }
+    .c-metric strong { display: block; color: var(--text); font-size: 12px; }
+    .c-charts { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; height: 56px; }
+    .c-line { background: #e2e8f0; border-radius: 4px; position: relative; }
+    .c-bars { background: #e2e8f0; border-radius: 4px; display: flex; align-items: flex-end; gap: 4px; padding: 4px; }
+    .c-bars span { flex: 1; background: var(--blue); border-radius: 2px; opacity: 0.6; }
+    .c-bento { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .c-tile { border: 1px solid var(--border); border-radius: 6px; padding: 8px; }
+    .c-tile .img { height: 36px; background: #cbd5e1; border-radius: 4px; margin-bottom: 6px; }
+    .tag { display: inline-block; margin-top: 8px; padding: 4px 10px; font-size: 0.75rem; border-radius: 999px; background: #eff6ff; color: var(--blue); }
+    @media (max-width: 640px) {
+      .a-hero, .a-grid, .c-bento { grid-template-columns: 1fr; }
+      .c-metrics { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>首页设计方向 · 三方案画面预览</h1>
+    <p class="lead">
+      若 Cursor Canvas 打不开，请用本页查看三种布局线框。本地：<code>npm run dev</code> 后打开
+      <code>http://localhost:5173/home-design-previews.html</code>；线上部署后访问
+      <code>/home-design-previews.html</code>。选定后回复「选 A / B / C」即可开始改代码。
+    </p>
+    <nav class="nav">
+      <a href="#scheme-a">A 临床精密站</a>
+      <a href="#scheme-b">B 期刊权威派</a>
+      <a href="#scheme-c">C 观测台仪表盘</a>
+    </nav>
+
+    <section class="scheme" id="scheme-a">
+      <div class="scheme-head">
+        <h2>A · 临床精密站</h2>
+        <p>左文案 + 右驾驶舱；3×2 模块封面卡；观察站在页尾。改动最小，延续现版。</p>
+        <span class="tag">参考：Apple Health · 当前站点</span>
+      </div>
+      <div class="mock">
+        <div class="mock-bar"><div class="mock-logo"></div><div class="mock-nav"></div></div>
+        <div class="mock-body">
+          <div class="a-hero">
+            <div class="a-hero-copy">
+              <div class="line w90"></div>
+              <div class="line w70"></div>
+              <div class="line w70"></div>
+              <div class="a-cta"><span class="pri">获取行动方案</span><span class="sec">证据库</span></div>
+            </div>
+            <div class="a-cockpit">驾驶舱大图</div>
+          </div>
+          <div class="a-grid">
+            <div class="a-card"><div class="a-card-img"></div><div class="a-card-t"><div class="l"></div></div></div>
+            <div class="a-card"><div class="a-card-img"></div><div class="a-card-t"><div class="l"></div></div></div>
+            <div class="a-card"><div class="a-card-img"></div><div class="a-card-t"><div class="l"></div></div></div>
+            <div class="a-card"><div class="a-card-img"></div><div class="a-card-t"><div class="l"></div></div></div>
+            <div class="a-card"><div class="a-card-img"></div><div class="a-card-t"><div class="l"></div></div></div>
+            <div class="a-card"><div class="a-card-img"></div><div class="a-card-t"><div class="l"></div></div></div>
+          </div>
+          <div class="a-stats">
+            <div><b>12,856</b>研究</div>
+            <div><b>3,200</b>证据</div>
+            <div><b>1,680</b>方案</div>
+            <div><b>24</b>日更</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="scheme" id="scheme-b">
+      <div class="scheme-head">
+        <h2>B · 期刊权威派</h2>
+        <p>居中大标题；证据数字横条；模块改纵向列表。偏学术权威、长文可读。</p>
+        <span class="tag">参考：Nature Medicine · NEJM</span>
+      </div>
+      <div class="mock">
+        <div class="mock-bar"><div class="mock-logo"></div></div>
+        <div class="mock-body">
+          <div class="b-hero">
+            <div class="title"></div>
+            <div class="sub"></div>
+            <div class="a-cta" style="justify-content:center"><span class="pri">生成建议</span></div>
+          </div>
+          <div class="b-evidence">
+            <div><b>—</b>研究</div>
+            <div><b>—</b>证据</div>
+            <div><b>—</b>方案</div>
+            <div><b>—</b>更新</div>
+          </div>
+          <div class="b-strip">驾驶舱 · 全宽图说条</div>
+          <div class="b-list">
+            <div class="row"><div><div class="line w90" style="height:8px;background:#cbd5e1;border-radius:2px;width:60%;margin-bottom:6px"></div><div style="height:6px;background:#e2e8f0;border-radius:2px;width:90%"></div></div><div class="thumb"></div></div>
+            <div class="row"><div><div style="height:8px;background:#cbd5e1;border-radius:2px;width:55%;margin-bottom:6px"></div><div style="height:6px;background:#e2e8f0;border-radius:2px;width:85%"></div></div><div class="thumb"></div></div>
+            <div class="row"><div><div style="height:8px;background:#cbd5e1;border-radius:2px;width:50%;margin-bottom:6px"></div><div style="height:6px;background:#e2e8f0;border-radius:2px;width:80%"></div></div><div class="thumb"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="scheme" id="scheme-c">
+      <div class="scheme-head">
+        <h2>C · 观测台仪表盘</h2>
+        <p>首屏即四指标 + 趋势图；模块为 Bento 小磁贴。科技感、数据平台气质最强。</p>
+        <span class="tag">参考：Bloomberg · Notion Analytics</span>
+      </div>
+      <div class="mock">
+        <div class="mock-bar"><div class="mock-logo"></div></div>
+        <div class="mock-body">
+          <div class="c-panel">
+            <h3>长寿科学观察站 · Live</h3>
+            <div class="c-metrics">
+              <div class="c-metric"><strong>12,856</strong>研究</div>
+              <div class="c-metric"><strong>3,200</strong>证据</div>
+              <div class="c-metric"><strong>1,680</strong>方案</div>
+              <div class="c-metric"><strong>24</strong>日更</div>
+            </div>
+            <div class="c-charts">
+              <div class="c-line">趋势折线</div>
+              <div class="c-bars"><span style="height:40%"></span><span style="height:70%"></span><span style="height:35%"></span><span style="height:55%"></span></div>
+            </div>
+          </div>
+          <div class="c-bento">
+            <div class="c-tile"><div class="img"></div><div style="height:5px;background:#e2e8f0;border-radius:2px;width:75%"></div></div>
+            <div class="c-tile"><div class="img"></div><div style="height:5px;background:#e2e8f0;border-radius:2px;width:75%"></div></div>
+            <div class="c-tile"><div class="img"></div><div style="height:5px;background:#e2e8f0;border-radius:2px;width:75%"></div></div>
+            <div class="c-tile"><div class="img"></div><div style="height:5px;background:#e2e8f0;border-radius:2px;width:75%"></div></div>
+            <div class="c-tile"><div class="img"></div><div style="height:5px;background:#e2e8f0;border-radius:2px;width:75%"></div></div>
+            <div class="c-tile"><div class="img"></div><div style="height:5px;background:#e2e8f0;border-radius:2px;width:75%"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

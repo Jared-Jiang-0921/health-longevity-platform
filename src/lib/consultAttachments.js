@@ -254,11 +254,32 @@ export async function fileToAttachment(file, copy) {
   fail('attachUnsupported', '暂不支持该文件类型')
 }
 
-export function canAddAttachment(list, next) {
+function isPdfName(name) {
+  return extOf(name) === 'pdf'
+}
+
+/**
+ * 普通会员：最多 5 张图片、3 份文档（PDF/Word/TXT 合计）。
+ * 整站管理员：图片张数和 PDF 份数不设上限；Word/TXT 仍最多 3 份。单文件大小不变。
+ */
+export function canAddAttachment(list, next, options = {}) {
+  const unlimitedImages = Boolean(options.unlimitedImages)
+  const unlimitedPdfs = Boolean(options.unlimitedPdfs)
   const images = list.filter((a) => a.kind === 'image').length
-  const docs = list.filter((a) => a.kind === 'document').length
-  if (next.kind === 'image') return images < MAX_IMAGES
-  if (next.kind === 'document') return docs < MAX_DOCS
+  const docs = list.filter((a) => a.kind === 'document')
+  const otherDocs = docs.filter((a) => !isPdfName(a.name)).length
+  if (next.kind === 'image') {
+    if (unlimitedImages) return true
+    return images < MAX_IMAGES
+  }
+  if (next.kind === 'document') {
+    if (isPdfName(next.name)) {
+      if (unlimitedPdfs) return true
+      return docs.length < MAX_DOCS
+    }
+    if (unlimitedPdfs) return otherDocs < MAX_DOCS
+    return docs.length < MAX_DOCS
+  }
   return false
 }
 

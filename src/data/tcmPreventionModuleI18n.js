@@ -27,7 +27,7 @@ const COPY = {
     constitution: '体质识别',
     constitutionH2: '九种体质',
     constitutionLead: '先认识九种体质各自的常见表现和调养方向。下面的卡片只做对照学习。初步辨识在单独一页，问卷计分，舌象只对照、不加分。',
-    constitutionStart: '开始初步辨识',
+    constitutionStart: '开始体质辨识',
     season: '四季养生',
     seasonH2: '四时起居',
     seasonLead: '每季分三层：原文要点、标准定义、本站说明。标准不规定钟点和药量。四季各附 3 款粥，长夏另附 3 款；书中写明季节的照书放，没写明的标出来。',
