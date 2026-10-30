@@ -160,8 +160,8 @@ function ConsultCard({ title, description, requiredLevel, consultEntry, user, t,
       <p className="consult-card-desc">{description}</p>
       <label className="consult-query">
         <span>{t.queryLabel}</span>
-        <input
-          type="text"
+        <textarea
+          rows={2}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t.queryPlaceholder}
@@ -206,6 +206,33 @@ export default function Solutions() {
       <aside className="solutions-disclaimer page-callout page-callout--warn" role="note">
         <p>{t.medicalDisclaimer}</p>
       </aside>
+
+      {loading ? (
+        <p className="consult-auth-loading" role="status">
+          {t.loading}
+        </p>
+      ) : (
+        <div className="consult-grid">
+          <ConsultCard
+            title={t.proTitle}
+            description={t.proDesc}
+            requiredLevel="premium"
+            user={user}
+            consultEntry="professional"
+            t={t}
+            p={p}
+          />
+          <ConsultCard
+            title={t.genTitle}
+            description={t.genDesc}
+            requiredLevel="free"
+            user={user}
+            consultEntry="general"
+            t={t}
+            p={p}
+          />
+        </div>
+      )}
 
       <section className="solutions-features" aria-labelledby="solutions-features-heading">
         <h2 id="solutions-features-heading">{t.featuresTitle}</h2>
@@ -262,48 +289,20 @@ export default function Solutions() {
         </div>
       </section>
 
-      {loading ? (
-        <p className="consult-auth-loading" role="status">
-          {t.loading}
-        </p>
-      ) : (
-      <>
-        {CONTENT_ENTRY_URL ? (
-          <section className="solutions-content-channel">
-            <h2>{t.contentTitle}</h2>
-            <p className="solutions-content-desc">{t.contentDesc}</p>
-            <a
-              className="consult-card-btn"
-              href={appendExternalEntryParams(CONTENT_ENTRY_URL, user, { channel: 'content', lang: t.langKey })}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {t.contentBtn}
-            </a>
-          </section>
-        ) : null}
-        <div className="consult-grid">
-          <ConsultCard
-            title={t.proTitle}
-            description={t.proDesc}
-            requiredLevel="premium"
-            user={user}
-            consultEntry="professional"
-            t={t}
-            p={p}
-          />
-          <ConsultCard
-            title={t.genTitle}
-            description={t.genDesc}
-            requiredLevel="free"
-            user={user}
-            consultEntry="general"
-            t={t}
-            p={p}
-          />
-        </div>
-      </>
-      )}
+      {CONTENT_ENTRY_URL ? (
+        <section className="solutions-content-channel">
+          <h2>{t.contentTitle}</h2>
+          <p className="solutions-content-desc">{t.contentDesc}</p>
+          <a
+            className="consult-card-btn"
+            href={appendExternalEntryParams(CONTENT_ENTRY_URL, user, { channel: 'content', lang: t.langKey })}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {t.contentBtn}
+          </a>
+        </section>
+      ) : null}
     </div>
   )
 }
