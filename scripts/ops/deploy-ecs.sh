@@ -18,6 +18,9 @@ test -f dist/index.html
 test -f public/images/logo-longevity-atlas.png
 
 ops_restart_api || echo "[warn] API restart failed — continue so nginx/static still go live"
+if systemctl cat healthlongevity-mcp >/dev/null 2>&1; then
+  systemctl restart healthlongevity-mcp || echo "[warn] consult mcp restart failed"
+fi
 sleep 2
 ops_curl_health || echo "[warn] /api/health not ready"
 ops_reload_nginx || echo "[warn] nginx reload skipped"

@@ -1,0 +1,21 @@
+[Unit]
+Description=Health longevity professional consult MCP for Grok
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/health-longevity-platform
+EnvironmentFile=/opt/health-longevity-platform/.env.prod
+Environment=MCP_HOST=127.0.0.1
+Environment=MCP_PORT=3002
+Environment=MCP_PUBLIC_BASE=https://www.healthlongevity.cn
+Environment=CONSULT_UPSTREAM=http://127.0.0.1:3001
+Environment=MCP_API_UPSTREAM=http://127.0.0.1:3000
+Environment=MCP_OAUTH_STORE=/var/lib/healthlongevity-mcp/oauth.json
+ExecStart=/usr/bin/node services/consult-mcp/server.mjs
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
