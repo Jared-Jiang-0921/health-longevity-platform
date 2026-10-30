@@ -41,7 +41,15 @@ function safeEqual(a, b) {
   return timingSafeEqual(left, right)
 }
 
+const EXTRA_REDIRECTS = new Set([
+  'https://www.cursor.com/agents/mcp/oauth/callback',
+  'http://localhost:8787/callback',
+  'cursor://anysphere.cursor-mcp/oauth/callback',
+])
+
 function redirectAllowed(uri) {
+  const normalized = String(uri || '').trim().replace(/\/$/, '')
+  if (EXTRA_REDIRECTS.has(normalized)) return true
   let url
   try {
     url = new URL(uri)
