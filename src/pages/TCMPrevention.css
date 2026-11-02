@@ -22,6 +22,71 @@
   border: 0;
 }
 
+.tcm-consult {
+  margin: 0 0 var(--space-5);
+}
+
+.tcm-consult-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tcm-consult-card h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.35;
+}
+
+.tcm-consult-desc {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+}
+
+.tcm-consult-query {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.tcm-consult-query span {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.tcm-consult-query textarea {
+  height: 72px;
+  min-height: 72px;
+  resize: vertical;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
+  padding: 0.4rem 0.7rem;
+  line-height: 1.45;
+  font: inherit;
+}
+
+.tcm-consult-go {
+  width: 100%;
+}
+
+.tcm-consult-lock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.tcm-consult-lock p,
+.tcm-consult-wait {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
 .tcm-differentiation {
   margin: 0 0 var(--space-3);
   color: var(--color-text-muted);

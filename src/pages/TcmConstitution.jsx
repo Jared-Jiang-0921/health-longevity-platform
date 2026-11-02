@@ -68,10 +68,10 @@ const COPY = {
     score: '转化分',
     judgment: { yes: '是', basic: '基本是', tendency: '倾向', no: '否' },
     cardLink: '查看调养要点',
-    consultHint: '可以直接复制下面这段，填写到 AI 长寿师的专业咨询。发送后会给出调养建议，并列出相关经典方剂和单药作对照。这些内容仅供参考，并非确诊。体质是否成立、选用哪首方、以及药量多少，都需要就医后由执业医师当面确定。',
+    consultHint: '可以直接复制下面这段，填写到中医养生保健咨询。发送后会按中医书给出调养说明，并列出相关参考方剂和单药。这些内容仅供参考，并非确诊。体质是否成立、选用哪首方、以及药量多少，都需要就医后由执业医师当面确定。',
     copyResult: '复制这段',
     copied: '已复制',
-    fillConsult: '填写到 AI 长寿师',
+    fillConsult: '填写到中医养生保健',
     error: '暂时没有完成',
   },
   en: {
@@ -122,10 +122,10 @@ const COPY = {
     score: 'Converted score',
     judgment: { yes: 'Yes', basic: 'Basically yes', tendency: 'Tendency', no: 'No' },
     cardLink: 'Care notes',
-    consultHint: 'Copy the text below into the professional AI Coach. After you send it, you get lifestyle suggestions plus classical formulas and single herbs as references. They are for study only, not a confirmed diagnosis. Whether the constitution applies, which formula to choose, and what dose to take must be decided in person by a licensed clinician.',
+    consultHint: 'Copy the text below into the TCM wellness consult. After you send it, the reply stays with TCM books: daily-care notes, plus reference formulas and single herbs. They are for study only, not a confirmed diagnosis. Whether the constitution applies, which formula to choose, and what dose to take must be decided in person by a licensed clinician.',
     copyResult: 'Copy text',
     copied: 'Copied',
-    fillConsult: 'Fill in AI Coach',
+    fillConsult: 'Fill in TCM consult',
     error: 'Could not finish',
   },
   ar: {
@@ -176,10 +176,10 @@ const COPY = {
     score: 'الدرجة المحوّلة',
     judgment: { yes: 'نعم', basic: 'نعم إلى حد كبير', tendency: 'ميل', no: 'لا' },
     cardLink: 'ملاحظات العناية',
-    consultHint: 'انسخ النص أدناه إلى الاستشارة المهنية. بعد الإرسال تظهر اقتراحات نمط الحياة مع وصفات كلاسيكية وأعشاب مفردة للمرجعية. ليست تشخيصاً مؤكداً. ثبوت النمط واختيار الوصفة ومقدار الجرعة يحددها طبيب مرخص بعد المعاينة.',
+    consultHint: 'انسخ النص أدناه إلى استشارة العناية بالطب الصيني. بعد الإرسال يبقى الجواب في كتب الطب الصيني: ملاحظات العناية مع وصفات وأعشاب مرجعية. ليست تشخيصاً مؤكداً. ثبوت النمط واختيار الوصفة ومقدار الجرعة يحددها طبيب مرخص بعد المعاينة.',
     copyResult: 'نسخ النص',
     copied: 'تم النسخ',
-    fillConsult: 'تعبئة مدرب الصحة',
+    fillConsult: 'تعبئة استشارة الطب الصيني',
     error: 'تعذر الإكمال',
   },
 }
@@ -386,7 +386,7 @@ export default function TcmConstitution() {
     if (!consultText) return
     saveConstitutionConsultDraft(saved?.summary, lang)
     copyConsultText()
-    navigate('/consult?entry=professional')
+    navigate('/consult?entry=tcm')
   }
 
   return (

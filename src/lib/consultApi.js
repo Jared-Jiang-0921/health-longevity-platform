@@ -225,7 +225,7 @@ export async function fetchConsultSession(token, sessionId) {
  *   message: string,
  *   lang: string,
  *   sessionId?: string | null,
- *   entry?: 'general' | 'professional',
+ *   entry?: 'general' | 'professional' | 'tcm',
    *   usePubmed?: boolean,
  *   useCochrane?: boolean,
  *   useEuropePmc?: boolean,

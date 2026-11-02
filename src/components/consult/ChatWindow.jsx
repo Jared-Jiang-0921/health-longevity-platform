@@ -577,9 +577,11 @@ export default function ChatWindow({
           <p className="chat-empty">{copy.historyLoading || '…'}</p>
         ) : messages.length === 0 && !sending ? (
           <p className="chat-empty">
-            {entry === 'professional'
-              ? (copy.emptyProfessional || copy.empty)
-              : (copy.emptyGeneral || copy.empty)}
+            {entry === 'tcm'
+              ? (copy.emptyTcm || copy.empty)
+              : entry === 'professional'
+                ? (copy.emptyProfessional || copy.empty)
+                : (copy.emptyGeneral || copy.empty)}
           </p>
         ) : null}
         {loadingHistory ? null : messages.map((m, i) => (

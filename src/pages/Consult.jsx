@@ -5,7 +5,7 @@ import { useLocale } from '../context/LocaleContext'
 import { hasLevelAccess, MEMBERSHIP_LEVELS } from '../data/membership'
 import { fetchConsultProfile } from '../lib/consultProfile'
 import { takeConstitutionConsultDraft } from '../lib/tcmConstitution/consultDraft'
-import { fetchConsultSessions, clearConsultSessions, deleteConsultSession, renameConsultSession, fetchConsultQuota } from '../lib/consultApi'
+import { fetchConsultSessions, deleteConsultSession, renameConsultSession, fetchConsultQuota } from '../lib/consultApi'
 import ChatWindow from '../components/consult/ChatWindow'
 import SessionList from '../components/consult/SessionList'
 import ModulePageHero from '../components/ModulePageHero'
@@ -25,6 +25,10 @@ const COPY = {
     professional: '专业健康长寿',
     modeHintGeneral: '大众向：生活方式与养生科普。不含药理、免疫学教材、内外科等专科知识，也不检索 PubMed / Cochrane / 欧洲 PMC。',
     modeHintProfessional: '专业向：覆盖基础医学、临床医学、功能医学、长寿学等。可按需检索 PubMed、Cochrane、欧洲 PMC。',
+    tcmTitle: 'AI 中医养生保健',
+    backTcm: '返回中医治未病',
+    modeHintTcm: '只检索本站中医书，按证候方向、病机和方义说明。不使用西医书，也不检索文献库。',
+    emptyTcm: '中医养生保健：只依据本站已入库的中医书。可以讨论证候方向和参考方剂，并写清对应证候。未经当场辨证，不能作为用药依据。',
     needLogin: '请先登录后使用咨询。',
     login: '登录',
     upgrade: '升级会员',
@@ -134,6 +138,10 @@ const COPY = {
     professional: 'Professional',
     modeHintGeneral: 'Public mode: lifestyle and wellness sources only. No specialty textbooks, and no PubMed / Cochrane / Europe PMC.',
     modeHintProfessional: 'Professional mode: basic, clinical, functional, and longevity medicine. Optional PubMed, Cochrane, Europe PMC.',
+    tcmTitle: 'AI TCM wellness consult',
+    backTcm: 'Back to preventive TCM',
+    modeHintTcm: 'Uses only this site’s TCM books, and explains by pattern, mechanism, and formula meaning. Western books and literature databases stay off.',
+    emptyTcm: 'TCM wellness: answers stay with the TCM books on this site. Pattern direction and reference formulas are allowed when the matching pattern is stated. Without an in-person assessment, this is not a basis for taking medicine.',
     needLogin: 'Please sign in to use consultation.',
     login: 'Login',
     upgrade: 'Upgrade',
@@ -243,6 +251,10 @@ const COPY = {
     professional: 'استشارة مهنية',
     modeHintGeneral: 'للجمهور: نمط الحياة والعافية فقط. بدون كتب تخصصية وبدون PubMed / Cochrane / Europe PMC.',
     modeHintProfessional: 'للمتخصصين: الطب الأساسي والسريري والوظيفي، مع خيار PubMed وCochrane وEurope PMC.',
+    tcmTitle: 'استشارة العناية بالطب الصيني',
+    backTcm: 'العودة إلى الوقاية الصينية',
+    modeHintTcm: 'يستخدم فقط كتب الطب الصيني في هذا الموقع، ويشرح باتجاه المتلازمة والآلية ومعنى الوصفة. كتب الطب الغربي وقواعد الأدبيات متوقفة.',
+    emptyTcm: 'العناية بالطب الصيني تعتمد على كتب الموقع فقط. اتجاه المتلازمة والوصفة المرجعية مسموحان مع ذكر المتلازمة. بلا معاينة حضورية لا يُعد هذا أساساً لتناول الدواء.',
     needLogin: 'يرجى تسجيل الدخول لاستخدام الاستشارة.',
     login: 'تسجيل الدخول',
     upgrade: 'ترقية',
@@ -351,6 +363,7 @@ const COPY = {
 const ENTRY_LEVEL = {
   general: 'free',
   professional: 'premium',
+  tcm: 'premium',
 }
 
 function formatQuotaTokens(n, lang) {
@@ -383,7 +396,12 @@ export default function Consult() {
   const [quota, setQuota] = useState(null)
   const [draftSeed, setDraftSeed] = useState('')
 
-  const entry = params.get('entry') === 'professional' ? 'professional' : 'general'
+  const rawEntry = params.get('entry')
+  const entry = rawEntry === 'professional' || rawEntry === 'tcm' ? rawEntry : 'general'
+  const homePath = entry === 'tcm' ? '/tcm-prevention' : '/solutions'
+  const visibleSessions = sessions.filter((row) => (
+    entry === 'tcm' ? row.entry === 'tcm' : row.entry !== 'tcm'
+  ))
   const initialQuery = params.get('q') || ''
   const sessionId = params.get('session') || ''
   const required = ENTRY_LEVEL[entry]
@@ -488,6 +506,7 @@ export default function Consult() {
       empty: t.empty,
       emptyGeneral: t.emptyGeneral,
       emptyProfessional: t.emptyProfessional,
+      emptyTcm: t.emptyTcm,
       placeholder: t.placeholder,
       send: t.send,
       sending: t.sending,
@@ -591,12 +610,16 @@ export default function Consult() {
   }
 
   async function clearAllSessions() {
-    if (!token || !sessions.length || clearing) return
+    const rows = visibleSessions
+    if (!token || !rows.length || clearing) return
     if (!window.confirm(t.clearConfirm)) return
     setClearing(true)
     try {
-      await clearConsultSessions(token)
-      setSessions([])
+      for (const row of rows) {
+        await deleteConsultSession(token, row.id)
+      }
+      const drop = new Set(rows.map((row) => row.id))
+      setSessions((prev) => prev.filter((row) => !drop.has(row.id)))
       setSessionsStatus('ready')
       setSessionsErr('')
       newChat()
@@ -613,7 +636,7 @@ export default function Consult() {
     const sp = new URLSearchParams(params)
     sp.set('session', row.id)
     sp.delete('q')
-    if (row.entry === 'professional' || row.entry === 'general') {
+    if (row.entry === 'professional' || row.entry === 'general' || row.entry === 'tcm') {
       sp.set('entry', row.entry)
     }
     setParams(sp, { replace: true })
@@ -647,7 +670,7 @@ export default function Consult() {
         <p>
           <Link to="/login" className="btn-primary">{t.login}</Link>
         </p>
-        <p><Link to="/solutions">{t.back}</Link></p>
+        <p><Link to={homePath}>{entry === 'tcm' ? t.backTcm : t.back}</Link></p>
       </div>
     )
   }
@@ -655,11 +678,11 @@ export default function Consult() {
   return (
     <div className={`page-consult ${rtl ? 'page-consult--rtl' : ''}`} dir={rtl ? 'rtl' : 'ltr'}>
       <header className="consult-top">
-        <button type="button" className="consult-back" onClick={() => navigate('/solutions')}>
-          ← {t.back}
+        <button type="button" className="consult-back" onClick={() => navigate(homePath)}>
+          ← {entry === 'tcm' ? t.backTcm : t.back}
         </button>
       </header>
-      <ModulePageHero path="/consult" title={t.title} />
+      <ModulePageHero path={entry === 'tcm' ? '/tcm-prevention' : '/consult'} title={entry === 'tcm' ? t.tcmTitle : t.title} />
 
       <aside className="consult-disclaimer page-callout page-callout--warn" role="note">
         <p>{disclaimer}</p>
@@ -667,26 +690,32 @@ export default function Consult() {
 
       <div className="consult-layout">
         <nav className="consult-modes" aria-label="consult mode">
-          <button
-            type="button"
-            className={entry === 'general' ? 'is-active' : ''}
-            onClick={() => setEntry('general')}
-          >
-            {t.general}
-          </button>
-          <button
-            type="button"
-            className={entry === 'professional' ? 'is-active' : ''}
-            onClick={() => setEntry('professional')}
-          >
-            {t.professional}
-          </button>
-          <p className="consult-mode-hint">
-            {entry === 'professional' ? t.modeHintProfessional : t.modeHintGeneral}
-          </p>
+          {entry === 'tcm' ? (
+            <p className="consult-mode-hint">{t.modeHintTcm}</p>
+          ) : (
+            <>
+              <button
+                type="button"
+                className={entry === 'general' ? 'is-active' : ''}
+                onClick={() => setEntry('general')}
+              >
+                {t.general}
+              </button>
+              <button
+                type="button"
+                className={entry === 'professional' ? 'is-active' : ''}
+                onClick={() => setEntry('professional')}
+              >
+                {t.professional}
+              </button>
+              <p className="consult-mode-hint">
+                {entry === 'professional' ? t.modeHintProfessional : t.modeHintGeneral}
+              </p>
+            </>
+          )}
           {allowed ? (
             <SessionList
-              sessions={sessions}
+              sessions={visibleSessions}
               activeId={sessionId}
               loading={sessionsStatus === 'loading'}
               error={sessionsStatus === 'error' ? (sessionsErr || true) : false}
@@ -735,8 +764,12 @@ export default function Consult() {
                 <Link to="/health-questionnaire">
                   {profileStatus === 'ready' ? t.profileUpdate : t.profileFill}
                 </Link>
-                <Link to="/solutions/risk">{t.profileRisk}</Link>
-                <Link to="/solutions/aging">{t.profileAging}</Link>
+                {entry === 'tcm' ? null : (
+                  <>
+                    <Link to="/solutions/risk">{t.profileRisk}</Link>
+                    <Link to="/solutions/aging">{t.profileAging}</Link>
+                  </>
+                )}
               </aside>
               ) : null}
               {quota ? (

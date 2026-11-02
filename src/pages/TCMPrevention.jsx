@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useCallback, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { TCM_CONSTITUTION_SOURCE, TCM_CONSTITUTIONS } from '../data/tcmConstitutions'
 import { TCM_HERB_SOURCE, TCM_HERBS, TCM_PRESCRIPTIONS, TCM_RX_SOURCE } from '../data/tcmPrevention'
 import { TCM_DIET_SOURCE, TCM_DIET_TOPICS } from '../data/tcmDiet'
@@ -8,6 +8,7 @@ import { TCM_MOVEMENT_SOURCE, TCM_MOVEMENT_TOPICS } from '../data/tcmMovement'
 import { TCM_COMPARE_SOURCE, TCM_COMPARE_TOPICS } from '../data/tcmCompare'
 import { TCM_FOOD_BASIS, TCM_LATE_SUMMER, TCM_LATE_SUMMER_RECIPES, TCM_SEASON_PRINCIPLE, TCM_SEASON_RECIPES, TCM_SEASON_SOURCE, TCM_SEASONS } from '../data/tcmSeasons'
 import { getTcmPreventionModuleCopy } from '../data/tcmPreventionModuleI18n'
+import { hasLevelAccess, MEMBERSHIP_LEVELS } from '../data/membership'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
 import ModuleAccessHint from '../components/ModuleAccessHint'
@@ -48,9 +49,53 @@ function SeasonRecipes({ recipes, lang, label }) {
   )
 }
 
+function TcmConsultCard({ mod, user, loading }) {
+  const navigate = useNavigate()
+  const [query, setQuery] = useState('')
+  const allowed = hasLevelAccess(user?.level, 'premium', { isGuest: !user })
+
+  const openConsult = useCallback(() => {
+    const sp = new URLSearchParams()
+    sp.set('entry', 'tcm')
+    if (query.trim()) sp.set('q', query.trim())
+    navigate(`/consult?${sp.toString()}`)
+  }, [navigate, query])
+
+  return (
+    <section className="tcm-consult" aria-labelledby="tcm-consult-title">
+      <article className={`tcm-consult-card content-card content-card--padded ${!allowed ? 'is-locked' : ''}`}>
+        <h2 id="tcm-consult-title">{mod.consultTitle}</h2>
+        <p className="tcm-consult-desc">{mod.consultDesc}</p>
+        <label className="tcm-consult-query">
+          <span>{mod.consultQuery}</span>
+          <textarea
+            rows={2}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={mod.consultPlaceholder}
+            disabled={loading || !allowed}
+          />
+        </label>
+        {loading ? (
+          <p className="tcm-consult-wait" role="status">…</p>
+        ) : !allowed ? (
+          <div className="tcm-consult-lock">
+            <p>{mod.consultUpgrade} · {MEMBERSHIP_LEVELS.premium.name}</p>
+            <Link to="/payment?plan=premium_monthly" className="btn-primary">{mod.consultUpgrade}</Link>
+          </div>
+        ) : (
+          <button type="button" className="btn-primary tcm-consult-go" onClick={openConsult}>
+            {query.trim() ? mod.consultEnterQuery : mod.consultEnter}
+          </button>
+        )}
+      </article>
+    </section>
+  )
+}
+
 export default function TCMPrevention() {
   const { lang } = useLocale()
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
   const isAdmin = Boolean(user?.site_admin)
   const mod = getTcmPreventionModuleCopy(lang)
   const [activeTab, setActiveTab] = useState(TAB_CONSTITUTION)
@@ -67,6 +112,8 @@ export default function TCMPrevention() {
         <p className="tcm-differentiation">{mod.differentiation}</p>
         <p className="tcm-positioning page-callout">{mod.positioning}</p>
       </section>
+
+      <TcmConsultCard mod={mod} user={user} loading={loading} />
 
       <section className="tcm-toolbar" aria-label={mod.constitution}>
         <div className="tcm-tabs" role="tablist">
