@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
-import { hasLevelAccess, MEMBERSHIP_LEVELS } from '../data/membership'
+import { hasLevelAccess } from '../data/membership'
+import { getMembershipLevelLabel } from '../i18n/terms'
 import { fetchConsultProfile } from '../lib/consultProfile'
 import { takeConstitutionConsultDraft } from '../lib/tcmConstitution/consultDraft'
 import { fetchConsultSessions, deleteConsultSession, renameConsultSession, fetchConsultQuota } from '../lib/consultApi'
@@ -31,6 +32,14 @@ const COPY = {
     emptyTcm: '中医养生保健：只依据本站已入库的中医书。可以讨论证候方向和参考方剂，并写清对应证候。未经当场辨证，不能作为用药依据。',
     needLogin: '请先登录后使用咨询。',
     login: '登录',
+    authLoading: '正在验证会员身份，请稍候…',
+    profileLoading: '正在读取健康问卷与评估摘要，随后即可提问。',
+    handoffReady: '已把你在上一页写下的问题填入输入框。请核对后再发送。回答仅供参考，不能替代医生诊断、治疗或处方。',
+    handoffPreview: '待核对的问题',
+    unavailable: '历史会话暂时无法加载。你仍可以开始新的咨询。',
+    retry: '重试',
+    modeLabel: '咨询类型',
+    profileAssessLocked: '评估需标准会员',
     upgrade: '升级会员',
     needLevel: (name) => `该咨询类型需要「${name}」及以上会员。`,
     empty: '向助手提问健康与长寿相关问题。回答仅供参考。',
@@ -144,6 +153,14 @@ const COPY = {
     emptyTcm: 'TCM wellness: answers stay with the TCM books on this site. Pattern direction and reference formulas are allowed when the matching pattern is stated. Without an in-person assessment, this is not a basis for taking medicine.',
     needLogin: 'Please sign in to use consultation.',
     login: 'Login',
+    authLoading: 'Verifying membership…',
+    profileLoading: 'Loading your questionnaire and assessment summary. You can ask in a moment.',
+    handoffReady: 'Your question from the previous page is in the box. Review it before sending. Answers are for reference only and do not replace a physician’s diagnosis, treatment, or prescriptions.',
+    handoffPreview: 'Question to review',
+    unavailable: 'Previous chats could not be loaded. You can still start a new consultation.',
+    retry: 'Retry',
+    modeLabel: 'Consultation type',
+    profileAssessLocked: 'Assessments need Standard',
     upgrade: 'Upgrade',
     needLevel: (name) => `This mode requires ${name} or higher.`,
     empty: 'Ask about health and longevity. Answers are for reference only.',
@@ -257,6 +274,14 @@ const COPY = {
     emptyTcm: 'العناية بالطب الصيني تعتمد على كتب الموقع فقط. اتجاه المتلازمة والوصفة المرجعية مسموحان مع ذكر المتلازمة. بلا معاينة حضورية لا يُعد هذا أساساً لتناول الدواء.',
     needLogin: 'يرجى تسجيل الدخول لاستخدام الاستشارة.',
     login: 'تسجيل الدخول',
+    authLoading: 'جار التحقق من العضوية…',
+    profileLoading: 'جارٍ تحميل الاستبيان وملخص التقييم. يمكنك السؤال بعد لحظات.',
+    handoffReady: 'وُضع سؤالك من الصفحة السابقة في مربع الكتابة. راجعه قبل الإرسال. الإجابات للمرجعية فقط ولا تغني عن تشخيص الطبيب أو علاجه أو وصفاته.',
+    handoffPreview: 'سؤال بانتظار المراجعة',
+    unavailable: 'تعذر تحميل المحادثات السابقة. يمكنك بدء استشارة جديدة.',
+    retry: 'إعادة المحاولة',
+    modeLabel: 'نوع الاستشارة',
+    profileAssessLocked: 'التقييمات للعضو القياسي',
     upgrade: 'ترقية',
     needLevel: (name) => `يتطلب هذا الوضع عضوية ${name} أو أعلى.`,
     empty: 'اطرح أسئلة حول الصحة وطول العمر. الإجابات للمرجعية فقط.',
@@ -390,7 +415,6 @@ export default function Consult() {
   const [profileStatus, setProfileStatus] = useState('loading')
   const [sessions, setSessions] = useState([])
   const [sessionsStatus, setSessionsStatus] = useState('loading')
-  const [sessionsErr, setSessionsErr] = useState('')
   const [clearing, setClearing] = useState(false)
   const [chatNonce, setChatNonce] = useState(0)
   const [quota, setQuota] = useState(null)
@@ -402,11 +426,12 @@ export default function Consult() {
   const visibleSessions = sessions.filter((row) => (
     entry === 'tcm' ? row.entry === 'tcm' : row.entry !== 'tcm'
   ))
-  const initialQuery = params.get('q') || ''
   const sessionId = params.get('session') || ''
   const required = ENTRY_LEVEL[entry]
-  const allowed = hasLevelAccess(user?.level, required, { isGuest: !user })
   const token = getToken?.()
+  const allowed = Boolean(user && token) && (
+    required === 'free' || hasLevelAccess(user.level, required, { isGuest: false })
+  )
 
   function refreshSessions() {
     if (!token) {
@@ -414,16 +439,15 @@ export default function Consult() {
       setSessionsStatus('missing')
       return
     }
+    setSessionsStatus('loading')
     fetchConsultSessions(token)
       .then((rows) => {
         setSessions(rows)
         setSessionsStatus('ready')
-        setSessionsErr('')
       })
-      .catch((err) => {
+      .catch(() => {
         setSessions([])
         setSessionsStatus('error')
-        setSessionsErr(err?.message || '')
       })
   }
 
@@ -464,13 +488,11 @@ export default function Consult() {
         if (cancelled) return
         setSessions(rows)
         setSessionsStatus('ready')
-        setSessionsErr('')
       })
-      .catch((err) => {
+      .catch(() => {
         if (cancelled) return
         setSessions([])
         setSessionsStatus('error')
-        setSessionsErr(err?.message || '')
       })
     return () => {
       cancelled = true
@@ -531,6 +553,7 @@ export default function Consult() {
       historyLoading: t.historyLoading,
       loadFail: t.loadFail,
       disclaimer,
+      handoffReady: t.handoffReady,
       downloadWord: t.downloadWord,
       downloadBusy: t.downloadBusy,
       downloadFail: t.downloadFail,
@@ -576,9 +599,12 @@ export default function Consult() {
   )
 
   function setEntry(next) {
+    if (next === entry) return
     const sp = new URLSearchParams(params)
     sp.set('entry', next)
+    sp.delete('session')
     setParams(sp, { replace: true })
+    setChatNonce((n) => n + 1)
   }
 
   function newChat() {
@@ -603,9 +629,8 @@ export default function Consult() {
       await deleteConsultSession(token, row.id)
       setSessions((prev) => prev.filter((s) => s.id !== row.id))
       if (sessionId === row.id) newChat()
-    } catch (err) {
+    } catch {
       setSessionsStatus('error')
-      setSessionsErr(err?.message || t.sessionsError)
     }
   }
 
@@ -621,11 +646,9 @@ export default function Consult() {
       const drop = new Set(rows.map((row) => row.id))
       setSessions((prev) => prev.filter((row) => !drop.has(row.id)))
       setSessionsStatus('ready')
-      setSessionsErr('')
       newChat()
-    } catch (err) {
+    } catch {
       setSessionsStatus('error')
-      setSessionsErr(err?.message || t.sessionsError)
     } finally {
       setClearing(false)
     }
@@ -655,22 +678,40 @@ export default function Consult() {
     refreshSessions()
   }
 
+  const queryFromUrl = (params.get('q') || '').trim()
+  const composerSeed = queryFromUrl || draftSeed
+  const assessAllowed = hasLevelAccess(user?.level, 'standard', { isGuest: !user })
+  const professionalAllowed = hasLevelAccess(user?.level, 'premium', { isGuest: !user })
+  const loginTarget = {
+    pathname: '/consult',
+    search: params.toString() ? `?${params.toString()}` : '',
+  }
+
   if (loading) {
     return (
-      <div className="page-consult">
-        <p className="consult-auth-loading" role="status">…</p>
+      <div className={`page-consult ${rtl ? 'page-consult--rtl' : ''}`} dir={rtl ? 'rtl' : 'ltr'}>
+        <aside className="consult-disclaimer page-callout page-callout--warn" role="note">
+          <p>{disclaimer}</p>
+        </aside>
+        <p className="consult-auth-loading" role="status">{t.authLoading}</p>
       </div>
     )
   }
 
   if (!user || !token) {
     return (
-      <div className="page-consult">
-        <p>{t.needLogin}</p>
-        <p>
-          <Link to="/login" className="btn-primary">{t.login}</Link>
-        </p>
-        <p><Link to={homePath}>{entry === 'tcm' ? t.backTcm : t.back}</Link></p>
+      <div className={`page-consult ${rtl ? 'page-consult--rtl' : ''}`} dir={rtl ? 'rtl' : 'ltr'}>
+        <aside className="consult-disclaimer page-callout page-callout--warn" role="note">
+          <p>{disclaimer}</p>
+        </aside>
+        <div className="consult-gate content-card content-card--padded">
+          <h1>{entry === 'tcm' ? t.tcmTitle : t.title}</h1>
+          <p>{t.needLogin}</p>
+          <div className="consult-gate-actions">
+            <Link to="/login" state={{ from: loginTarget }} className="btn-primary">{t.login}</Link>
+            <Link to={homePath}>{entry === 'tcm' ? t.backTcm : t.back}</Link>
+          </div>
+        </div>
       </div>
     )
   }
@@ -679,7 +720,8 @@ export default function Consult() {
     <div className={`page-consult ${rtl ? 'page-consult--rtl' : ''}`} dir={rtl ? 'rtl' : 'ltr'}>
       <header className="consult-top">
         <button type="button" className="consult-back" onClick={() => navigate(homePath)}>
-          ← {entry === 'tcm' ? t.backTcm : t.back}
+          <span className="consult-back-arrow" aria-hidden="true" />
+          {entry === 'tcm' ? t.backTcm : t.back}
         </button>
       </header>
       <ModulePageHero path={entry === 'tcm' ? '/tcm-prevention' : '/consult'} title={entry === 'tcm' ? t.tcmTitle : t.title} />
@@ -688,89 +730,108 @@ export default function Consult() {
         <p>{disclaimer}</p>
       </aside>
 
-      <div className="consult-layout">
-        <nav className="consult-modes" aria-label="consult mode">
-          {entry === 'tcm' ? (
-            <p className="consult-mode-hint">{t.modeHintTcm}</p>
-          ) : (
-            <>
-              <button
-                type="button"
-                className={entry === 'general' ? 'is-active' : ''}
-                onClick={() => setEntry('general')}
-              >
-                {t.general}
-              </button>
-              <button
-                type="button"
-                className={entry === 'professional' ? 'is-active' : ''}
-                onClick={() => setEntry('professional')}
-              >
-                {t.professional}
-              </button>
-              <p className="consult-mode-hint">
-                {entry === 'professional' ? t.modeHintProfessional : t.modeHintGeneral}
-              </p>
-            </>
-          )}
-          {allowed ? (
-            <SessionList
-              sessions={visibleSessions}
-              activeId={sessionId}
-              loading={sessionsStatus === 'loading'}
-              error={sessionsStatus === 'error' ? (sessionsErr || true) : false}
-              lang={lang}
-              copy={{
-                sessions: t.sessions,
-                newChat: t.newChat,
-                sessionsEmpty: t.sessionsEmpty,
-                sessionsLoading: t.sessionsLoading,
-                sessionsError: t.sessionsError,
-                untitled: t.untitled,
-                clearAll: t.clearAll,
-                clearing: t.clearing,
-                deleteSession: t.deleteSession,
-                renameSession: t.renameSession,
-                retentionNote: t.retentionNote,
-              }}
-              onOpen={openSession}
-              onNew={newChat}
-              onClear={clearAllSessions}
-              onDelete={deleteOneSession}
-              onRename={renameOneSession}
-              clearing={clearing}
-            />
-          ) : null}
-        </nav>
+      <div className={`consult-layout ${entry === 'tcm' ? 'consult-layout--single' : ''}`}>
+        {entry === 'tcm' ? null : (
+          <div className="consult-mode-switch" role="group" aria-label={t.modeLabel}>
+            <button
+              type="button"
+              className={entry === 'general' ? 'is-active' : ''}
+              aria-pressed={entry === 'general'}
+              onClick={() => setEntry('general')}
+            >
+              {t.general}
+            </button>
+            <button
+              type="button"
+              className={entry === 'professional' ? 'is-active' : ''}
+              aria-pressed={entry === 'professional'}
+              onClick={() => setEntry('professional')}
+            >
+              <span>{t.professional}</span>
+              {!professionalAllowed ? <small>{getMembershipLevelLabel('premium', lang)}</small> : null}
+            </button>
+          </div>
+        )}
+        <p className="consult-mode-hint">
+          {entry === 'tcm'
+            ? t.modeHintTcm
+            : entry === 'professional'
+              ? t.modeHintProfessional
+              : t.modeHintGeneral}
+        </p>
+        {allowed ? (
+          <SessionList
+            sessions={visibleSessions}
+            activeId={sessionId}
+            loading={sessionsStatus === 'loading'}
+            error={sessionsStatus === 'error'}
+            lang={lang}
+            copy={{
+              sessions: t.sessions,
+              newChat: t.newChat,
+              sessionsEmpty: t.sessionsEmpty,
+              sessionsLoading: t.sessionsLoading,
+              sessionsError: t.sessionsError,
+              untitled: t.untitled,
+              clearAll: t.clearAll,
+              clearing: t.clearing,
+              deleteSession: t.deleteSession,
+              renameSession: t.renameSession,
+              retentionNote: t.retentionNote,
+            }}
+            onOpen={openSession}
+            onNew={newChat}
+            onClear={clearAllSessions}
+            onDelete={deleteOneSession}
+            onRename={renameOneSession}
+            clearing={clearing}
+          />
+        ) : null}
 
         <main className="consult-main">
           {!allowed ? (
             <div className="consult-locked content-card content-card--padded">
-              <p>{t.needLevel(MEMBERSHIP_LEVELS[required]?.name || required)}</p>
+              <p>{t.needLevel(getMembershipLevelLabel(required, lang))}</p>
+              {queryFromUrl ? (
+                <p className="consult-lock-query">
+                  <span>{t.handoffPreview}</span>
+                  {queryFromUrl}
+                </p>
+              ) : null}
               <Link to={required === 'premium' ? '/payment?plan=premium_monthly' : '/payment?plan=standard_monthly'} className="btn-primary">{t.upgrade}</Link>
+              <Link to={homePath}>{entry === 'tcm' ? t.backTcm : t.back}</Link>
             </div>
           ) : (
             <>
-              {profileStatus !== 'loading' ? (
               <aside
                 className={`consult-profile-banner ${profileStatus === 'ready' ? 'is-ready' : 'is-missing'}`}
                 role="status"
               >
                 <p>
-                  {profileStatus === 'ready' ? t.profileReady
-                    : profileStatus === 'error' ? t.profileError
-                      : t.profileMissing}
+                  {profileStatus === 'loading' ? t.profileLoading
+                    : profileStatus === 'ready' ? t.profileReady
+                      : profileStatus === 'error' ? t.profileError
+                        : t.profileMissing}
                 </p>
-                <Link to="/health-questionnaire">
-                  {profileStatus === 'ready' ? t.profileUpdate : t.profileFill}
-                </Link>
-                {entry === 'tcm' ? null : (
+                {profileStatus === 'loading' ? null : (
+                  <Link to="/health-questionnaire">
+                    {profileStatus === 'ready' ? t.profileUpdate : t.profileFill}
+                  </Link>
+                )}
+                {entry === 'tcm' || profileStatus === 'loading' ? null : assessAllowed ? (
                   <>
                     <Link to="/solutions/risk">{t.profileRisk}</Link>
                     <Link to="/solutions/aging">{t.profileAging}</Link>
                   </>
+                ) : (
+                  <Link to="/payment?plan=standard_monthly">{t.profileAssessLocked}</Link>
                 )}
               </aside>
+              {sessionsStatus === 'error' ? (
+                <div className="consult-unavailable" role="alert">
+                  <p>{t.unavailable}</p>
+                  <button type="button" onClick={refreshSessions}>{t.retry}</button>
+                </div>
               ) : null}
               {quota ? (
                 <aside className={`consult-quota ${!quota.unlimited && quota.remaining === 0 ? 'is-empty' : ''}`} role="status">
@@ -785,15 +846,22 @@ export default function Consult() {
                 </aside>
               ) : null}
               {profileStatus === 'loading' ? (
-                <p className="consult-auth-loading" role="status">…</p>
+                <div className="consult-boot" role="status">
+                  <p>{t.profileLoading}</p>
+                  {queryFromUrl || draftSeed ? (
+                    <p className="consult-boot-q">
+                      <span>{t.handoffPreview}</span>
+                      {queryFromUrl || draftSeed}
+                    </p>
+                  ) : null}
+                </div>
               ) : (
                 <ChatWindow
-                  key={`chat-${chatNonce}`}
+                  key={`chat-${entry}-${chatNonce}`}
                   token={token}
                   lang={lang}
                   entry={entry}
-                  initialQuery={initialQuery}
-                  initialDraft={draftSeed}
+                  initialDraft={composerSeed}
                   rtl={rtl}
                   copy={chatCopy}
                   profile={profile}
