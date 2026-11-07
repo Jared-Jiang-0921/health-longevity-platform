@@ -1,0 +1,57 @@
+.page-about h2 {
+  margin: 1.75rem 0 0.6rem;
+  font-size: 1.15rem;
+}
+
+.page-about h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+}
+
+.about-kicker {
+  margin: 0 0 0.35rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+}
+
+.about-updated {
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.about-lead {
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.about-modules article,
+.about-faq article {
+  padding: 0.85rem 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.about-modules p,
+.about-faq p,
+.about-urls {
+  margin-bottom: 0.75rem;
+}
+
+.about-urls {
+  padding-left: 1.2rem;
+}
+
+.page-about--rtl .about-urls {
+  padding-left: 0;
+  padding-right: 1.2rem;
+}
+
+.about-url-text {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.82rem;
+  word-break: break-all;
+}
+
+.about-faq h3 {
+  line-height: 1.45;
+}

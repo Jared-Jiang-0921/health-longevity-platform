@@ -1,5 +1,8 @@
+import { getPageFaqs } from '../data/publicSummary.js'
+import { SITE_LEGAL } from '../data/siteLegal.js'
 import {
   DEFAULT_OG_IMAGE,
+  PUBLIC_SUMMARY_UPDATED,
   SEO_BRAND,
   SEO_LANGS,
   SITE_ORIGIN,
@@ -27,8 +30,16 @@ export function resolveSeo(pathname, lang) {
   const title = page?.title?.[lang] || page?.title?.zh || brand.name
   const description = page?.description?.[lang] || page?.description?.zh || brand.description
   const canonical = absoluteUrl(lang, page?.path || pathname || '/')
-  const robots = indexable ? 'index,follow' : 'noindex,nofollow'
+  const robots = indexable
+    ? 'index,follow,max-snippet:-1,max-image-preview:large'
+    : 'noindex,nofollow'
   return { page, title, description, canonical, robots, indexable }
+}
+
+const EDUCATION_DISCLAIMER = {
+  zh: '仅供健康教育与生活方式参考，不替代专业诊疗、处方或紧急医疗处置。',
+  en: 'For education and lifestyle reference only—not diagnosis, prescriptions, or emergency care.',
+  ar: 'للتعليم ونمط الحياة فقط، وليس بديلاً عن التشخيص أو الوصفات أو الطوارئ.',
 }
 
 export function buildJsonLd({ lang, pathname, title, description, canonical }) {
@@ -36,42 +47,68 @@ export function buildJsonLd({ lang, pathname, title, description, canonical }) {
   const brand = SEO_BRAND[lang] || SEO_BRAND.zh
   const page = findSeoPage(pathname)
   const inLanguage = spec.htmlLang
+  const usageInfo = EDUCATION_DISCLAIMER[lang] || EDUCATION_DISCLAIMER.zh
   const website = {
     '@type': 'WebSite',
     '@id': `${SITE_ORIGIN}/#website`,
     url: `${SITE_ORIGIN}/`,
     name: brand.name,
-    inLanguage,
+    description: brand.description,
+    inLanguage: ['zh-Hans', 'en', 'ar'],
     publisher: { '@id': `${SITE_ORIGIN}/#org` },
   }
   const org = {
     '@type': 'Organization',
     '@id': `${SITE_ORIGIN}/#org`,
     name: brand.name,
+    legalName: SITE_LEGAL.legalEntityName,
+    description: brand.description,
     url: `${SITE_ORIGIN}/`,
     logo: DEFAULT_OG_IMAGE,
+    email: SITE_LEGAL.contactEmail,
   }
   const webPage = {
-    '@type': page?.type === 'module' ? 'MedicalWebPage' : 'WebPage',
+    '@type': 'WebPage',
     '@id': `${canonical}#webpage`,
     url: canonical,
     name: title,
     description,
     inLanguage,
     isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
+    publisher: { '@id': `${SITE_ORIGIN}/#org` },
     about: {
       '@type': 'Thing',
       name: lang === 'zh' ? '健康长寿与预防保健' : 'Health, longevity and prevention',
     },
+    usageInfo,
+    disclaimer: usageInfo,
   }
-  if (page?.type === 'module' || page?.type === 'home') {
-    webPage.disclaimer = lang === 'zh'
-      ? '仅供健康教育与生活方式参考，不替代专业诊疗。'
-      : 'For education and lifestyle reference only—not medical care.'
+  if (page?.path === '/about') webPage.dateModified = PUBLIC_SUMMARY_UPDATED
+  const graph = [org, website, webPage]
+  const faqs = getPageFaqs(page?.path || pathname, lang)
+  if (faqs.length) {
+    const faqId = `${canonical}#faq`
+    webPage.mainEntity = { '@id': faqId }
+    graph.push({
+      '@type': 'FAQPage',
+      '@id': faqId,
+      url: canonical,
+      inLanguage,
+      isPartOf: { '@id': `${canonical}#webpage` },
+      usageInfo,
+      mainEntity: faqs.map((item) => ({
+        '@type': 'Question',
+        name: item.q,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: item.a,
+        },
+      })),
+    })
   }
   return {
     '@context': 'https://schema.org',
-    '@graph': [org, website, webPage],
+    '@graph': graph,
   }
 }
 
@@ -114,7 +151,9 @@ export function renderHeadSnippet({ lang, pathname }) {
     `<meta name="twitter:card" content="summary_large_image" />`,
     `<meta name="twitter:title" content="${escapeHtml(seo.title)}" />`,
     `<meta name="twitter:description" content="${escapeHtml(seo.description)}" />`,
-    `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`,
+    `<meta name="twitter:image" content="${escapeHtml(DEFAULT_OG_IMAGE)}" />`,
+    `<link rel="alternate" type="text/plain" href="${escapeHtml(`${SITE_ORIGIN}/llms.txt`)}" title="llms.txt" />`,
+    `<script type="application/ld+json">${JSON.stringify(jsonLd).replace(/</g, '\\u003c')}</script>`,
   ]
   return lines.join('\n    ')
 }
@@ -161,6 +200,8 @@ export function applySeoToDocument({ lang, pathname }) {
   appendMeta('twitter:card', 'twitter:card', 'summary_large_image')
   appendMeta('twitter:title', 'twitter:title', seo.title)
   appendMeta('twitter:description', 'twitter:description', seo.description)
+  appendMeta('twitter:image', 'twitter:image', DEFAULT_OG_IMAGE)
+  appendLink('alternate', `${SITE_ORIGIN}/llms.txt`, { type: 'text/plain', title: 'llms.txt' })
 
   const script = document.createElement('script')
   script.type = 'application/ld+json'

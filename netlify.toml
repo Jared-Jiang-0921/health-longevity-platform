@@ -2,7 +2,273 @@
   command = "npm run build"
   publish = "dist"
 
+# 公开页预渲染 HTML。必须写在通配回退之前，否则 /about 会落到首页。
+[[redirects]]
+  from = "/about"
+  to = "/about/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/solutions"
+  to = "/solutions/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/products"
+  to = "/products/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/tcm-prevention"
+  to = "/tcm-prevention/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/longevity-news"
+  to = "/longevity-news/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/translation-opportunities"
+  to = "/translation-opportunities/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/health-skills"
+  to = "/health-skills/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/consult"
+  to = "/consult/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/login"
+  to = "/login/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/register"
+  to = "/register/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/terms"
+  to = "/terms/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/privacy"
+  to = "/privacy/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/disclaimer"
+  to = "/disclaimer/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/legal/sale"
+  to = "/legal/sale/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/legal/health-data"
+  to = "/legal/health-data/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/legal/cookies"
+  to = "/legal/cookies/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en"
+  to = "/en/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en/about"
+  to = "/en/about/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en/solutions"
+  to = "/en/solutions/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en/products"
+  to = "/en/products/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en/tcm-prevention"
+  to = "/en/tcm-prevention/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en/longevity-news"
+  to = "/en/longevity-news/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en/translation-opportunities"
+  to = "/en/translation-opportunities/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en/health-skills"
+  to = "/en/health-skills/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en/consult"
+  to = "/en/consult/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en/login"
+  to = "/en/login/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en/register"
+  to = "/en/register/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en/terms"
+  to = "/en/terms/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en/privacy"
+  to = "/en/privacy/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en/disclaimer"
+  to = "/en/disclaimer/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en/legal/sale"
+  to = "/en/legal/sale/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en/legal/health-data"
+  to = "/en/legal/health-data/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en/legal/cookies"
+  to = "/en/legal/cookies/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/ar"
+  to = "/ar/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/ar/about"
+  to = "/ar/about/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/ar/solutions"
+  to = "/ar/solutions/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/ar/products"
+  to = "/ar/products/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/ar/tcm-prevention"
+  to = "/ar/tcm-prevention/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/ar/longevity-news"
+  to = "/ar/longevity-news/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/ar/translation-opportunities"
+  to = "/ar/translation-opportunities/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/ar/health-skills"
+  to = "/ar/health-skills/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/ar/consult"
+  to = "/ar/consult/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/ar/login"
+  to = "/ar/login/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/ar/register"
+  to = "/ar/register/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/ar/terms"
+  to = "/ar/terms/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/ar/privacy"
+  to = "/ar/privacy/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/ar/disclaimer"
+  to = "/ar/disclaimer/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/ar/legal/sale"
+  to = "/ar/legal/sale/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/ar/legal/health-data"
+  to = "/ar/legal/health-data/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/ar/legal/cookies"
+  to = "/ar/legal/cookies/index.html"
+  status = 200
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+[[headers]]
+  for = "/robots.txt"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
+
+[[headers]]
+  for = "/sitemap.xml"
+  [headers.values]
+    Content-Type = "application/xml; charset=utf-8"
+
+[[headers]]
+  for = "/llms.txt"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"

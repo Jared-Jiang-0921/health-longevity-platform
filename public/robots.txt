@@ -1,6 +1,15 @@
+# 长健星图公开抓取规则
+# 适用于全部抓取器，包括 Googlebot、Baiduspider、GPTBot、OAI-SearchBot、
+# ChatGPT-User、Bytespider（豆包/字节）以及 DeepSeek 等自有 UA。
+# 不单独收紧 AI 爬虫：公开营销与内容页允许抓取；账户、支付、接口、后台不允许。
+# 机器可读摘要：/llms.txt
+# 关于页面：/about
+# 规范站点 Sitemap 亦适用于同一内容的公开部署。
+
 User-agent: *
 Allow: /
 
+Disallow: /api/
 Disallow: /account
 Disallow: /payment
 Disallow: /ops/
@@ -9,5 +18,44 @@ Disallow: /favorites
 Disallow: /forgot-password
 Disallow: /reset-password
 Disallow: /health-questionnaire
+Disallow: /solutions/risk
+Disallow: /solutions/aging
+Disallow: /tcm-prevention/constitution
+Disallow: /health-skills/
+Disallow: /mcp
+Disallow: /.well-known/
+Disallow: /tax
+
+Disallow: /en/api/
+Disallow: /en/account
+Disallow: /en/payment
+Disallow: /en/ops/
+Disallow: /en/org
+Disallow: /en/favorites
+Disallow: /en/forgot-password
+Disallow: /en/reset-password
+Disallow: /en/health-questionnaire
+Disallow: /en/solutions/risk
+Disallow: /en/solutions/aging
+Disallow: /en/tcm-prevention/constitution
+Disallow: /en/health-skills/
+Disallow: /en/mcp
+Disallow: /en/tax
+
+Disallow: /ar/api/
+Disallow: /ar/account
+Disallow: /ar/payment
+Disallow: /ar/ops/
+Disallow: /ar/org
+Disallow: /ar/favorites
+Disallow: /ar/forgot-password
+Disallow: /ar/reset-password
+Disallow: /ar/health-questionnaire
+Disallow: /ar/solutions/risk
+Disallow: /ar/solutions/aging
+Disallow: /ar/tcm-prevention/constitution
+Disallow: /ar/health-skills/
+Disallow: /ar/mcp
+Disallow: /ar/tax
 
 Sitemap: https://www.healthlongevity.cn/sitemap.xml

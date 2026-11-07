@@ -43,6 +43,7 @@ const I18N = {
     footerMethodology: '证据分级说明',
     footerSources: '来源：临床指南 · PubMed · 注册试验 · 监管公开信息',
     footerContact: '联系',
+    footerAbout: '关于本站',
     footerFavorites: '我的收藏',
     footerPayment: '支付结算',
     footerAccount: '会员信息',
@@ -61,6 +62,7 @@ const I18N = {
     footerMethodology: 'Evidence grading',
     footerSources: 'Sources: guidelines · PubMed · trials · regulatory disclosures',
     footerContact: 'Contact',
+    footerAbout: 'About',
     footerFavorites: 'Favorites',
     footerPayment: 'Payment',
     footerAccount: 'Account',
@@ -78,6 +80,7 @@ const I18N = {
     footerMethodology: 'تصنيف الأدلة',
     footerSources: 'المصادر: إرشادات · PubMed · تجارب · معلومات تنظيمية',
     footerContact: 'تواصل',
+    footerAbout: 'حول المنصة',
     footerFavorites: 'المفضلة',
     footerPayment: 'الدفع',
     footerAccount: 'الحساب',
@@ -203,6 +206,8 @@ export default function Layout({ children }) {
           ) : null}
           <p className="footer-copy">© {SITE_LEGAL.brandName}</p>
           <nav className="footer-legal" aria-label={t.legalAria}>
+            <Link to="/about">{t.footerAbout}</Link>
+            <span className="footer-sep">·</span>
             <Link to="/terms">Terms of Service</Link>
             <span className="footer-sep">·</span>
             <Link to="/privacy">Privacy Policy</Link>

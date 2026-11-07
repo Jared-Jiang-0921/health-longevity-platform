@@ -8,6 +8,7 @@ import { getMembershipLevelLabel } from '../i18n/terms'
 import { getContentEntryUrl } from '../config/externalUrls'
 import { appendExternalEntryParams } from '../lib/externalEntry'
 import ModulePageHero from '../components/ModulePageHero'
+import { getSolutionsPublicCopy } from '../data/publicSummary'
 import './Solutions.css'
 
 const CONTENT_ENTRY_URL = getContentEntryUrl()
@@ -287,9 +288,25 @@ function ToolCard({ title, line, href, actionLabel, allowed, loading, user, t, p
   )
 }
 
+function withPublicCopy(lang) {
+  const pub = getSolutionsPublicCopy(lang)
+  return {
+    ...(I18N[lang] || I18N.zh),
+    lead: pub.lead,
+    medicalDisclaimer: pub.medicalDisclaimer,
+    consultSectionLead: pub.consultLead,
+    genTitle: pub.general.title,
+    genDesc: pub.general.body,
+    proTitle: pub.professional.title,
+    proDesc: pub.professional.body,
+    faqHeading: pub.faqHeading,
+    faqs: pub.faqs,
+  }
+}
+
 export default function Solutions() {
   const { lang } = useLocale()
-  const t = I18N[lang] || I18N.zh
+  const t = withPublicCopy(lang)
   const p = getPatterns(lang)
   const { user, loading, refreshUser } = useAuth()
   const riskAllowed = hasLevelAccess(user?.level, 'standard', { isGuest: !user })
@@ -434,6 +451,16 @@ export default function Solutions() {
           </a>
         </section>
       ) : null}
+
+      <section className="solutions-faq" aria-labelledby="solutions-faq-heading">
+        <h2 id="solutions-faq-heading">{t.faqHeading}</h2>
+        {t.faqs.map((item) => (
+          <article key={item.q} className="solutions-faq-item">
+            <h3>{item.q}</h3>
+            <p>{item.a}</p>
+          </article>
+        ))}
+      </section>
     </div>
   )
 }
