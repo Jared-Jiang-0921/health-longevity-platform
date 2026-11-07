@@ -13,6 +13,21 @@ export function detectLangFromPathname(pathname) {
   return 'zh'
 }
 
+/** 把 /en/about、/ar/about 拆成语言和 React Router 路径（不含语言前缀）。 */
+export function splitLocalePath(pathname) {
+  const raw = String(pathname || '/').split('?')[0].split('#')[0]
+  const trimmed = raw.length > 1 ? raw.replace(/\/+$/, '') : raw || '/'
+  if (trimmed === '/en' || trimmed.startsWith('/en/')) {
+    const rest = trimmed.slice(3) || '/'
+    return { lang: 'en', routerPath: rest.startsWith('/') ? rest : `/${rest}` }
+  }
+  if (trimmed === '/ar' || trimmed.startsWith('/ar/')) {
+    const rest = trimmed.slice(3) || '/'
+    return { lang: 'ar', routerPath: rest.startsWith('/') ? rest : `/${rest}` }
+  }
+  return { lang: 'zh', routerPath: trimmed || '/' }
+}
+
 export function getRouterBasename() {
   if (typeof window === 'undefined') return ''
   return LOCALE_PREFIX[detectLangFromPathname(window.location.pathname)] || ''

@@ -1,6 +1,10 @@
 /** 爬虫可读 SEO：公开页 meta、hreflang、结构化数据。默认规范域名为 www。 */
 
 export const SITE_ORIGIN = 'https://www.healthlongevity.cn'
+/** 当前公开部署。规范网址仍是 SITE_ORIGIN，此地址只在关于页与 llms.txt 中标明。 */
+export const PUBLIC_LIVE_ORIGIN = 'https://healthlongevityplatform.vercel.app'
+/** 关于页与 AI 摘要的编辑日期（不是每次构建时间）。 */
+export const PUBLIC_SUMMARY_UPDATED = '2026-11-07'
 export const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/images/logo-longevity-atlas.png`
 
 export const SEO_LANGS = [
@@ -46,6 +50,23 @@ export const SEO_PAGES = [
       zh: '基于指南与研究证据，结合中医体质与四时养生，提供可执行的生活方式与风险提示。教育信息，不替代诊疗。',
       en: 'Guideline-informed longevity insights with constitution and seasonal framing. Education only—not medical care.',
       ar: 'رؤى طول عمر مستندة إلى الأدلة. للتعليم فقط وليس بديلاً عن الرعاية الطبية.',
+    },
+  },
+  {
+    path: '/about',
+    type: 'about',
+    changefreq: 'monthly',
+    priority: '0.8',
+    index: true,
+    title: {
+      zh: '关于长健星图 | 循证健康长寿教育平台',
+      en: 'About Longevity Atlas | Evidence-based longevity education',
+      ar: 'حول Longevity Atlas | تعليم طول العمر',
+    },
+    description: {
+      zh: `长健星图是什么、面向谁、公开模块、两类长寿咨询与中医养生保健咨询、合规边界和规范网址。仅供健康教育，不替代诊疗。最近更新 ${PUBLIC_SUMMARY_UPDATED}。`,
+      en: `What Longevity Atlas is, who it is for, public modules, consult types, compliance limits, and the canonical URL. Education only—not medical care. Updated ${PUBLIC_SUMMARY_UPDATED}.`,
+      ar: `ما هي المنصة، لمن، الوحدات، أنواع الاستشارة وحدود الامتثال. تعليمي فقط وليس بديلاً عن الرعاية الطبية. التحديث ${PUBLIC_SUMMARY_UPDATED}.`,
     },
   },
   {

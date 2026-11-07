@@ -8,9 +8,11 @@ import { fileURLToPath } from 'node:url'
 import { HOME_MODULES, getHomeCopy } from '../../src/data/homePageContent.js'
 import { articleDisplay, getLongevityNewsArticles } from '../../src/data/longevityNewsArticles.js'
 import { LONGEVITY_NEWS_COLUMNS, columnDisplayLabel } from '../../src/data/longevityNewsColumns.js'
+import { PUBLIC_CRAWL_NAV, getAboutPage, getSolutionsPublicCopy } from '../../src/data/publicSummary.js'
 import { SEO_LANGS, SEO_PAGES, SITE_ORIGIN, absoluteUrl } from '../../src/data/seo.js'
 import { extractLongevityKeywords, newsCardExcerpt, toNewsSearchCard } from '../../src/lib/longevityNewsCard.js'
 import { langSpec, renderHeadSnippet, resolveSeo } from '../../src/lib/seoDocument.js'
+import { buildLlmsTxt, buildSitemapXml } from '../../src/lib/seoPublicFiles.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const rootDir = path.resolve(__dirname, '../..')
@@ -61,6 +63,73 @@ function homeBody(lang) {
     <h2>${escapeHtml(copy.modulesTitle)}</h2>
     <p>${escapeHtml(copy.modulesLead)}</p>
     ${modules}
+    <p><a href="${escapeHtml(absoluteUrl(lang, '/about'))}">${escapeHtml(navLabel('/about', lang))}</a></p>
+  `
+}
+
+function navLabel(routerPath, lang) {
+  const item = PUBLIC_CRAWL_NAV.find((entry) => entry.path === routerPath)
+  return item?.label?.[lang] || item?.label?.zh || routerPath
+}
+
+function crawlNav(lang) {
+  const items = PUBLIC_CRAWL_NAV.map((item) => {
+    const href = absoluteUrl(lang, item.path)
+    return `<a href="${escapeHtml(href)}">${escapeHtml(navLabel(item.path, lang))}</a>`
+  })
+  return `<nav class="seo-prerender-nav" aria-label="Public pages">${items.join(' · ')}</nav>`
+}
+
+function faqBlock(heading, faqs) {
+  const articles = faqs
+    .map((item) => `<article><h3>${escapeHtml(item.q)}</h3><p>${escapeHtml(item.a)}</p></article>`)
+    .join('')
+  return `<section><h2>${escapeHtml(heading)}</h2>${articles}</section>`
+}
+
+function aboutBody(lang) {
+  const page = getAboutPage(lang)
+  const sections = page.sections.map((section) => {
+    const paragraphs = (section.paragraphs || []).map((text) => `<p>${escapeHtml(text)}</p>`).join('')
+    const modules = (section.modules || [])
+      .map(
+        (mod) =>
+          `<article><h3><a href="${escapeHtml(absoluteUrl(lang, mod.path))}">${escapeHtml(mod.title)}</a></h3><p>${escapeHtml(mod.intro)}</p></article>`,
+      )
+      .join('')
+    const urls = (section.urls || [])
+      .map(
+        (item) =>
+          `<li><a href="${escapeHtml(item.href)}">${escapeHtml(item.label)}</a>：${escapeHtml(item.href)}</li>`,
+      )
+      .join('')
+    const list = urls ? `<ul>${urls}</ul>` : ''
+    return `<section id="${escapeHtml(section.id)}"><h2>${escapeHtml(section.heading)}</h2>${paragraphs}${modules}${list}</section>`
+  }).join('')
+  return `
+    <h1>${escapeHtml(page.title)}</h1>
+    <p>${escapeHtml(page.updatedLabel)}：<time datetime="${escapeHtml(page.updated)}">${escapeHtml(page.updated)}</time></p>
+    <p>${escapeHtml(page.lead)}</p>
+    ${sections}
+    ${faqBlock(page.faqHeading, page.faqs)}
+  `
+}
+
+function solutionsBody(lang) {
+  const page = getSolutionsPublicCopy(lang)
+  const seo = resolveSeo('/solutions', lang)
+  return `
+    <h1>${escapeHtml(page.heading)}</h1>
+    <p>${escapeHtml(page.lead)}</p>
+    <p>${escapeHtml(page.medicalDisclaimer)}</p>
+    <h2>${escapeHtml(lang === 'zh' ? '咨询' : lang === 'ar' ? 'الاستشارة' : 'Consults')}</h2>
+    <p>${escapeHtml(page.consultLead)}</p>
+    <article><h3>${escapeHtml(page.general.title)}</h3><p>${escapeHtml(page.general.body)}</p></article>
+    <article><h3>${escapeHtml(page.professional.title)}</h3><p>${escapeHtml(page.professional.body)}</p></article>
+    <article><h3>${escapeHtml(page.tcm.title)}</h3><p>${escapeHtml(page.tcm.body)}</p></article>
+    <p>${escapeHtml(page.assessment)}</p>
+    <p>${escapeHtml(seo.description)}</p>
+    ${faqBlock(page.faqHeading, page.faqs)}
   `
 }
 
@@ -185,6 +254,8 @@ function newsBody(lang, cards) {
 
 function pageBody(page, lang, newsCards) {
   if (page.type === 'home') return homeBody(lang)
+  if (page.path === '/about') return aboutBody(lang)
+  if (page.path === '/solutions') return solutionsBody(lang)
   if (page.type === 'legal') return legalBody(page, lang)
   if (page.path === '/longevity-news') return newsBody(lang, newsCards)
   const seo = resolveSeo(page.path, lang)
@@ -205,6 +276,7 @@ function stripBaselineSeo(html) {
     .replace(/<meta\s+property="(?:og:[^"]+)"[\s\S]*?>\s*/gi, '')
     .replace(/<link\s+rel="canonical"[\s\S]*?>\s*/gi, '')
     .replace(/<link\s+rel="alternate"[\s\S]*?>\s*/gi, '')
+    .replace(/<script\s+type="application\/ld\+json"[\s\S]*?<\/script>\s*/gi, '')
 }
 
 function injectHtml(template, { lang, pathname, body, extraHead = '' }) {
@@ -214,6 +286,7 @@ function injectHtml(template, { lang, pathname, body, extraHead = '' }) {
   const root = `<div id="root">
       <main class="seo-prerender" lang="${escapeHtml(spec.htmlLang)}" dir="${escapeHtml(spec.dir)}">
         ${langs}
+        ${crawlNav(lang)}
         ${body}
       </main>
     </div>`
@@ -224,29 +297,24 @@ function injectHtml(template, { lang, pathname, body, extraHead = '' }) {
   return html
 }
 
-function sitemapXml() {
-  const today = new Date().toISOString().slice(0, 10)
-  const urls = SEO_PAGES.filter((page) => page.index).map((page) => {
-    const loc = absoluteUrl('zh', page.path)
-    const alts = SEO_LANGS.map(
-      (item) =>
-        `    <xhtml:link rel="alternate" hreflang="${item.hreflang}" href="${absoluteUrl(item.id, page.path)}"/>`,
-    )
-    alts.push(`    <xhtml:link rel="alternate" hreflang="x-default" href="${absoluteUrl('zh', page.path)}"/>`)
-    return `  <url>
-    <loc>${loc}</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>${page.changefreq}</changefreq>
-    <priority>${page.priority}</priority>
-${alts.join('\n')}
-  </url>`
+export function staticNewsCards() {
+  return getLongevityNewsArticles().map((item) => toNewsSearchCard(item)).filter((card) => card.title)
+}
+
+export function renderRouteHtml(template, { lang, pathname, newsCards = [] }) {
+  const page = SEO_PAGES.find((item) => item.path === pathname)
+  if (!page) return null
+  const cards = page.path === '/longevity-news' && newsCards.length === 0 ? staticNewsCards() : newsCards
+  const extraHead =
+    page.path === '/longevity-news'
+      ? `<script type="application/ld+json" data-seo-news="1">${JSON.stringify(newsJsonLd(lang, cards)).replace(/</g, '\\u003c')}</script>`
+      : ''
+  return injectHtml(template, {
+    lang,
+    pathname: page.path,
+    body: pageBody(page, lang, cards),
+    extraHead,
   })
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
-${urls.join('\n')}
-</urlset>
-`
 }
 
 async function main() {
@@ -256,15 +324,10 @@ async function main() {
   let count = 0
   for (const page of SEO_PAGES) {
     for (const spec of SEO_LANGS) {
-      const extraHead =
-        page.path === '/longevity-news'
-          ? `<script type="application/ld+json" data-seo-news="1">${JSON.stringify(newsJsonLd(spec.id, newsCards))}</script>`
-          : ''
-      const html = injectHtml(template, {
+      const html = renderRouteHtml(template, {
         lang: spec.id,
         pathname: page.path,
-        body: pageBody(page, spec.id, newsCards),
-        extraHead,
+        newsCards,
       })
       const dest = distFileFor(spec.id, page.path)
       await fs.mkdir(path.dirname(dest), { recursive: true })
@@ -272,11 +335,15 @@ async function main() {
       count += 1
     }
   }
-  await fs.writeFile(path.join(distDir, 'sitemap.xml'), sitemapXml(), 'utf8')
-  console.log(`[seo] prerendered ${count} HTML pages + sitemap.xml → ${distDir}`)
+  await fs.writeFile(path.join(distDir, 'sitemap.xml'), buildSitemapXml(), 'utf8')
+  await fs.writeFile(path.join(distDir, 'llms.txt'), buildLlmsTxt(), 'utf8')
+  console.log(`[seo] prerendered ${count} HTML pages + sitemap.xml + llms.txt → ${distDir}`)
 }
 
-main().catch((err) => {
-  console.error(err)
-  process.exit(1)
-})
+const isDirectRun = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+if (isDirectRun) {
+  main().catch((err) => {
+    console.error(err)
+    process.exit(1)
+  })
+}
