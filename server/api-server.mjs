@@ -80,7 +80,7 @@ const PORT = Number(process.env.PORT || 3000)
 const MAX_API_BODY_BYTES = Number(process.env.MAX_API_BODY_BYTES || 150 * 1024 * 1024)
 
 // 与上方 projectRoot / .env 一致：勿依赖 process.cwd()（pm2、systemd 下 cwd 常非仓库根目录）
-const apiDirAbs = path.join(projectRoot, 'api')
+const apiDirAbs = path.join(projectRoot, 'lib', 'http-api')
 const routeTable = await buildApiRouteTable(apiDirAbs)
 
 /** 个别环境下 walk 未收录关键路由时兜底注册（避免 /api 列表不全导致 ROUTE_NOT_FOUND） */

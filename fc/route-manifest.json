@@ -7,8 +7,8 @@
       ],
       "paramKeys": [],
       "catchAll": false,
-      "modulePath": "../api/admin-health-questionnaires.js",
-      "sourceFile": "api/admin-health-questionnaires.js"
+      "modulePath": "../lib/http-api/admin-health-questionnaires.js",
+      "sourceFile": "lib/http-api/admin-health-questionnaires.js"
     },
     {
       "segments": [
@@ -16,8 +16,17 @@
       ],
       "paramKeys": [],
       "catchAll": false,
-      "modulePath": "../api/admin-users.js",
-      "sourceFile": "api/admin-users.js"
+      "modulePath": "../lib/http-api/admin-users.js",
+      "sourceFile": "lib/http-api/admin-users.js"
+    },
+    {
+      "segments": [
+        "aging-assessments"
+      ],
+      "paramKeys": [],
+      "catchAll": false,
+      "modulePath": "../lib/http-api/aging-assessments.js",
+      "sourceFile": "lib/http-api/aging-assessments.js"
     },
     {
       "segments": [
@@ -28,8 +37,8 @@
         "path"
       ],
       "catchAll": true,
-      "modulePath": "../api/auth/[...path].js",
-      "sourceFile": "api/auth/[...path].js"
+      "modulePath": "../lib/http-api/auth/[...path].js",
+      "sourceFile": "lib/http-api/auth/[...path].js"
     },
     {
       "segments": [
@@ -37,8 +46,8 @@
       ],
       "paramKeys": [],
       "catchAll": false,
-      "modulePath": "../api/confirm-checkout-session.js",
-      "sourceFile": "api/confirm-checkout-session.js"
+      "modulePath": "../lib/http-api/confirm-checkout-session.js",
+      "sourceFile": "lib/http-api/confirm-checkout-session.js"
     },
     {
       "segments": [
@@ -46,8 +55,8 @@
       ],
       "paramKeys": [],
       "catchAll": false,
-      "modulePath": "../api/consult-sso-ticket.js",
-      "sourceFile": "api/consult-sso-ticket.js"
+      "modulePath": "../lib/http-api/consult-sso-ticket.js",
+      "sourceFile": "lib/http-api/consult-sso-ticket.js"
     },
     {
       "segments": [
@@ -55,8 +64,8 @@
       ],
       "paramKeys": [],
       "catchAll": false,
-      "modulePath": "../api/course-modules.js",
-      "sourceFile": "api/course-modules.js"
+      "modulePath": "../lib/http-api/course-modules.js",
+      "sourceFile": "lib/http-api/course-modules.js"
     },
     {
       "segments": [
@@ -64,8 +73,8 @@
       ],
       "paramKeys": [],
       "catchAll": false,
-      "modulePath": "../api/create-checkout-session.js",
-      "sourceFile": "api/create-checkout-session.js"
+      "modulePath": "../lib/http-api/create-checkout-session.js",
+      "sourceFile": "lib/http-api/create-checkout-session.js"
     },
     {
       "segments": [
@@ -73,8 +82,8 @@
       ],
       "paramKeys": [],
       "catchAll": false,
-      "modulePath": "../api/create-payment-intent.js",
-      "sourceFile": "api/create-payment-intent.js"
+      "modulePath": "../lib/http-api/create-payment-intent.js",
+      "sourceFile": "lib/http-api/create-payment-intent.js"
     },
     {
       "segments": [
@@ -82,8 +91,8 @@
       ],
       "paramKeys": [],
       "catchAll": false,
-      "modulePath": "../api/health-questionnaire.js",
-      "sourceFile": "api/health-questionnaire.js"
+      "modulePath": "../lib/http-api/health-questionnaire.js",
+      "sourceFile": "lib/http-api/health-questionnaire.js"
     },
     {
       "segments": [
@@ -91,8 +100,8 @@
       ],
       "paramKeys": [],
       "catchAll": false,
-      "modulePath": "../api/health.js",
-      "sourceFile": "api/health.js"
+      "modulePath": "../lib/http-api/health.js",
+      "sourceFile": "lib/http-api/health.js"
     },
     {
       "segments": [
@@ -100,8 +109,8 @@
       ],
       "paramKeys": [],
       "catchAll": false,
-      "modulePath": "../api/init-db.js",
-      "sourceFile": "api/init-db.js"
+      "modulePath": "../lib/http-api/init-db.js",
+      "sourceFile": "lib/http-api/init-db.js"
     },
     {
       "segments": [
@@ -112,8 +121,8 @@
         "id"
       ],
       "catchAll": false,
-      "modulePath": "../api/module-assets/[id].js",
-      "sourceFile": "api/module-assets/[id].js"
+      "modulePath": "../lib/http-api/module-assets/[id].js",
+      "sourceFile": "lib/http-api/module-assets/[id].js"
     },
     {
       "segments": [
@@ -121,8 +130,8 @@
       ],
       "paramKeys": [],
       "catchAll": false,
-      "modulePath": "../api/module-assets.js",
-      "sourceFile": "api/module-assets.js"
+      "modulePath": "../lib/http-api/module-assets.js",
+      "sourceFile": "lib/http-api/module-assets.js"
     },
     {
       "segments": [
@@ -133,8 +142,8 @@
         "action"
       ],
       "catchAll": false,
-      "modulePath": "../api/org/[action].js",
-      "sourceFile": "api/org/[action].js"
+      "modulePath": "../lib/http-api/org/[action].js",
+      "sourceFile": "lib/http-api/org/[action].js"
     },
     {
       "segments": [
@@ -142,8 +151,8 @@
       ],
       "paramKeys": [],
       "catchAll": false,
-      "modulePath": "../api/payment-event-logs.js",
-      "sourceFile": "api/payment-event-logs.js"
+      "modulePath": "../lib/http-api/payment-event-logs.js",
+      "sourceFile": "lib/http-api/payment-event-logs.js"
     },
     {
       "segments": [
@@ -154,8 +163,8 @@
         "id"
       ],
       "catchAll": false,
-      "modulePath": "../api/product-catalog/[id].js",
-      "sourceFile": "api/product-catalog/[id].js"
+      "modulePath": "../lib/http-api/product-catalog/[id].js",
+      "sourceFile": "lib/http-api/product-catalog/[id].js"
     },
     {
       "segments": [
@@ -163,8 +172,8 @@
       ],
       "paramKeys": [],
       "catchAll": false,
-      "modulePath": "../api/product-catalog.js",
-      "sourceFile": "api/product-catalog.js"
+      "modulePath": "../lib/http-api/product-catalog.js",
+      "sourceFile": "lib/http-api/product-catalog.js"
     },
     {
       "segments": [
@@ -172,8 +181,17 @@
       ],
       "paramKeys": [],
       "catchAll": false,
-      "modulePath": "../api/product-evidence.js",
-      "sourceFile": "api/product-evidence.js"
+      "modulePath": "../lib/http-api/product-evidence.js",
+      "sourceFile": "lib/http-api/product-evidence.js"
+    },
+    {
+      "segments": [
+        "risk-assessments"
+      ],
+      "paramKeys": [],
+      "catchAll": false,
+      "modulePath": "../lib/http-api/risk-assessments.js",
+      "sourceFile": "lib/http-api/risk-assessments.js"
     },
     {
       "segments": [
@@ -181,8 +199,26 @@
       ],
       "paramKeys": [],
       "catchAll": false,
-      "modulePath": "../api/stripe-webhook.js",
-      "sourceFile": "api/stripe-webhook.js"
+      "modulePath": "../lib/http-api/stripe-webhook.js",
+      "sourceFile": "lib/http-api/stripe-webhook.js"
+    },
+    {
+      "segments": [
+        "tcm-constitution-tongue"
+      ],
+      "paramKeys": [],
+      "catchAll": false,
+      "modulePath": "../lib/http-api/tcm-constitution-tongue.js",
+      "sourceFile": "lib/http-api/tcm-constitution-tongue.js"
+    },
+    {
+      "segments": [
+        "tcm-constitution"
+      ],
+      "paramKeys": [],
+      "catchAll": false,
+      "modulePath": "../lib/http-api/tcm-constitution.js",
+      "sourceFile": "lib/http-api/tcm-constitution.js"
     },
     {
       "segments": [
@@ -193,8 +229,8 @@
         "id"
       ],
       "catchAll": false,
-      "modulePath": "../api/translation-pdfs/[id].js",
-      "sourceFile": "api/translation-pdfs/[id].js"
+      "modulePath": "../lib/http-api/translation-pdfs/[id].js",
+      "sourceFile": "lib/http-api/translation-pdfs/[id].js"
     },
     {
       "segments": [
@@ -202,8 +238,8 @@
       ],
       "paramKeys": [],
       "catchAll": false,
-      "modulePath": "../api/translation-pdfs.js",
-      "sourceFile": "api/translation-pdfs.js"
+      "modulePath": "../lib/http-api/translation-pdfs.js",
+      "sourceFile": "lib/http-api/translation-pdfs.js"
     }
   ]
 }
