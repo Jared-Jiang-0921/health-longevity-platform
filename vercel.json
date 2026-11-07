@@ -6,234 +6,25 @@
     {
       "source": "/sitemap.xml",
       "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/xml; charset=utf-8"
-        }
+        { "key": "Content-Type", "value": "application/xml; charset=utf-8" }
       ]
     },
     {
       "source": "/llms.txt",
       "headers": [
-        {
-          "key": "Content-Type",
-          "value": "text/plain; charset=utf-8"
-        }
+        { "key": "Content-Type", "value": "text/plain; charset=utf-8" }
       ]
     },
     {
       "source": "/robots.txt",
       "headers": [
-        {
-          "key": "Content-Type",
-          "value": "text/plain; charset=utf-8"
-        }
+        { "key": "Content-Type", "value": "text/plain; charset=utf-8" }
       ]
     }
   ],
   "rewrites": [
     {
-      "source": "/about",
-      "destination": "/about/index.html"
-    },
-    {
-      "source": "/solutions",
-      "destination": "/solutions/index.html"
-    },
-    {
-      "source": "/products",
-      "destination": "/products/index.html"
-    },
-    {
-      "source": "/tcm-prevention",
-      "destination": "/tcm-prevention/index.html"
-    },
-    {
-      "source": "/longevity-news",
-      "destination": "/longevity-news/index.html"
-    },
-    {
-      "source": "/translation-opportunities",
-      "destination": "/translation-opportunities/index.html"
-    },
-    {
-      "source": "/health-skills",
-      "destination": "/health-skills/index.html"
-    },
-    {
-      "source": "/consult",
-      "destination": "/consult/index.html"
-    },
-    {
-      "source": "/login",
-      "destination": "/login/index.html"
-    },
-    {
-      "source": "/register",
-      "destination": "/register/index.html"
-    },
-    {
-      "source": "/terms",
-      "destination": "/terms/index.html"
-    },
-    {
-      "source": "/privacy",
-      "destination": "/privacy/index.html"
-    },
-    {
-      "source": "/disclaimer",
-      "destination": "/disclaimer/index.html"
-    },
-    {
-      "source": "/legal/sale",
-      "destination": "/legal/sale/index.html"
-    },
-    {
-      "source": "/legal/health-data",
-      "destination": "/legal/health-data/index.html"
-    },
-    {
-      "source": "/legal/cookies",
-      "destination": "/legal/cookies/index.html"
-    },
-    {
-      "source": "/en",
-      "destination": "/en/index.html"
-    },
-    {
-      "source": "/en/about",
-      "destination": "/en/about/index.html"
-    },
-    {
-      "source": "/en/solutions",
-      "destination": "/en/solutions/index.html"
-    },
-    {
-      "source": "/en/products",
-      "destination": "/en/products/index.html"
-    },
-    {
-      "source": "/en/tcm-prevention",
-      "destination": "/en/tcm-prevention/index.html"
-    },
-    {
-      "source": "/en/longevity-news",
-      "destination": "/en/longevity-news/index.html"
-    },
-    {
-      "source": "/en/translation-opportunities",
-      "destination": "/en/translation-opportunities/index.html"
-    },
-    {
-      "source": "/en/health-skills",
-      "destination": "/en/health-skills/index.html"
-    },
-    {
-      "source": "/en/consult",
-      "destination": "/en/consult/index.html"
-    },
-    {
-      "source": "/en/login",
-      "destination": "/en/login/index.html"
-    },
-    {
-      "source": "/en/register",
-      "destination": "/en/register/index.html"
-    },
-    {
-      "source": "/en/terms",
-      "destination": "/en/terms/index.html"
-    },
-    {
-      "source": "/en/privacy",
-      "destination": "/en/privacy/index.html"
-    },
-    {
-      "source": "/en/disclaimer",
-      "destination": "/en/disclaimer/index.html"
-    },
-    {
-      "source": "/en/legal/sale",
-      "destination": "/en/legal/sale/index.html"
-    },
-    {
-      "source": "/en/legal/health-data",
-      "destination": "/en/legal/health-data/index.html"
-    },
-    {
-      "source": "/en/legal/cookies",
-      "destination": "/en/legal/cookies/index.html"
-    },
-    {
-      "source": "/ar",
-      "destination": "/ar/index.html"
-    },
-    {
-      "source": "/ar/about",
-      "destination": "/ar/about/index.html"
-    },
-    {
-      "source": "/ar/solutions",
-      "destination": "/ar/solutions/index.html"
-    },
-    {
-      "source": "/ar/products",
-      "destination": "/ar/products/index.html"
-    },
-    {
-      "source": "/ar/tcm-prevention",
-      "destination": "/ar/tcm-prevention/index.html"
-    },
-    {
-      "source": "/ar/longevity-news",
-      "destination": "/ar/longevity-news/index.html"
-    },
-    {
-      "source": "/ar/translation-opportunities",
-      "destination": "/ar/translation-opportunities/index.html"
-    },
-    {
-      "source": "/ar/health-skills",
-      "destination": "/ar/health-skills/index.html"
-    },
-    {
-      "source": "/ar/consult",
-      "destination": "/ar/consult/index.html"
-    },
-    {
-      "source": "/ar/login",
-      "destination": "/ar/login/index.html"
-    },
-    {
-      "source": "/ar/register",
-      "destination": "/ar/register/index.html"
-    },
-    {
-      "source": "/ar/terms",
-      "destination": "/ar/terms/index.html"
-    },
-    {
-      "source": "/ar/privacy",
-      "destination": "/ar/privacy/index.html"
-    },
-    {
-      "source": "/ar/disclaimer",
-      "destination": "/ar/disclaimer/index.html"
-    },
-    {
-      "source": "/ar/legal/sale",
-      "destination": "/ar/legal/sale/index.html"
-    },
-    {
-      "source": "/ar/legal/health-data",
-      "destination": "/ar/legal/health-data/index.html"
-    },
-    {
-      "source": "/ar/legal/cookies",
-      "destination": "/ar/legal/cookies/index.html"
-    },
-    {
-      "source": "/((?!api/|robots\\.txt|sitemap\\.xml|llms\\.txt).*)",
+      "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
   ]

@@ -17,7 +17,7 @@
 
 构建命令 `npm run build` 会预渲染上述公开页的标题、说明、Open Graph、Twitter 和 JSON-LD，并把正文放进 HTML，不执行 JavaScript 的抓取器也能读到。`npm run dev` 下这些地址同样可直接查看。
 
-Vercel 与 Netlify 把 `/about` 这类干净路径指到对应的 `about/index.html`，避免被单页回退写成首页。自建 Nginx 已用 `try_files` 做同样的事，不用改配置。新增一个要收录的公开路由时，把它放进 `src/data/seo.js` 的 `SEO_PAGES`，并在 `vercel.json` 与 `netlify.toml` 加上同样的路径映射。
+Vercel 先提供 `dist` 里的静态文件（包括 `about/index.html`、`robots.txt`、`sitemap.xml`、`llms.txt`），找不到时再用 `/((?!api/).*)` 回到首页。不要把这条回退写成带多个排除项的正则，当前 path-to-regexp 会判为非法路由。自建 Nginx 已用 `try_files` 找到预渲染页。Netlify 仍在 `netlify.toml` 里把公开路径指到对应的 `index.html`。新增要收录的公开路由时，把它放进 `src/data/seo.js` 的 `SEO_PAGES`，并在 `netlify.toml` 加上同样的路径映射。
 
 不收录：`/account`、`/payment`、`/ops/`、`/org`、`/favorites`、`/health-questionnaire`、`/solutions/risk`、`/solutions/aging`、`/tcm-prevention/constitution`、`/health-skills/` 下的课程页、`/api/`、`/mcp`、`/.well-known/`。
 

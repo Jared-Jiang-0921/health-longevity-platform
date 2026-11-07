@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const rootDir = path.resolve(__dirname, '../../')
-const apiDir = path.join(rootDir, 'api')
+const apiDir = path.join(rootDir, 'lib', 'http-api')
 const outDir = path.join(rootDir, 'fc')
 const outPath = path.join(outDir, 'route-manifest.json')
 
@@ -18,14 +18,14 @@ async function main() {
   for (const absFile of files) {
     const rel = path.relative(apiDir, absFile)
     const { segments, paramKeys, catchAll } = routeFromApiFile(rel)
-    const moduleRel = path.join('..', 'api', rel).replace(/\\/g, '/')
+    const moduleRel = path.join('..', 'lib', 'http-api', rel).replace(/\\/g, '/')
 
     routes.push({
       segments,
       paramKeys,
       catchAll,
       modulePath: moduleRel,
-      sourceFile: path.join('api', rel),
+      sourceFile: path.join('lib', 'http-api', rel),
     })
   }
 
