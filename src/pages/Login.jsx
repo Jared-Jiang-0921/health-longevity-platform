@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
 import PasswordField from '../components/PasswordField'
@@ -12,7 +12,18 @@ const I18N = {
   ar: { title: 'تسجيل الدخول', email: 'الحساب', password: 'كلمة المرور', login: 'دخول', logging: 'جار تسجيل الدخول…', forgot: 'هل نسيت كلمة المرور؟', noAcc: 'ليس لديك حساب؟', register: 'إنشاء حساب', twofa: 'التحقق بخطوتين', code: 'الرمز', verify: 'تأكيد الدخول', verifying: 'جار التحقق…', back: 'العودة لإدخال كلمة المرور', phAcc: 'اسم المستخدم أو البريد', phPwd: 'أدخل كلمة المرور', phCode: '000000', note2fa: 'أدخل رمز التحقق المكون من 6 أرقام من تطبيق المصادقة.', errEmail: 'يرجى إدخال اسم مستخدم أو بريد إلكتروني', errPwd: 'يرجى إدخال كلمة المرور', errCode: 'يرجى إدخال رمز صحيح من 6 أرقام', errLogin: 'فشل تسجيل الدخول', errVerify: 'فشل التحقق' },
 }
 
+function safeReturnPath(location) {
+  const from = location.state?.from
+  const pathname = typeof from === 'string' ? from : from?.pathname
+  const search = typeof from === 'object' && typeof from?.search === 'string' ? from.search : ''
+  if (typeof pathname !== 'string') return '/'
+  if (!pathname.startsWith('/') || pathname.startsWith('//') || pathname.includes('\\')) return '/'
+  return `${pathname}${search}`
+}
+
 export default function Login() {
+  const location = useLocation()
+  const returnTo = safeReturnPath(location)
   const { lang } = useLocale()
   const ui = getUi(lang)
   const t = I18N[lang] || I18N.zh
@@ -53,7 +64,7 @@ export default function Login() {
       return
     }
     if (result.ok) {
-      navigate('/')
+      navigate(returnTo)
       return
     }
     setError(result.error || t.errLogin)
@@ -71,7 +82,7 @@ export default function Login() {
     const result = await login2fa(preAuthToken, code)
     setSubmitting(false)
     if (result.ok) {
-      navigate('/')
+      navigate(returnTo)
       return
     }
     setError(result.error || t.errVerify)

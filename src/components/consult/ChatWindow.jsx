@@ -112,7 +112,6 @@ export default function ChatWindow({
   const [attaching, setAttaching] = useState(false)
   const bottomRef = useRef(null)
   const abortRef = useRef(null)
-  const bootRef = useRef(false)
   const skipReloadRef = useRef(false)
   const fileRef = useRef(null)
   const inputRef = useRef(null)
@@ -380,14 +379,12 @@ export default function ChatWindow({
   }, [initialDraft])
 
   useEffect(() => {
-    if (bootRef.current) return
     if (sessionIdProp) return
     const q = String(initialQuery || '').trim()
-    if (!q || !token) return
-    bootRef.current = true
-    sendMessage(q)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, initialQuery, sessionIdProp])
+    if (!q) return
+    setInput((prev) => (prev.trim() ? prev : q))
+    inputRef.current?.focus()
+  }, [initialQuery, sessionIdProp])
 
   function onSubmit(e) {
     e.preventDefault()
@@ -576,13 +573,18 @@ export default function ChatWindow({
         {loadingHistory ? (
           <p className="chat-empty">{copy.historyLoading || '…'}</p>
         ) : messages.length === 0 && !sending ? (
-          <p className="chat-empty">
-            {entry === 'tcm'
-              ? (copy.emptyTcm || copy.empty)
-              : entry === 'professional'
-                ? (copy.emptyProfessional || copy.empty)
-                : (copy.emptyGeneral || copy.empty)}
-          </p>
+          <>
+            {String(initialDraft || initialQuery || '').trim() && copy.handoffReady ? (
+              <p className="chat-handoff">{copy.handoffReady}</p>
+            ) : null}
+            <p className="chat-empty">
+              {entry === 'tcm'
+                ? (copy.emptyTcm || copy.empty)
+                : entry === 'professional'
+                  ? (copy.emptyProfessional || copy.empty)
+                  : (copy.emptyGeneral || copy.empty)}
+            </p>
+          </>
         ) : null}
         {loadingHistory ? null : messages.map((m, i) => (
           <MessageBubble
