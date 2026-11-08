@@ -133,32 +133,75 @@ function solutionsBody(lang) {
   `
 }
 
+const NEWS_ASSET_ATTEMPTS = 4
+const NEWS_ASSET_BACKOFF_MS = [300, 700, 1500]
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+function briefBody(text) {
+  const oneLine = String(text || '').replace(/\s+/g, ' ').trim()
+  if (!oneLine) return ''
+  const snippet = oneLine.length > 180 ? `${oneLine.slice(0, 180)}…` : oneLine
+  return ` body=${JSON.stringify(snippet)}`
+}
+
+function errorDetail(err) {
+  const code = err?.cause?.code || err?.cause?.message
+  return code ? `${err.message} (${code})` : err.message
+}
+
+function uploadsFromPayload(data) {
+  return (Array.isArray(data?.items) ? data.items : []).map((item) =>
+    toNewsSearchCard({
+      id: `upload-${item.id}`,
+      column: item.subcategory,
+      title: item.title,
+      summary: item.summary,
+      external_url: item.external_url,
+      created_at: item.created_at,
+    }),
+  )
+}
+
+async function fetchLongevityNewsUploads(origin) {
+  const url = `${origin}/api/module-assets?module=longevity-news`
+  for (let attempt = 1; attempt <= NEWS_ASSET_ATTEMPTS; attempt++) {
+    const last = attempt === NEWS_ASSET_ATTEMPTS
+    try {
+      const res = await fetch(url, { signal: AbortSignal.timeout(12000) })
+      if (res.ok) {
+        return uploadsFromPayload(await res.json())
+      }
+      const snippet = briefBody(await res.text().catch(() => ''))
+      const retryable = res.status >= 500 && res.status <= 599
+      if (!retryable || last) {
+        console.warn(`[seo] longevity-news assets HTTP ${res.status} from ${origin}${snippet}`)
+        return []
+      }
+      console.warn(
+        `[seo] longevity-news assets HTTP ${res.status} from ${origin}; retry ${attempt}/${NEWS_ASSET_ATTEMPTS - 1}${snippet}`,
+      )
+    } catch (err) {
+      const detail = errorDetail(err)
+      if (last) {
+        console.warn(`[seo] longevity-news assets skipped: ${detail}`)
+        return []
+      }
+      console.warn(
+        `[seo] longevity-news assets skipped: ${detail}; retry ${attempt}/${NEWS_ASSET_ATTEMPTS - 1}`,
+      )
+    }
+    await sleep(NEWS_ASSET_BACKOFF_MS[attempt - 1] ?? 1500)
+  }
+  return []
+}
+
 async function loadLongevityNewsCards() {
   const staticCards = getLongevityNewsArticles().map((item) => toNewsSearchCard(item))
   const origin = String(process.env.SEO_NEWS_API || 'http://127.0.0.1:3000').replace(/\/$/, '')
-  let uploads = []
-  try {
-    const res = await fetch(`${origin}/api/module-assets?module=longevity-news`, {
-      signal: AbortSignal.timeout(12000),
-    })
-    if (res.ok) {
-      const data = await res.json()
-      uploads = (Array.isArray(data.items) ? data.items : []).map((item) =>
-        toNewsSearchCard({
-          id: `upload-${item.id}`,
-          column: item.subcategory,
-          title: item.title,
-          summary: item.summary,
-          external_url: item.external_url,
-          created_at: item.created_at,
-        }),
-      )
-    } else {
-      console.warn(`[seo] longevity-news assets HTTP ${res.status} from ${origin}`)
-    }
-  } catch (err) {
-    console.warn(`[seo] longevity-news assets skipped: ${err.message}`)
-  }
+  const uploads = await fetchLongevityNewsUploads(origin)
   return [...uploads, ...staticCards].filter((card) => card.title)
 }
 
@@ -320,7 +363,8 @@ export function renderRouteHtml(template, { lang, pathname, newsCards = [] }) {
 async function main() {
   const template = await fs.readFile(path.join(distDir, 'index.html'), 'utf8')
   const newsCards = await loadLongevityNewsCards()
-  console.log(`[seo] longevity-news cards: ${newsCards.length}`)
+  const apiCards = newsCards.filter((card) => String(card.id || '').startsWith('upload-')).length
+  console.log(`[seo] longevity-news cards: ${newsCards.length} (api ${apiCards})`)
   let count = 0
   for (const page of SEO_PAGES) {
     for (const spec of SEO_LANGS) {
