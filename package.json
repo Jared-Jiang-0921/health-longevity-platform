@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/seo/prerender.mjs",
+    "build:client": "vite build",
+    "build:seo": "node scripts/seo/prerender.mjs",
+    "build": "npm run build:client && npm run build:seo",
     "preview": "vite preview",
     "fc:routes": "node scripts/fc/generate-route-manifest.mjs",
     "ops:migrate-series-folders": "node scripts/ops/migrate-health-skills-series-folders.mjs",
