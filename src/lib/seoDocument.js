@@ -127,8 +127,14 @@ export function buildHeadTags({ lang, pathname }) {
   return { spec, seo, jsonLd, alternates }
 }
 
-export function renderHeadSnippet({ lang, pathname }) {
-  const { spec, seo, jsonLd, alternates } = buildHeadTags({ lang, pathname })
+export function renderHeadSnippet({ lang, pathname, seo, jsonLd, alternates }) {
+  const built = seo
+    ? { spec: langSpec(lang), seo, jsonLd, alternates: alternates || [] }
+    : buildHeadTags({ lang, pathname })
+  return renderHeadFromParts(built)
+}
+
+function renderHeadFromParts({ spec, seo, jsonLd, alternates }) {
   const lines = [
     `<title>${escapeHtml(seo.title)}</title>`,
     `<meta name="description" content="${escapeHtml(seo.description)}" />`,
@@ -160,15 +166,30 @@ export function renderHeadSnippet({ lang, pathname }) {
 
 const MANAGED = 'data-seo-managed'
 
-export function applySeoToDocument({ lang, pathname }) {
+export function applySeoToDocument({ lang, pathname, seo, jsonLd, alternates, replaceUnmanaged = false }) {
   if (typeof document === 'undefined') return
-  const { spec, seo, jsonLd, alternates } = buildHeadTags({ lang, pathname })
+  const built = seo
+    ? { spec: langSpec(lang), seo, jsonLd, alternates: alternates || [] }
+    : buildHeadTags({ lang, pathname })
+  const { spec, seo: resolved, jsonLd: resolvedJson, alternates: resolvedAlts } = {
+    spec: built.spec,
+    seo: built.seo,
+    jsonLd: built.jsonLd,
+    alternates: built.alternates,
+  }
   document.documentElement.lang = spec.htmlLang
   document.documentElement.dir = spec.dir
-  document.title = seo.title
+  document.title = resolved.title
 
   const head = document.head
   head.querySelectorAll(`[${MANAGED}]`).forEach((el) => el.remove())
+  if (replaceUnmanaged) {
+    head.querySelectorAll(
+      'meta[name="description"], meta[name="robots"], link[rel="canonical"], script[type="application/ld+json"]',
+    ).forEach((el) => {
+      if (!el.hasAttribute(MANAGED)) el.remove()
+    })
+  }
 
   const appendMeta = (attr, key, value, prop = 'name') => {
     const el = document.createElement('meta')
@@ -186,26 +207,28 @@ export function applySeoToDocument({ lang, pathname }) {
     head.appendChild(el)
   }
 
-  appendMeta('robots', 'robots', seo.robots)
-  appendMeta('description', 'description', seo.description)
-  appendLink('canonical', seo.canonical)
-  alternates.forEach((item) => appendLink('alternate', item.href, { hreflang: item.hreflang }))
+  appendMeta('robots', 'robots', resolved.robots)
+  appendMeta('description', 'description', resolved.description)
+  appendLink('canonical', resolved.canonical)
+  resolvedAlts.forEach((item) => appendLink('alternate', item.href, { hreflang: item.hreflang }))
   appendMeta('og:type', 'og:type', 'website', 'property')
   appendMeta('og:site_name', 'og:site_name', SEO_BRAND.zh.name, 'property')
-  appendMeta('og:title', 'og:title', seo.title, 'property')
-  appendMeta('og:description', 'og:description', seo.description, 'property')
-  appendMeta('og:url', 'og:url', seo.canonical, 'property')
+  appendMeta('og:title', 'og:title', resolved.title, 'property')
+  appendMeta('og:description', 'og:description', resolved.description, 'property')
+  appendMeta('og:url', 'og:url', resolved.canonical, 'property')
   appendMeta('og:image', 'og:image', DEFAULT_OG_IMAGE, 'property')
   appendMeta('og:locale', 'og:locale', spec.ogLocale, 'property')
   appendMeta('twitter:card', 'twitter:card', 'summary_large_image')
-  appendMeta('twitter:title', 'twitter:title', seo.title)
-  appendMeta('twitter:description', 'twitter:description', seo.description)
+  appendMeta('twitter:title', 'twitter:title', resolved.title)
+  appendMeta('twitter:description', 'twitter:description', resolved.description)
   appendMeta('twitter:image', 'twitter:image', DEFAULT_OG_IMAGE)
   appendLink('alternate', `${SITE_ORIGIN}/llms.txt`, { type: 'text/plain', title: 'llms.txt' })
 
-  const script = document.createElement('script')
-  script.type = 'application/ld+json'
-  script.setAttribute(MANAGED, 'ld+json')
-  script.textContent = JSON.stringify(jsonLd)
-  head.appendChild(script)
+  if (resolvedJson) {
+    const script = document.createElement('script')
+    script.type = 'application/ld+json'
+    script.setAttribute(MANAGED, 'ld+json')
+    script.textContent = JSON.stringify(resolvedJson)
+    head.appendChild(script)
+  }
 }

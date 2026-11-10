@@ -101,5 +101,6 @@ export function toNewsSearchCard(item) {
     url: item.url || item.external_url || '',
     publishedAt: item.publishedAt || (item.created_at ? String(item.created_at).slice(0, 10) : ''),
     sourceNote: item.sourceNote || '',
+    takeaways: Array.isArray(item.takeaways) ? item.takeaways.filter(Boolean) : [],
   }
 }
