@@ -6,11 +6,24 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { HOME_MODULES, getHomeCopy } from '../../src/data/homePageContent.js'
-import { articleDisplay, getLongevityNewsArticles } from '../../src/data/longevityNewsArticles.js'
+import { getLongevityNewsArticles } from '../../src/data/longevityNewsArticles.js'
 import { LONGEVITY_NEWS_COLUMNS, columnDisplayLabel } from '../../src/data/longevityNewsColumns.js'
-import { PUBLIC_CRAWL_NAV, getAboutPage, getSolutionsPublicCopy } from '../../src/data/publicSummary.js'
+import { getLongevityNewsModuleCopy } from '../../src/data/longevityNewsModuleI18n.js'
+import { PUBLIC_CRAWL_NAV, getAboutPage, getFaqHeading, getSolutionsPublicCopy } from '../../src/data/publicSummary.js'
+import {
+  articleLanguages,
+  isSubstantiveNewsCard,
+  newsArticleAlternates,
+  newsArticleJsonLd,
+  newsArticleRouterPath,
+  newsArticleSeoFields,
+  newsHubLastmod,
+  newsReadingFaqs,
+  newsSitemapEntries,
+  presentNewsArticle,
+} from '../../src/lib/newsArticleSeo.js'
 import { SEO_LANGS, SEO_PAGES, SITE_ORIGIN, absoluteUrl } from '../../src/data/seo.js'
-import { extractLongevityKeywords, newsCardExcerpt, toNewsSearchCard } from '../../src/lib/longevityNewsCard.js'
+import { extractLongevityKeywords, toNewsSearchCard } from '../../src/lib/longevityNewsCard.js'
 import { langSpec, renderHeadSnippet, resolveSeo } from '../../src/lib/seoDocument.js'
 import { buildLlmsTxt, buildSitemapXml } from '../../src/lib/seoPublicFiles.js'
 
@@ -219,24 +232,11 @@ function displayKeywords(title, summary, lang) {
 }
 
 function presentNewsCard(card, lang) {
-  const article = getLongevityNewsArticles().find((item) => item.id === card.id)
-  if (article) {
-    const view = articleDisplay(article, lang)
-    return {
-      ...card,
-      title: view.title,
-      excerpt: newsCardExcerpt(view.summary),
-      keywords: displayKeywords(view.title, view.summary, lang),
-      columnLabel: columnDisplayLabel(card.column, lang),
-      zhOnly: view.zhOnly,
-    }
-  }
-  const zhOnly = lang !== 'zh' && hasChinese(`${card.title || ''} ${card.excerpt || ''}`)
+  const base = presentNewsArticle(card, lang)
   return {
-    ...card,
-    keywords: displayKeywords(card.title, card.excerpt || card.summary, lang),
-    columnLabel: columnDisplayLabel(card.column, lang) || card.column,
-    zhOnly,
+    ...base,
+    keywords: displayKeywords(base.title, base.excerpt || base.summary, lang),
+    columnLabel: columnDisplayLabel(base.column, lang) || base.column,
   }
 }
 
@@ -258,7 +258,9 @@ function newsJsonLd(lang, cards) {
         headline: shown.title,
         keywords: (shown.keywords || []).join(', '),
         description: shown.excerpt || shown.title,
-        url: `${canonical}#${encodeURIComponent(shown.id)}`,
+        url: articleLanguages(shown).includes(lang)
+          ? absoluteUrl(lang, newsArticleRouterPath(shown.id))
+          : `${canonical}#${encodeURIComponent(shown.id)}`,
         isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
         ...(shown.url ? { isBasedOn: shown.url } : {}),
       },
@@ -287,12 +289,18 @@ function newsBody(lang, cards) {
           : ''
         const excerpt = card.excerpt ? `<p>${escapeHtml(card.excerpt)}</p>` : ''
         const onlyZh = card.zhOnly ? `<p>${escapeHtml(lang === 'ar' ? 'هذا المحتوى بالصينية فقط' : 'This item is in Chinese only')}</p>` : ''
-        return `<article id="${escapeHtml(card.id)}"><h3>${escapeHtml(card.title)}</h3>${onlyZh}${kws}${excerpt}</article>`
+        const heading = isSubstantiveNewsCard(card, lang)
+          ? `<a href="${escapeHtml(absoluteUrl(lang, newsArticleRouterPath(card.id)))}">${escapeHtml(card.title)}</a>`
+          : escapeHtml(card.title)
+        const dated = card.publishedAt ? `<p><time datetime="${escapeHtml(card.publishedAt)}">${escapeHtml(card.publishedAt)}</time></p>` : ''
+        return `<article id="${escapeHtml(card.id)}"><h3>${heading}</h3>${dated}${onlyZh}${kws}${excerpt}</article>`
       })
       .join('')
     sections.push(`<section><h2>${escapeHtml(columnDisplayLabel(label, lang))}</h2>${articles}</section>`)
   }
-  return `<h1>${escapeHtml(seo.title)}</h1><p>${escapeHtml(seo.description)}</p>${moduleIntro('/longevity-news', lang)}${sections.join('')}`
+  const mod = getLongevityNewsModuleCopy(lang)
+  const faqs = newsReadingFaqs(lang).map((item) => `<article><h3>${escapeHtml(item.q)}</h3><p>${escapeHtml(item.a)}</p></article>`).join('')
+  return `<h1>${escapeHtml(seo.title)}</h1><p>${escapeHtml(seo.description)}</p><p>${escapeHtml(mod.caveatPhrase)}</p>${moduleIntro('/longevity-news', lang)}<section><h2>${escapeHtml(getFaqHeading(lang))}</h2>${faqs}</section>${sections.join('')}`
 }
 
 function pageBody(page, lang, newsCards) {
@@ -322,9 +330,27 @@ function stripBaselineSeo(html) {
     .replace(/<script\s+type="application\/ld\+json"[\s\S]*?<\/script>\s*/gi, '')
 }
 
-function injectHtml(template, { lang, pathname, body, extraHead = '' }) {
+function newsArticleBody(view, lang) {
+  const mod = getLongevityNewsModuleCopy(lang)
+  const takes = (view.takeaways || []).filter(Boolean)
+  const list = takes.length
+    ? `<h2>${escapeHtml(lang === 'zh' ? '阅读要点' : lang === 'ar' ? 'نقاط' : 'Takeaways')}</h2><ul>${takes.map((line) => `<li>${escapeHtml(line)}</li>`).join('')}</ul>`
+    : ''
+  const dated = view.publishedAt ? `<p><time datetime="${escapeHtml(view.publishedAt)}">${escapeHtml(view.publishedAt)}</time></p>` : ''
+  const excerpt = view.excerpt ? `<p>${escapeHtml(view.excerpt)}</p>` : ''
+  const source = view.url && /^https?:\/\//i.test(view.url)
+    ? `<p>${escapeHtml(lang === 'zh' ? '来源页' : lang === 'ar' ? 'صفحة المصدر' : 'Source page')}：<a href="${escapeHtml(view.url)}">${escapeHtml(view.url)}</a></p>`
+    : ''
+  const note = view.sourceNote ? `<p>${escapeHtml(view.sourceNote)}</p>` : ''
+  const back = `<p><a href="${escapeHtml(absoluteUrl(lang, '/longevity-news'))}">${escapeHtml(navLabel('/longevity-news', lang))}</a></p>`
+  return `<article><h1>${escapeHtml(view.title)}</h1>${dated}${excerpt}${list}${note}${source}<p>${escapeHtml(mod.caveatPhrase)}</p>${back}</article>`
+}
+
+function injectHtml(template, { lang, pathname, body, extraHead = '', head }) {
   const spec = langSpec(lang)
-  const head = renderHeadSnippet({ lang, pathname })
+  const headHtml = head
+    ? renderHeadSnippet({ lang, pathname, ...head })
+    : renderHeadSnippet({ lang, pathname })
   const langs = langLinks(pathname, lang)
   const root = `<div id="root">
       <main class="seo-prerender" lang="${escapeHtml(spec.htmlLang)}" dir="${escapeHtml(spec.dir)}">
@@ -335,13 +361,28 @@ function injectHtml(template, { lang, pathname, body, extraHead = '' }) {
     </div>`
   let html = stripBaselineSeo(template)
   html = html.replace(/<html([^>]*)>/i, `<html lang="${spec.htmlLang}" dir="${spec.dir}">`)
-  html = html.replace('</head>', `    ${head}\n    ${extraHead}\n  </head>`)
+  html = html.replace('</head>', `    ${headHtml}\n    ${extraHead}\n  </head>`)
   html = html.replace(/<div id="root"><\/div>/, root)
   return html
 }
 
 export function staticNewsCards() {
   return getLongevityNewsArticles().map((item) => toNewsSearchCard(item)).filter((card) => card.title)
+}
+
+export function renderNewsArticleHtml(template, { lang, card }) {
+  const view = presentNewsArticle(card, lang)
+  if (!articleLanguages(card).includes(lang) || !isSubstantiveNewsCard(view, lang)) return null
+  return injectHtml(template, {
+    lang,
+    pathname: newsArticleRouterPath(view.id),
+    body: newsArticleBody(view, lang),
+    head: {
+      seo: newsArticleSeoFields(view, lang),
+      jsonLd: newsArticleJsonLd(view, lang),
+      alternates: newsArticleAlternates(card),
+    },
+  })
 }
 
 export function renderRouteHtml(template, { lang, pathname, newsCards = [] }) {
@@ -379,8 +420,21 @@ async function main() {
       count += 1
     }
   }
-  await fs.writeFile(path.join(distDir, 'sitemap.xml'), buildSitemapXml(), 'utf8')
-  await fs.writeFile(path.join(distDir, 'llms.txt'), buildLlmsTxt(), 'utf8')
+  for (const card of newsCards) {
+    for (const lang of articleLanguages(card)) {
+      const html = renderNewsArticleHtml(template, { lang, card })
+      if (!html) continue
+      const dest = distFileFor(lang, newsArticleRouterPath(card.id))
+      await fs.mkdir(path.dirname(dest), { recursive: true })
+      await fs.writeFile(dest, html, 'utf8')
+      count += 1
+    }
+  }
+  await fs.writeFile(path.join(distDir, 'sitemap.xml'), buildSitemapXml({
+    extra: newsSitemapEntries(newsCards),
+    newsLastmod: newsHubLastmod(newsCards),
+  }), 'utf8')
+  await fs.writeFile(path.join(distDir, 'llms.txt'), buildLlmsTxt({ articles: newsCards }), 'utf8')
   console.log(`[seo] prerendered ${count} HTML pages + sitemap.xml + llms.txt → ${distDir}`)
 }
 

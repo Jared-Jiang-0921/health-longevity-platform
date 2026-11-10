@@ -1,7 +1,8 @@
 import { splitLocalePath } from '../../src/lib/localePath.js'
 import { pageIndexable } from '../../src/data/seo.js'
+import { newsArticleIdFromPath, newsHubLastmod, newsSitemapEntries } from '../../src/lib/newsArticleSeo.js'
 import { buildLlmsTxt, buildSitemapXml } from '../../src/lib/seoPublicFiles.js'
-import { renderRouteHtml, staticNewsCards } from './prerender.mjs'
+import { renderNewsArticleHtml, renderRouteHtml, staticNewsCards } from './prerender.mjs'
 
 const newsCards = staticNewsCards()
 
@@ -21,11 +22,14 @@ export function seoDevPlugin() {
       server.middlewares.use((req, res, next) => {
         const pathname = String(req.url || '').split('?')[0]
         if (pathname === '/sitemap.xml') {
-          sendText(res, buildSitemapXml(), 'application/xml; charset=utf-8')
+          sendText(res, buildSitemapXml({
+            extra: newsSitemapEntries(newsCards),
+            newsLastmod: newsHubLastmod(newsCards),
+          }), 'application/xml; charset=utf-8')
           return
         }
         if (pathname === '/llms.txt') {
-          sendText(res, buildLlmsTxt(), 'text/plain; charset=utf-8')
+          sendText(res, buildLlmsTxt({ articles: newsCards }), 'text/plain; charset=utf-8')
           return
         }
         next()
@@ -36,7 +40,11 @@ export function seoDevPlugin() {
       handler(html, ctx) {
         if (!ctx.server) return html
         const { lang, routerPath } = splitLocalePath(ctx.originalUrl || ctx.path || '/')
-        const rendered = renderRouteHtml(html, { lang, pathname: routerPath, newsCards })
+        const articleId = newsArticleIdFromPath(routerPath)
+        const articleCard = articleId ? newsCards.find((card) => card.id === articleId) : null
+        const rendered = articleCard
+          ? renderNewsArticleHtml(html, { lang, card: articleCard })
+          : renderRouteHtml(html, { lang, pathname: routerPath, newsCards })
         if (rendered) return rendered
         if (!pageIndexable(routerPath)) {
           return html.replace(

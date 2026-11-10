@@ -3,6 +3,7 @@
  * 以便和已经上线的免责声明、咨询边界保持一致。
  */
 import { HOME_MODULES } from './homePageContent.js'
+import { getLongevityNewsModuleCopy } from './longevityNewsModuleI18n.js'
 import {
   PUBLIC_LIVE_ORIGIN,
   PUBLIC_SUMMARY_UPDATED,
@@ -223,9 +224,38 @@ const ABOUT_FAQS = {
   ],
 }
 
+function newsFaqs(lang) {
+  const key = pickLang(lang)
+  const mod = getLongevityNewsModuleCopy(key)
+  const questions = {
+    zh: [
+      '前沿医学资讯页面上的卡片是全文吗？',
+      '这些标题可以理解成已经证实有效的治疗结论吗？',
+      '为什么很多条目只有标题和关键词？',
+    ],
+    en: [
+      'Are the insight cards the full text?',
+      'Do these titles mean a treatment is already proven?',
+      'Why do many cards only have a title and keywords?',
+    ],
+    ar: [
+      'هل بطاقات المستجدات هي النص الكامل؟',
+      'هل تعني العناوين أن العلاج مثبت؟',
+      'لماذا كثير من البطاقات عنوان وكلمات فقط؟',
+    ],
+  }
+  const prompts = questions[key] || questions.zh
+  return [
+    { q: prompts[0], a: mod.lead },
+    { q: prompts[1], a: mod.caveatPhrase },
+    { q: prompts[2], a: mod.wechatBody },
+  ]
+}
+
 export function getPageFaqs(pathname, lang) {
   const key = pickLang(lang)
   const path = String(pathname || '/').replace(/\/$/, '') || '/'
+  if (path === '/longevity-news') return newsFaqs(key)
   const table = path === '/about' ? ABOUT_FAQS : path === '/solutions' ? SOLUTION_FAQS : null
   if (!table) return []
   return table[key] || table.zh
