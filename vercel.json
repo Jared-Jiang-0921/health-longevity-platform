@@ -2,30 +2,372 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "healthlongevity.cn"
+        }
+      ],
+      "destination": "https://www.healthlongevity.cn/:path*",
+      "statusCode": 301
+    }
+  ],
   "headers": [
     {
       "source": "/sitemap.xml",
       "headers": [
-        { "key": "Content-Type", "value": "application/xml; charset=utf-8" }
+        {
+          "key": "Content-Type",
+          "value": "application/xml; charset=utf-8"
+        }
       ]
     },
     {
       "source": "/llms.txt",
       "headers": [
-        { "key": "Content-Type", "value": "text/plain; charset=utf-8" }
+        {
+          "key": "Content-Type",
+          "value": "text/plain; charset=utf-8"
+        }
       ]
     },
     {
       "source": "/robots.txt",
       "headers": [
-        { "key": "Content-Type", "value": "text/plain; charset=utf-8" }
+        {
+          "key": "Content-Type",
+          "value": "text/plain; charset=utf-8"
+        }
       ]
     }
   ],
   "rewrites": [
     {
-      "source": "/((?!api/).*)",
+      "source": "/account",
       "destination": "/index.html"
+    },
+    {
+      "source": "/account/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/payment",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/payment/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/favorites",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/favorites/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/health-skills",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/health-skills/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/health-questionnaire",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/health-questionnaire/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/forgot-password",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/forgot-password/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/reset-password",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/reset-password/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/ops",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/ops/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/org",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/org/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/tax",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/tax/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/solutions/risk",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/solutions/risk/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/solutions/aging",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/solutions/aging/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/tcm-prevention/constitution",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/tcm-prevention/constitution/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/products/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/en/account",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/account/(.*)",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/payment",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/payment/(.*)",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/favorites",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/favorites/(.*)",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/health-skills",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/health-skills/(.*)",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/health-questionnaire",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/health-questionnaire/(.*)",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/forgot-password",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/forgot-password/(.*)",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/reset-password",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/reset-password/(.*)",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/ops",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/ops/(.*)",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/org",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/org/(.*)",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/tax",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/tax/(.*)",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/solutions/risk",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/solutions/risk/(.*)",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/solutions/aging",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/solutions/aging/(.*)",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/tcm-prevention/constitution",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/tcm-prevention/constitution/(.*)",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/products/(.*)",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/ar/account",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar/account/(.*)",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar/payment",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar/payment/(.*)",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar/favorites",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar/favorites/(.*)",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar/health-skills",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar/health-skills/(.*)",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar/health-questionnaire",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar/health-questionnaire/(.*)",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar/forgot-password",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar/forgot-password/(.*)",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar/reset-password",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar/reset-password/(.*)",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar/ops",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar/ops/(.*)",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar/org",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar/org/(.*)",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar/tax",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar/tax/(.*)",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar/solutions/risk",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar/solutions/risk/(.*)",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar/solutions/aging",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar/solutions/aging/(.*)",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar/tcm-prevention/constitution",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar/tcm-prevention/constitution/(.*)",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar/products/(.*)",
+      "destination": "/ar/index.html"
     }
   ]
 }

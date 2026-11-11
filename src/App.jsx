@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Link, Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout'
 import ProtectedModule from './components/ProtectedModule'
 import SiteAdminOnly from './components/SiteAdminOnly'
@@ -45,6 +45,20 @@ const About = lazy(() => import('./pages/About'))
 const Account = lazy(() => import('./pages/Account'))
 const OrgConsole = lazy(() => import('./pages/OrgConsole'))
 const OrgInviteAccept = lazy(() => import('./pages/OrgInviteAccept'))
+const DevConsultPreview = import.meta.env.DEV
+  ? lazy(() => import('./pages/DevConsultPreview.jsx'))
+  : null
+
+function NotFoundPage() {
+  return (
+    <div className="page-content">
+      <h1>未找到该页面</h1>
+      <p>Page not found.</p>
+      <p lang="ar" dir="rtl">الصفحة غير موجودة.</p>
+      <p><Link to="/">返回首页</Link></p>
+    </div>
+  )
+}
 
 function WithModuleAssets({ moduleKey, children }) {
   return (
@@ -108,6 +122,8 @@ export default function App() {
           <Route path="/legal/sale" element={<LegalSale />} />
           <Route path="/legal/health-data" element={<LegalHealthData />} />
           <Route path="/legal/cookies" element={<LegalCookies />} />
+          {DevConsultPreview ? <Route path="/dev/consult-composer" element={<DevConsultPreview />} /> : null}
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
     </Layout>

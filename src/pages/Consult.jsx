@@ -39,6 +39,15 @@ const COPY = {
     unavailable: '历史会话暂时无法加载。你仍可以开始新的咨询。',
     retry: '重试',
     modeLabel: '咨询类型',
+    composerModeNow: '当前模式',
+    composerSourcesOff: '此模式不检索 PubMed、Cochrane、欧洲 PMC。',
+    composerSourcesHere: '文献检索在输入框上方，默认关闭，可按需打开。',
+    composerTcmSources: '中医咨询不检索 PubMed、Cochrane、欧洲 PMC。',
+    composerUseProfessional: '切换到专业健康长寿',
+    composerUseGeneral: '切换到自我健康促进',
+    sessionGeneralNote: '这条历史属于自我健康促进，所以没有 PubMed、Cochrane、欧洲 PMC 开关。记录类型保持不变。',
+    sessionProfessionalNote: '这条历史属于专业健康长寿。文献开关只对这一条记录有效，不会把其它历史改成专业咨询。',
+    sessionTcmNote: '这条历史属于中医养生保健，不检索 PubMed、Cochrane、欧洲 PMC。记录类型保持不变。',
     profileAssessLocked: '评估需标准会员',
     upgrade: '升级会员',
     needLevel: (name) => `该咨询类型需要「${name}」及以上会员。`,
@@ -160,6 +169,15 @@ const COPY = {
     unavailable: 'Previous chats could not be loaded. You can still start a new consultation.',
     retry: 'Retry',
     modeLabel: 'Consultation type',
+    composerModeNow: 'Current mode',
+    composerSourcesOff: 'This mode does not search PubMed, Cochrane, or Europe PMC.',
+    composerSourcesHere: 'Literature search sits above the box. It is off until you turn it on.',
+    composerTcmSources: 'TCM consult does not search PubMed, Cochrane, or Europe PMC.',
+    composerUseProfessional: 'Switch to professional',
+    composerUseGeneral: 'Switch to self-care',
+    sessionGeneralNote: 'This saved chat is self-care, so PubMed, Cochrane, and Europe PMC stay off. Its type is unchanged.',
+    sessionProfessionalNote: 'This saved chat is professional. Literature switches apply only to this record and do not reclassify other chats.',
+    sessionTcmNote: 'This saved chat is TCM preventive care and does not search PubMed, Cochrane, or Europe PMC. Its type is unchanged.',
     profileAssessLocked: 'Assessments need Standard',
     upgrade: 'Upgrade',
     needLevel: (name) => `This mode requires ${name} or higher.`,
@@ -281,6 +299,15 @@ const COPY = {
     unavailable: 'تعذر تحميل المحادثات السابقة. يمكنك بدء استشارة جديدة.',
     retry: 'إعادة المحاولة',
     modeLabel: 'نوع الاستشارة',
+    composerModeNow: 'الوضع الحالي',
+    composerSourcesOff: 'هذا الوضع لا يبحث في PubMed أو Cochrane أو Europe PMC.',
+    composerSourcesHere: 'بحث الأدبيات فوق مربع السؤال، ومغلق حتى تفتحه.',
+    composerTcmSources: 'استشارة الطب الصيني لا تبحث في PubMed أو Cochrane أو Europe PMC.',
+    composerUseProfessional: 'التبديل إلى الاستشارة المهنية',
+    composerUseGeneral: 'التبديل إلى تعزيز الصحة الذاتية',
+    sessionGeneralNote: 'هذه المحادثة المحفوظة من نوع تعزيز الصحة الذاتية، لذلك لا تظهر مفاتيح PubMed وCochrane وEurope PMC. نوع السجل يبقى كما هو.',
+    sessionProfessionalNote: 'هذه المحادثة المحفوظة مهنية. مفاتيح الأدبيات تخص هذا السجل فقط ولا تغيّر نوع المحادثات الأخرى.',
+    sessionTcmNote: 'هذه المحادثة المحفوظة للرعاية الوقائية بالطب الصيني، ولا تبحث في PubMed أو Cochrane أو Europe PMC. نوع السجل يبقى كما هو.',
     profileAssessLocked: 'التقييمات للعضو القياسي',
     upgrade: 'ترقية',
     needLevel: (name) => `يتطلب هذا الوضع عضوية ${name} أو أعلى.`,
@@ -550,6 +577,21 @@ export default function Consult() {
       europepmc: t.europepmc,
       europepmcHint: t.europepmcHint,
       thinkingPubmed: t.thinkingPubmed,
+      modeLabel: t.modeLabel,
+      composerModeNow: t.composerModeNow,
+      composerSourcesOff: t.composerSourcesOff,
+      composerSourcesHere: t.composerSourcesHere,
+      composerTcmSources: t.composerTcmSources,
+      composerUseProfessional: t.composerUseProfessional,
+      composerUseGeneral: t.composerUseGeneral,
+      sessionModeNote: !sessionId
+        ? ''
+        : entry === 'professional'
+          ? t.sessionProfessionalNote
+          : entry === 'tcm'
+            ? t.sessionTcmNote
+            : t.sessionGeneralNote,
+      modeName: entry === 'tcm' ? t.tcmTitle : entry === 'professional' ? t.professional : t.general,
       historyLoading: t.historyLoading,
       loadFail: t.loadFail,
       disclaimer,
@@ -595,7 +637,7 @@ export default function Consult() {
       thinkingUpload: t.thinkingUpload,
       quotaExceeded: t.quotaExceeded,
     }),
-    [t, disclaimer, user?.site_admin],
+    [t, disclaimer, entry, sessionId, user?.site_admin],
   )
 
   function setEntry(next) {
@@ -861,6 +903,7 @@ export default function Consult() {
                   token={token}
                   lang={lang}
                   entry={entry}
+                  onSelectEntry={entry === 'tcm' ? undefined : setEntry}
                   initialDraft={composerSeed}
                   rtl={rtl}
                   copy={chatCopy}

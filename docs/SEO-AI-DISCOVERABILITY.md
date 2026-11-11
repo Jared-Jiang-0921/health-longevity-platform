@@ -23,7 +23,7 @@
 
 `llms.txt` 仍只是给程序读的目录，并写明它不是百度或其它搜索引擎的收录或排名承诺。
 
-部署仍是：`deploy-ecs.sh` 先构建前端，再等 API 和资讯接口就绪，然后预渲染。Vercel 仍是一个 API 函数加 `/((?!api/).*)` 回退；单篇 HTML 作为静态文件优先提供。本机没有资讯接口时，预渲染只会带上 5 篇静态稿；线上 ECS 部署才会把数据库里有摘要的条目一并写成单篇。
+部署仍是：`deploy-ecs.sh` 先构建前端，再等 API 和资讯接口就绪，然后预渲染。Vercel 仍是一个 API 函数。未知地址不再用 `/((?!api/).*)` 回到首页，见下文 2026-11-11。单篇 HTML 作为静态文件优先提供。本机没有资讯接口时，预渲染只会带上 5 篇静态稿；线上 ECS 部署才会把数据库里有摘要的条目一并写成单篇。
 
 回归检查：
 
@@ -43,7 +43,7 @@ npm run build
 
 构建命令 `npm run build` 会预渲染上述公开页的标题、说明、Open Graph、Twitter 和 JSON-LD，并把正文放进 HTML，不执行 JavaScript 的抓取器也能读到。`npm run dev` 下这些地址同样可直接查看。
 
-Vercel 先提供 `dist` 里的静态文件（包括 `about/index.html`、`robots.txt`、`sitemap.xml`、`llms.txt`），找不到时再用 `/((?!api/).*)` 回到首页。不要把这条回退写成带多个排除项的正则，当前 path-to-regexp 会判为非法路由。自建 Nginx 已用 `try_files` 找到预渲染页。Netlify 仍在 `netlify.toml` 里把公开路径指到对应的 `index.html`。新增要收录的公开路由时，把它放进 `src/data/seo.js` 的 `SEO_PAGES`，并在 `netlify.toml` 加上同样的路径映射。
+Vercel 先提供 `dist` 里的静态文件（包括 `about/index.html`、`robots.txt`、`sitemap.xml`、`llms.txt`）。找不到文件时，只有 `src/lib/sitePaths.js` 里的动态或登录后路径才回到前端壳；其它地址返回 `404.html`。不要恢复 `/((?!api/).*)` 这种整站回首页的规则，path-to-regexp 6 也不接受更宽的排除正则。Nginx 示例用 `try_files` 找到预渲染页，没有文件且不在动态名单里则 404。Netlify 把公开路径指到对应的 `index.html`，不再使用 `/*` 回首页。新增要收录的公开路由时，把它放进 `src/data/seo.js` 的 `SEO_PAGES`，并在 `netlify.toml` 加上同样的路径映射。新增动态路径时，同时改 `src/lib/sitePaths.js`，让 Vercel、Netlify 和 Nginx 示例保持同一份名单。
 
 不收录：`/account`、`/payment`、`/ops/`、`/org`、`/favorites`、`/health-questionnaire`、`/solutions/risk`、`/solutions/aging`、`/tcm-prevention/constitution`、`/health-skills/` 下的课程页、`/api/`、`/mcp`、`/.well-known/`。
 
@@ -76,6 +76,41 @@ curl -sS http://localhost:5173/about | tr '\n' ' ' | grep -o '<title>[^<]*</titl
 npm run build
 test -f dist/robots.txt && test -f dist/sitemap.xml && test -f dist/about/index.html
 ```
+
+## 2026-11-11 自检里和抓取有关的四项
+
+这些改动在仓库和本机构建里可以核对。它们**还没有**写进线上 Nginx。`deploy-ecs.sh` 只会 `nginx -t` 后 reload 机器上现有的站点文件，不会用 `deploy/nginx-healthlongevity.conf.example` 覆盖它。因此提交或合并本分支，不会让裸域名开始 301，也不会让未知网址开始返回 404。
+
+2026-11-11 线上（未改 ECS）核对到的行为：
+
+- `https://healthlongevity.cn/about?x=1` 返回 200，没有 `Location`。裸域名和 `www` 当时由同一段 `server_name` 提供同一份页面。
+- `/favicon.ico`、`/favicon.png`、`/favicon.svg`、`/apple-touch-icon.png` 返回首页 HTML（约 8679 字节）。
+- `/longevity-news/not-a-real-id` 和 `/en/not-a-page` 返回 200 首页。英文未知路径返回的是英文首页。
+- `/assets/missing-file.js` 和 `/images/missing.png` 已经是 404，正文不是首页。这条要保持。
+- `/ar/` 的 `lang` 和 `dir` 已是阿拉伯语从右到左，但首页标题和导语仍是英文。
+
+这次在仓库里做了：
+
+- 未知站点路径、未知资讯 id（含 `/en/`、`/ar/`）改为真正的 404 页面 `public/404.html`（`noindex`，不是首页）。已预渲染的栏目和有摘要的资讯文件仍按文件提供。咨询、账户、支付、问卷、课程、产品详情、风险评估、体质辨识等动态或登录后路径仍回退到对应语言的前端壳。`/api/` 不改写。缺的 js、css、图片不再回退成 HTML。
+- Vercel 去掉 `/((?!api/).*)` 这种任何未知地址都回首页的规则，只保留上面的动态路径。仍是一个 API 函数 `api/[...path].js`。回退规则用 path-to-regexp 6 编译，避免 Hobby 部署再次因路由语法失败。
+- 裸域名 301 到 `https://www.healthlongevity.cn`，路径和查询串保留。Vercel 用主机条件，只匹配 `healthlongevity.cn`，不匹配 `www` 或 `*.vercel.app`。Nginx 示例把裸域名和 `www` 分成两个 server，`return 301 https://www.healthlongevity.cn$request_uri;`。
+- 图标用现有 `public/images/logo-longevity-atlas.png` 做成 `favicon.ico`、`favicon.png`、`favicon.svg` 和 `apple-touch-icon.png`，并写进 `index.html`。没有另做医疗认证标志。
+- 阿拉伯语首页的标题、导语和首页上的说明改为阿拉伯文，预渲染走同一套 `getHomeCopy('ar')`。资讯正文没有整库翻译，不能说新闻语料已经全部阿拉伯化。
+- sitemap 的 `lastmod` 没有改：首页仍是内容日期 `2026-11-07`，资讯栏目仍取说明日期 `2026-11-10` 和条目日期里较新的一天，单篇仍用条目自己的日期（静态稿 `ln-static-1` 为 `2026-07-01`）。不要改成部署当天。
+
+线上要让 301 和 HTML 404 生效，需要在 ECS 上改**正在 listen 443 的那份配置**，而不是只改本仓库。安全做法只复制 Nginx 站点文件，不要把 `.env.prod` 打进新的备份包，也不要把证书私钥贴出来：
+
+```bash
+sudo cp /etc/nginx/conf.d/healthlongevity.conf /etc/nginx/conf.d/healthlongevity.conf.bak-YYYYmmddHHMM
+# 按 deploy/nginx-healthlongevity.conf.example 修改正在生效的 443 server 后再执行：
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+回滚是把该 `.bak` 拷回去，再 `nginx -t` 和 reload。站点文件若不是 `conf.d/healthlongevity.conf`，以 `nginx -T` 里实际 include 的路径为准。
+
+`scripts/ops/deploy-ecs.sh` 含 `git reset --hard origin/main`。在得到单独确认之前不要执行它。即便以后执行，顺序仍是：构建前端 → 重启并等待 `/api/health` 和资讯 `module-assets` → 再预渲染 → reload 现有 Nginx。它不会自动套用本示例里的 301/404。
+
+搜索引擎提交仍要站长账号自己做，本仓库不代提交。
 
 ## Google Search Console
 
