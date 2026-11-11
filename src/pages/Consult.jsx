@@ -45,6 +45,9 @@ const COPY = {
     composerTcmSources: '中医咨询不检索 PubMed、Cochrane、欧洲 PMC。',
     composerUseProfessional: '切换到专业健康长寿',
     composerUseGeneral: '切换到自我健康促进',
+    sessionGeneralNote: '这条历史属于自我健康促进，所以没有 PubMed、Cochrane、欧洲 PMC 开关。记录类型保持不变。',
+    sessionProfessionalNote: '这条历史属于专业健康长寿。文献开关只对这一条记录有效，不会把其它历史改成专业咨询。',
+    sessionTcmNote: '这条历史属于中医养生保健，不检索 PubMed、Cochrane、欧洲 PMC。记录类型保持不变。',
     profileAssessLocked: '评估需标准会员',
     upgrade: '升级会员',
     needLevel: (name) => `该咨询类型需要「${name}」及以上会员。`,
@@ -172,6 +175,9 @@ const COPY = {
     composerTcmSources: 'TCM consult does not search PubMed, Cochrane, or Europe PMC.',
     composerUseProfessional: 'Switch to professional',
     composerUseGeneral: 'Switch to self-care',
+    sessionGeneralNote: 'This saved chat is self-care, so PubMed, Cochrane, and Europe PMC stay off. Its type is unchanged.',
+    sessionProfessionalNote: 'This saved chat is professional. Literature switches apply only to this record and do not reclassify other chats.',
+    sessionTcmNote: 'This saved chat is TCM preventive care and does not search PubMed, Cochrane, or Europe PMC. Its type is unchanged.',
     profileAssessLocked: 'Assessments need Standard',
     upgrade: 'Upgrade',
     needLevel: (name) => `This mode requires ${name} or higher.`,
@@ -299,6 +305,9 @@ const COPY = {
     composerTcmSources: 'استشارة الطب الصيني لا تبحث في PubMed أو Cochrane أو Europe PMC.',
     composerUseProfessional: 'التبديل إلى الاستشارة المهنية',
     composerUseGeneral: 'التبديل إلى تعزيز الصحة الذاتية',
+    sessionGeneralNote: 'هذه المحادثة المحفوظة من نوع تعزيز الصحة الذاتية، لذلك لا تظهر مفاتيح PubMed وCochrane وEurope PMC. نوع السجل يبقى كما هو.',
+    sessionProfessionalNote: 'هذه المحادثة المحفوظة مهنية. مفاتيح الأدبيات تخص هذا السجل فقط ولا تغيّر نوع المحادثات الأخرى.',
+    sessionTcmNote: 'هذه المحادثة المحفوظة للرعاية الوقائية بالطب الصيني، ولا تبحث في PubMed أو Cochrane أو Europe PMC. نوع السجل يبقى كما هو.',
     profileAssessLocked: 'التقييمات للعضو القياسي',
     upgrade: 'ترقية',
     needLevel: (name) => `يتطلب هذا الوضع عضوية ${name} أو أعلى.`,
@@ -575,6 +584,13 @@ export default function Consult() {
       composerTcmSources: t.composerTcmSources,
       composerUseProfessional: t.composerUseProfessional,
       composerUseGeneral: t.composerUseGeneral,
+      sessionModeNote: !sessionId
+        ? ''
+        : entry === 'professional'
+          ? t.sessionProfessionalNote
+          : entry === 'tcm'
+            ? t.sessionTcmNote
+            : t.sessionGeneralNote,
       modeName: entry === 'tcm' ? t.tcmTitle : entry === 'professional' ? t.professional : t.general,
       historyLoading: t.historyLoading,
       loadFail: t.loadFail,
@@ -621,7 +637,7 @@ export default function Consult() {
       thinkingUpload: t.thinkingUpload,
       quotaExceeded: t.quotaExceeded,
     }),
-    [t, disclaimer, entry, user?.site_admin],
+    [t, disclaimer, entry, sessionId, user?.site_admin],
   )
 
   function setEntry(next) {

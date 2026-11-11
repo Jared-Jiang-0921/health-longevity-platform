@@ -98,8 +98,10 @@ export default function ChatWindow({
   quotaUnlimited,
   unlimitedUploads = false,
   onSelectEntry,
+  seedMessages = null,
+  previewLocked = false,
 }) {
-  const [messages, setMessages] = useState([])
+  const [messages, setMessages] = useState(() => (Array.isArray(seedMessages) ? seedMessages : []))
   const [input, setInput] = useState('')
   const [sessionId, setSessionId] = useState(sessionIdProp || null)
   const [usePubmed, setUsePubmed] = useState(false)
@@ -185,6 +187,7 @@ export default function ChatWindow({
   }, [sessionIdProp, token])
 
   async function sendMessage(raw) {
+    if (previewLocked) return
     const pending = attachments
     const text = String(raw || '').trim() || (pending.length ? (copy.attachDefault || '') : '')
     if ((!text && !pending.length) || sending || attaching || !token || loadingHistory) return
@@ -488,7 +491,7 @@ export default function ChatWindow({
   }
 
   async function toggleVoice() {
-    if (sending || attaching || transcribing || !token || voiceBusyRef.current) return
+    if (previewLocked || sending || attaching || transcribing || !token || voiceBusyRef.current) return
     if (!canSpeech) {
       setError(copy.speechUnsupported || copy.speechFail)
       return
@@ -564,7 +567,7 @@ export default function ChatWindow({
       ? (copy.thinkingPubmed || copy.thinking)
       : copy.thinking)
   const quotaBlocked = !quotaUnlimited && quotaRemaining === 0
-  const canSend = !sending && !attaching && !loadingHistory && Boolean(token)
+  const canSend = !previewLocked && !sending && !attaching && !loadingHistory && Boolean(token)
     && (Boolean(input.trim()) || attachments.length > 0)
     && !quotaBlocked
 
@@ -658,6 +661,7 @@ export default function ChatWindow({
                 ? (copy.composerTcmSources || '')
                 : (copy.composerSourcesOff || '')}
           </p>
+          {copy.sessionModeNote ? <p className="chat-mode-session">{copy.sessionModeNote}</p> : null}
           {entry !== 'tcm' && onSelectEntry ? (
             <button
               type="button"
@@ -772,7 +776,7 @@ export default function ChatWindow({
             onChange={(e) => setInput(e.target.value)}
             placeholder={copy.placeholder}
             rows={6}
-            disabled={sending || !token || loadingHistory || quotaBlocked}
+            disabled={sending || (!token && !previewLocked) || loadingHistory || quotaBlocked}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault()

@@ -1,9 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { seoDevPlugin } from './scripts/seo/dev-server.mjs'
+import { seoDevPlugin, seoPreviewPlugin } from './scripts/seo/dev-server.mjs'
 
 export default defineConfig({
-  plugins: [react(), seoDevPlugin()],
+  plugins: [react(), seoDevPlugin(), seoPreviewPlugin()],
   build: {
     rollupOptions: {
       output: {
