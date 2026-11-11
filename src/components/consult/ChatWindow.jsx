@@ -97,6 +97,7 @@ export default function ChatWindow({
   quotaRemaining,
   quotaUnlimited,
   unlimitedUploads = false,
+  onSelectEntry,
 }) {
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
@@ -647,6 +648,28 @@ export default function ChatWindow({
       {error ? <p className="chat-error" role="alert">{error}</p> : null}
 
       <form className="chat-composer" onSubmit={onSubmit}>
+        <div className="chat-mode-bar" role="group" aria-label={copy.modeLabel || 'mode'}>
+          <p>
+            <strong>{copy.composerModeNow || '当前模式'}：{copy.modeName || ''}</strong>
+            {' '}
+            {entry === 'professional'
+              ? (copy.composerSourcesHere || '')
+              : entry === 'tcm'
+                ? (copy.composerTcmSources || '')
+                : (copy.composerSourcesOff || '')}
+          </p>
+          {entry !== 'tcm' && onSelectEntry ? (
+            <button
+              type="button"
+              className="chat-mode-switch-btn"
+              onClick={() => onSelectEntry(entry === 'professional' ? 'general' : 'professional')}
+            >
+              {entry === 'professional'
+                ? (copy.composerUseGeneral || '自我健康促进')
+                : (copy.composerUseProfessional || '专业健康长寿')}
+            </button>
+          ) : null}
+        </div>
         {isProfessional ? (
         <div className="chat-toggles">
           <label className={`chat-toggle ${usePubmed ? 'is-on' : ''}`}>
@@ -748,7 +771,7 @@ export default function ChatWindow({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={copy.placeholder}
-            rows={2}
+            rows={6}
             disabled={sending || !token || loadingHistory || quotaBlocked}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {

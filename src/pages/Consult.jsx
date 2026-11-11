@@ -39,6 +39,12 @@ const COPY = {
     unavailable: '历史会话暂时无法加载。你仍可以开始新的咨询。',
     retry: '重试',
     modeLabel: '咨询类型',
+    composerModeNow: '当前模式',
+    composerSourcesOff: '此模式不检索 PubMed、Cochrane、欧洲 PMC。',
+    composerSourcesHere: '文献检索在输入框上方，默认关闭，可按需打开。',
+    composerTcmSources: '中医咨询不检索 PubMed、Cochrane、欧洲 PMC。',
+    composerUseProfessional: '切换到专业健康长寿',
+    composerUseGeneral: '切换到自我健康促进',
     profileAssessLocked: '评估需标准会员',
     upgrade: '升级会员',
     needLevel: (name) => `该咨询类型需要「${name}」及以上会员。`,
@@ -160,6 +166,12 @@ const COPY = {
     unavailable: 'Previous chats could not be loaded. You can still start a new consultation.',
     retry: 'Retry',
     modeLabel: 'Consultation type',
+    composerModeNow: 'Current mode',
+    composerSourcesOff: 'This mode does not search PubMed, Cochrane, or Europe PMC.',
+    composerSourcesHere: 'Literature search sits above the box. It is off until you turn it on.',
+    composerTcmSources: 'TCM consult does not search PubMed, Cochrane, or Europe PMC.',
+    composerUseProfessional: 'Switch to professional',
+    composerUseGeneral: 'Switch to self-care',
     profileAssessLocked: 'Assessments need Standard',
     upgrade: 'Upgrade',
     needLevel: (name) => `This mode requires ${name} or higher.`,
@@ -281,6 +293,12 @@ const COPY = {
     unavailable: 'تعذر تحميل المحادثات السابقة. يمكنك بدء استشارة جديدة.',
     retry: 'إعادة المحاولة',
     modeLabel: 'نوع الاستشارة',
+    composerModeNow: 'الوضع الحالي',
+    composerSourcesOff: 'هذا الوضع لا يبحث في PubMed أو Cochrane أو Europe PMC.',
+    composerSourcesHere: 'بحث الأدبيات فوق مربع السؤال، ومغلق حتى تفتحه.',
+    composerTcmSources: 'استشارة الطب الصيني لا تبحث في PubMed أو Cochrane أو Europe PMC.',
+    composerUseProfessional: 'التبديل إلى الاستشارة المهنية',
+    composerUseGeneral: 'التبديل إلى تعزيز الصحة الذاتية',
     profileAssessLocked: 'التقييمات للعضو القياسي',
     upgrade: 'ترقية',
     needLevel: (name) => `يتطلب هذا الوضع عضوية ${name} أو أعلى.`,
@@ -550,6 +568,14 @@ export default function Consult() {
       europepmc: t.europepmc,
       europepmcHint: t.europepmcHint,
       thinkingPubmed: t.thinkingPubmed,
+      modeLabel: t.modeLabel,
+      composerModeNow: t.composerModeNow,
+      composerSourcesOff: t.composerSourcesOff,
+      composerSourcesHere: t.composerSourcesHere,
+      composerTcmSources: t.composerTcmSources,
+      composerUseProfessional: t.composerUseProfessional,
+      composerUseGeneral: t.composerUseGeneral,
+      modeName: entry === 'tcm' ? t.tcmTitle : entry === 'professional' ? t.professional : t.general,
       historyLoading: t.historyLoading,
       loadFail: t.loadFail,
       disclaimer,
@@ -595,7 +621,7 @@ export default function Consult() {
       thinkingUpload: t.thinkingUpload,
       quotaExceeded: t.quotaExceeded,
     }),
-    [t, disclaimer, user?.site_admin],
+    [t, disclaimer, entry, user?.site_admin],
   )
 
   function setEntry(next) {
@@ -861,6 +887,7 @@ export default function Consult() {
                   token={token}
                   lang={lang}
                   entry={entry}
+                  onSelectEntry={entry === 'tcm' ? undefined : setEntry}
                   initialDraft={composerSeed}
                   rtl={rtl}
                   copy={chatCopy}
