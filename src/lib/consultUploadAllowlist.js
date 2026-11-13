@@ -1,6 +1,6 @@
 /**
- * AI 长寿师咨询：仅这些账号上传图片和 PDF 时，不按张数、不按单文件大小拒绝。
- * 不授予整站管理员权限。Word / TXT 的份数和 5MB 上限对所有人不变。
+ * AI 长寿师咨询：仅这些账号上传图片、PDF、Word、TXT 时，不按张数、不按单文件大小拒绝。
+ * 不授予整站管理员权限。其他账号仍用原来的张数和 5MB / 12MB。
  *
  * 核对（仓库内，无生产用户表）：
  * - `fsjy_2001@163.cm` 与 `fsjy_2001@163.com` 都没有出现在用户种子、
@@ -26,7 +26,8 @@ export function isConsultUnlimitedUploadEmail(email) {
 }
 
 /**
- * 咨询附件策略。整站管理员只放开图片/PDF 张数；白名单账号同时放开张数和单文件大小。
+ * 咨询附件策略。整站管理员只放开图片/PDF 张数。
+ * 白名单账号同时放开图片、PDF、Word、TXT 的张数和单文件大小。
  */
 export function consultAttachmentPolicy({ email, siteAdmin = false } = {}) {
   const exempt = isConsultUnlimitedUploadEmail(email)
@@ -35,7 +36,9 @@ export function consultAttachmentPolicy({ email, siteAdmin = false } = {}) {
     exempt,
     unlimitedImages: admin || exempt,
     unlimitedPdfs: admin || exempt,
+    unlimitedOtherDocs: exempt,
     unlimitedImageBytes: exempt,
     unlimitedPdfBytes: exempt,
+    unlimitedDocBytes: exempt,
   }
 }

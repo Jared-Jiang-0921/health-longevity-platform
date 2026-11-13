@@ -1,15 +1,15 @@
 const IMAGE_MIME = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'])
 /** 图片选源上限（会先压缩再发送）。白名单账号不走这条。 */
 export const MAX_IMAGE_BYTES = 12 * 1024 * 1024
-/** 文档大小上限。白名单账号的 PDF 不走这条；Word/TXT 仍走。 */
+/** 文档大小上限。白名单账号的 PDF、Word、TXT 不走这条。 */
 export const MAX_DOC_BYTES = 5 * 1024 * 1024
 const MAX_DOC_CHARS = 12000
+const MAX_PDF_PAGES = 20
 export const MAX_IMAGES = 5
 export const MAX_DOCS = 3
-const MAX_PDF_PAGES = 20
 /**
  * 普通账号压缩后的 base64 上限，需小于咨询后端约 1.8MB 的静默丢弃阈值。
- * 白名单账号不再因该阈值拒绝；发出去的请求体仍受 CONSULT_TRANSPORT_MAX_BYTES 约束。
+ * 白名单账号会继续缩小，直到能放进该阈值；放不进就明确失败，不再把后端会丢掉的图发出去。
  */
 const MAX_IMAGE_B64 = 1800000
 /**
@@ -115,6 +115,15 @@ export async function compressImage(file, maxEdge = 1280, quality = 0.72, option
       { edge: 900, quality: 0.55 },
       { edge: 720, quality: 0.48 },
     ]
+    // 白名单不再因源文件大小拒绝，但仍要把结果压进咨询后端会保留的 base64 阈值。
+    // 超过该阈值的图片会被 3001 上的咨询服务静默丢掉，模型等于没看到图。
+    if (allowOversize) {
+      attempts.push(
+        { edge: 480, quality: 0.42 },
+        { edge: 360, quality: 0.4 },
+        { edge: 240, quality: 0.38 },
+      )
+    }
 
     let lastErr = null
     let best = null
@@ -151,7 +160,11 @@ export async function compressImage(file, maxEdge = 1280, quality = 0.72, option
         lastErr = err
       }
     }
-    if (allowOversize && best?.data) return best
+    if (allowOversize && best?.data) {
+      const err = new Error('image still too large')
+      err.code = 'attachImageUnread'
+      throw err
+    }
     throw lastErr || new Error('compress failed')
   } finally {
     URL.revokeObjectURL(url)
@@ -169,7 +182,36 @@ async function loadPdfDocument(pdfjs, fileBuffer, disableWorker) {
   }).promise
 }
 
-async function extractPdfText(file) {
+/** 普通账号最多读 20 页。白名单读全文，直到网关请求体预算。 */
+export function consultPdfPageCount(numPages, options = {}) {
+  const n = Math.max(0, Number(numPages) || 0)
+  if (options.unlimitedDocBytes) return n
+  return Math.min(n, MAX_PDF_PAGES)
+}
+
+/** 普通账号正文截到 12000 字。白名单只截到网关还能带走的长度。 */
+export function clipConsultDocumentText(text, options = {}) {
+  const raw = String(text || '')
+  if (options.unlimitedDocBytes) {
+    const cap = CONSULT_TRANSPORT_MAX_BYTES - TRANSPORT_JSON_MARGIN
+    return raw.length > cap ? raw.slice(0, cap) : raw
+  }
+  return raw.slice(0, MAX_DOC_CHARS)
+}
+
+/**
+ * 发送阶段碰到 413 / payload too large 时用哪句文案。
+ * 白名单不再复用「文档请控制在 5MB」这句，改指网关 25MB。
+ */
+export function consultTransportErrorMessage(err, copy = {}, options = {}) {
+  const tooBig = err?.code === 'HTTP_413'
+    || /payload|entity too large|413/i.test(String(err?.message || ''))
+  if (!tooBig) return ''
+  if (options.unlimitedUploadBytes && copy.attachTransport) return copy.attachTransport
+  return copy.attachTooLarge || err?.message || ''
+}
+
+async function extractPdfText(file, options = {}) {
   const pdfjs = await import('pdfjs-dist/build/pdf.mjs')
   try {
     const workerUrl = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default
@@ -184,12 +226,19 @@ async function extractPdfText(file) {
   } catch {
     doc = await loadPdfDocument(pdfjs, fileBuffer, true)
   }
-  const max = Math.min(doc.numPages, MAX_PDF_PAGES)
+  const max = consultPdfPageCount(doc.numPages, options)
+  const charCap = options.unlimitedDocBytes
+    ? CONSULT_TRANSPORT_MAX_BYTES - TRANSPORT_JSON_MARGIN
+    : Number.POSITIVE_INFINITY
   const parts = []
+  let size = 0
   for (let i = 1; i <= max; i += 1) {
     const page = await doc.getPage(i)
     const content = await page.getTextContent()
-    parts.push(content.items.map((it) => it.str || '').join(' '))
+    const line = content.items.map((it) => it.str || '').join(' ')
+    parts.push(line)
+    size += line.length + 1
+    if (size >= charCap) break
   }
   return parts.join('\n').replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim()
 }
@@ -215,7 +264,7 @@ function isDocxFile(type, ext) {
 
 /**
  * 单文件字节门槛。返回错误码，或 null 表示这一关通过。
- * 白名单只跳过图片和 PDF；Word/TXT 以及其它类型仍用原来的 5MB。
+ * 白名单跳过图片、PDF、Word、TXT。其它类型不在这里加新规则。
  */
 export function attachmentByteLimitCode(file, options = {}) {
   const type = String(file?.type || '').toLowerCase()
@@ -230,7 +279,7 @@ export function attachmentByteLimitCode(file, options = {}) {
     return null
   }
   if (isDocxFile(type, ext) || ext === 'txt' || type === 'text/plain') {
-    if (size > MAX_DOC_BYTES) return 'attachTooLarge'
+    if (!options.unlimitedDocBytes && size > MAX_DOC_BYTES) return 'attachTooLarge'
   }
   return null
 }
@@ -265,7 +314,10 @@ export async function fileToAttachment(file, copy, options = {}) {
       return await compressImage(file, 1280, 0.72, {
         allowOversize: Boolean(options.unlimitedImageBytes),
       })
-    } catch {
+    } catch (err) {
+      if (err?.code === 'attachImageUnread') {
+        fail('attachImageUnread', '图片无法压到咨询服务可识别的大小')
+      }
       fail('attachUnsupported', '图片无法读取，请改用 JPG/PNG')
     }
   }
@@ -277,7 +329,7 @@ export async function fileToAttachment(file, copy, options = {}) {
   if (isPdfFile(type, ext)) {
     let text = ''
     try {
-      text = await extractPdfText(file)
+      text = await extractPdfText(file, options)
     } catch {
       fail('attachPdfFail', '这份 PDF 暂时无法解析，请刷新后重试，或改用可复制的 Word，或把报告拍成清晰照片上传')
     }
@@ -285,7 +337,7 @@ export async function fileToAttachment(file, copy, options = {}) {
     return {
       kind: 'document',
       name,
-      text: text.slice(0, MAX_DOC_CHARS),
+      text: clipConsultDocumentText(text, options),
     }
   }
 
@@ -300,7 +352,7 @@ export async function fileToAttachment(file, copy, options = {}) {
     return {
       kind: 'document',
       name,
-      text: text.slice(0, MAX_DOC_CHARS),
+      text: clipConsultDocumentText(text, options),
     }
   }
 
@@ -310,7 +362,7 @@ export async function fileToAttachment(file, copy, options = {}) {
     return {
       kind: 'document',
       name,
-      text: text.slice(0, MAX_DOC_CHARS),
+      text: clipConsultDocumentText(text, options),
     }
   }
 
@@ -325,11 +377,12 @@ function isPdfName(name) {
 /**
  * 普通会员：最多 5 张图片、3 份文档（PDF/Word/TXT 合计）。
  * 整站管理员：图片张数和 PDF 份数不设上限；Word/TXT 仍最多 3 份。单文件大小不变。
- * 咨询上传白名单：图片和 PDF 的张数另由调用方放开。Word/TXT 仍最多 3 份。
+ * 咨询上传白名单：图片、PDF、Word、TXT 的张数都放开。
  */
 export function canAddAttachment(list, next, options = {}) {
   const unlimitedImages = Boolean(options.unlimitedImages)
   const unlimitedPdfs = Boolean(options.unlimitedPdfs)
+  const unlimitedOtherDocs = Boolean(options.unlimitedOtherDocs)
   const images = list.filter((a) => a.kind === 'image').length
   const docs = list.filter((a) => a.kind === 'document')
   const otherDocs = docs.filter((a) => !isPdfName(a.name)).length
@@ -342,6 +395,7 @@ export function canAddAttachment(list, next, options = {}) {
       if (unlimitedPdfs) return true
       return docs.length < MAX_DOCS
     }
+    if (unlimitedOtherDocs) return true
     if (unlimitedPdfs) return otherDocs < MAX_DOCS
     return docs.length < MAX_DOCS
   }
