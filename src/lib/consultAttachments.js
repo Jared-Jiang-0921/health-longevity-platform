@@ -1,3 +1,8 @@
+import {
+  choosePdfDelivery,
+  scanOcrPageCount,
+} from './consultPdfScan.js'
+
 const IMAGE_MIME = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'])
 /** 图片选源上限（会先压缩再发送）。白名单账号不走这条。 */
 export const MAX_IMAGE_BYTES = 12 * 1024 * 1024
@@ -95,11 +100,73 @@ function canvasToJpegBlob(canvas, quality) {
 }
 
 /**
- * 多档压缩。普通账号必须压到 MAX_IMAGE_B64 以内（过大曾被咨询后端静默丢弃）。
- * allowOversize 只给白名单账号：压不进该阈值时仍返回最小的一版，不再当失败。
+ * 把图片或画布压成 JPEG。结果必须小于咨询后端会保留的 base64 上限，
+ * 否则 3001 上的服务会静默丢掉，模型等于没看到图。
+ * allowOversize 会多试几档更小的尺寸；仍然超限就失败，不把会被丢掉的图发出去。
  */
-export async function compressImage(file, maxEdge = 1280, quality = 0.72, options = {}) {
+async function packDownscaledSource(source, sourceWidth, sourceHeight, name, options, firstEdge, firstQuality) {
   const allowOversize = Boolean(options?.allowOversize)
+  const attempts = [
+    { edge: firstEdge, quality: firstQuality },
+    { edge: 1024, quality: 0.65 },
+    { edge: 900, quality: 0.55 },
+    { edge: 720, quality: 0.48 },
+  ]
+  if (allowOversize) {
+    attempts.push(
+      { edge: 480, quality: 0.42 },
+      { edge: 360, quality: 0.4 },
+      { edge: 240, quality: 0.38 },
+    )
+  }
+
+  let lastErr = null
+  let best = null
+  const longest = Math.max(sourceWidth, sourceHeight, 1)
+  for (const attempt of attempts) {
+    try {
+      const scale = Math.min(1, attempt.edge / longest)
+      const canvas = document.createElement('canvas')
+      canvas.width = Math.max(1, Math.round(sourceWidth * scale))
+      canvas.height = Math.max(1, Math.round(sourceHeight * scale))
+      const ctx = canvas.getContext('2d')
+      if (!ctx) throw new Error('compress failed')
+      ctx.fillStyle = '#ffffff'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      ctx.drawImage(source, 0, 0, canvas.width, canvas.height)
+      const blob = await canvasToJpegBlob(canvas, attempt.quality)
+      const dataUrl = await blobToDataUrl(blob)
+      const data = dataUrl.split(',')[1] || ''
+      if (!data) {
+        lastErr = new Error('image still too large')
+        continue
+      }
+      const packed = {
+        kind: 'image',
+        name: name || 'image.jpg',
+        mediaType: 'image/jpeg',
+        data,
+        preview: dataUrl,
+      }
+      if (!best || data.length < best.data.length) best = packed
+      if (data.length > MAX_IMAGE_B64) {
+        lastErr = new Error('image still too large')
+        continue
+      }
+      return packed
+    } catch (err) {
+      lastErr = err
+    }
+  }
+  if (allowOversize && best?.data) {
+    const err = new Error('image still too large')
+    err.code = 'attachImageUnread'
+    throw err
+  }
+  throw lastErr || new Error('compress failed')
+}
+
+export async function compressImage(file, maxEdge = 1280, quality = 0.72, options = {}) {
   const url = URL.createObjectURL(file)
   try {
     const img = await new Promise((resolve, reject) => {
@@ -108,64 +175,15 @@ export async function compressImage(file, maxEdge = 1280, quality = 0.72, option
       el.onerror = () => reject(new Error('image decode failed'))
       el.src = url
     })
-
-    const attempts = [
-      { edge: maxEdge, quality },
-      { edge: 1024, quality: 0.65 },
-      { edge: 900, quality: 0.55 },
-      { edge: 720, quality: 0.48 },
-    ]
-    // 白名单不再因源文件大小拒绝，但仍要把结果压进咨询后端会保留的 base64 阈值。
-    // 超过该阈值的图片会被 3001 上的咨询服务静默丢掉，模型等于没看到图。
-    if (allowOversize) {
-      attempts.push(
-        { edge: 480, quality: 0.42 },
-        { edge: 360, quality: 0.4 },
-        { edge: 240, quality: 0.38 },
-      )
-    }
-
-    let lastErr = null
-    let best = null
-    for (const attempt of attempts) {
-      try {
-        const scale = Math.min(1, attempt.edge / Math.max(img.width, img.height, 1))
-        const canvas = document.createElement('canvas')
-        canvas.width = Math.max(1, Math.round(img.width * scale))
-        canvas.height = Math.max(1, Math.round(img.height * scale))
-        const ctx = canvas.getContext('2d')
-        if (!ctx) throw new Error('compress failed')
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-        const blob = await canvasToJpegBlob(canvas, attempt.quality)
-        const dataUrl = await blobToDataUrl(blob)
-        const data = dataUrl.split(',')[1] || ''
-        if (!data) {
-          lastErr = new Error('image still too large')
-          continue
-        }
-        const packed = {
-          kind: 'image',
-          name: file.name || 'image.jpg',
-          mediaType: 'image/jpeg',
-          data,
-          preview: dataUrl,
-        }
-        if (!best || data.length < best.data.length) best = packed
-        if (data.length > MAX_IMAGE_B64) {
-          lastErr = new Error('image still too large')
-          continue
-        }
-        return packed
-      } catch (err) {
-        lastErr = err
-      }
-    }
-    if (allowOversize && best?.data) {
-      const err = new Error('image still too large')
-      err.code = 'attachImageUnread'
-      throw err
-    }
-    throw lastErr || new Error('compress failed')
+    return await packDownscaledSource(
+      img,
+      img.width,
+      img.height,
+      file.name || 'image.jpg',
+      options,
+      maxEdge,
+      quality,
+    )
   } finally {
     URL.revokeObjectURL(url)
   }
@@ -211,7 +229,7 @@ export function consultTransportErrorMessage(err, copy = {}, options = {}) {
   return copy.attachTooLarge || err?.message || ''
 }
 
-async function extractPdfText(file, options = {}) {
+async function loadPdfjs() {
   const pdfjs = await import('pdfjs-dist/build/pdf.mjs')
   try {
     const workerUrl = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default
@@ -219,6 +237,11 @@ async function extractPdfText(file, options = {}) {
   } catch {
     /* worker 可选；失败时走主线程解析 */
   }
+  return pdfjs
+}
+
+async function openPdfFile(file) {
+  const pdfjs = await loadPdfjs()
   const fileBuffer = await file.arrayBuffer()
   let doc
   try {
@@ -226,6 +249,10 @@ async function extractPdfText(file, options = {}) {
   } catch {
     doc = await loadPdfDocument(pdfjs, fileBuffer, true)
   }
+  return doc
+}
+
+async function extractPdfTextFromDoc(doc, options = {}) {
   const max = consultPdfPageCount(doc.numPages, options)
   const charCap = options.unlimitedDocBytes
     ? CONSULT_TRANSPORT_MAX_BYTES - TRANSPORT_JSON_MARGIN
@@ -241,6 +268,82 @@ async function extractPdfText(file, options = {}) {
     if (size >= charCap) break
   }
   return parts.join('\n').replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim()
+}
+
+async function renderPdfPage(doc, pageNumber, maxEdge) {
+  const page = await doc.getPage(pageNumber)
+  const unscaled = page.getViewport({ scale: 1 })
+  const scale = maxEdge / Math.max(unscaled.width, unscaled.height, 1)
+  const viewport = page.getViewport({ scale })
+  const canvas = document.createElement('canvas')
+  canvas.width = Math.max(1, Math.floor(viewport.width))
+  canvas.height = Math.max(1, Math.floor(viewport.height))
+  const ctx = canvas.getContext('2d', { willReadFrequently: true })
+  if (!ctx) throw new Error('compress failed')
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, canvas.width, canvas.height)
+  await page.render({ canvasContext: ctx, viewport }).promise
+  return canvas
+}
+
+async function ocrPdfDocument(doc) {
+  const max = scanOcrPageCount(doc.numPages)
+  const { startConsultOcr } = await import('./consultPdfOcr.js')
+  const session = await startConsultOcr()
+  const parts = []
+  let confidenceSum = 0
+  let counted = 0
+  try {
+    for (let i = 1; i <= max; i += 1) {
+      const canvas = await renderPdfPage(doc, i, 1800)
+      const recognized = await session.recognize(canvas)
+      canvas.width = 0
+      canvas.height = 0
+      const text = String(recognized.text || '').trim()
+      if (text) parts.push(text)
+      confidenceSum += Number(recognized.confidence) || 0
+      counted += 1
+      if (parts.join('\n\n').length >= MAX_DOC_CHARS) break
+    }
+  } finally {
+    await session.terminate()
+  }
+  return {
+    text: parts.join('\n\n').replace(/\n{3,}/g, '\n\n').trim(),
+    confidence: counted ? confidenceSum / counted : 0,
+  }
+}
+
+function scanPageFileName(name, pageNumber) {
+  const base = String(name || 'scan.pdf').replace(/\.pdf$/i, '') || 'scan'
+  return `${base}-p${pageNumber}.jpg`
+}
+
+async function compressPdfPageImages(doc, name, pageCount) {
+  const images = []
+  for (let i = 1; i <= pageCount; i += 1) {
+    let canvas = null
+    try {
+      canvas = await renderPdfPage(doc, i, 1280)
+      const packed = await packDownscaledSource(
+        canvas,
+        canvas.width,
+        canvas.height,
+        scanPageFileName(name, i),
+        { allowOversize: true },
+        1024,
+        0.68,
+      )
+      images.push(packed)
+    } catch {
+      /* 这一页压不进后端阈值就跳过，不发送会被静默丢掉的大图 */
+    }
+    if (canvas) {
+      canvas.width = 0
+      canvas.height = 0
+    }
+  }
+  return images
 }
 
 async function extractDocxText(file) {
@@ -296,6 +399,57 @@ export function withinTransportLimit(list, next) {
   return used + attachmentWireBytes(next) <= CONSULT_TRANSPORT_MAX_BYTES - TRANSPORT_JSON_MARGIN
 }
 
+async function readConsultPdf(file, name, options, fail) {
+  let doc
+  try {
+    doc = await openPdfFile(file)
+  } catch {
+    fail('attachPdfFail', '这份 PDF 暂时无法解析，请刷新后重试，或改用可复制的 Word，或把报告拍成清晰照片上传')
+  }
+  try {
+    let textLayer = ''
+    try {
+      textLayer = await extractPdfTextFromDoc(doc, options)
+    } catch {
+      fail('attachPdfFail', '这份 PDF 暂时无法解析，请刷新后重试，或改用可复制的 Word，或把报告拍成清晰照片上传')
+    }
+    if (choosePdfDelivery({ textLayer, pageCount: doc.numPages }).mode === 'text-layer') {
+      return {
+        kind: 'document',
+        name,
+        text: clipConsultDocumentText(textLayer, options),
+      }
+    }
+
+    let ocr = null
+    try {
+      ocr = await ocrPdfDocument(doc)
+    } catch {
+      ocr = null
+    }
+    const plan = choosePdfDelivery({
+      textLayer,
+      ocrText: ocr ? ocr.text : '',
+      ocrConfidence: ocr ? ocr.confidence : null,
+      pageCount: doc.numPages,
+    })
+    if (plan.mode === 'ocr-text') {
+      return {
+        kind: 'document',
+        name,
+        text: clipConsultDocumentText(ocr.text, options),
+      }
+    }
+    if (plan.mode === 'page-images') {
+      const images = await compressPdfPageImages(doc, name, plan.pages)
+      if (images.length) return images
+    }
+    fail('attachScannedPdf', '这份扫描 PDF 没能识别出可用文字，也没能生成可发送的页面图片')
+  } finally {
+    try { await doc.destroy() } catch { /* 文档已经关掉 */ }
+  }
+}
+
 export async function fileToAttachment(file, copy, options = {}) {
   const name = file?.name || 'file'
   const type = String(file?.type || '').toLowerCase()
@@ -327,18 +481,7 @@ export async function fileToAttachment(file, copy, options = {}) {
   }
 
   if (isPdfFile(type, ext)) {
-    let text = ''
-    try {
-      text = await extractPdfText(file, options)
-    } catch {
-      fail('attachPdfFail', '这份 PDF 暂时无法解析，请刷新后重试，或改用可复制的 Word，或把报告拍成清晰照片上传')
-    }
-    if (!text || text.length < 40) fail('attachScannedPdf', '未能从 PDF 抽出文字，请改用可复制的文档或拍摄清晰照片')
-    return {
-      kind: 'document',
-      name,
-      text: clipConsultDocumentText(text, options),
-    }
+    return readConsultPdf(file, name, options, fail)
   }
 
   if (isDocxFile(type, ext)) {

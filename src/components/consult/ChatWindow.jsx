@@ -415,24 +415,28 @@ export default function ChatWindow({
       const unlimitedPdfs = unlimitedUploads || unlimitedUploadBytes
       for (const file of files) {
         try {
-          const item = await fileToAttachment(file, copy, {
+          const produced = await fileToAttachment(file, copy, {
             unlimitedImageBytes: unlimitedUploadBytes,
             unlimitedPdfBytes: unlimitedUploadBytes,
             unlimitedDocBytes: unlimitedUploadBytes,
           })
-          if (!canAddAttachment(next, item, {
-            unlimitedImages,
-            unlimitedPdfs,
-            unlimitedOtherDocs: unlimitedUploadBytes,
-          })) {
-            limitHit = true
-            break
+          const items = Array.isArray(produced) ? produced : [produced]
+          for (const item of items) {
+            if (!canAddAttachment(next, item, {
+              unlimitedImages,
+              unlimitedPdfs,
+              unlimitedOtherDocs: unlimitedUploadBytes,
+            })) {
+              limitHit = true
+              break
+            }
+            if (!withinTransportLimit(next, item)) {
+              transportHit = true
+              break
+            }
+            next.push(item)
           }
-          if (!withinTransportLimit(next, item)) {
-            transportHit = true
-            break
-          }
-          next.push(item)
+          if (limitHit || transportHit) break
         } catch (err) {
           setError(err?.message || copy.attachUnsupported || copy.sendFail)
           if (next.length > attachments.length) setAttachments(next)
