@@ -8,7 +8,7 @@
     "build:client": "vite build",
     "build:seo": "node scripts/seo/prerender.mjs",
     "seo:check": "node scripts/seo/check-discoverability.mjs",
-    "test": "node --test src/lib/consultUploadLimits.test.mjs",
+    "test": "node --test src/lib/consultUploadLimits.test.mjs src/lib/consultPdfScan.test.mjs",
     "build": "npm run build:client && npm run build:seo",
     "preview": "vite preview",
     "fc:routes": "node scripts/fc/generate-route-manifest.mjs",
@@ -35,6 +35,7 @@
     "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
     "stripe": "^17.4.0",
+    "tesseract.js": "^5.1.1",
     "unified": "^11.0.5"
   },
   "devDependencies": {
