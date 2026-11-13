@@ -170,7 +170,7 @@ server {
     }
 
     # AI 咨询 SSE：必须写在通用 /api/ 之前（更长前缀优先）
-    # client_max_body_size 不能按登录账号区分。白名单账号的图片/PDF
+    # client_max_body_size 不能按登录账号区分。白名单账号的图片、PDF、Word、TXT
     # 在应用层不再按张数和单文件大小拒绝，但请求体仍受这里的 25m 约束。
     # 前端 CONSULT_TRANSPORT_MAX_BYTES 与此对齐。不要只改其中一边。
     # 不把 25m 调到与 /api/ 相同的 120m：那会让所有 /api/ai/ 调用方都能提交更大请求体。

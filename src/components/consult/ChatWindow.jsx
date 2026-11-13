@@ -5,6 +5,7 @@ import { stripBibliographySection, parseFollowups, normalizeFollowups } from '..
 import {
   blobToBase64,
   canAddAttachment,
+  consultTransportErrorMessage,
   fileToAttachment,
   withinTransportLimit,
   micSupported,
@@ -29,12 +30,11 @@ function litItem(p, fallbackKind) {
   }
 }
 
-function displayStreamError(err, copy) {
+function displayStreamError(err, copy, options = {}) {
   if (err?.code === 'QUOTA_EXCEEDED') return copy.quotaExceeded || err.message
   if (err?.code === 'ATTACH_INVALID') return err.message || copy.attachUnsupported || copy.sendFail
-  if (err?.code === 'HTTP_413' || /payload|entity too large|413/i.test(err?.message || '')) {
-    return copy.attachTooLarge || err.message || copy.sendFail
-  }
+  const transport = consultTransportErrorMessage(err, copy, options)
+  if (transport) return transport
   if (err?.code === 'NETWORK' || err?.message === 'Failed to fetch' || err?.message === 'Incomplete stream') {
     return copy.networkFail || copy.sendFail
   }
@@ -320,7 +320,7 @@ export default function ChatWindow({
           })
         },
         onError: (err) => {
-          setError(displayStreamError(err, copy))
+          setError(displayStreamError(err, copy, { unlimitedUploadBytes }))
           if (err?.quota) onQuota?.(err.quota)
         },
       })
@@ -358,7 +358,7 @@ export default function ChatWindow({
           })
         }
       } else {
-        setError(displayStreamError(err, copy))
+        setError(displayStreamError(err, copy, { unlimitedUploadBytes }))
         if (!assistant) {
           setMessages((prev) => {
             const next = [...prev]
@@ -418,10 +418,12 @@ export default function ChatWindow({
           const item = await fileToAttachment(file, copy, {
             unlimitedImageBytes: unlimitedUploadBytes,
             unlimitedPdfBytes: unlimitedUploadBytes,
+            unlimitedDocBytes: unlimitedUploadBytes,
           })
           if (!canAddAttachment(next, item, {
             unlimitedImages,
             unlimitedPdfs,
+            unlimitedOtherDocs: unlimitedUploadBytes,
           })) {
             limitHit = true
             break
