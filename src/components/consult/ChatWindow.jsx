@@ -6,6 +6,7 @@ import {
   blobToBase64,
   canAddAttachment,
   fileToAttachment,
+  withinTransportLimit,
   micSupported,
   pickRecorderMime,
   recorderMediaType,
@@ -97,6 +98,7 @@ export default function ChatWindow({
   quotaRemaining,
   quotaUnlimited,
   unlimitedUploads = false,
+  unlimitedUploadBytes = false,
   onSelectEntry,
   seedMessages = null,
   previewLocked = false,
@@ -408,14 +410,24 @@ export default function ChatWindow({
     try {
       const next = [...attachments]
       let limitHit = false
+      let transportHit = false
+      const unlimitedImages = unlimitedUploads || unlimitedUploadBytes
+      const unlimitedPdfs = unlimitedUploads || unlimitedUploadBytes
       for (const file of files) {
         try {
-          const item = await fileToAttachment(file, copy)
+          const item = await fileToAttachment(file, copy, {
+            unlimitedImageBytes: unlimitedUploadBytes,
+            unlimitedPdfBytes: unlimitedUploadBytes,
+          })
           if (!canAddAttachment(next, item, {
-            unlimitedImages: unlimitedUploads,
-            unlimitedPdfs: unlimitedUploads,
+            unlimitedImages,
+            unlimitedPdfs,
           })) {
             limitHit = true
+            break
+          }
+          if (!withinTransportLimit(next, item)) {
+            transportHit = true
             break
           }
           next.push(item)
@@ -426,7 +438,8 @@ export default function ChatWindow({
         }
       }
       setAttachments(next)
-      if (limitHit) setError(copy.attachLimit || '')
+      if (transportHit) setError(copy.attachTransport || copy.attachTooLarge || '')
+      else if (limitHit) setError(copy.attachLimit || '')
     } catch (err) {
       setError(err?.message || copy.attachUnsupported || copy.sendFail)
     } finally {

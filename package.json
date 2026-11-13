@@ -8,6 +8,7 @@
     "build:client": "vite build",
     "build:seo": "node scripts/seo/prerender.mjs",
     "seo:check": "node scripts/seo/check-discoverability.mjs",
+    "test": "node --test src/lib/consultUploadLimits.test.mjs",
     "build": "npm run build:client && npm run build:seo",
     "preview": "vite preview",
     "fc:routes": "node scripts/fc/generate-route-manifest.mjs",

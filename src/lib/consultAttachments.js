@@ -1,14 +1,25 @@
 const IMAGE_MIME = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'])
-/** 图片选源上限（会先压缩再发送） */
-const MAX_IMAGE_BYTES = 12 * 1024 * 1024
-/** 文档大小上限 */
+/** 图片选源上限（会先压缩再发送）。白名单账号不走这条。 */
+export const MAX_IMAGE_BYTES = 12 * 1024 * 1024
+/** 文档大小上限。白名单账号的 PDF 不走这条；Word/TXT 仍走。 */
 export const MAX_DOC_BYTES = 5 * 1024 * 1024
 const MAX_DOC_CHARS = 12000
 export const MAX_IMAGES = 5
 export const MAX_DOCS = 3
 const MAX_PDF_PAGES = 20
-/** 压缩后 base64 上限，需小于咨询后端 MAX_IMAGE_B64，避免被静默丢弃 */
+/**
+ * 普通账号压缩后的 base64 上限，需小于咨询后端约 1.8MB 的静默丢弃阈值。
+ * 白名单账号不再因该阈值拒绝；发出去的请求体仍受 CONSULT_TRANSPORT_MAX_BYTES 约束。
+ */
 const MAX_IMAGE_B64 = 1800000
+/**
+ * 与 deploy/nginx-healthlongevity.conf.example 里 location /api/ai/ 的
+ * client_max_body_size 25m 对齐。Nginx 不能按账号拆开，所以不能只给白名单放开。
+ * 调大这里之前要同时改那一行，否则界面会收下网关随后拒绝的文件。
+ */
+export const CONSULT_TRANSPORT_MAX_BYTES = 25 * 1024 * 1024
+/** 给 JSON 键名和其余字段留出的余量，避免贴着 25m 被 Nginx 截断。 */
+const TRANSPORT_JSON_MARGIN = 1024 * 1024
 
 function extOf(name = '') {
   const m = String(name).toLowerCase().match(/\.([a-z0-9]+)$/)
@@ -84,9 +95,11 @@ function canvasToJpegBlob(canvas, quality) {
 }
 
 /**
- * 多档压缩，确保 base64 不超过后端可接受上限（过大曾被服务端静默丢弃）。
+ * 多档压缩。普通账号必须压到 MAX_IMAGE_B64 以内（过大曾被咨询后端静默丢弃）。
+ * allowOversize 只给白名单账号：压不进该阈值时仍返回最小的一版，不再当失败。
  */
-export async function compressImage(file, maxEdge = 1280, quality = 0.72) {
+export async function compressImage(file, maxEdge = 1280, quality = 0.72, options = {}) {
+  const allowOversize = Boolean(options?.allowOversize)
   const url = URL.createObjectURL(file)
   try {
     const img = await new Promise((resolve, reject) => {
@@ -104,6 +117,7 @@ export async function compressImage(file, maxEdge = 1280, quality = 0.72) {
     ]
 
     let lastErr = null
+    let best = null
     for (const attempt of attempts) {
       try {
         const scale = Math.min(1, attempt.edge / Math.max(img.width, img.height, 1))
@@ -116,21 +130,28 @@ export async function compressImage(file, maxEdge = 1280, quality = 0.72) {
         const blob = await canvasToJpegBlob(canvas, attempt.quality)
         const dataUrl = await blobToDataUrl(blob)
         const data = dataUrl.split(',')[1] || ''
-        if (!data || data.length > MAX_IMAGE_B64) {
+        if (!data) {
           lastErr = new Error('image still too large')
           continue
         }
-        return {
+        const packed = {
           kind: 'image',
           name: file.name || 'image.jpg',
           mediaType: 'image/jpeg',
           data,
           preview: dataUrl,
         }
+        if (!best || data.length < best.data.length) best = packed
+        if (data.length > MAX_IMAGE_B64) {
+          lastErr = new Error('image still too large')
+          continue
+        }
+        return packed
       } catch (err) {
         lastErr = err
       }
     }
+    if (allowOversize && best?.data) return best
     throw lastErr || new Error('compress failed')
   } finally {
     URL.revokeObjectURL(url)
@@ -184,7 +205,49 @@ function isImageFile(type, ext) {
   return IMAGE_MIME.has(type) || ['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext)
 }
 
-export async function fileToAttachment(file, copy) {
+function isPdfFile(type, ext) {
+  return ext === 'pdf' || type === 'application/pdf'
+}
+
+function isDocxFile(type, ext) {
+  return ext === 'docx' || type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+}
+
+/**
+ * 单文件字节门槛。返回错误码，或 null 表示这一关通过。
+ * 白名单只跳过图片和 PDF；Word/TXT 以及其它类型仍用原来的 5MB。
+ */
+export function attachmentByteLimitCode(file, options = {}) {
+  const type = String(file?.type || '').toLowerCase()
+  const ext = extOf(file?.name || '')
+  const size = Number(file?.size || 0)
+  if (isImageFile(type, ext)) {
+    if (!options.unlimitedImageBytes && size > MAX_IMAGE_BYTES) return 'attachTooLarge'
+    return null
+  }
+  if (isPdfFile(type, ext)) {
+    if (!options.unlimitedPdfBytes && size > MAX_DOC_BYTES) return 'attachTooLarge'
+    return null
+  }
+  if (isDocxFile(type, ext) || ext === 'txt' || type === 'text/plain') {
+    if (size > MAX_DOC_BYTES) return 'attachTooLarge'
+  }
+  return null
+}
+
+export function attachmentWireBytes(item) {
+  if (!item) return 0
+  if (item.kind === 'image') return String(item.data || '').length
+  return String(item.text || '').length
+}
+
+/** 已选附件再加上下一份之后，请求体是否仍低于 Nginx /api/ai/ 的 25m。 */
+export function withinTransportLimit(list, next) {
+  const used = (Array.isArray(list) ? list : []).reduce((sum, item) => sum + attachmentWireBytes(item), 0)
+  return used + attachmentWireBytes(next) <= CONSULT_TRANSPORT_MAX_BYTES - TRANSPORT_JSON_MARGIN
+}
+
+export async function fileToAttachment(file, copy, options = {}) {
   const name = file?.name || 'file'
   const type = String(file?.type || '').toLowerCase()
   const ext = extOf(name)
@@ -194,10 +257,14 @@ export async function fileToAttachment(file, copy) {
     throw err
   }
 
+  const byteCode = attachmentByteLimitCode(file, options)
+  if (byteCode) fail(byteCode, '文件过大')
+
   if (isImageFile(type, ext)) {
-    if (file.size > MAX_IMAGE_BYTES) fail('attachTooLarge', '图片过大')
     try {
-      return await compressImage(file)
+      return await compressImage(file, 1280, 0.72, {
+        allowOversize: Boolean(options.unlimitedImageBytes),
+      })
     } catch {
       fail('attachUnsupported', '图片无法读取，请改用 JPG/PNG')
     }
@@ -207,8 +274,7 @@ export async function fileToAttachment(file, copy) {
     fail('attachHeic', '请将 HEIC 转为 JPG/PNG 后再上传')
   }
 
-  if (ext === 'pdf' || type === 'application/pdf') {
-    if (file.size > MAX_DOC_BYTES) fail('attachTooLarge', '文件过大')
+  if (isPdfFile(type, ext)) {
     let text = ''
     try {
       text = await extractPdfText(file)
@@ -223,8 +289,7 @@ export async function fileToAttachment(file, copy) {
     }
   }
 
-  if (ext === 'docx' || type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-    if (file.size > MAX_DOC_BYTES) fail('attachTooLarge', '文件过大')
+  if (isDocxFile(type, ext)) {
     let text = ''
     try {
       text = await extractDocxText(file)
@@ -240,7 +305,6 @@ export async function fileToAttachment(file, copy) {
   }
 
   if (ext === 'txt' || type === 'text/plain') {
-    if (file.size > MAX_DOC_BYTES) fail('attachTooLarge', '文件过大')
     const text = (await readAsText(file)).trim()
     if (!text) fail('attachEmptyDoc', '文档里没有可读取的文字')
     return {
@@ -261,6 +325,7 @@ function isPdfName(name) {
 /**
  * 普通会员：最多 5 张图片、3 份文档（PDF/Word/TXT 合计）。
  * 整站管理员：图片张数和 PDF 份数不设上限；Word/TXT 仍最多 3 份。单文件大小不变。
+ * 咨询上传白名单：图片和 PDF 的张数另由调用方放开。Word/TXT 仍最多 3 份。
  */
 export function canAddAttachment(list, next, options = {}) {
   const unlimitedImages = Boolean(options.unlimitedImages)
