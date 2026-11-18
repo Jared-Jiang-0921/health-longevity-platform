@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import MessageBubble from './MessageBubble'
 import { streamConsultChat, fetchConsultSession, submitConsultFeedback, transcribeConsultAudio } from '../../lib/consultApi'
+import { fetchConsultSources, findConsultUrls, consultLinkMessage } from '../../lib/consultLinks'
 import { stripBibliographySection, parseFollowups, normalizeFollowups } from '../../lib/consultText'
 import {
   blobToBase64,
@@ -197,16 +198,48 @@ export default function ChatWindow({
       setError(copy.quotaExceeded || copy.sendFail)
       return
     }
+    const foundLinks = findConsultUrls(text)
+    if (foundLinks.overflow) {
+      setError(copy.linkTooMany || copy.linkFail || copy.sendFail)
+      return
+    }
+    let linkSources = []
+    if (foundLinks.urls.length) {
+      setError('')
+      setSending(true)
+      try {
+        const data = await fetchConsultSources(token, { urls: foundLinks.urls, question: text })
+        const sources = Array.isArray(data?.sources) ? data.sources : []
+        const bad = sources.filter((item) => !item?.ok || !item?.text)
+        if (bad.length || sources.length !== foundLinks.urls.length) {
+          setSending(false)
+          setError(bad.map((item) => consultLinkMessage(item?.code, copy)).filter(Boolean).join('\n') || copy.linkFail || copy.sendFail)
+          return
+        }
+        linkSources = sources
+      } catch (err) {
+        setSending(false)
+        setError(consultLinkMessage(err?.code, copy) || copy.linkFail || copy.sendFail)
+        return
+      }
+    }
     setError('')
     setSending(true)
     setMessages((prev) => [...prev, {
       role: 'user',
       content: text,
-      attachments: pending.map((a) => ({
-        kind: a.kind,
-        name: a.name,
-        preview: a.preview || '',
-      })),
+      attachments: [
+        ...pending.map((a) => ({
+          kind: a.kind,
+          name: a.name,
+          preview: a.preview || '',
+        })),
+        ...linkSources.map((item) => ({
+          kind: 'document',
+          name: item.title || item.url,
+          preview: '',
+        })),
+      ],
     }])
     setInput('')
     setAttachments([])
@@ -235,6 +268,7 @@ export default function ChatWindow({
         useEuropePmc: isProfessional && useEuropePmc,
         profile,
         attachments: toApiAttachments(pending),
+        linkSources,
         signal: ac.signal,
         onMeta: (meta) => {
           if (meta.sessionId) {

@@ -1,6 +1,7 @@
 /**
  * AI 咨询 SSE 客户端。默认请求同域 /api/ai/*（由 Nginx / Vite 反代到咨询后端）。
  */
+import { buildConsultChatPayload } from '../../lib/consultLinkText.js'
 
 const AI_BASE = String(import.meta.env.VITE_AI_API_BASE || '').replace(/\/$/, '')
 
@@ -231,6 +232,7 @@ export async function fetchConsultSession(token, sessionId) {
  *   useEuropePmc?: boolean,
  *   profile?: object | null,
  *   attachments?: Array<object>,
+ *   linkSources?: Array<object>,
  *   signal?: AbortSignal,
  *   onMeta?: (data: object) => void,
  *   onDelta?: (text: string) => void,
@@ -250,6 +252,7 @@ export async function streamConsultChat(opts) {
     useEuropePmc = false,
     profile = null,
     attachments = [],
+    linkSources = [],
     signal,
     onMeta,
     onDelta,
@@ -266,19 +269,18 @@ export async function streamConsultChat(opts) {
         Authorization: `Bearer ${token}`,
         Accept: 'text/event-stream',
       },
-      body: JSON.stringify({
+      body: JSON.stringify(buildConsultChatPayload({
         message,
         lang,
-        sessionId: sessionId || undefined,
+        sessionId,
+        entry,
         usePubmed,
         useCochrane,
         useEuropePmc,
-        profile: {
-          consultEntry: entry,
-          ...(profile && typeof profile === 'object' ? profile : {}),
-        },
-        attachments: Array.isArray(attachments) && attachments.length ? attachments : undefined,
-      }),
+        profile,
+        attachments,
+        linkSources,
+      })),
       signal,
     })
   } catch (err) {

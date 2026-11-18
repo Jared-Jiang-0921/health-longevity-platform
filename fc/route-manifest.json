@@ -51,6 +51,15 @@
     },
     {
       "segments": [
+        "consult-link"
+      ],
+      "paramKeys": [],
+      "catchAll": false,
+      "modulePath": "../lib/http-api/consult-link.js",
+      "sourceFile": "lib/http-api/consult-link.js"
+    },
+    {
+      "segments": [
         "consult-sso-ticket"
       ],
       "paramKeys": [],
