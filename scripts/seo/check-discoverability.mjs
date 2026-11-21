@@ -12,7 +12,7 @@ import {
   newsHubLastmod,
   newsSitemapEntries,
 } from '../../src/lib/newsArticleSeo.js'
-import { buildLlmsTxt, buildSitemapXml } from '../../src/lib/seoPublicFiles.js'
+import { buildAboutMarkdown, buildLlmsFullTxt, buildLlmsTxt, buildSitemapXml } from '../../src/lib/seoPublicFiles.js'
 import {
   apexRedirectRules,
   documentStatus,
@@ -38,7 +38,7 @@ const xml = buildSitemapXml({
   extra: newsSitemapEntries(cards),
   newsLastmod: newsHubLastmod(cards),
 })
-expect(xml.includes('<lastmod>2026-11-07</lastmod>'), 'editorial pages keep the published summary date')
+expect(xml.includes(`<lastmod>${PUBLIC_SUMMARY_UPDATED}</lastmod>`), 'editorial pages keep the published summary date')
 expect(xml.includes('<loc>https://www.healthlongevity.cn/longevity-news/ln-static-1</loc>'), 'static article has a stable URL')
 expect(xml.includes('<lastmod>2026-07-01</lastmod>'), 'article lastmod uses its own date')
 expect(!xml.includes(`/longevity-news/${thin.id}`), 'thin card is absent from the sitemap')
@@ -47,10 +47,21 @@ expect(homeLastmod && homeLastmod[1] === PUBLIC_SUMMARY_UPDATED, 'home lastmod s
 
 const faqs = getPageFaqs('/longevity-news', 'zh').map((item) => item.a).join('\n')
 expect(faqs.includes('请勿将单篇前沿研究'), 'news FAQ reuses the existing evidence caveat')
+expect(getPageFaqs('/products', 'zh').some((item) => item.a.includes('不把任何商品包装为疾病治疗方案')), 'products FAQ keeps treatment boundary')
+expect(getPageFaqs('/tcm-prevention', 'zh').some((item) => item.a.includes('不替代个体辨证论治')), 'tcm FAQ keeps pattern-differentiation boundary')
 
 const llms = buildLlmsTxt({ articles: cards })
 expect(llms.includes('不是百度'), 'llms.txt says it is not a ranking promise')
 expect(llms.includes('https://www.healthlongevity.cn/longevity-news/ln-static-1'), 'llms.txt lists the stable article URL')
+expect(llms.includes('/llms-full.txt') && llms.includes('/about.md'), 'llms.txt optional section points to full summary and markdown')
+
+const llmsFull = buildLlmsFullTxt({ articles: cards })
+expect(llmsFull.includes('English about') && llmsFull.includes('What not to cite'), 'llms-full.txt is bilingual with citation limits')
+expect(llmsFull.includes('https://www.healthlongevity.cn/longevity-news/ln-static-1'), 'llms-full.txt lists the stable article URL')
+
+const aboutMd = buildAboutMarkdown('zh')
+expect(aboutMd.includes('# 关于长健星图') && aboutMd.includes('不替代专业诊疗'), 'about.md mirrors the public about facts')
+expect(buildAboutMarkdown('en').includes('About Longevity Atlas'), 'english about.md exists')
 
 const template = `<!DOCTYPE html><html lang="zh-Hans"><head><title>old</title></head><body><div id="root"></div></body></html>`
 const articleHtml = renderNewsArticleHtml(template, { lang: 'zh', card: cards.find((card) => card.id === 'ln-static-1') })
@@ -62,6 +73,14 @@ expect(!renderNewsArticleHtml(template, { lang: 'zh', card: thin }), 'thin card 
 const newsHtml = renderRouteHtml(template, { lang: 'zh', pathname: '/longevity-news', newsCards: cards })
 expect(newsHtml.includes('href="https://www.healthlongevity.cn/longevity-news/ln-static-1"'), 'news index links to the stable article')
 expect(newsHtml.includes('请勿将单篇前沿研究'), 'news index includes the evidence caveat in HTML')
+
+const productsHtml = renderRouteHtml(template, { lang: 'zh', pathname: '/products', newsCards: cards })
+expect(productsHtml.includes('保健食品不是药物'), 'products prerender includes compliance copy')
+expect(productsHtml.includes('FAQPage'), 'products page emits FAQ JSON-LD')
+expect(productsHtml.includes('BreadcrumbList'), 'non-home pages emit BreadcrumbList')
+
+const tcmHtml = renderRouteHtml(template, { lang: 'zh', pathname: '/tcm-prevention', newsCards: cards })
+expect(tcmHtml.includes('治未病') && tcmHtml.includes('FAQPage'), 'tcm prerender includes module copy and FAQ')
 
 const arHome = renderRouteHtml(template, { lang: 'ar', pathname: '/', newsCards: cards })
 const arCopy = getHomeCopy('ar')
@@ -138,9 +157,14 @@ expect(nginx.includes('return 301 https://www.healthlongevity.cn$request_uri;'),
 expect(nginx.includes('error_page 404 /404.html;'), 'nginx example uses a real 404')
 expect(!nginx.includes('try_files $uri $uri/index.html $uri/ /index.html'), 'nginx example does not fall unknown paths back to the homepage')
 expect(!nginx.includes('server_name healthlongevity.cn www.healthlongevity.cn'), 'apex and www are not the same server')
+expect(nginx.includes('location = /favicon.ico') && nginx.includes('location = /llms-full.txt'), 'nginx example serves favicons and llms-full explicitly')
+expect(nginx.includes('location = /about.md'), 'nginx example serves about.md')
 for (const name of ['account', 'payment', 'favorites', 'health-skills', 'health-questionnaire', 'forgot-password', 'reset-password', 'ops', 'org', 'tax']) {
   expect(nginx.includes(name), `nginx example keeps /${name}`)
 }
+
+const robots = fs.readFileSync(new URL('../../public/robots.txt', import.meta.url), 'utf8')
+expect(robots.includes('ClaudeBot') && robots.includes('PerplexityBot') && robots.includes('llms-full.txt'), 'robots.txt names major AI crawlers and llms-full')
 
 const consult = fs.readFileSync(new URL('../../src/pages/Consult.jsx', import.meta.url), 'utf8')
 const setEntry = consult.slice(consult.indexOf('function setEntry'), consult.indexOf('function newChat'))

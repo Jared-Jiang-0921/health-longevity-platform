@@ -6,6 +6,18 @@
 
 本站内容只供健康教育与生活方式参考，不替代诊疗、处方或紧急医疗处置。提交收录时不要把页面句子改成诊断或疗效承诺。
 
+## 2026-11-21 补强（本轮）
+
+在已有预渲染、sitemap、`llms.txt`、关于页与资讯单篇的基础上，再补 AI / 搜索可引用面：
+
+- `/llms-full.txt`：双语完整摘要、方案/产品/治未病 FAQ、不可引用范围与可引用资讯卡片。
+- `/about.md`、`/en/about.md`、`/ar/about.md`：关于页 Markdown 镜像，给偏好纯文本的抓取器。
+- `llms.txt` 按 llmstxt.org 增加 Optional 链接；`robots.txt` 注明 ClaudeBot、PerplexityBot、Google-Extended 等 UA，并指向上述文件。
+- 产品证据库与治未病预渲染正文写入站内已有合规说明与 FAQ；JSON-LD 增加 `BreadcrumbList`，Organization logo 改为 `ImageObject`。
+- Nginx 示例为 favicon、`llms*.txt`、`about.md`、`404.html` 增加显式 `location`（线上 ECS 曾对根目录部分静态文件返回 403，需人工套用示例后 reload）。
+
+栏目 `lastmod` / 关于页编辑日期改为 `2026-11-21`。资讯单篇仍用条目自己的日期。
+
 ## 2026-11-10 线上核对后补上的
 
 核对的是当时已上线的 `https://www.healthlongevity.cn`（首页约 8.7KB，资讯页约 134KB，均为预渲染 HTML）：
@@ -38,7 +50,9 @@ npm run build
 | --- | --- |
 | `/robots.txt` | 允许公开页；拦截账户、支付、接口、后台和需登录的深层路径 |
 | `/sitemap.xml` | 上述栏目页，以及已有摘要或阅读要点的资讯单篇。栏目 `lastmod` 用内容日期，单篇用条目自己的日期 |
-| `/llms.txt` | 给 Doubao、DeepSeek、ChatGPT 等系统的纯文本摘要，与关于页同一套事实 |
+| `/llms.txt` | 给 Doubao、DeepSeek、ChatGPT、Claude、Perplexity 等系统的纯文本目录，与关于页同一套事实 |
+| `/llms-full.txt` | 双语完整摘要与 FAQ，供需要更长上下文的 AI 系统 |
+| `/about.md`（及 `/en/`、`/ar/`） | 关于页 Markdown 镜像 |
 | `/about` | 平台是什么、面向谁、模块、咨询概览、合规声明、网址和最近更新 |
 
 构建命令 `npm run build` 会预渲染上述公开页的标题、说明、Open Graph、Twitter 和 JSON-LD，并把正文放进 HTML，不执行 JavaScript 的抓取器也能读到。`npm run dev` 下这些地址同样可直接查看。
@@ -58,6 +72,9 @@ npm run dev
 ```bash
 curl -sS http://localhost:5173/robots.txt
 curl -sS http://localhost:5173/sitemap.xml
+curl -sS http://localhost:5173/llms.txt | head
+curl -sS http://localhost:5173/llms-full.txt | head
+curl -sS http://localhost:5173/about.md | head
 curl -sS http://localhost:5173/ | tr '\n' ' ' | grep -o '<title>[^<]*</title>'
 curl -sS http://localhost:5173/solutions | tr '\n' ' ' | grep -o '<title>[^<]*</title>'
 curl -sS http://localhost:5173/about | tr '\n' ' ' | grep -o '<title>[^<]*</title>'
@@ -75,6 +92,7 @@ curl -sS http://localhost:5173/about | tr '\n' ' ' | grep -o '<title>[^<]*</titl
 ```bash
 npm run build
 test -f dist/robots.txt && test -f dist/sitemap.xml && test -f dist/about/index.html
+test -f dist/llms.txt && test -f dist/llms-full.txt && test -f dist/about.md && test -f dist/en/about.md
 ```
 
 ## 2026-11-11 自检里和抓取有关的四项
@@ -96,7 +114,7 @@ test -f dist/robots.txt && test -f dist/sitemap.xml && test -f dist/about/index.
 - 裸域名 301 到 `https://www.healthlongevity.cn`，路径和查询串保留。Vercel 用主机条件，只匹配 `healthlongevity.cn`，不匹配 `www` 或 `*.vercel.app`。Nginx 示例把裸域名和 `www` 分成两个 server，`return 301 https://www.healthlongevity.cn$request_uri;`。
 - 图标用现有 `public/images/logo-longevity-atlas.png` 做成 `favicon.ico`、`favicon.png`、`favicon.svg` 和 `apple-touch-icon.png`，并写进 `index.html`。没有另做医疗认证标志。
 - 阿拉伯语首页的标题、导语和首页上的说明改为阿拉伯文，预渲染走同一套 `getHomeCopy('ar')`。资讯正文没有整库翻译，不能说新闻语料已经全部阿拉伯化。
-- sitemap 的 `lastmod` 没有改：首页仍是内容日期 `2026-11-07`，资讯栏目仍取说明日期 `2026-11-10` 和条目日期里较新的一天，单篇仍用条目自己的日期（静态稿 `ln-static-1` 为 `2026-07-01`）。不要改成部署当天。
+- 当时 sitemap 的 `lastmod`：首页是内容日期 `2026-11-07`，资讯栏目取说明日期 `2026-11-10` 和条目日期里较新的一天，单篇用条目自己的日期（静态稿 `ln-static-1` 为 `2026-07-01`）。2026-11-21 起栏目编辑日期改为 `2026-11-21`；单篇仍用条目日期。不要改成部署当天。
 
 线上要让 301 和 HTML 404 生效，需要在 ECS 上改**正在 listen 443 的那份配置**，而不是只改本仓库。安全做法只复制 Nginx 站点文件，不要把 `.env.prod` 打进新的备份包，也不要把证书私钥贴出来：
 
@@ -129,3 +147,19 @@ sudo nginx -t && sudo systemctl reload nginx
 5. 不要提交 `/api/`、账户、支付、问卷或咨询对话。这些路径已在 `robots.txt` 中禁止。
 
 索引有延迟，提交成功只说明平台收到了 sitemap，不表示当天就会出现在搜索结果里。
+
+## Bing Webmaster Tools
+
+1. 打开 [Bing Webmaster Tools](https://www.bing.com/webmasters)，添加 `https://www.healthlongevity.cn/`。
+2. 用 DNS、HTML 文件或「导入 Google Search Console」完成验证。
+3. 提交 sitemap：`https://www.healthlongevity.cn/sitemap.xml`。本轮上线后重新提交一次。
+4. 可选：在「URL 检查」核对 `/`、`/about`、`/llms.txt`、`/llms-full.txt`。
+
+## 本轮上线后仍需人工做的事
+
+仓库与 Vercel 构建能带上新的 `llms-full.txt`、`about.md` 与更厚的预渲染页。以下仍要站长在机器或站长平台上操作：
+
+1. **ECS 部署**：按既有 `deploy-ecs.sh` 流程构建并预渲染（需单独确认后再执行；脚本含 `git reset --hard`）。
+2. **Nginx**：把 `deploy/nginx-healthlongevity.conf.example` 里 favicon / `llms*.txt` / `about.md` / `404.html` 的显式 `location` 合进正在 listen 443 的配置，再 `nginx -t && reload`。当前线上对 `/favicon.ico`、`/404.html` 曾返回 403，合并前请先备份站点文件。
+3. **Google Search Console / 百度 / Bing**：验证站点（若未完成）并重新提交 sitemap；对 `/about`、`/llms.txt` 可做一次网址检查或手动提交。
+4. **不要**把账户、支付、问卷、咨询对话或 `/api` 提交给收录。

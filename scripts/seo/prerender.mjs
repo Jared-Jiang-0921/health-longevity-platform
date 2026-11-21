@@ -9,7 +9,9 @@ import { HOME_MODULES, getHomeCopy } from '../../src/data/homePageContent.js'
 import { getLongevityNewsArticles } from '../../src/data/longevityNewsArticles.js'
 import { LONGEVITY_NEWS_COLUMNS, columnDisplayLabel } from '../../src/data/longevityNewsColumns.js'
 import { getLongevityNewsModuleCopy } from '../../src/data/longevityNewsModuleI18n.js'
-import { PUBLIC_CRAWL_NAV, getAboutPage, getFaqHeading, getSolutionsPublicCopy } from '../../src/data/publicSummary.js'
+import { PUBLIC_CRAWL_NAV, getAboutPage, getFaqHeading, getPageFaqs, getSolutionsPublicCopy } from '../../src/data/publicSummary.js'
+import { getProductsEvidenceCopy } from '../../src/data/productsEvidenceLibraryI18n.js'
+import { getTcmPreventionModuleCopy } from '../../src/data/tcmPreventionModuleI18n.js'
 import {
   articleLanguages,
   isSubstantiveNewsCard,
@@ -25,7 +27,7 @@ import {
 import { SEO_LANGS, SEO_PAGES, SITE_ORIGIN, absoluteUrl } from '../../src/data/seo.js'
 import { extractLongevityKeywords, toNewsSearchCard } from '../../src/lib/longevityNewsCard.js'
 import { langSpec, renderHeadSnippet, resolveSeo } from '../../src/lib/seoDocument.js'
-import { buildLlmsTxt, buildSitemapXml } from '../../src/lib/seoPublicFiles.js'
+import { buildAboutMarkdown, buildLlmsFullTxt, buildLlmsTxt, buildSitemapXml } from '../../src/lib/seoPublicFiles.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const rootDir = path.resolve(__dirname, '../..')
@@ -303,10 +305,69 @@ function newsBody(lang, cards) {
   return `<h1>${escapeHtml(seo.title)}</h1><p>${escapeHtml(seo.description)}</p><p>${escapeHtml(mod.caveatPhrase)}</p>${moduleIntro('/longevity-news', lang)}<section><h2>${escapeHtml(getFaqHeading(lang))}</h2>${faqs}</section>${sections.join('')}`
 }
 
+function productsBody(lang) {
+  const seo = resolveSeo('/products', lang)
+  const copy = getProductsEvidenceCopy(lang)
+  const types = (copy.productTypes || [])
+    .map((item) => `<li>${escapeHtml(item)}</li>`)
+    .join('')
+  const rows = (copy.scoringRows || [])
+    .map(
+      (row) =>
+        `<tr><th scope="row">${escapeHtml(row.dimension)}</th><td>${escapeHtml(row.explain)}</td></tr>`,
+    )
+    .join('')
+  const faqs = getPageFaqs('/products', lang)
+  return `
+    <h1>${escapeHtml(seo.title)}</h1>
+    <p>${escapeHtml(seo.description)}</p>
+    ${moduleIntro('/products', lang)}
+    <p>${escapeHtml(copy.lead)}</p>
+    <p>${escapeHtml(copy.roleDisclaimer)}</p>
+    <h2>${escapeHtml(copy.cnRegTitle)}</h2>
+    <p>${escapeHtml(copy.cnRegBody)}</p>
+    <h2>${escapeHtml(copy.intlTitle)}</h2>
+    <p>${escapeHtml(copy.intlBody)}</p>
+    <h2>${escapeHtml(copy.productTypesTitle)}</h2>
+    <ul>${types}</ul>
+    <h2>${escapeHtml(copy.scoringTitle)}</h2>
+    <table><thead><tr><th>${escapeHtml(copy.colDimension)}</th><th>${escapeHtml(copy.colExplain)}</th></tr></thead><tbody>${rows}</tbody></table>
+    <p>${escapeHtml(copy.listFooterNote)}</p>
+    ${faqBlock(getFaqHeading(lang), faqs)}
+  `
+}
+
+function tcmBody(lang) {
+  const seo = resolveSeo('/tcm-prevention', lang)
+  const copy = getTcmPreventionModuleCopy(lang)
+  const rows = (copy.columnRows || [])
+    .map(
+      (row) =>
+        `<tr><th scope="row">${escapeHtml(row.module)}</th><td>${escapeHtml(row.content)}</td></tr>`,
+    )
+    .join('')
+  const faqs = getPageFaqs('/tcm-prevention', lang)
+  return `
+    <h1>${escapeHtml(seo.title)}</h1>
+    <p>${escapeHtml(seo.description)}</p>
+    ${moduleIntro('/tcm-prevention', lang)}
+    <p>${escapeHtml(copy.differentiation)}</p>
+    <p>${escapeHtml(copy.positioning)}</p>
+    <h2>${escapeHtml(copy.columnsTitle)}</h2>
+    <table><thead><tr><th>${escapeHtml(copy.colModule)}</th><th>${escapeHtml(copy.colContent)}</th></tr></thead><tbody>${rows}</tbody></table>
+    <p>${escapeHtml(copy.bridgeTabs)}</p>
+    <h2>${escapeHtml(copy.consultTitle)}</h2>
+    <p>${escapeHtml(copy.consultDesc)}</p>
+    ${faqBlock(getFaqHeading(lang), faqs)}
+  `
+}
+
 function pageBody(page, lang, newsCards) {
   if (page.type === 'home') return homeBody(lang)
   if (page.path === '/about') return aboutBody(lang)
   if (page.path === '/solutions') return solutionsBody(lang)
+  if (page.path === '/products') return productsBody(lang)
+  if (page.path === '/tcm-prevention') return tcmBody(lang)
   if (page.type === 'legal') return legalBody(page, lang)
   if (page.path === '/longevity-news') return newsBody(lang, newsCards)
   const seo = resolveSeo(page.path, lang)
@@ -435,7 +496,13 @@ async function main() {
     newsLastmod: newsHubLastmod(newsCards),
   }), 'utf8')
   await fs.writeFile(path.join(distDir, 'llms.txt'), buildLlmsTxt({ articles: newsCards }), 'utf8')
-  console.log(`[seo] prerendered ${count} HTML pages + sitemap.xml + llms.txt → ${distDir}`)
+  await fs.writeFile(path.join(distDir, 'llms-full.txt'), buildLlmsFullTxt({ articles: newsCards }), 'utf8')
+  await fs.writeFile(path.join(distDir, 'about.md'), buildAboutMarkdown('zh'), 'utf8')
+  await fs.mkdir(path.join(distDir, 'en'), { recursive: true })
+  await fs.mkdir(path.join(distDir, 'ar'), { recursive: true })
+  await fs.writeFile(path.join(distDir, 'en', 'about.md'), buildAboutMarkdown('en'), 'utf8')
+  await fs.writeFile(path.join(distDir, 'ar', 'about.md'), buildAboutMarkdown('ar'), 'utf8')
+  console.log(`[seo] prerendered ${count} HTML pages + sitemap.xml + llms.txt + llms-full.txt + about.md → ${distDir}`)
 }
 
 const isDirectRun = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
