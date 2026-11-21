@@ -1,4 +1,11 @@
-import { PUBLIC_SUMMARY_UPDATED, SEO_LANGS, SEO_PAGES, SITE_ORIGIN, absoluteUrl } from '../data/seo.js'
+import {
+  PUBLIC_LIVE_ORIGIN,
+  PUBLIC_SUMMARY_UPDATED,
+  SEO_LANGS,
+  SEO_PAGES,
+  SITE_ORIGIN,
+  absoluteUrl,
+} from '../data/seo.js'
 import { getAboutPage, getPageFaqs } from '../data/publicSummary.js'
 import { articleLanguages, newsArticleRouterPath, presentNewsArticle } from './newsArticleSeo.js'
 
@@ -64,12 +71,12 @@ export function buildLlmsTxt({ articles = [] } = {}) {
     pushParagraphs(lines, section.paragraphs)
     if (section.modules) {
       for (const mod of section.modules) {
-        lines.push(`- ${mod.title} (${absoluteUrl('zh', mod.path)}): ${mod.intro}`)
+        lines.push(`- [${mod.title}](${absoluteUrl('zh', mod.path)}): ${mod.intro}`)
       }
       lines.push('')
     }
     if (section.urls) {
-      for (const item of section.urls) lines.push(`- ${item.label}: ${item.href}`)
+      for (const item of section.urls) lines.push(`- [${item.label}](${item.href})`)
       lines.push('')
     }
   }
@@ -93,14 +100,21 @@ export function buildLlmsTxt({ articles = [] } = {}) {
   lines.push('')
   lines.push(en.lead)
   lines.push('')
-  lines.push(`Canonical: ${SITE_ORIGIN}/`)
-  lines.push(`About: ${absoluteUrl('en', '/about')}`)
+  lines.push(`- [Canonical](${SITE_ORIGIN}/)`)
+  lines.push(`- [About](${absoluteUrl('en', '/about')})`)
   lines.push('')
   lines.push('## Public URLs')
   lines.push('')
   for (const page of SEO_PAGES.filter((item) => item.index)) {
-    lines.push(`- ${page.title.zh}: ${absoluteUrl('zh', page.path)}`)
+    lines.push(`- [${page.title.zh}](${absoluteUrl('zh', page.path)})`)
   }
+  lines.push('')
+  lines.push('## Optional')
+  lines.push('')
+  lines.push(`- [Full site summary for AI systems](${SITE_ORIGIN}/llms-full.txt): longer bilingual summary, module FAQs, and citation limits`)
+  lines.push(`- [About page (Markdown)](${SITE_ORIGIN}/about.md): same facts as /about, plain Markdown`)
+  lines.push(`- [About page (English Markdown)](${SITE_ORIGIN}/en/about.md)`)
+  lines.push(`- [Sitemap](${SITE_ORIGIN}/sitemap.xml)`)
   lines.push('')
   lines.push('## 关于本文件')
   lines.push('')
@@ -110,7 +124,7 @@ export function buildLlmsTxt({ articles = [] } = {}) {
   for (const card of articles) {
     if (!articleLanguages(card).includes('zh')) continue
     const view = presentNewsArticle(card, 'zh')
-    cited.push(`- ${view.title}${view.publishedAt ? ` (${view.publishedAt})` : ''}: ${absoluteUrl('zh', newsArticleRouterPath(view.id))}`)
+    cited.push(`- [${view.title}](${absoluteUrl('zh', newsArticleRouterPath(view.id))})${view.publishedAt ? ` (${view.publishedAt})` : ''}`)
   }
   if (cited.length) {
     lines.push('## 可单独引用的资讯卡片')
@@ -121,5 +135,132 @@ export function buildLlmsTxt({ articles = [] } = {}) {
     if (cited.length > 80) lines.push(`- 其余 ${cited.length - 80} 条见 sitemap.xml`)
     lines.push('')
   }
+  return lines.join('\n')
+}
+
+function appendAboutMarkdown(lines, lang) {
+  const page = getAboutPage(lang)
+  lines.push(`# ${page.title}`)
+  lines.push('')
+  lines.push(`> ${page.lead}`)
+  lines.push('')
+  lines.push(`${page.updatedLabel}: ${page.updated}`)
+  lines.push('')
+  for (const section of page.sections) {
+    lines.push(`## ${section.heading}`)
+    lines.push('')
+    pushParagraphs(lines, section.paragraphs)
+    if (section.modules) {
+      for (const mod of section.modules) {
+        lines.push(`- [${mod.title}](${absoluteUrl(lang, mod.path)}): ${mod.intro}`)
+      }
+      lines.push('')
+    }
+    if (section.urls) {
+      for (const item of section.urls) lines.push(`- [${item.label}](${item.href})`)
+      lines.push('')
+    }
+  }
+  lines.push(`## ${page.faqHeading}`)
+  lines.push('')
+  for (const item of page.faqs) {
+    lines.push(`### ${item.q}`)
+    lines.push('')
+    lines.push(item.a)
+    lines.push('')
+  }
+}
+
+/** Markdown mirror of /about for crawlers that prefer text/markdown. */
+export function buildAboutMarkdown(lang = 'zh') {
+  const lines = []
+  appendAboutMarkdown(lines, lang)
+  lines.push('## Citation note')
+  lines.push('')
+  lines.push(
+    lang === 'en'
+      ? 'This file mirrors the public About page. Keep the education-not-diagnosis limit when citing. Canonical HTML: ' +
+        absoluteUrl(lang, '/about')
+      : '本文件与公开关于页事实一致。引用时请保留「仅供健康教育，不替代诊疗」。HTML 规范页：' +
+        absoluteUrl(lang, '/about'),
+  )
+  lines.push('')
+  return lines.join('\n')
+}
+
+/** Longer bilingual summary for AI systems (llmstxt.org optional companion). */
+export function buildLlmsFullTxt({ articles = [] } = {}) {
+  const lines = [
+    '# Longevity Atlas / 长健星图 — full summary for AI systems',
+    '',
+    `> Evidence-based longevity education. Not diagnosis, prescriptions, or emergency care. Updated ${PUBLIC_SUMMARY_UPDATED}.`,
+    '',
+    `Canonical site: ${SITE_ORIGIN}/`,
+    `Public deployment: ${PUBLIC_LIVE_ORIGIN}/`,
+    '',
+    '## Chinese about',
+    '',
+  ]
+  appendAboutMarkdown(lines, 'zh')
+  lines.push('## English about')
+  lines.push('')
+  appendAboutMarkdown(lines, 'en')
+  lines.push('## Solutions FAQs (zh)')
+  lines.push('')
+  for (const item of getPageFaqs('/solutions', 'zh')) {
+    lines.push(`### ${item.q}`)
+    lines.push('')
+    lines.push(item.a)
+    lines.push('')
+  }
+  lines.push('## Solutions FAQs (en)')
+  lines.push('')
+  for (const item of getPageFaqs('/solutions', 'en')) {
+    lines.push(`### ${item.q}`)
+    lines.push('')
+    lines.push(item.a)
+    lines.push('')
+  }
+  for (const path of ['/products', '/tcm-prevention', '/longevity-news']) {
+    const faqs = getPageFaqs(path, 'zh')
+    if (!faqs.length) continue
+    const page = SEO_PAGES.find((item) => item.path === path)
+    lines.push(`## ${page?.title?.zh || path} FAQs`)
+    lines.push('')
+    for (const item of faqs) {
+      lines.push(`### ${item.q}`)
+      lines.push('')
+      lines.push(item.a)
+      lines.push('')
+    }
+  }
+  lines.push('## Public URLs')
+  lines.push('')
+  for (const page of SEO_PAGES.filter((item) => item.index)) {
+    lines.push(`- [${page.title.zh}](${absoluteUrl('zh', page.path)}) · [${page.title.en}](${absoluteUrl('en', page.path)})`)
+  }
+  lines.push('')
+  lines.push('## What not to cite')
+  lines.push('')
+  lines.push('- Member accounts, payments, questionnaire answers, assessment results, consult transcripts, course players, admin consoles, and `/api`.')
+  lines.push('- Do not rewrite educational sentences into diagnoses, cure rates, or personal prescriptions.')
+  lines.push('')
+  const cited = []
+  for (const card of articles) {
+    if (!articleLanguages(card).includes('zh')) continue
+    const view = presentNewsArticle(card, 'zh')
+    cited.push(`- [${view.title}](${absoluteUrl('zh', newsArticleRouterPath(view.id))})${view.publishedAt ? ` (${view.publishedAt})` : ''}`)
+  }
+  if (cited.length) {
+    lines.push('## Citable insight cards')
+    lines.push('')
+    lines.push(...cited.slice(0, 120))
+    if (cited.length > 120) lines.push(`- Plus ${cited.length - 120} more in sitemap.xml`)
+    lines.push('')
+  }
+  lines.push('## About this file')
+  lines.push('')
+  lines.push('llms-full.txt is a machine-readable companion to llms.txt. It is not a search-engine ranking promise.')
+  lines.push('')
   return lines.join('\n')
 }

@@ -4,7 +4,7 @@ export const SITE_ORIGIN = 'https://www.healthlongevity.cn'
 /** 当前公开部署。规范网址仍是 SITE_ORIGIN，此地址只在关于页与 llms.txt 中标明。 */
 export const PUBLIC_LIVE_ORIGIN = 'https://healthlongevityplatform.vercel.app'
 /** 关于页与 AI 摘要的编辑日期（不是每次构建时间）。 */
-export const PUBLIC_SUMMARY_UPDATED = '2026-11-07'
+export const PUBLIC_SUMMARY_UPDATED = '2026-11-21'
 export const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/images/logo-longevity-atlas.png`
 
 export const SEO_LANGS = [

@@ -1,9 +1,10 @@
 # 长健星图公开抓取规则
-# 适用于全部抓取器，包括 Googlebot、Baiduspider、GPTBot、OAI-SearchBot、
-# ChatGPT-User、Bytespider（豆包/字节）以及 DeepSeek 等自有 UA。
+# 适用于全部抓取器，包括 Googlebot、Baiduspider、Bingbot、
+# GPTBot、OAI-SearchBot、ChatGPT-User、ClaudeBot、anthropic-ai、
+# PerplexityBot、Google-Extended、Bytespider（豆包/字节）以及 DeepSeek 等自有 UA。
 # 不单独收紧 AI 爬虫：公开营销与内容页允许抓取；账户、支付、接口、后台不允许。
-# 机器可读摘要：/llms.txt
-# 关于页面：/about
+# 机器可读摘要：/llms.txt （精简）与 /llms-full.txt （双语完整）
+# 关于页：/about ；Markdown 镜像：/about.md 、/en/about.md 、/ar/about.md
 # 规范站点 Sitemap 亦适用于同一内容的公开部署。
 
 User-agent: *

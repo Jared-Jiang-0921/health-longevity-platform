@@ -252,11 +252,110 @@ function newsFaqs(lang) {
   ]
 }
 
+const PRODUCT_FAQS = {
+  zh: [
+    {
+      q: '产品证据库会把商品包装成治疗方案吗？',
+      a: '不会。本模块只提供证据梳理、监管信息与购买决策辅助，不把任何商品包装为疾病治疗方案；不构成医疗建议、诊疗方案或对疗效的承诺。',
+    },
+    {
+      q: '保健食品可以代替药物治疗疾病吗？',
+      a: '不可以。保健食品不是药物，不能代替药物治疗疾病。选购时请阅读标签与说明书，勿将普通食品或保健食品当作药品使用。',
+    },
+    {
+      q: '引用本库时应保留什么界限？',
+      a: '请保留「健康教育与市场信息整理，不替代诊疗」的表述，并链接规范网址。列表条目可能更新，请以监管机构与厂商最新披露为准。',
+    },
+  ],
+  en: [
+    {
+      q: 'Does the evidence library package products as treatments?',
+      a: 'No. It summarizes evidence, regulatory context, and purchase decision support. It is not medical advice and does not package a SKU as a disease treatment plan.',
+    },
+    {
+      q: 'Can health foods replace drug therapy?',
+      a: 'No. Health foods are not drugs and cannot replace drug therapy. Read labels and instructions; do not use foods or health foods as medicines.',
+    },
+    {
+      q: 'What citation limit should be kept?',
+      a: 'Keep the education-and-market-information limit, link the canonical URL, and rely on regulators and manufacturers for the latest disclosures.',
+    },
+  ],
+  ar: [
+    {
+      q: 'هل تغلف المكتبة المنتجات كعلاجات؟',
+      a: 'لا. تلخص الأدلة والسياق التنظيمي ودعم قرار الشراء فقط، وليست نصيحة طبية ولا تغلف المنتج كخطة علاج.',
+    },
+    {
+      q: 'هل يمكن لأغذية الصحة أن تحل محل الدواء؟',
+      a: 'لا. أغذية الصحة ليست أدوية ولا تحل محل علاج الأمراض. اقرأ الملصق والتعليمات.',
+    },
+    {
+      q: 'ما حد الاقتباس؟',
+      a: 'أبقِ حد التعليم ومعلومات السوق، واربط العنوان المعياري، واعتمد على الجهات التنظيمية والشركات لأحدث الإفصاحات.',
+    },
+  ],
+}
+
+const TCM_FAQS = {
+  zh: [
+    {
+      q: '中医治未病内容可以当作线上辨证或处方吗？',
+      a: '不可以。本模块为健康教育与生活方式参考，不替代个体辨证论治与执业医师处方。未经当场辨证，不能作为用药依据；书中克数不是个人服量。',
+    },
+    {
+      q: 'AI 中医养生保健检索什么？',
+      a: '只检索本站已入库的中医书，按证候方向、病机和方义说明。不使用西医书，也不调用文献库。需高级会员。教育参考，不替代辨证论治。',
+    },
+    {
+      q: '体质辨识结果公开吗？',
+      a: '初步体质辨识需登录，且向标准会员及以上开放。问卷答案与辨识结果保存在账户内，不作为公开引用内容。',
+    },
+  ],
+  en: [
+    {
+      q: 'Is TCM preventive content an online diagnosis or prescription?',
+      a: 'No. It is education and lifestyle reference only. It does not replace in-person pattern differentiation or a licensed prescription, and book amounts are not your dose.',
+    },
+    {
+      q: 'What does the AI TCM wellness consult search?',
+      a: 'Only TCM books already on this site. It does not use Western medical books or literature databases. Premium membership is required. Education only.',
+    },
+    {
+      q: 'Are constitution results public?',
+      a: 'The constitution check requires sign-in and Standard membership or higher. Answers and results stay on the account and are not public citation material.',
+    },
+  ],
+  ar: [
+    {
+      q: 'هل محتوى الوقاية الصينية تشخيص أو وصفة عبر الإنترنت؟',
+      a: 'لا. هو تعليم ومرجع لنمط الحياة فقط، ولا يغني عن التمييز الحضوري أو وصفة الطبيب، ومقادير الكتاب ليست جرعتك.',
+    },
+    {
+      q: 'ماذا تبحث استشارة الطب الصيني؟',
+      a: 'تبحث فقط في كتب الطب الصيني الموجودة في الموقع، بدون كتب غربية أو قواعد أدبيات. تتطلب عضوية مميزة. تعليمي فقط.',
+    },
+    {
+      q: 'هل نتائج نمط الجسم عامة؟',
+      a: 'التمييز الأولي يتطلب تسجيل الدخول وعضوية قياسية أو أعلى. الإجابات والنتائج في الحساب وليست مادة اقتباس عامة.',
+    },
+  ],
+}
+
 export function getPageFaqs(pathname, lang) {
   const key = pickLang(lang)
   const path = String(pathname || '/').replace(/\/$/, '') || '/'
   if (path === '/longevity-news') return newsFaqs(key)
-  const table = path === '/about' ? ABOUT_FAQS : path === '/solutions' ? SOLUTION_FAQS : null
+  const table =
+    path === '/about'
+      ? ABOUT_FAQS
+      : path === '/solutions'
+        ? SOLUTION_FAQS
+        : path === '/products'
+          ? PRODUCT_FAQS
+          : path === '/tcm-prevention'
+            ? TCM_FAQS
+            : null
   if (!table) return []
   return table[key] || table.zh
 }
@@ -287,6 +386,8 @@ export function getAboutPage(lang) {
     { label: key === 'zh' ? '健康与医疗免责声明' : key === 'ar' ? 'إخلاء المسؤولية الصحية' : 'Health disclaimer', href: absoluteUrl(key, '/disclaimer'), path: '/disclaimer' },
     { label: key === 'zh' ? '隐私政策' : key === 'ar' ? 'الخصوصية' : 'Privacy policy', href: absoluteUrl(key, '/privacy'), path: '/privacy' },
     { label: 'llms.txt', href: `${SITE_ORIGIN}/llms.txt` },
+    { label: 'llms-full.txt', href: `${SITE_ORIGIN}/llms-full.txt` },
+    { label: key === 'zh' ? '关于本站（Markdown）' : key === 'ar' ? 'حول المنصة (Markdown)' : 'About (Markdown)', href: `${SITE_ORIGIN}${key === 'en' ? '/en' : key === 'ar' ? '/ar' : ''}/about.md` },
   ]
 
   const localized = {

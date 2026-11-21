@@ -5,7 +5,7 @@ import { splitLocalePath } from '../../src/lib/localePath.js'
 import { pageIndexable } from '../../src/data/seo.js'
 import { newsArticleIdFromPath, newsHubLastmod, newsSitemapEntries } from '../../src/lib/newsArticleSeo.js'
 import { documentStatus } from '../../src/lib/sitePaths.js'
-import { buildLlmsTxt, buildSitemapXml } from '../../src/lib/seoPublicFiles.js'
+import { buildAboutMarkdown, buildLlmsFullTxt, buildLlmsTxt, buildSitemapXml } from '../../src/lib/seoPublicFiles.js'
 import { renderNewsArticleHtml, renderRouteHtml, staticNewsCards } from './prerender.mjs'
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
@@ -43,7 +43,7 @@ function isViteInternal(pathname) {
 }
 
 function hasAssetExtension(pathname) {
-  return /\.(?:js|mjs|css|map|png|jpe?g|gif|webp|svg|ico|woff2?|ttf|json|txt|xml|webmanifest)$/i.test(pathname)
+  return /\.(?:js|mjs|css|map|png|jpe?g|gif|webp|svg|ico|woff2?|ttf|json|txt|xml|md|webmanifest)$/i.test(pathname)
 }
 
 function fileExists(root, pathname) {
@@ -72,6 +72,22 @@ function installRouting(server, { allowDevPreview, fileRoot, localeShell }) {
     }
     if (pathname === '/llms.txt') {
       sendText(res, buildLlmsTxt({ articles: newsCards }), 'text/plain; charset=utf-8')
+      return
+    }
+    if (pathname === '/llms-full.txt') {
+      sendText(res, buildLlmsFullTxt({ articles: newsCards }), 'text/plain; charset=utf-8')
+      return
+    }
+    if (pathname === '/about.md') {
+      sendText(res, buildAboutMarkdown('zh'), 'text/markdown; charset=utf-8')
+      return
+    }
+    if (pathname === '/en/about.md') {
+      sendText(res, buildAboutMarkdown('en'), 'text/markdown; charset=utf-8')
+      return
+    }
+    if (pathname === '/ar/about.md') {
+      sendText(res, buildAboutMarkdown('ar'), 'text/markdown; charset=utf-8')
       return
     }
     if (isViteInternal(pathname)) {

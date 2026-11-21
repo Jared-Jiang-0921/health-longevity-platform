@@ -64,8 +64,18 @@ export function buildJsonLd({ lang, pathname, title, description, canonical }) {
     legalName: SITE_LEGAL.legalEntityName,
     description: brand.description,
     url: `${SITE_ORIGIN}/`,
-    logo: DEFAULT_OG_IMAGE,
+    logo: {
+      '@type': 'ImageObject',
+      url: DEFAULT_OG_IMAGE,
+      contentUrl: DEFAULT_OG_IMAGE,
+    },
     email: SITE_LEGAL.contactEmail,
+    contactPoint: {
+      '@type': 'ContactPoint',
+      email: SITE_LEGAL.contactEmail,
+      contactType: 'customer support',
+      availableLanguage: ['zh-Hans', 'en', 'ar'],
+    },
   }
   const webPage = {
     '@type': 'WebPage',
@@ -83,8 +93,13 @@ export function buildJsonLd({ lang, pathname, title, description, canonical }) {
     usageInfo,
     disclaimer: usageInfo,
   }
-  if (page?.path === '/about') webPage.dateModified = PUBLIC_SUMMARY_UPDATED
+  if (page?.path === '/about' || page?.path === '/') webPage.dateModified = PUBLIC_SUMMARY_UPDATED
   const graph = [org, website, webPage]
+  const crumbs = buildBreadcrumbList({ lang, pathname: page?.path || pathname, title, canonical })
+  if (crumbs) {
+    webPage.breadcrumb = { '@id': crumbs['@id'] }
+    graph.push(crumbs)
+  }
   const faqs = getPageFaqs(page?.path || pathname, lang)
   if (faqs.length) {
     const faqId = `${canonical}#faq`
@@ -109,6 +124,31 @@ export function buildJsonLd({ lang, pathname, title, description, canonical }) {
   return {
     '@context': 'https://schema.org',
     '@graph': graph,
+  }
+}
+
+function buildBreadcrumbList({ lang, pathname, title, canonical }) {
+  const path = String(pathname || '/').replace(/\/$/, '') || '/'
+  if (path === '/') return null
+  const homeName =
+    lang === 'en' ? 'Home' : lang === 'ar' ? 'الرئيسية' : '首页'
+  return {
+    '@type': 'BreadcrumbList',
+    '@id': `${canonical}#breadcrumb`,
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: homeName,
+        item: absoluteUrl(lang, '/'),
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: title,
+        item: canonical,
+      },
+    ],
   }
 }
 
@@ -159,6 +199,8 @@ function renderHeadFromParts({ spec, seo, jsonLd, alternates }) {
     `<meta name="twitter:description" content="${escapeHtml(seo.description)}" />`,
     `<meta name="twitter:image" content="${escapeHtml(DEFAULT_OG_IMAGE)}" />`,
     `<link rel="alternate" type="text/plain" href="${escapeHtml(`${SITE_ORIGIN}/llms.txt`)}" title="llms.txt" />`,
+    `<link rel="alternate" type="text/plain" href="${escapeHtml(`${SITE_ORIGIN}/llms-full.txt`)}" title="llms-full.txt" />`,
+    `<link rel="alternate" type="text/markdown" href="${escapeHtml(`${SITE_ORIGIN}/about.md`)}" title="About (Markdown)" />`,
     `<script type="application/ld+json">${JSON.stringify(jsonLd).replace(/</g, '\\u003c')}</script>`,
   ]
   return lines.join('\n    ')
@@ -223,6 +265,8 @@ export function applySeoToDocument({ lang, pathname, seo, jsonLd, alternates, re
   appendMeta('twitter:description', 'twitter:description', resolved.description)
   appendMeta('twitter:image', 'twitter:image', DEFAULT_OG_IMAGE)
   appendLink('alternate', `${SITE_ORIGIN}/llms.txt`, { type: 'text/plain', title: 'llms.txt' })
+  appendLink('alternate', `${SITE_ORIGIN}/llms-full.txt`, { type: 'text/plain', title: 'llms-full.txt' })
+  appendLink('alternate', `${SITE_ORIGIN}/about.md`, { type: 'text/markdown', title: 'About (Markdown)' })
 
   if (resolvedJson) {
     const script = document.createElement('script')
