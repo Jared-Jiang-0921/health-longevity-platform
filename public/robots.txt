@@ -42,20 +42,4 @@ Disallow: /en/health-skills/
 Disallow: /en/mcp
 Disallow: /en/tax
 
-Disallow: /ar/api/
-Disallow: /ar/account
-Disallow: /ar/payment
-Disallow: /ar/ops/
-Disallow: /ar/org
-Disallow: /ar/favorites
-Disallow: /ar/forgot-password
-Disallow: /ar/reset-password
-Disallow: /ar/health-questionnaire
-Disallow: /ar/solutions/risk
-Disallow: /ar/solutions/aging
-Disallow: /ar/tcm-prevention/constitution
-Disallow: /ar/health-skills/
-Disallow: /ar/mcp
-Disallow: /ar/tax
-
 Sitemap: https://www.healthlongevity.cn/sitemap.xml

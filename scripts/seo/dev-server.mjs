@@ -83,7 +83,7 @@ function installRouting(server, { allowDevPreview, fileRoot, localeShell }) {
       next()
       return
     }
-    if (pathname === '/index.html' || pathname === '/en/index.html' || pathname === '/ar/index.html') {
+    if (pathname === '/index.html' || pathname === '/en/index.html') {
       next()
       return
     }
@@ -105,7 +105,7 @@ function installRouting(server, { allowDevPreview, fileRoot, localeShell }) {
           ? '/index.html'
           : `${pathname.endsWith('/') ? pathname : `${pathname}/`}index.html`
         const { lang } = splitLocalePath(pathname)
-        const shell = lang === 'en' ? '/en/index.html' : lang === 'ar' ? '/ar/index.html' : '/index.html'
+        const shell = lang === 'en' ? '/en/index.html' : '/index.html'
         const rel = fileExists(fileRoot, indexRel) ? indexRel : shell
         const body = fs.readFileSync(path.join(fileRoot, rel.replace(/^\//, '')))
         sendText(res, body, 'text/html; charset=utf-8')

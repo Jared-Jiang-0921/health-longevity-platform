@@ -106,21 +106,6 @@ export default function CourseSeriesVideos({ course }) {
       next: 'Next',
       episodes: (n) => `${n} episodes`,
     },
-    ar: {
-      heading: 'هذا الموضوع',
-      empty: 'لا توجد حلقات بعد.',
-      loading: 'جارٍ التحميل…',
-      lead: 'كل فيديوهات الموضوع في بطاقة واحدة.',
-      chapter: (n) => `الحلقة ${n}`,
-      open: 'فتح',
-      watch: 'مشاهدة',
-      backToc: 'إغلاق',
-      playing: 'يتم التشغيل',
-      siblings: 'الحلقات',
-      prev: 'السابق',
-      next: 'التالي',
-      episodes: (n) => `${n} حلقات`,
-    },
   }[lang || 'zh']
 
   const openChapter = (id) => {

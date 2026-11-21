@@ -78,7 +78,6 @@ export function appendExternalEntryParams(url, user, options = {}) {
     const langMap = {
       zh: { short: 'zh', locale: 'zh-CN' },
       en: { short: 'en', locale: 'en-US' },
-      ar: { short: 'ar', locale: 'ar' },
     }
     const mapped = langMap[langRaw] || { short: langRaw, locale: langRaw }
     params.set('lang', mapped.short)

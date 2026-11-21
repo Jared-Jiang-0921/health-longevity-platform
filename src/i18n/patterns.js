@@ -11,12 +11,6 @@ const PATTERNS = {
     legalVersion: (v) => `Legal version: ${v}`,
     latestSavedAt: (v) => `Latest saved: ${v}`,
   },
-  ar: {
-    requiresLevel: (level) => `يتطلب ${level} أو أعلى`,
-    configureEnvVar: (name) => `يرجى ضبط ${name} في .env`,
-    legalVersion: (v) => `نسخة الشروط: ${v}`,
-    latestSavedAt: (v) => `آخر حفظ: ${v}`,
-  },
 }
 
 export function getPatterns(lang = 'zh') {

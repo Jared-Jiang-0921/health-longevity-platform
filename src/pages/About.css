@@ -40,11 +40,6 @@
   padding-left: 1.2rem;
 }
 
-.page-about--rtl .about-urls {
-  padding-left: 0;
-  padding-right: 1.2rem;
-}
-
 .about-url-text {
   display: block;
   margin-top: 0.15rem;

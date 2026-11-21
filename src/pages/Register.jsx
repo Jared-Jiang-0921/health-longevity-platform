@@ -18,7 +18,6 @@ const PREMIUM_PLANS = CHECKOUT_PLANS.filter((p) => p.tier === 'premium')
 const CURRENCIES = {
   zh: { USD: '美元', EUR: '欧元', CNY: '人民币', HKD: '港币', SGD: '新加坡元', GBP: '英镑', JPY: '日元', AUD: '澳元' },
   en: { USD: 'US dollar', EUR: 'Euro', CNY: 'Chinese yuan', HKD: 'Hong Kong dollar', SGD: 'Singapore dollar', GBP: 'Pound sterling', JPY: 'Yen', AUD: 'Australian dollar' },
-  ar: { USD: 'دولار أمريكي', EUR: 'يورو', CNY: 'يوان صيني', HKD: 'دولار هونغ كونغ', SGD: 'دولار سنغافوري', GBP: 'جنيه إسترليني', JPY: 'ين', AUD: 'دولار أسترالي' },
 }
 
 const I18N = {
@@ -64,28 +63,6 @@ const I18N = {
       standard_yearly: { period: 'Yearly', desc: '12 months, about 17% off' },
       premium_monthly: { period: 'Monthly', desc: '1 month' },
       premium_yearly: { period: 'Yearly', desc: '12 months, about 17% off' },
-    },
-  },
-  ar: {
-    title: 'إنشاء حساب', login: 'تسجيل الدخول', hasAcc: 'لديك حساب بالفعل؟', forgot: 'هل نسيت كلمة المرور؟', email: 'البريد الإلكتروني', nickname: 'الاسم المعروض (اختياري)', password: 'كلمة المرور', confirm: 'تأكيد كلمة المرور', register: 'إنشاء الحساب', registering: 'جار إنشاء الحساب…', toPay: 'إنشاء الحساب والدفع', toPaying: 'جار فتح صفحة الدفع…', choose: 'اختر نوع العضوية', payCurrency: 'عملة الدفع',
-    intro: 'العضوية العادية مجانية. القياسي والمميز ينتقلان إلى صفحة الدفع نفسها، مع WeChat Pay أو Alipay أو البطاقة (Stripe: بطاقة / WeChat Pay / Alipay).',
-    freePrice: 'مجاني', freeDesc: 'أنشئ حسابًا لتجربة بعض الأقسام والمحتوى',
-    namePh: 'الاسم المعروض', passwordPh: 'كلمة المرور', confirmPh: 'أعد إدخال كلمة المرور', approx: 'حوالي',
-    errEmail: 'أدخل بريدًا صالحًا، مثل name@example.com', errPassword: 'كلمة المرور 6 أحرف على الأقل', errMatch: 'كلمتا المرور غير متطابقتين', errLegal: 'يرجى الموافقة على Terms of Service و Privacy Policy', errPlan: 'اختر خطة مدفوعة صالحة', errFail: 'تعذر إنشاء الحساب',
-    rateMissing: (code) => `لا يوجد سعر لـ ${code}. تعرض البطاقة سعر العملة الأساسية؛ الخصم الفعلي حسب قناة الدفع.`,
-    apiErrors: {
-      '该邮箱已注册': 'هذا البريد مسجّل بالفعل',
-      '邮箱和密码必填': 'البريد وكلمة المرور مطلوبان',
-      '邮箱格式不正确': 'صيغة البريد غير صالحة',
-      '该企业域名已启用企业管理，请联系管理员邀请加入': 'نطاق الشركة هذا يستخدم حسابات مؤسسة. اطلب دعوة من المسؤول',
-      '注册失败：未写入用户': 'تعذر إنشاء الحساب: لم يُحفظ',
-      '注册失败': 'تعذر إنشاء الحساب',
-    },
-    plans: {
-      standard_monthly: { period: 'شهري', desc: 'شهر واحد' },
-      standard_yearly: { period: 'سنوي', desc: '12 شهرًا، خصم نحو 17%' },
-      premium_monthly: { period: 'شهري', desc: 'شهر واحد' },
-      premium_yearly: { period: 'سنوي', desc: '12 شهرًا، خصم نحو 17%' },
     },
   },
 }
@@ -310,7 +287,7 @@ export default function Register() {
               <Link to="/disclaimer" target="_blank" rel="noopener noreferrer">
                 Health Disclaimer
               </Link>
-              . Legal pages offer English, 简体中文, and العربية.
+              . Legal pages offer English and 简体中文.
             </span>
           </label>
 

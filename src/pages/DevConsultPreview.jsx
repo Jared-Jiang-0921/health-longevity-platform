@@ -61,7 +61,6 @@ function Panel({ title, initialEntry, initialSession }) {
         token=""
         lang="zh"
         entry={entry}
-        rtl={false}
         copy={copyFor(entry, sessionOpen)}
         seedMessages={initialSession ? seedMessages() : []}
         initialDraft="模拟问题：每周步行多久比较合适？"

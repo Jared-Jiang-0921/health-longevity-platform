@@ -215,9 +215,9 @@ test('other accounts keep the existing limit copy, and the allowlist hint no lon
   assert.match(consult, /Up to 5 images and 3 documents \(≤5MB each\)\./)
   assert.match(consult, /Keep each document under 5MB; compress large photos before uploading\./)
   const hints = [...consult.matchAll(/attachHintExempt: '([^']*)'/g)].map((m) => m[1])
-  assert.equal(hints.length, 3)
+  assert.equal(hints.length, 2)
   for (const line of hints) {
-    assert.doesNotMatch(line, /不超过 5MB|≤5MB|5MB لكل/)
+    assert.doesNotMatch(line, /不超过 5MB|≤5MB/)
     assert.match(line, /25MB/)
   }
   assert.match(hints[0], /不限单文件大小/)

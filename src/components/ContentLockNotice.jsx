@@ -19,13 +19,6 @@ const COPY = {
     register: 'Sign up',
     upgrade: 'Upgrade',
   },
-  ar: {
-    guest: (label) => `يتطلب هذا المحتوى ${label}. يرجى تسجيل الدخول أو إنشاء حساب.`,
-    member: (label) => `يتطلب هذا المحتوى ${label}. يرجى ترقية العضوية.`,
-    login: 'تسجيل الدخول',
-    register: 'إنشاء حساب',
-    upgrade: 'ترقية العضوية',
-  },
 }
 
 /**

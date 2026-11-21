@@ -18,43 +18,36 @@ const FIELD_LABELS = {
   'health-skills': {
     zh: { subcategory: '课程大类（亚类）', subtopic: '系列合集（如：老年人7分钟力量训练）', subcategoryContent: '按课程大类查看资料', hint: '上传视频时请选择与课程系列一致的「系列合集」，视频会显示在该系列课程页。' },
     en: { subcategory: 'Course category', subtopic: 'Series collection', subcategoryContent: 'Browse by course category', hint: 'Pick the series name; videos appear on that series course page.' },
-    ar: { subcategory: 'فئة الدورة', subtopic: 'المجموعة', subcategoryContent: 'حسب فئة الدورة', hint: '' },
   },
   products: {
     zh: { subcategory: '产品类型', subtopic: '资料类型', subcategoryContent: '按产品类型查看资料', hint: '资料会归入上方商品分类（营养补充剂、健康设备等）。' },
     en: { subcategory: 'Product type', subtopic: 'Asset type', subcategoryContent: 'Browse by product type', hint: '' },
-    ar: { subcategory: 'نوع المنتج', subtopic: 'نوع المادة', subcategoryContent: 'حسب نوع المنتج', hint: '' },
   },
   'tcm-prevention': {
     zh: { subcategory: '治未病栏目', subtopic: '对应条目（单药 / 处方 / 专题）', subcategoryContent: '按治未病栏目查看资料', hint: '请选与本页栏目一致的分类：规划栏目或「中草药单药 / 经典处方」。' },
     en: { subcategory: 'Preventive TCM column', subtopic: 'Matching item', subcategoryContent: 'Browse by TCM column', hint: '' },
-    ar: { subcategory: 'عمود الوقاية', subtopic: 'البند', subcategoryContent: 'حسب العمود', hint: '' },
   },
   'longevity-news': {
     zh: { subcategory: '资讯栏目', subtopic: '稿件类型', subcategoryContent: '按资讯栏目查看资料', hint: '请选与本页栏目一致的分类后再发布链接或上传文件。' },
     en: { subcategory: 'News column', subtopic: 'Item type', subcategoryContent: 'Browse by news column', hint: '' },
-    ar: { subcategory: 'عمود الأخبار', subtopic: 'نوع المادة', subcategoryContent: 'حسب العمود', hint: '' },
   },
   'translation-opportunities': {
     zh: { subcategory: '转化栏目', subtopic: '资料类型', subcategoryContent: '按转化栏目查看资料', hint: '请选与上表栏目一致的分类。' },
     en: { subcategory: 'Column', subtopic: 'Asset type', subcategoryContent: 'Browse by column', hint: '' },
-    ar: { subcategory: 'العمود', subtopic: 'نوع المادة', subcategoryContent: 'حسب العمود', hint: '' },
   },
   solutions: {
     zh: { subcategory: '能力栏目', subtopic: '资料类型', subcategoryContent: '按能力栏目查看资料', hint: '请归入本页能力：专业咨询、自我促进咨询、内容资源或健康问卷。' },
     en: { subcategory: 'Capability', subtopic: 'Asset type', subcategoryContent: 'Browse by capability', hint: '' },
-    ar: { subcategory: 'القدرة', subtopic: 'نوع المادة', subcategoryContent: 'حسب القدرة', hint: '' },
   },
 }
 
 const DEFAULT_LABELS = {
   zh: { subcategory: '栏目', subtopic: '条目', subcategoryContent: '按栏目查看资料', hint: '' },
   en: { subcategory: 'Column', subtopic: 'Item', subcategoryContent: 'Browse by column', hint: '' },
-  ar: { subcategory: 'العمود', subtopic: 'البند', subcategoryContent: 'حسب العمود', hint: '' },
 }
 
 export function getModuleAssetFieldLabels(moduleKey, lang = 'zh') {
-  const locale = lang === 'en' || lang === 'ar' ? lang : 'zh'
+  const locale = lang === 'en' ? lang : 'zh'
   const pack = FIELD_LABELS[moduleKey] || DEFAULT_LABELS
   return pack[locale] || pack.zh || DEFAULT_LABELS.zh
 }

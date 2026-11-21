@@ -1,6 +1,6 @@
 import { hasChinese } from '../data/productLocale.js'
 
-/** 上架商品中英阿展示字段。阿语无专用列时用英文；缺译文时保留中文并标 zhOnly。 */
+/** 上架商品中英展示字段。缺译文时保留中文并标 zhOnly。 */
 export function pickCatalogLocale(item, lang) {
   const titleZh = item.title_zh ?? item.title ?? ''
   const titleEn = item.title_en ?? ''
@@ -9,7 +9,7 @@ export function pickCatalogLocale(item, lang) {
   const originZh = item.origin_zh ?? item.origin ?? ''
   const originEn = item.origin_en ?? ''
 
-  if (lang === 'en' || lang === 'ar') {
+  if (lang === 'en') {
     const title = titleEn || titleZh
     const desc = descEn || descZh
     const origin = originEn || originZh
@@ -32,6 +32,5 @@ export function pickSkuLocale(sku, lang) {
   const zh = sku.spec_zh || sku.specZh || ''
   const en = sku.spec_en || sku.specEn || ''
   if (lang === 'en') return en || zh
-  if (lang === 'ar') return en || zh
   return zh || en
 }

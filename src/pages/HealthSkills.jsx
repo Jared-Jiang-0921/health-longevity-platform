@@ -43,17 +43,6 @@ export default function HealthSkills() {
       epCount: (n) => `${n} episodes`,
       lessonCount: (n) => `${n} lessons`,
     },
-    ar: {
-      title: 'مهارات الصحة',
-      desc: 'دورات منهجية. المجموعة مثل كتاب: افتحها ثم شاهد كل حلقة.',
-      cancel: 'إزالة من المفضلة',
-      fav: 'إضافة للمفضلة',
-      series: 'مجموعة فيديو',
-      openBook: 'فتح',
-      moreEps: (n) => `+${n}`,
-      epCount: (n) => `${n}`,
-      lessonCount: (n) => `${n}`,
-    },
   }[lang || 'zh']
   const methodologyLine = getHealthSkillsContentApproach(lang)
   const [activeCategory, setActiveCategory] = useState(CATEGORIES[0]?.id || 'basics')
@@ -112,7 +101,7 @@ export default function HealthSkills() {
         </section>
       ) : null}
 
-      <section className="health-skills-toolbar" aria-label={lang === 'en' ? 'Course categories' : lang === 'ar' ? 'فئات الدورات' : '课程分类'}>
+      <section className="health-skills-toolbar" aria-label={lang === 'en' ? 'Course categories' : '课程分类'}>
         <div className="category-tabs health-skills-tabs">
           {CATEGORIES.map(({ id }) => (
             <button
@@ -135,9 +124,7 @@ export default function HealthSkills() {
           <p>
             {lang === 'en'
               ? `${filtered.length} courses`
-              : lang === 'ar'
-                ? `${filtered.length} دورات`
-                : `${filtered.length} 门课程`}
+              : `${filtered.length} 门课程`}
           </p>
         </div>
         {filtered.length === 0 ? (

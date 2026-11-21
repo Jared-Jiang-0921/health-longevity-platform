@@ -180,7 +180,6 @@ export default function Account() {
   const T = {
     zh: { title: '会员信息', loading: '加载中…', needLogin: '请先登录后查看。', login: '登录', refresh: '刷新', name: '昵称', email: '登录账号', level: '会员等级', expires: '有效期至', hint: '支付成功后若未更新，请点击「刷新」或重新登录。升级会员请前往' },
     en: { title: 'Account', loading: 'Loading…', needLogin: 'Please login first.', login: 'Login', refresh: 'Refresh', name: 'Name', email: 'Email', level: 'Membership', expires: 'Expires at', hint: 'If payment status is not updated, click refresh or login again. Upgrade at ' },
-    ar: { title: 'الحساب', loading: 'جار التحميل…', needLogin: 'يرجى تسجيل الدخول أولاً.', login: 'تسجيل الدخول', refresh: 'تحديث', name: 'الاسم', email: 'البريد الإلكتروني', level: 'العضوية', expires: 'تاريخ الانتهاء', hint: 'إذا لم يتم تحديث الحالة بعد الدفع، اضغط تحديث أو سجّل الدخول مجددًا. للترقية انتقل إلى ' },
   }
   const t = T[lang] || T.zh
   const { user, loading, refreshUser, getToken } = useAuth()

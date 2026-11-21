@@ -1,4 +1,4 @@
-/** 首页静态内容（中文为主；EN/AR 为简化占位） */
+/** 首页静态内容（中文为主；EN 为简化占位） */
 
 /**
  * 长寿科学观察站数字：来自生产 Qdrant（2026-08-28）
@@ -8,115 +8,102 @@
 export const HOME_STATS = [
   {
     id: 'books',
-    value: { zh: '1,366', en: '1,366', ar: '1,366' },
-    label: { zh: '入库书目', en: 'Works indexed', ar: 'أعمال مفهرسة' },
+    value: { zh: '1,366', en: '1,366' },
+    label: { zh: '入库书目', en: 'Works indexed' },
   },
   {
     id: 'passages',
-    value: { zh: '91.9万', en: '919,000+', ar: '919,000+' },
-    label: { zh: '知识片段', en: 'Knowledge passages', ar: 'مقاطع معرفية' },
+    value: { zh: '91.9万', en: '919,000+' },
+    label: { zh: '知识片段', en: 'Knowledge passages' },
   },
   {
     id: 'zh-corpus',
-    value: { zh: '38.8万', en: '388,000+', ar: '388,000+' },
-    label: { zh: '中文知识库', en: 'Chinese corpus', ar: 'المدونة الصينية' },
+    value: { zh: '38.8万', en: '388,000+' },
+    label: { zh: '中文知识库', en: 'Chinese corpus' },
   },
   {
     id: 'en-corpus',
-    value: { zh: '53.2万', en: '532,000+', ar: '532,000+' },
-    label: { zh: '英文知识库', en: 'English corpus', ar: 'المدونة الإنجليزية' },
+    value: { zh: '53.2万', en: '532,000+' },
+    label: { zh: '英文知识库', en: 'English corpus' },
   },
 ]
 
 export const HOME_MODULES = [
   {
     path: '/solutions',
-    title: { zh: 'AI 长寿方案师', en: 'AI Longevity Coach', ar: 'مدرب طول العمر بالذكاء الاصطناعي' },
+    title: { zh: 'AI 长寿方案师', en: 'AI Longevity Coach' },
     intro: {
       zh: '基于您的健康画像与目标，生成分层行动建议：风险识别、优先级排序、报告解读与就医提示。全程标注证据等级与适用边界，仅供健康教育，不替代诊疗。',
       en: 'Builds a health profile and tiered action plan—risks, priorities, lab context, and care prompts—with evidence grades and clear boundaries. Education only, not medical care.',
-      ar: 'يُنشئ صورة صحية وخطة متدرجة مع درجات الأدلة وحدود الاستخدام. للتعليم فقط.',
     },
     chips: {
       zh: ['健康画像', '可解释建议', '就医提示'],
       en: ['Health profile', 'Explainable', 'Care prompts'],
-      ar: ['صورة صحية', 'قابل للتفسير', 'تنبيهات'],
     },
   },
   {
     path: '/products',
-    title: { zh: '长寿产品证据库', en: 'Product Evidence Library', ar: 'مكتبة أدلة المنتجات' },
+    title: { zh: '长寿产品证据库', en: 'Product Evidence Library' },
     intro: {
       zh: '汇集健康产品与补充剂的成分说明、研究证据、监管信息与相互作用提示，并标明适用人群与谨慎事项。帮助您在购买前完成「证据核对」，不做治疗方案包装。',
       en: 'Ingredients, research evidence, regulatory context, interactions, and who should use or avoid each product—evidence-first, not sold as treatment.',
-      ar: 'مكونات وأدلة وتنظيم وتفاعلات وجمهور مستهدف قبل الشراء.',
     },
     chips: {
       zh: ['成分证据', '监管信息', '相互作用'],
       en: ['Ingredients', 'Regulatory', 'Interactions'],
-      ar: ['مكونات', 'تنظيم', 'تفاعلات'],
     },
   },
   {
     path: '/tcm-prevention',
-    title: { zh: '中医药特色 · 治未病', en: 'TCM Preventive Care', ar: 'الوقاية بالطب الصيني' },
+    title: { zh: '中医药特色 · 治未病', en: 'TCM Preventive Care' },
     intro: {
       zh: '以中医治未病思想结合现代预防医学：体质辨识、四时养生、饮食调养、情志调摄与导引运动，并提供药食同源与经典方资料。强调教育参考，不替代辨证论治与处方。',
       en: 'TCM preventive care plus modern prevention—constitution, seasons, diet, mind–body, movement, with herbs and classical formulas (education only).',
-      ar: 'وقاية صينية مع طب وقائي حديث؛ أنماط وفصول وتغذية وحركة.',
     },
     chips: {
       zh: ['体质调养', '四时养生', '药食同源'],
       en: ['Constitution', 'Seasons', 'Food therapy'],
-      ar: ['نمط', 'فصول', 'غذاء دوائي'],
     },
     accent: true,
     disclaimer: {
       zh: '教育/生活方式信息，不替代诊疗',
       en: 'Education only—not medical care',
-      ar: 'تعليمي فقط',
     },
   },
   {
     path: '/health-skills',
-    title: { zh: '长寿知识技能', en: 'Health Skills', ar: 'مهارات طول العمر' },
+    title: { zh: '长寿知识技能', en: 'Health Skills' },
     intro: {
       zh: '将循证医学与生活方式干预拆解为可学可练的结构：知识卡片、实操清单、证据等级、适用人群与风险提示。覆盖睡眠、代谢、运动、营养等主题，支持系列课程与视频学习。',
       en: 'Structured learning—cards, checklists, evidence grades, audience fit, and risk notes—on sleep, metabolism, exercise, and nutrition, with courses and video series.',
-      ar: 'تعلم منظم ببطاقات وقوائم ودرجات أدلة حول النوم والتمثيل والحركة والتغذية.',
     },
     chips: {
       zh: ['系列课程', '证据等级', '实操清单'],
       en: ['Course series', 'Evidence grade', 'Checklists'],
-      ar: ['دورات', 'أدلة', 'قوائم'],
     },
   },
   {
     path: '/longevity-news',
-    title: { zh: '前沿医学资讯', en: 'Frontier Medical Insights', ar: 'مستجدات طبية رائدة' },
+    title: { zh: '前沿医学资讯', en: 'Frontier Medical Insights' },
     intro: {
       zh: '追踪 PubMed、顶刊与临床指南中的长寿与慢病相关进展，提供证据解读与试验动态。统一审慎表述，区分「前沿发现」与「已证实有效」，避免夸大疗效。',
       en: 'Digests from PubMed, leading journals, and guidelines—with evidence framing and trial updates. Frontier findings are not equated with proven efficacy.',
-      ar: 'ملخصات من دوريات وإرشادات مع إطار أدلة وتجارب.',
     },
     chips: {
       zh: ['指南速递', '顶刊解读', '试验追踪'],
       en: ['Guidelines', 'Journal digests', 'Trials'],
-      ar: ['إرشادات', 'دوريات', 'تجارب'],
     },
   },
   {
     path: '/translation-opportunities',
-    title: { zh: '转化应用机遇', en: 'Translation & Commercialization', ar: 'فرص التحويل' },
+    title: { zh: '转化应用机遇', en: 'Translation & Commercialization' },
     intro: {
       zh: '面向创业者、投资人与产业团队：从研究、指南与临床需求中提炼可落地的技术、产品与服务形态，并提示监管、证据与获客等关键风险。涵盖产业趋势、商业模式与机会库。',
       en: 'For founders and industry: translational signals, business models, opportunity bank, and compliance risks—from research to viable products and services.',
-      ar: 'لرواد الأعمال: إشارات تحويل ونماذج أعمال ومخاطر امتثال.',
     },
     chips: {
       zh: ['产业趋势', '商业模式', '合规风险'],
       en: ['Trends', 'Business models', 'Compliance'],
-      ar: ['اتجاهات', 'نماذج', 'امتثال'],
     },
   },
 ]
@@ -130,7 +117,6 @@ export const HOME_TODAY_FRONTIER = [
     summary: {
       zh: '早期人体试验显示衰老细胞清除与炎症指标改善相关，尚不足以作为临床常规推荐。',
       en: 'Early human trials link senescent-cell clearance with changes in inflammatory markers. That is not enough for routine clinical use.',
-      ar: 'تجارب بشرية مبكرة تربط إزالة الخلايا الهرمة بتغيّر واسمات الالتهاب. هذا لا يكفي للاستخدام السريري الروتيني.',
     },
   },
   {
@@ -141,7 +127,6 @@ export const HOME_TODAY_FRONTIER = [
     summary: {
       zh: '观察性队列提示时间限制进食与心血管事件关联，需更多随机对照验证。',
       en: 'An observational cohort suggests a link between time-restricted eating and cardiovascular events. More randomized trials are needed.',
-      ar: 'تشير مجموعة رصدية إلى صلة بين تقييد وقت الأكل وحوادث القلب والأوعية. يلزم مزيد من التجارب العشوائية.',
     },
   },
   {
@@ -152,7 +137,6 @@ export const HOME_TODAY_FRONTIER = [
     summary: {
       zh: '百岁老人菌群特征具一致性，但因果与干预路径仍待明确。',
       en: 'Centenarian microbiome patterns look consistent, but cause and any intervention path are still unclear.',
-      ar: 'سمات ميكروبيوم المعمرين تبدو متسقة، لكن السببية ومسار أي تدخل ما زالا غير واضحين.',
     },
   },
 ]
@@ -160,46 +144,40 @@ export const HOME_TODAY_FRONTIER = [
 export const HOME_HOT_EVIDENCE = [
   {
     id: 1,
-    name: { zh: '维生素 D3 + K2', en: 'Vitamin D3 + K2', ar: 'فيتامين D3 + K2' },
+    name: { zh: '维生素 D3 + K2', en: 'Vitamin D3 + K2' },
     audience: {
       zh: '日照不足、骨骼健康关注者',
       en: 'People with little sun who are watching bone health',
-      ar: 'من قلّ تعرضهم للشمس ويهتمون بصحة العظام',
     },
     risk: {
       zh: '高钙血症、抗凝用药者需咨询医生',
       en: 'People with high blood calcium, or on anticoagulants, should ask a clinician',
-      ar: 'فرط كالسيوم الدم أو من يتناول مضاد تخثر يسأل الطبيب',
     },
     evidence: 'B',
   },
   {
     id: 2,
-    name: { zh: 'Omega-3 鱼油', en: 'Omega-3 fish oil', ar: 'زيت السمك أوميغا-3' },
+    name: { zh: 'Omega-3 鱼油', en: 'Omega-3 fish oil' },
     audience: {
       zh: '心血管与认知健康关注者',
       en: 'People watching cardiovascular and cognitive health',
-      ar: 'من يهتم بصحة القلب والأوعية والإدراك',
     },
     risk: {
       zh: '抗凝/手术前后需评估出血风险',
       en: 'Bleeding risk should be reviewed around anticoagulants or surgery',
-      ar: 'يُراجع خطر النزف مع مضادات التخثر أو حول الجراحة',
     },
     evidence: 'A',
   },
   {
     id: 3,
-    name: { zh: '间歇性断食（16:8）', en: 'Time-restricted eating (16:8)', ar: 'الأكل المقيّد بالوقت (16:8)' },
+    name: { zh: '间歇性断食（16:8）', en: 'Time-restricted eating (16:8)' },
     audience: {
       zh: '代谢健康、体重管理者',
       en: 'People managing metabolic health or weight',
-      ar: 'من يدير الصحة الأيضية أو الوزن',
     },
     risk: {
       zh: '糖尿病、妊娠、进食障碍不适用；需个体化',
       en: 'Not for diabetes, pregnancy, or eating disorders; needs an individual plan',
-      ar: 'لا يناسب السكري أو الحمل أو اضطرابات الأكل؛ يحتاج خطة فردية',
     },
     evidence: 'C',
   },
@@ -286,47 +264,6 @@ export function getHomeCopy(lang) {
     stepNote: 'Reports, favorites, and plans require sign-in',
     welcome: 'Welcome',
   }
-  const ar = {
-    heroH1: 'منصة طب طول العمر المبنية على الأدلة: الطب الحديث مع الوقاية بالطب الصيني',
-    heroSub:
-      'تستند إلى الإرشادات وأدلة البحث، وتجمع إطار أنماط الجسم والمواسم في الطب الصيني، لتقديم أسلوب حياة قابل للتطبيق وتنبيهات للمخاطر. معلومات تعليمية لا تغني عن الرعاية الطبية، مع ذكر درجة الدليل والفئة المناسبة.',
-    ctaPrimary: 'أنشئ اقتراحاتي خلال دقيقة',
-    ctaSecondary: 'تصفح مكتبة الأدلة',
-    demoLabel: 'تقرير نموذجي',
-    demoRisk: 'نظرة على المخاطر',
-    demoRiskVal: 'الأيض · النوم · اهتمام متوسط',
-    demoAdvice: 'ملخص المقترحات',
-    demoAdviceVal: 'أولوية ضبط إيقاع النوم؛ 150 دقيقة أسبوعيًا من النشاط المتوسط؛ استراتيجيات تغذية بدرجة دليل B.',
-    demoEvidence: 'درجة الدليل',
-    trustTitle: 'كيف نعرض المعلومات',
-    trustEvidence: 'درجات الدليل',
-    trustEvidenceDesc: 'تصنيف من A إلى D يميز الإرشادات والتجارب العشوائية والدراسات الرصدية',
-    trustAudience: 'الفئة المناسبة',
-    trustAudienceDesc: 'من قد يستفيد، ومن ينبغي أن يتوخى الحذر أو يتجنب',
-    trustRisk: 'المخاطر والتفاعلات',
-    trustRiskDesc: 'تنبيهات لطلب الرعاية، وتفاعلات الأدوية، والفئات الخاصة',
-    modulesTitle: 'ست وحدات للخدمة',
-    modulesLead: 'لكل وحدة غلاف ومقدمة للمحتوى الرئيسي، ويمكن الدخول إليها',
-    statsTitle: 'مرصد علوم طول العمر',
-    statsLead: 'الأرقام من قاعدة المعرفة المفهرسة بالصينية والإنجليزية، وتتجدد مع الإضافة',
-    moduleEnter: 'ادخل الوحدة',
-    todayTitle: 'تحديثات اليوم',
-    todayCurated: 'اختيار تحريري · ليس بثًا مباشرًا',
-    todayFrontier: 'أبرز المستجدات',
-    todayHot: 'مدخلات أدلة شائعة',
-    evidenceLabel: 'دليل',
-    appliesLabel: 'لمن: ',
-    cautionLabel: 'تنبيه',
-    stepsTitle: 'ثلاث خطوات للبدء',
-    steps: [
-      { title: 'اختر هدفًا', desc: 'النوم / الأيض / الحركة / الإدراك / قراءة الفحوصات' },
-      { title: 'أنشئ المقترحات', desc: 'الأولوية + تنبيه المخاطر + درجة الدليل' },
-      { title: 'أضفها إلى الخطة', desc: 'قائمة أسبوعية + متابعة بعد تسجيل الدخول' },
-    ],
-    stepNote: 'المفضلة والتقارير ومتابعة الخطة تحتاج تسجيل الدخول',
-    welcome: 'مرحبًا',
-  }
   if (lang === 'en') return en
-  if (lang === 'ar') return ar
   return zh
 }

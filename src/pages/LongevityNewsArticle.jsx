@@ -20,7 +20,6 @@ const STATIC_CARDS = getLongevityNewsArticles().map((item) => toNewsSearchCard(i
 const LABEL = {
   zh: { back: '返回前沿医学资讯', missing: '未找到这条资讯', source: '来源页', thin: '这条目前只有标题，完整说明仍在栏目页。' },
   en: { back: 'Back to medical insights', missing: 'This insight was not found', source: 'Source page', thin: 'This card only has a title. The column page has the rest.' },
-  ar: { back: 'العودة إلى المستجدات', missing: 'لم يُعثر على هذه البطاقة', source: 'صفحة المصدر', thin: 'هذه البطاقة عنوان فقط. الباقي في صفحة العمود.' },
 }
 
 function uploadCard(item) {
@@ -112,7 +111,7 @@ export default function LongevityNewsArticle() {
               {view.excerpt ? <p>{view.excerpt}</p> : null}
               {view.takeaways?.filter(Boolean).length ? (
                 <>
-                  <h2>{lang === 'zh' ? '阅读要点' : lang === 'ar' ? 'نقاط' : 'Takeaways'}</h2>
+                  <h2>{lang === 'zh' ? '阅读要点' : 'Takeaways'}</h2>
                   <ul>
                     {view.takeaways.filter(Boolean).map((line) => <li key={line}>{line}</li>)}
                   </ul>

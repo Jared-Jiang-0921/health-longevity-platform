@@ -112,6 +112,10 @@ sudo nginx -t && sudo systemctl reload nginx
 
 搜索引擎提交仍要站长账号自己做，本仓库不代提交。
 
+## 2026-11-21 移除阿拉伯语版
+
+网站只保留中文和英文，上面 11-11 一节里的阿语首页已不存在。`/ar` 前缀、阿语预渲染页、sitemap 和 hreflang 里的阿语条目，以及 `vercel.json`、`netlify.toml`、`robots.txt` 里的 `/ar` 规则都已删除。线上 Nginx 把 `/ar` 和 `/ar/...` 301 到中文同一路径（写法见示例配置）；Vercel、Netlify 上的 `/ar` 旧链接直接 404。
+
 ## Google Search Console
 
 1. 打开 [Google Search Console](https://search.google.com/search-console)，添加资源。规范域名用「网域」资源 `healthlongevity.cn`，或网址前缀 `https://www.healthlongevity.cn/`。

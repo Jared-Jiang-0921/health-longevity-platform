@@ -9,7 +9,6 @@ export default function OrgInviteAccept() {
   const t = {
     zh: { title: '接受企业邀请', loading: '加载中…', needLogin: '请先登录后接受邀请。', current: '当前登录邮箱：', tokenMissing: '邀请链接缺少 token，请确认链接完整。', handling: '处理中…', accept: '接受邀请', fail: '接受邀请失败', joined: '已加入企业：' },
     en: { title: 'Accept Organization Invite', loading: 'Loading…', needLogin: 'Please login first to accept the invite.', current: 'Current account: ', tokenMissing: 'Invite token missing. Please verify the full link.', handling: 'Processing…', accept: 'Accept Invite', fail: 'Failed to accept invite', joined: 'Joined organization: ' },
-    ar: { title: 'قبول دعوة المؤسسة', loading: 'جار التحميل…', needLogin: 'يرجى تسجيل الدخول أولاً.', current: 'الحساب الحالي: ', tokenMissing: 'رابط الدعوة يفتقد token.', handling: 'جار المعالجة…', accept: 'قبول الدعوة', fail: 'فشل قبول الدعوة', joined: 'تم الانضمام إلى المؤسسة: ' },
   }[lang || 'zh']
   const [search] = useSearchParams()
   const token = useMemo(() => String(search.get('token') || '').trim(), [search])

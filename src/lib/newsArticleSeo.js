@@ -40,7 +40,7 @@ function hasChinese(value) {
 }
 
 export function presentNewsArticle(card, lang) {
-  const key = lang === 'en' || lang === 'ar' ? lang : 'zh'
+  const key = lang === 'en' ? lang : 'zh'
   const article = getLongevityNewsArticles().find((item) => item.id === card?.id)
   const view = article ? articleDisplay(article, key) : null
   const summary = view?.summary || card?.summary || ''
@@ -67,7 +67,7 @@ export function isSubstantiveNewsCard(card, lang = 'zh') {
 }
 
 export function articleLanguages(card) {
-  return ['zh', 'en', 'ar'].filter((lang) => {
+  return ['zh', 'en'].filter((lang) => {
     const view = presentNewsArticle(card, lang)
     if (!isSubstantiveNewsCard(view, lang)) return false
     if (lang !== 'zh' && view.zhOnly) return false

@@ -15,14 +15,6 @@ const MESSAGES = {
     networkError: 'Network error: ',
     invalidInput: 'Invalid input',
   },
-  ar: {
-    loadFail: 'فشل التحميل',
-    requestFail: 'فشل الطلب',
-    saveFail: 'فشل الحفظ',
-    operationFail: 'فشلت العملية',
-    networkError: 'خطأ في الشبكة: ',
-    invalidInput: 'إدخال غير صالح',
-  },
 }
 
 export function getMessages(lang = 'zh') {

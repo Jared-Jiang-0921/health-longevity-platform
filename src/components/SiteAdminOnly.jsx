@@ -19,14 +19,6 @@ const I18N = {
     register: 'Sign up',
     home: 'Back to home',
   },
-  ar: {
-    loading: 'جارٍ التحميل…',
-    needLogin: 'يرجى تسجيل الدخول للوصول إلى هذه الصفحة.',
-    forbidden: 'هذه الصفحة مخصصة لمسؤولي الموقع فقط (SITE_ADMIN_EMAILS على الخادم).',
-    login: 'تسجيل الدخول',
-    register: 'إنشاء حساب',
-    home: 'العودة للرئيسية',
-  },
 }
 
 export default function SiteAdminOnly({ children }) {

@@ -1,4 +1,4 @@
-const BIBLIO_HEAD = /(?:^|\n)\s*(?:#{1,3}\s*|\*\*)?(?:参考文献|引用文献|参考资料|المراجع)(?:\*\*)?\s*(?:\n|$)/
+const BIBLIO_HEAD = /(?:^|\n)\s*(?:#{1,3}\s*|\*\*)?(?:参考文献|引用文献|参考资料)(?:\*\*)?\s*(?:\n|$)/
 const BIBLIO_HEAD_EN = /(?:^|\n)\s*#{1,3}\s*(?:References|Sources)\s*(?:\n|$)/i
 
 function cutIndex(text) {

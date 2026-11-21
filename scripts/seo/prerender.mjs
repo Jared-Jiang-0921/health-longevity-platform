@@ -1,6 +1,6 @@
 /**
  * 构建后预渲染公开页 HTML（含 meta / hreflang / JSON-LD / 正文），供不执行 JS 的爬虫读取。
- * 语言前缀：中文默认路径，英文 /en，阿拉伯语 /ar。
+ * 语言前缀：中文默认路径，英文 /en。
  */
 import fs from 'node:fs/promises'
 import path from 'node:path'
@@ -135,7 +135,7 @@ function solutionsBody(lang) {
     <h1>${escapeHtml(page.heading)}</h1>
     <p>${escapeHtml(page.lead)}</p>
     <p>${escapeHtml(page.medicalDisclaimer)}</p>
-    <h2>${escapeHtml(lang === 'zh' ? '咨询' : lang === 'ar' ? 'الاستشارة' : 'Consults')}</h2>
+    <h2>${escapeHtml(lang === 'zh' ? '咨询' : 'Consults')}</h2>
     <p>${escapeHtml(page.consultLead)}</p>
     <article><h3>${escapeHtml(page.general.title)}</h3><p>${escapeHtml(page.general.body)}</p></article>
     <article><h3>${escapeHtml(page.professional.title)}</h3><p>${escapeHtml(page.professional.body)}</p></article>
@@ -225,7 +225,7 @@ function hasChinese(value) {
 function displayKeywords(title, summary, lang) {
   const found = extractLongevityKeywords(title, summary)
   if (!lang || lang === 'zh') return found
-  const fallback = lang === 'ar' ? 'بحث طول العمر' : 'longevity research'
+  const fallback = 'longevity research'
   return found
     .map((term) => (term === '长寿研究' ? fallback : term))
     .filter((term) => !hasChinese(term))
@@ -278,7 +278,7 @@ function newsBody(lang, cards) {
     if (!grouped.has(label)) grouped.set(label, [])
     grouped.get(label).push(presentNewsCard(card, lang))
   }
-  const keywordLabel = lang === 'en' ? 'Keywords' : lang === 'ar' ? 'كلمات مفتاحية' : '关键词'
+  const keywordLabel = lang === 'en' ? 'Keywords' : '关键词'
   const sections = []
   for (const [label, items] of grouped) {
     if (!items.length) continue
@@ -288,7 +288,7 @@ function newsBody(lang, cards) {
           ? `<p>${escapeHtml(keywordLabel)}: ${escapeHtml(card.keywords.join(', '))}</p>`
           : ''
         const excerpt = card.excerpt ? `<p>${escapeHtml(card.excerpt)}</p>` : ''
-        const onlyZh = card.zhOnly ? `<p>${escapeHtml(lang === 'ar' ? 'هذا المحتوى بالصينية فقط' : 'This item is in Chinese only')}</p>` : ''
+        const onlyZh = card.zhOnly ? `<p>${escapeHtml('This item is in Chinese only')}</p>` : ''
         const heading = isSubstantiveNewsCard(card, lang)
           ? `<a href="${escapeHtml(absoluteUrl(lang, newsArticleRouterPath(card.id)))}">${escapeHtml(card.title)}</a>`
           : escapeHtml(card.title)
@@ -334,12 +334,12 @@ function newsArticleBody(view, lang) {
   const mod = getLongevityNewsModuleCopy(lang)
   const takes = (view.takeaways || []).filter(Boolean)
   const list = takes.length
-    ? `<h2>${escapeHtml(lang === 'zh' ? '阅读要点' : lang === 'ar' ? 'نقاط' : 'Takeaways')}</h2><ul>${takes.map((line) => `<li>${escapeHtml(line)}</li>`).join('')}</ul>`
+    ? `<h2>${escapeHtml(lang === 'zh' ? '阅读要点' : 'Takeaways')}</h2><ul>${takes.map((line) => `<li>${escapeHtml(line)}</li>`).join('')}</ul>`
     : ''
   const dated = view.publishedAt ? `<p><time datetime="${escapeHtml(view.publishedAt)}">${escapeHtml(view.publishedAt)}</time></p>` : ''
   const excerpt = view.excerpt ? `<p>${escapeHtml(view.excerpt)}</p>` : ''
   const source = view.url && /^https?:\/\//i.test(view.url)
-    ? `<p>${escapeHtml(lang === 'zh' ? '来源页' : lang === 'ar' ? 'صفحة المصدر' : 'Source page')}：<a href="${escapeHtml(view.url)}">${escapeHtml(view.url)}</a></p>`
+    ? `<p>${escapeHtml(lang === 'zh' ? '来源页' : 'Source page')}：<a href="${escapeHtml(view.url)}">${escapeHtml(view.url)}</a></p>`
     : ''
   const note = view.sourceNote ? `<p>${escapeHtml(view.sourceNote)}</p>` : ''
   const back = `<p><a href="${escapeHtml(absoluteUrl(lang, '/longevity-news'))}">${escapeHtml(navLabel('/longevity-news', lang))}</a></p>`

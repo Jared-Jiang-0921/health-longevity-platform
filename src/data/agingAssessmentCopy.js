@@ -180,5 +180,3 @@ AGING_ASSESSMENT_COPY.en = {
     yearBands: '|Δ|<5 near · 5–10 mild · ≥10 marked',
   },
 }
-
-AGING_ASSESSMENT_COPY.ar = AGING_ASSESSMENT_COPY.en

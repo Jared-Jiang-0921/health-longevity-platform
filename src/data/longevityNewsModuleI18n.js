@@ -52,34 +52,9 @@ const COPY = {
     wechatBody:
       'WeChat does not allow embedding full posts. Copy each title and URL from the official account, then use Publish link or Bulk import at the bottom (one line: title | URL). Readers open the original in WeChat.',
   },
-  ar: {
-    title: 'مستجدات طبية رائدة',
-    lead:
-      'تلخيص وقراءة منظّمة للأدبيات المحكمة والمصادر الرسمية. تصفّح حسب العمود ثم افتح كل مقال. يمكن للمسؤولين رفع ملفات إلى العمود المناسب.',
-    sourcesTitle: 'مصادر (أمثلة)',
-    sourcesBody:
-      'PubMed؛ دوريات مثل Nature وScience وCell وThe Lancet وNEJM وJAMA وBMJ؛ مراجعات كوكران؛ تعاميم منظمات مثل WHO وFDA وNMPA؛ إرشادات وطنية وجمعيات عند توفرها علناً.',
-    caveatTitle: 'صياغة الأدلة',
-    caveatPhrase:
-      'البحث الحالي يشير إلى احتمال صلة، لكن يلزم المزيد من أدلة سريرية عالية الجودة. لا تعامل ورقة واحدة أو عنواناً إعلامياً كدليل على الفعالية في الإنسان.',
-    columnsTitle: 'هيكل أعمدة مقترح',
-    colColumn: 'العمود',
-    colContent: 'المحتوى',
-    columnRows: [
-      { column: 'ملخص أسبوعي', content: 'تلخيص أحدث الأوراق مع حدود التطبيق' },
-      { column: 'شرح الأدلة', content: 'ترجمة الدراسات المعقدة إلى قوة دليل وقيود' },
-      { column: 'مراقبة الجدل', content: 'حذر مع NMN وميتفورمين ورابامايسين والخلايا الجذعية والحويصلات الخارجية' },
-      { column: 'متابعة التجارب', content: 'تجارب طول العمر الجارية والسجلات والمراحل' },
-      { column: 'تحديثات الإرشادات', content: 'توصيات جديدة أو معدّلة من جهات موثوقة' },
-    ],
-    listIntro: 'البطاقات أدناه للعرض التجريبي—استبدلها بمحتوى تحريري لاحقاً.',
-    wechatTitle: 'نقل مقالات WeChat',
-    wechatBody:
-      'لا يمكن تضمين مقال WeChat كاملاً. انسخ العنوان والرابط ثم انشره من أسفل الصفحة، سطراً لكل مقال: العنوان | الرابط.',
-  },
 }
 
 export function getLongevityNewsModuleCopy(lang) {
-  const key = lang === 'en' || lang === 'ar' ? lang : 'zh'
+  const key = lang === 'en' ? lang : 'zh'
   return COPY[key] || COPY.zh
 }

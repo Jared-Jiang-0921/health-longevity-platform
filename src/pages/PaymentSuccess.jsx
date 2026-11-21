@@ -12,7 +12,6 @@ export default function PaymentSuccess() {
   const t = {
     zh: { syncing: '正在同步会员信息…', syncHint: '同步提示：', notDone: '同步未完成，请刷新页面重试', net: '网络异常，请刷新页面', title: '支付成功', thanks: '感谢您的支付，订单已确认。', home: '返回首页' },
     en: { syncing: 'Syncing membership…', syncHint: 'Sync note: ', notDone: 'Sync not completed. Please refresh.', net: 'Network error, please refresh', title: 'Payment Success', thanks: 'Thank you for your payment. Your order is confirmed.', home: 'Back Home' },
-    ar: { syncing: 'جار مزامنة العضوية…', syncHint: 'ملاحظة المزامنة: ', notDone: 'لم تكتمل المزامنة، يرجى التحديث', net: 'خطأ في الشبكة، يرجى التحديث', title: 'تم الدفع بنجاح', thanks: 'شكرًا لك، تم تأكيد طلبك.', home: 'العودة للرئيسية' },
   }[lang || 'zh']
   const [searchParams] = useSearchParams()
   const { refreshUser } = useAuth()

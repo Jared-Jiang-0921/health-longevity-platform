@@ -37,25 +37,6 @@ const UI = {
     notFound: 'Not found',
     language: 'Language',
   },
-  ar: {
-    loading: 'جار التحميل…',
-    refresh: 'تحديث',
-    refreshing: 'جار التحديث…',
-    search: 'بحث',
-    save: 'حفظ',
-    saving: 'جار الحفظ…',
-    cancel: 'إلغاء',
-    prev: 'السابق',
-    next: 'التالي',
-    login: 'تسجيل الدخول',
-    register: 'إنشاء حساب',
-    back: 'عودة',
-    details: 'التفاصيل',
-    learn: 'تعلم',
-    noData: 'لا توجد بيانات',
-    notFound: 'غير موجود',
-    language: 'اللغة',
-  },
 }
 
 export function getUi(lang = 'zh') {

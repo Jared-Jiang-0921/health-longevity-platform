@@ -26,7 +26,7 @@ const TAB_PRESCRIPTIONS = 'prescriptions'
 
 function localeText(field, lang) {
   if (!field) return ''
-  if (lang === 'en' || lang === 'ar') return field[lang] || field.zh
+  if (lang === 'en') return field[lang] || field.zh
   return field.zh
 }
 
@@ -199,9 +199,7 @@ export default function TCMPrevention() {
             <p>
               {lang === 'en'
                 ? `${TCM_CONSTITUTIONS.length} types`
-                : lang === 'ar'
-                  ? `${TCM_CONSTITUTIONS.length}`
-                  : `${TCM_CONSTITUTIONS.length} 种`}
+                : `${TCM_CONSTITUTIONS.length} 种`}
             </p>
           </div>
           <p className="tcm-constitution-lead">{mod.constitutionLead}</p>

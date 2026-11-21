@@ -90,34 +90,43 @@ server {
         add_header Cache-Control "public, max-age=3600" always;
     }
 
+    # 阿拉伯语版已移除，旧链接永久跳到中文同一路径
+    location = /ar {
+        return 301 /;
+    }
+
+    location ^~ /ar/ {
+        rewrite ^/ar/(.*)$ /$1 permanent;
+    }
+
     # 动态或登录后路径才回退到对应语言的前端壳。已有预渲染文件时 try_files 会先用文件。
     # 名单与 src/lib/sitePaths.js 的 SPA_EXACT 一致。未知资讯 id 不在这里，没有文件就 404。
-    location ~ ^/(en|ar)/(account|payment|favorites|health-skills|health-questionnaire|forgot-password|reset-password|ops|org|tax)(/.*)?$ {
-        try_files $uri $uri/index.html /$1/index.html;
+    location ~ ^/en/(account|payment|favorites|health-skills|health-questionnaire|forgot-password|reset-password|ops|org|tax)(/.*)?$ {
+        try_files $uri $uri/index.html /en/index.html;
     }
 
     location ~ ^/(account|payment|favorites|health-skills|health-questionnaire|forgot-password|reset-password|ops|org|tax)(/.*)?$ {
         try_files $uri $uri/index.html /index.html;
     }
 
-    location ~ ^/(en|ar)/products/.+ {
-        try_files $uri $uri/index.html /$1/index.html;
+    location ~ ^/en/products/.+ {
+        try_files $uri $uri/index.html /en/index.html;
     }
 
     location ~ ^/products/.+ {
         try_files $uri $uri/index.html /index.html;
     }
 
-    location ~ ^/(en|ar)/solutions/(risk|aging)(/.*)?$ {
-        try_files $uri $uri/index.html /$1/index.html;
+    location ~ ^/en/solutions/(risk|aging)(/.*)?$ {
+        try_files $uri $uri/index.html /en/index.html;
     }
 
     location ~ ^/solutions/(risk|aging)(/.*)?$ {
         try_files $uri $uri/index.html /index.html;
     }
 
-    location ~ ^/(en|ar)/tcm-prevention/constitution(/.*)?$ {
-        try_files $uri $uri/index.html /$1/index.html;
+    location ~ ^/en/tcm-prevention/constitution(/.*)?$ {
+        try_files $uri $uri/index.html /en/index.html;
     }
 
     location ~ ^/tcm-prevention/constitution(/.*)?$ {
@@ -213,4 +222,4 @@ server {
 #     ssl_certificate_key /etc/letsencrypt/live/healthlongevity.cn/privkey.pem;
 #     return 301 https://www.healthlongevity.cn$request_uri;
 # }
-# www 的 443 使用与上面 www 相同的 location，不要再把未知的 /en/、/ar/ 或 / 回退到首页。
+# www 的 443 使用与上面 www 相同的 location，不要再把未知的 /en/ 或 / 回退到首页。

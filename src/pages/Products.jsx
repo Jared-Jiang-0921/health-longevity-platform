@@ -31,7 +31,7 @@ export default function Products() {
   const isAdmin = Boolean(user?.site_admin)
   const ui = getUi(lang)
   const ev = getProductsEvidenceCopy(lang)
-  const originLabel = { zh: '产地', en: 'Origin', ar: 'المنشأ' }[lang] || '产地'
+  const originLabel = { zh: '产地', en: 'Origin' }[lang] || '产地'
   const chrome = productChrome(lang)
 
   const [activeCategory, setActiveCategory] = useState(PRODUCT_CATEGORIES[0]?.id || 'supplement')

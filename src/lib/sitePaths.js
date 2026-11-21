@@ -8,7 +8,6 @@ import { articleLanguages, newsArticleIdFromPath } from './newsArticleSeo.js'
 const LOCALES = [
   { prefix: '', shell: '/index.html' },
   { prefix: '/en', shell: '/en/index.html' },
-  { prefix: '/ar', shell: '/ar/index.html' },
 ]
 
 /** 这些前缀本身或其子路径没有一份静态文件能覆盖全部地址。 */
@@ -41,10 +40,6 @@ export function splitSitePath(pathname) {
     const rest = p.slice(3) || '/'
     return { locale: 'en', routerPath: rest.startsWith('/') ? rest : `/${rest}` }
   }
-  if (p === '/ar' || p.startsWith('/ar/')) {
-    const rest = p.slice(3) || '/'
-    return { locale: 'ar', routerPath: rest.startsWith('/') ? rest : `/${rest}` }
-  }
   return { locale: 'zh', routerPath: p }
 }
 
@@ -72,7 +67,7 @@ export function isPrerenderedDocumentPath(pathname, cards = []) {
   if (!id) return false
   const card = (cards || []).find((item) => item.id === id)
   if (!card) return false
-  const lang = locale === 'en' || locale === 'ar' ? locale : 'zh'
+  const lang = locale === 'en' ? locale : 'zh'
   return articleLanguages(card).includes(lang)
 }
 

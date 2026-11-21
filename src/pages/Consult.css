@@ -4,10 +4,6 @@
   padding-bottom: 2rem;
 }
 
-.page-consult--rtl {
-  text-align: right;
-}
-
 .consult-top {
   display: flex;
   flex-direction: column;
@@ -41,10 +37,6 @@
 
 .consult-back-arrow::before {
   content: '←';
-}
-
-[dir='rtl'] .consult-back-arrow::before {
-  content: '→';
 }
 
 .consult-disclaimer {

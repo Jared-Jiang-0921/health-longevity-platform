@@ -13,7 +13,7 @@ import {
 import { SITE_LEGAL } from './siteLegal.js'
 
 function pickLang(lang) {
-  if (lang === 'en' || lang === 'ar') return lang
+  if (lang === 'en') return lang
   return 'zh'
 }
 
@@ -25,24 +25,20 @@ function pick(map, lang) {
 const FOOTER_DISCLAIMER = {
   zh: '本平台内容仅供健康教育与生活方式参考，不替代专业诊疗、处方或紧急医疗处置；特殊人群（妊娠、儿童、慢病用药者等）请咨询医生。',
   en: 'Content is for education and lifestyle guidance only—not medical diagnosis or treatment. Consult a clinician for special populations.',
-  ar: 'المحتوى تعليمي فقط وليس بديلاً عن الرعاية الطبية.',
 }
 
 const CONSULT_DISCLAIMER = {
   zh: '本平台提供的健康信息仅供参考，不构成医疗诊断、治疗建议或处方依据。如有健康问题，请及时就诊于执业医疗机构，遵从执业医师的专业判断。',
   en: 'The health information provided on this platform is for reference only and does not constitute medical diagnosis, treatment advice, or prescription guidance. If you have health concerns, please consult a licensed medical professional.',
-  ar: 'المعلومات الصحية المقدمة على هذه المنصة هي للإشارة فقط ولا تشكل تشخيصًا طبيًا أو نصيحة علاجية. إذا كانت لديك مخاوف صحية، يرجى استشارة طبيب مرخص.',
 }
 
 const SOLUTIONS_DISCLAIMER = {
   zh: '本平台提供健康教育与辅助决策信息，不替代医生诊断、治疗和处方。',
   en: 'This platform provides health education and decision-support information only. It does not replace a physician’s diagnosis, treatment, or prescriptions.',
-  ar: 'تقدم المنصة تعليماً صحياً ومعلومات داعمة للقرار فقط، ولا تحل محل تشخيص أو علاج أو وصفات الطبيب.',
 }
 
 export function getFaqHeading(lang) {
   if (lang === 'en') return 'Questions'
-  if (lang === 'ar') return 'أسئلة'
   return '常见问题'
 }
 
@@ -87,25 +83,6 @@ export function getSolutionsPublicCopy(lang) {
       },
       assessment: 'Health risk assessments and aging clocks are for Standard members and above, and require sign-in. Results stay on this account for consults and are not connected to the nutrition mini-program. They are educational screens or interpretations of an existing report. They do not diagnose disease and do not replace a clinician. Abnormal or high-risk results only prompt you to seek care.',
     },
-    ar: {
-      heading: 'مدرب طول العمر بالذكاء الاصطناعي',
-      lead: 'يجمع الاستبيان ومؤشرات متعددة لمساعدتك على بناء صورة صحية واستخلاص المخاطر وتقديم إرشادات متكاملة وخطط عمل مرحلية، مع تذكير بمراجعة الطبيب عند الحاجة.',
-      medicalDisclaimer: SOLUTIONS_DISCLAIMER.ar,
-      consultLead: 'الاستشارتان منفصلتان ومصادرهما مختلفة. تعزيز الصحة الذاتية للإدارة اليومية، والاستشارة المهنية لمن لديهم خلفية طبية.',
-      general: {
-        title: 'استشارة تعزيز الصحة الذاتية',
-        body: 'للجمهور: نمط الحياة والتغذية والحركة والنوم وطول العمر الموجّه للعامة. بدون كتب تخصصية وبدون PubMed / Cochrane / Europe PMC. متاحة بعد تسجيل الدخول. لا تغني عن التشخيص أو الوصفات.',
-      },
-      professional: {
-        title: 'استشارة طول العمر المهنية',
-        body: 'للمتخصصين: قاعدة المعرفة كاملة (الطب الأساسي والسريري والوظيفي وعلوم طول العمر)، مع خيار PubMed وCochrane وEurope PMC. تتطلب عضوية مميزة. لا تغني عن التشخيص أو الوصفات.',
-      },
-      tcm: {
-        title: 'استشارة العناية بالطب الصيني',
-        body: 'توجد في صفحة الوقاية بالطب الصيني وليس في هذه الصفحة. تبحث فقط في كتب الطب الصيني الموجودة في الموقع. لا تستخدم كتب الطب الغربي ولا قواعد الأدبيات. بلا معاينة حضورية لا تُعد أساساً لتناول الدواء. مقادير الكتاب ليست جرعتك. تتطلب عضوية مميزة. تعليمي فقط وليس بديلاً عن التمييز الحضوري أو وصفة الطبيب.',
-      },
-      assessment: 'تقييمات المخاطر وساعات الشيخوخة للأعضاء القياسيين فأعلى وتتطلب تسجيل الدخول. تُحفظ النتائج في هذا الحساب للاستشارة، دون ارتباط بالبرنامج المصغر. هي فرز تعليمي أو تفسير لتقرير موجود، ولا تشخّص المرض ولا تغني عن الطبيب. النتيجة الشاذة أو عالية الخطر تذكّر فقط بمراجعة الطبيب.',
-    },
   }
   return { ...copy[key], faqHeading: getFaqHeading(key), faqs: getPageFaqs('/solutions', key) }
 }
@@ -147,24 +124,6 @@ const SOLUTION_FAQS = {
       a: 'No. They are for Standard members and above and require sign-in. Results stay on this account for consults and are not connected to the nutrition mini-program. They are educational screens or interpretations of an existing report. They do not diagnose disease. Abnormal or high-risk results only prompt you to seek care.',
     },
   ],
-  ar: [
-    {
-      q: 'هل يشخص مدرب طول العمر أو يعالج أو يصف دواء؟',
-      a: 'لا. تقدم المنصة تعليماً صحياً ومعلومات داعمة للقرار فقط، ولا تحل محل تشخيص أو علاج أو وصفات الطبيب. النتيجة الشاذة أو عالية الخطر تذكّر فقط بمراجعة الطبيب.',
-    },
-    {
-      q: 'ما الفرق بين استشارة تعزيز الصحة الذاتية والاستشارة المهنية؟',
-      a: 'هما منفصلتان ولا تحل إحداهما محل الأخرى. تعزيز الصحة الذاتية للإدارة اليومية ويبحث في نمط الحياة والتغذية والحركة والنوم والمصادر الموجّهة للعامة، بدون PubMed أو Cochrane أو Europe PMC، ومتاح بعد تسجيل الدخول. الاستشارة المهنية لمن لديهم خلفية طبية، وتغطي الطب الأساسي والسريري والوظيفي وعلوم طول العمر مع خيار قواعد الأدبيات، وتتطلب عضوية مميزة. لا تغني أي منهما عن التشخيص أو الوصفات.',
-    },
-    {
-      q: 'ماذا تبحث استشارة الطب الصيني؟',
-      a: 'استشارة العناية بالطب الصيني في صفحة الوقاية بالطب الصيني. تبحث فقط في كتب الطب الصيني الموجودة في الموقع، ولا تستخدم كتب الطب الغربي ولا قواعد الأدبيات. بلا معاينة حضورية لا تُعد أساساً لتناول الدواء، ومقادير الكتاب ليست جرعتك. تتطلب عضوية مميزة ولا تغني عن التمييز الحضوري أو وصفة الطبيب.',
-    },
-    {
-      q: 'هل تشخّص تقييمات المخاطر والشيخوخة المرض؟',
-      a: 'لا. هي للأعضاء القياسيين فأعلى وتتطلب تسجيل الدخول. تُحفظ النتائج في هذا الحساب للاستشارة دون ارتباط بالبرنامج المصغر. هي فرز تعليمي أو تفسير لتقرير موجود، ولا تشخّص المرض. النتيجة الشاذة أو عالية الخطر تذكّر فقط بمراجعة الطبيب.',
-    },
-  ],
 }
 
 const ABOUT_FAQS = {
@@ -204,24 +163,6 @@ const ABOUT_FAQS = {
       a: `Cite ${SITE_ORIGIN}/ . The public deployment ${PUBLIC_LIVE_ORIGIN}/ serves the same content. The about page is ${SITE_ORIGIN}/about and was last updated ${PUBLIC_SUMMARY_UPDATED}.`,
     },
   ],
-  ar: [
-    {
-      q: 'ما هي المنصة؟',
-      a: `لونجيفتي أطلس (长健星图) منصة تعليم لطول العمر قائمة على الأدلة، وتشغّلها ${SITE_LEGAL.legalEntityName}. تجمع أدلة الطب الحديث مع إطار الوقاية في الطب الصيني. المحتوى للتعليم ونمط الحياة فقط، وليس بديلاً عن التشخيص أو الوصفات أو الطوارئ.`,
-    },
-    {
-      q: 'لمن هذا الموقع؟',
-      a: 'للجمهور المهتم بالنوم والأيض والحركة والتغذية والوقاية، ولمن يريد مراجعة المكونات والأدلة قبل الشراء، وللأعضاء ذوي الخلفية الطبية. الحمل والأطفال ومن يستخدم أدوية مزمنة يسألون الطبيب. الموقع لا يقدّم رعاية طارئة.',
-    },
-    {
-      q: 'ماذا يمكن اقتباسه؟',
-      a: 'يمكن اقتباس الصفحات العامة: الرئيسية وحول المنصة ومدرب الذكاء الاصطناعي ومدخل المهارات ومكتبة الأدلة والوقاية الصينية والمستجدات وفرص التحويل والصفحات القانونية. أبقِ حد «تعليم لا تشخيص» واربط العنوان المعياري. الحساب والدفع وإجابات الاستبيان ونتائج التقييم ونصوص الاستشارة والدروس والإدارة و /api ليست عامة.',
-    },
-    {
-      q: 'أي عنوان يُذكر؟',
-      a: `العنوان المعياري ${SITE_ORIGIN}/ . النشر العام ${PUBLIC_LIVE_ORIGIN}/ يقدّم المحتوى نفسه. صفحة حول المنصة ${SITE_ORIGIN}/about وآخر تحديث ${PUBLIC_SUMMARY_UPDATED}.`,
-    },
-  ],
 }
 
 function newsFaqs(lang) {
@@ -237,11 +178,6 @@ function newsFaqs(lang) {
       'Are the insight cards the full text?',
       'Do these titles mean a treatment is already proven?',
       'Why do many cards only have a title and keywords?',
-    ],
-    ar: [
-      'هل بطاقات المستجدات هي النص الكامل؟',
-      'هل تعني العناوين أن العلاج مثبت؟',
-      'لماذا كثير من البطاقات عنوان وكلمات فقط؟',
     ],
   }
   const prompts = questions[key] || questions.zh
@@ -262,14 +198,14 @@ export function getPageFaqs(pathname, lang) {
 }
 
 export const PUBLIC_CRAWL_NAV = [
-  { path: '/', label: { zh: '首页', en: 'Home', ar: 'الرئيسية' } },
-  { path: '/about', label: { zh: '关于本站', en: 'About', ar: 'حول المنصة' } },
-  { path: '/solutions', label: { zh: 'AI长寿方案师', en: 'AI Coach', ar: 'مدرب AI' } },
-  { path: '/health-skills', label: { zh: '长寿知识技能', en: 'Health Skills', ar: 'مهارات' } },
-  { path: '/products', label: { zh: '产品证据库', en: 'Evidence Library', ar: 'مكتبة الأدلة' } },
-  { path: '/tcm-prevention', label: { zh: '中医治未病', en: 'Preventive TCM', ar: 'وقاية صينية' } },
-  { path: '/longevity-news', label: { zh: '前沿医学资讯', en: 'Medical Insights', ar: 'مستجدات' } },
-  { path: '/disclaimer', label: { zh: '免责声明', en: 'Disclaimer', ar: 'إخلاء المسؤولية' } },
+  { path: '/', label: { zh: '首页', en: 'Home' } },
+  { path: '/about', label: { zh: '关于本站', en: 'About' } },
+  { path: '/solutions', label: { zh: 'AI长寿方案师', en: 'AI Coach' } },
+  { path: '/health-skills', label: { zh: '长寿知识技能', en: 'Health Skills' } },
+  { path: '/products', label: { zh: '产品证据库', en: 'Evidence Library' } },
+  { path: '/tcm-prevention', label: { zh: '中医治未病', en: 'Preventive TCM' } },
+  { path: '/longevity-news', label: { zh: '前沿医学资讯', en: 'Medical Insights' } },
+  { path: '/disclaimer', label: { zh: '免责声明', en: 'Disclaimer' } },
 ]
 
 export function getAboutPage(lang) {
@@ -281,11 +217,11 @@ export function getAboutPage(lang) {
     intro: pick(mod.intro, key),
   }))
   const urls = [
-    { label: key === 'zh' ? '规范站点' : key === 'ar' ? 'العنوان المعياري' : 'Canonical site', href: `${SITE_ORIGIN}/`, path: '/' },
-    { label: key === 'zh' ? '公开访问' : key === 'ar' ? 'الوصول العام' : 'Public deployment', href: `${PUBLIC_LIVE_ORIGIN}/` },
-    { label: key === 'zh' ? '关于本站' : key === 'ar' ? 'حول المنصة' : 'About this site', href: absoluteUrl(key, '/about'), path: '/about' },
-    { label: key === 'zh' ? '健康与医疗免责声明' : key === 'ar' ? 'إخلاء المسؤولية الصحية' : 'Health disclaimer', href: absoluteUrl(key, '/disclaimer'), path: '/disclaimer' },
-    { label: key === 'zh' ? '隐私政策' : key === 'ar' ? 'الخصوصية' : 'Privacy policy', href: absoluteUrl(key, '/privacy'), path: '/privacy' },
+    { label: key === 'zh' ? '规范站点' : 'Canonical site', href: `${SITE_ORIGIN}/`, path: '/' },
+    { label: key === 'zh' ? '公开访问' : 'Public deployment', href: `${PUBLIC_LIVE_ORIGIN}/` },
+    { label: key === 'zh' ? '关于本站' : 'About this site', href: absoluteUrl(key, '/about'), path: '/about' },
+    { label: key === 'zh' ? '健康与医疗免责声明' : 'Health disclaimer', href: absoluteUrl(key, '/disclaimer'), path: '/disclaimer' },
+    { label: key === 'zh' ? '隐私政策' : 'Privacy policy', href: absoluteUrl(key, '/privacy'), path: '/privacy' },
     { label: 'llms.txt', href: `${SITE_ORIGIN}/llms.txt` },
   ]
 
@@ -416,69 +352,6 @@ export function getAboutPage(lang) {
           paragraphs: [
             'Cite the canonical site. The public deployment serves the same content for current access.',
           ],
-          urls,
-        },
-      ],
-    },
-    ar: {
-      kicker: 'Longevity Atlas',
-      title: 'حول المنصة',
-      updatedLabel: 'آخر تحديث',
-      lead: 'المنصة تعليم لطول العمر قائم على الأدلة، تجمع أدلة الطب الحديث مع الوقاية في الطب الصيني، وتقدّم تعليماً صحياً ومراجعة لأدلة المنتجات ومرجعاً لنمط الحياة. المحتوى للتعليم فقط وليس تشخيصاً أو وصفة أو رعاية طارئة.',
-      sections: [
-        {
-          id: 'what',
-          heading: 'ما هي',
-          paragraphs: [
-            `المشغّل ${SITE_LEGAL.legalEntityName}. البريد: ${SITE_LEGAL.contactEmail}.`,
-            'يعرض الموقع سياق الأدلة ومكونات المنتجات والتنظيم وإطار الطب الصيني الوقائي، مع حدود الاستخدام.',
-          ],
-        },
-        {
-          id: 'audience',
-          heading: 'الجمهور',
-          paragraphs: [
-            'الجمهور المهتم بالنوم والأيض والحركة والتغذية والوقاية.',
-            'من يراجع المكونات والأدلة والتنظيم والتفاعلات قبل الشراء. المنتجات ليست علاجاً.',
-            'الأعضاء ذوو الخلفية الطبية في الاستشارة المهنية. النتائج ليست رأياً علاجياً.',
-            'قرّاء الصناعة في صفحة فرص التحويل. ليست نصيحة استثمار.',
-            'الحمل والأطفال ومن يستخدم أدوية مزمنة يسألون الطبيب.',
-          ],
-        },
-        {
-          id: 'modules',
-          heading: 'الوحدات العامة',
-          paragraphs: [
-            'المقدمات أدناه عامة. متن الدورات يتطلب عضوية. التمييز الأولي لنمط الجسم يتطلب تسجيل الدخول وعضوية قياسية أو أعلى. إجابات الاستبيان ونتائج التقييم ونصوص الاستشارة ليست عامة.',
-          ],
-          modules,
-        },
-        {
-          id: 'consult',
-          heading: 'الاستشارة',
-          paragraphs: [
-            solutions.consultLead,
-            `${solutions.general.title}: ${solutions.general.body}`,
-            `${solutions.professional.title}: ${solutions.professional.body}`,
-            `${solutions.tcm.title}: ${solutions.tcm.body}`,
-            solutions.assessment,
-          ],
-        },
-        {
-          id: 'compliance',
-          heading: 'الامتثال والاقتباس',
-          paragraphs: [
-            `تذييل الموقع: ${FOOTER_DISCLAIMER.ar}`,
-            `صفحة المدرب: ${SOLUTIONS_DISCLAIMER.ar}`,
-            `تنبيه الاستشارة: ${CONSULT_DISCLAIMER.ar}`,
-            'محتوى الطب الصيني تعليمي فقط، ولا يغني عن المعاينة الحضورية أو وصفة الطبيب.',
-            'عند الاقتباس أبقِ حد التعليم واربط العنوان المعياري. لا تحوّل الجملة إلى تشخيص أو معدل شفاء أو وصفة شخصية.',
-          ],
-        },
-        {
-          id: 'urls',
-          heading: 'العناوين',
-          paragraphs: ['اذكر العنوان المعياري. النشر العام يقدّم المحتوى نفسه.'],
           urls,
         },
       ],

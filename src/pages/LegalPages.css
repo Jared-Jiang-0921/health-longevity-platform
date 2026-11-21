@@ -71,16 +71,3 @@
   border: 1px dashed var(--color-border);
   border-radius: 8px;
 }
-
-.page-legal.legal-rtl {
-  direction: rtl;
-  text-align: right;
-}
-
-.page-legal.legal-rtl h1,
-.page-legal.legal-rtl h2,
-.page-legal.legal-rtl p,
-.page-legal.legal-rtl .legal-meta,
-.page-legal.legal-rtl .legal-counsel-note {
-  text-align: right;
-}

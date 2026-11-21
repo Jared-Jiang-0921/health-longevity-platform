@@ -21,7 +21,6 @@ export default function CourseLearn() {
   const t = {
     zh: { nf: '未找到该课程', backList: '返回课程列表', backDetail: '返回课程详情', modules: '课程模块', back: '返回课程详情', noVideo: '未配置视频地址（请在课程数据中为该课时设置 videoUrl 或 embedUrl）。', duration: '时长：', notSupport: '您的浏览器不支持视频播放。' },
     en: { nf: 'Course not found', backList: 'Back to list', backDetail: 'Back to details', modules: 'Modules', back: 'Back to details', noVideo: 'No video URL configured (set videoUrl or embedUrl in course data).', duration: 'Duration: ', notSupport: 'Your browser does not support video playback.' },
-    ar: { nf: 'الدورة غير موجودة', backList: 'العودة للقائمة', backDetail: 'العودة للتفاصيل', modules: 'وحدات الدورة', back: 'العودة للتفاصيل', noVideo: 'لم يتم إعداد رابط فيديو (اضبط videoUrl أو embedUrl).', duration: 'المدة: ', notSupport: 'متصفحك لا يدعم تشغيل الفيديو.' },
   }[lang || 'zh']
   const { id } = useParams()
   const course = getCourseById(id)
@@ -159,7 +158,7 @@ export default function CourseLearn() {
       setModules(normalized)
       setEditingModuleIdx(-1)
       setActiveIndex((v) => Math.min(v, Math.max(normalized.length - 1, 0)))
-      setModulesHint(lang === 'en' ? 'Saved' : lang === 'ar' ? 'تم الحفظ' : '保存成功')
+      setModulesHint(lang === 'en' ? 'Saved' : '保存成功')
     } catch (e) {
       setModulesError(e.message || 'save failed')
     } finally {
@@ -195,7 +194,7 @@ export default function CourseLearn() {
 
   async function removeModule(idx) {
     if (!isAdmin) return
-    const confirmed = window.confirm(lang === 'en' ? 'Delete this built-in module?' : lang === 'ar' ? 'حذف هذه الوحدة؟' : '确定删除该原有资料吗？')
+    const confirmed = window.confirm(lang === 'en' ? 'Delete this built-in module?' : '确定删除该原有资料吗？')
     if (!confirmed) return
     const next = modules.filter((_, i) => i !== idx)
     await saveModules(next)
@@ -238,7 +237,7 @@ export default function CourseLearn() {
       <div className="learn-layout">
         <aside className="learn-sidebar">
           <h3>{t.modules}</h3>
-          {modulesLoading ? <p className="video-missing">{lang === 'en' ? 'Loading modules...' : lang === 'ar' ? 'جارٍ تحميل الوحدات...' : '加载模块中…'}</p> : null}
+          {modulesLoading ? <p className="video-missing">{lang === 'en' ? 'Loading modules...' : '加载模块中…'}</p> : null}
           {modulesError ? <p className="video-missing">{modulesError}</p> : null}
           {modulesHint ? <p className="video-duration">{modulesHint}</p> : null}
           <ul className="module-list">
@@ -258,10 +257,10 @@ export default function CourseLearn() {
                 {isAdmin && !mod.fromUpload ? (
                   <div className="module-admin-actions">
                     <button type="button" onClick={() => startEditModule(idx)}>
-                      {lang === 'en' ? 'Edit' : lang === 'ar' ? 'تعديل' : '编辑'}
+                      {lang === 'en' ? 'Edit' : '编辑'}
                     </button>
                     <button type="button" onClick={() => removeModule(idx)} disabled={modulesSaving}>
-                      {lang === 'en' ? 'Delete' : lang === 'ar' ? 'حذف' : '删除'}
+                      {lang === 'en' ? 'Delete' : '删除'}
                     </button>
                   </div>
                 ) : null}
@@ -282,7 +281,7 @@ export default function CourseLearn() {
               <h2>{shownActive.title}</h2>
               <p>
                 <a href={shownActive.fileUrl} target="_blank" rel="noreferrer">
-                  {lang === 'en' ? 'Open file' : lang === 'ar' ? 'فتح' : '打开资料'}
+                  {lang === 'en' ? 'Open file' : '打开资料'}
                 </a>
               </p>
             </section>
@@ -326,19 +325,19 @@ export default function CourseLearn() {
       </div>
       {isAdmin && editingModuleIdx >= 0 ? (
         <section className="learn-document module-edit-panel">
-          <h2>{lang === 'en' ? 'Edit Built-in Material' : lang === 'ar' ? 'تعديل مادة مدمجة' : '编辑原有资料'}</h2>
+          <h2>{lang === 'en' ? 'Edit Built-in Material' : '编辑原有资料'}</h2>
           <div className="module-edit-grid">
-            <input value={editDraft.title} onChange={(e) => setEditDraft((v) => ({ ...v, title: e.target.value }))} placeholder={lang === 'en' ? 'Title' : lang === 'ar' ? 'العنوان' : '标题'} />
-            <input value={editDraft.duration} onChange={(e) => setEditDraft((v) => ({ ...v, duration: e.target.value }))} placeholder={lang === 'en' ? 'Duration' : lang === 'ar' ? 'المدة' : '时长'} />
-            <textarea rows={4} value={editDraft.content} onChange={(e) => setEditDraft((v) => ({ ...v, content: e.target.value }))} placeholder={lang === 'en' ? 'Document content' : lang === 'ar' ? 'محتوى المستند' : '文档内容'} />
+            <input value={editDraft.title} onChange={(e) => setEditDraft((v) => ({ ...v, title: e.target.value }))} placeholder={lang === 'en' ? 'Title' : '标题'} />
+            <input value={editDraft.duration} onChange={(e) => setEditDraft((v) => ({ ...v, duration: e.target.value }))} placeholder={lang === 'en' ? 'Duration' : '时长'} />
+            <textarea rows={4} value={editDraft.content} onChange={(e) => setEditDraft((v) => ({ ...v, content: e.target.value }))} placeholder={lang === 'en' ? 'Document content' : '文档内容'} />
             <input value={editDraft.videoUrl} onChange={(e) => setEditDraft((v) => ({ ...v, videoUrl: e.target.value }))} placeholder="videoUrl" />
             <input value={editDraft.embedUrl} onChange={(e) => setEditDraft((v) => ({ ...v, embedUrl: e.target.value }))} placeholder="embedUrl" />
             <div>
               <button type="button" className="btn-primary" onClick={submitEditModule} disabled={modulesSaving}>
-                {modulesSaving ? (lang === 'en' ? 'Saving...' : lang === 'ar' ? 'جارٍ الحفظ...' : '保存中…') : (lang === 'en' ? 'Save' : lang === 'ar' ? 'حفظ' : '保存')}
+                {modulesSaving ? (lang === 'en' ? 'Saving...' : '保存中…') : (lang === 'en' ? 'Save' : '保存')}
               </button>
               <button type="button" className="btn-favorite" style={{ marginLeft: 8 }} onClick={() => setEditingModuleIdx(-1)}>
-                {lang === 'en' ? 'Cancel' : lang === 'ar' ? 'إلغاء' : '取消'}
+                {lang === 'en' ? 'Cancel' : '取消'}
               </button>
             </div>
           </div>

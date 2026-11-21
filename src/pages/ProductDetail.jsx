@@ -49,16 +49,6 @@ export default function ProductDetail() {
       spec: 'Spec',
       price: 'Price',
     },
-    ar: {
-      notFound: 'المنتج غير موجود',
-      back: 'العودة إلى مكتبة الأدلة',
-      pay: 'الدفع',
-      origin: 'المنشأ',
-      sku: 'المواصفات',
-      code: 'الرمز',
-      spec: 'المواصفات',
-      price: 'السعر',
-    },
   }[lang || 'zh']
   const { id } = useParams()
   const isAdmin = Boolean(user?.site_admin)

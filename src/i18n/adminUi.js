@@ -17,15 +17,6 @@ const ADMIN_UI = {
     actions: 'Actions',
     noRecords: 'No records',
   },
-  ar: {
-    edit: 'تعديل',
-    revoke: 'إلغاء',
-    resend: 'إعادة إرسال',
-    enable: 'تفعيل',
-    disable: 'تعطيل',
-    actions: 'إجراءات',
-    noRecords: 'لا توجد سجلات',
-  },
 }
 
 export function getAdminUi(lang = 'zh') {

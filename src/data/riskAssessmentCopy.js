@@ -420,5 +420,3 @@ RISK_ASSESSMENT_COPY.en = {
     sep: ': ',
   },
 }
-
-RISK_ASSESSMENT_COPY.ar = RISK_ASSESSMENT_COPY.en

@@ -8,7 +8,6 @@ export default function MessageBubble({
   content,
   attachments,
   sources,
-  rtl,
   sourcesLabel,
   sourcesEmpty,
   exportable,
@@ -67,7 +66,7 @@ export default function MessageBubble({
   }
 
   return (
-    <div className={`msg-row ${isUser ? 'msg-row--user' : 'msg-row--assistant'}`} dir={rtl ? 'rtl' : 'ltr'}>
+    <div className={`msg-row ${isUser ? 'msg-row--user' : 'msg-row--assistant'}`}>
       <div className={`msg-bubble ${isUser ? 'msg-bubble--user' : 'msg-bubble--assistant'}`}>
         {isUser ? (
           <>

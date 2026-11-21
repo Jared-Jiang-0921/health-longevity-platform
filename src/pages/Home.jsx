@@ -22,7 +22,7 @@ import './Home.css'
 
 function homeField(value, lang) {
   if (value && typeof value === 'object') {
-    const key = lang === 'en' || lang === 'ar' ? lang : 'zh'
+    const key = lang === 'en' ? lang : 'zh'
     return value[key] || value.zh || ''
   }
   return value || ''

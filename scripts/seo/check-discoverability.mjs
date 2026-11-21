@@ -19,7 +19,6 @@ import {
   netlifySpaRedirects,
   spaRewriteRules,
 } from '../../src/lib/sitePaths.js'
-import { getHomeCopy } from '../../src/data/homePageContent.js'
 import { getLongevityNewsArticles } from '../../src/data/longevityNewsArticles.js'
 import { renderNewsArticleHtml, renderRouteHtml, staticNewsCards } from './prerender.mjs'
 
@@ -63,22 +62,14 @@ const newsHtml = renderRouteHtml(template, { lang: 'zh', pathname: '/longevity-n
 expect(newsHtml.includes('href="https://www.healthlongevity.cn/longevity-news/ln-static-1"'), 'news index links to the stable article')
 expect(newsHtml.includes('请勿将单篇前沿研究'), 'news index includes the evidence caveat in HTML')
 
-const arHome = renderRouteHtml(template, { lang: 'ar', pathname: '/', newsCards: cards })
-const arCopy = getHomeCopy('ar')
-expect(arHome.includes('lang="ar"') && arHome.includes('dir="rtl"'), 'arabic home keeps lang and rtl')
-expect(arHome.includes(arCopy.heroH1) && /[\u0600-\u06FF]/.test(arCopy.heroH1), 'arabic home h1 is Arabic')
-expect(arHome.includes(arCopy.heroSub) && /[\u0600-\u06FF]/.test(arCopy.heroSub), 'arabic home intro is Arabic')
-expect(!arHome.includes('Evidence-based longevity platform'), 'arabic home does not keep the English hero')
-expect(!arCopy.heroH1.includes('Evidence-based') && !arCopy.heroSub.includes('Guideline-informed'), 'arabic copy is not the English spread')
-
 const statusFor = (pathname) => documentStatus(pathname, { cards })
 expect(statusFor('/longevity-news/not-a-real-id') === 'missing', 'unknown news id is not a document')
 expect(statusFor('/en/not-a-page') === 'missing', 'unknown english path is not a document')
 expect(statusFor('/not-a-page') === 'missing', 'unknown site path is not a document')
-expect(statusFor('/') === 'ok' && statusFor('/en') === 'ok' && statusFor('/ar') === 'ok', 'locale homepages stay')
+expect(statusFor('/') === 'ok' && statusFor('/en') === 'ok', 'locale homepages stay')
 expect(statusFor('/about') === 'ok' && statusFor('/en/about') === 'ok', 'prerendered pages stay')
 expect(statusFor('/consult') === 'ok' && statusFor('/en/consult') === 'ok', 'consult shell stays')
-expect(statusFor('/solutions/risk') === 'ok' && statusFor('/ar/account') === 'ok', 'private spa routes stay')
+expect(statusFor('/solutions/risk') === 'ok' && statusFor('/en/account') === 'ok', 'private spa routes stay')
 expect(statusFor('/products/example') === 'ok' && statusFor('/health-skills/course-1/learn') === 'ok', 'dynamic routes stay')
 expect(statusFor('/longevity-news/ln-static-1') === 'ok', 'eligible static article stays')
 expect(statusFor('/api/health') === 'passthrough', 'api is not turned into a 404 page')

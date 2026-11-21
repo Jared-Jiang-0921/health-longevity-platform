@@ -89,7 +89,6 @@ export default function ChatWindow({
   entry,
   initialQuery,
   initialDraft,
-  rtl,
   copy,
   profile,
   sessionId: sessionIdProp,
@@ -625,7 +624,7 @@ export default function ChatWindow({
     && !quotaBlocked
 
   return (
-    <div className="chat-window" dir={rtl ? 'rtl' : 'ltr'}>
+    <div className="chat-window">
       <div className="chat-messages" role="log" aria-live="polite">
         {loadingHistory ? (
           <p className="chat-empty">{copy.historyLoading || '…'}</p>
@@ -650,7 +649,6 @@ export default function ChatWindow({
             content={m.content}
             attachments={m.attachments}
             sources={sending && i === messages.length - 1 ? [] : (m.sources || [])}
-            rtl={rtl}
             sourcesLabel={copy.sources}
             sourcesEmpty={
               i === messages.length - 1

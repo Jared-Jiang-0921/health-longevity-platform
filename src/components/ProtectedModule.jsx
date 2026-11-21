@@ -43,25 +43,6 @@ const COPY = {
     deniedBody: (name) => `This module requires ${name} or higher. Please upgrade your membership.`,
     upgrade: 'Upgrade',
   },
-  ar: {
-    registerTitle: 'سجّل عضوية لمشاهدة الدورات',
-    registerBody: 'يرجى التسجيل وتسجيل الدخول كعضو لمشاهدة دورات المعرفة والمهارات.',
-    riskTitle: 'يرجى تسجيل الدخول',
-    riskBody: 'تقييمات المخاطر الصحية تتطلب تسجيل الدخول وعضوية قياسية أو أعلى.',
-    consultTitle: 'يرجى تسجيل الدخول',
-    consultBody: 'تتطلب الاستشارة الصحية تسجيل الدخول. تعزيز الصحة الذاتية متاح بعد الدخول، والاستشارة المهنية تتطلب عضوية مميزة.',
-    consultDisclaimer: '⚠ المعلومات الصحية المقدمة على هذه المنصة هي للإشارة فقط ولا تشكل تشخيصًا طبيًا أو نصيحة علاجية. إذا كانت لديك مخاوف صحية، يرجى استشارة طبيب مرخص.',
-    agingTitle: 'يرجى تسجيل الدخول',
-    agingBody: 'تتطلب تقييمات الشيخوخة عضوية قياسية أو أعلى.',
-    constitutionTitle: 'يرجى تسجيل الدخول',
-    constitutionBody: 'التمييز الأولي لنمط الجسم يتطلب تسجيل الدخول وعضوية قياسية أو أعلى.',
-    register: 'إنشاء حساب',
-    login: 'تسجيل الدخول',
-    home: 'العودة للرئيسية',
-    deniedTitle: 'غير مسموح',
-    deniedBody: (name) => `تتطلب هذه الوحدة ${name} أو أعلى. يرجى ترقية العضوية.`,
-    upgrade: 'ترقية العضوية',
-  },
 }
 
 export default function ProtectedModule({ children }) {
@@ -103,7 +84,7 @@ export default function ProtectedModule({ children }) {
 
   const levelName = required
     ? getMembershipLevelLabel(required, lang)
-    : (lang === 'en' ? 'sign-in' : lang === 'ar' ? 'تسجيل الدخول' : '登录')
+    : (lang === 'en' ? 'sign-in' : '登录')
   return (
     <div className="page-content">
       {isConsult ? (

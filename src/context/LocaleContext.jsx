@@ -2,12 +2,11 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { detectLangFromPathname } from '../lib/localePath.js'
 
 const STORAGE_KEY = 'health-platform-lang'
-const SUPPORTED = ['zh', 'en', 'ar']
+const SUPPORTED = ['zh', 'en']
 
 function normalizeLang(raw) {
   const s = String(raw || '').toLowerCase().trim()
   if (s === 'zh' || s === 'zh-cn' || s === 'zh-hans') return 'zh'
-  if (s === 'ar' || s === 'ar-sa' || s === 'ar-ae') return 'ar'
   if (s === 'en' || s === 'en-us' || s === 'en-gb') return 'en'
   return 'zh'
 }
@@ -15,7 +14,7 @@ function normalizeLang(raw) {
 function resolveInitialLang() {
   if (typeof window !== 'undefined') {
     const fromPath = detectLangFromPathname(window.location.pathname)
-    if (fromPath === 'en' || fromPath === 'ar') return fromPath
+    if (fromPath === 'en') return fromPath
     const params = new URLSearchParams(window.location.search)
     const fromQuery = params.get('lang')
     if (fromQuery) return normalizeLang(fromQuery)
@@ -47,7 +46,6 @@ export function LocaleProvider({ children }) {
     }
     if (typeof document !== 'undefined') {
       document.documentElement.lang = lang === 'zh' ? 'zh-Hans' : lang
-      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'
     }
   }, [lang])
 

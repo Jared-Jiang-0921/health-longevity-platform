@@ -2,8 +2,8 @@ import { Children, Fragment } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
-const CITE_SPLIT = /(\[(?:来源\s*|source\s*|源|مصدر\s*|P)?\d+\])/i
-const CITE_ONE = /^\[(?:来源\s*|source\s*|源|مصدر\s*|P)?(\d+)\]$/i
+const CITE_SPLIT = /(\[(?:来源\s*|source\s*|源|P)?\d+\])/i
+const CITE_ONE = /^\[(?:来源\s*|source\s*|源|P)?(\d+)\]$/i
 
 export function renderWithCitations(text, sources, onCite) {
   if (!text) return null

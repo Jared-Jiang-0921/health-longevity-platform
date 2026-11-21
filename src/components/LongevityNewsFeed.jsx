@@ -33,7 +33,7 @@ function hasChinese(value) {
 function displayKeywords(title, summary, lang) {
   const found = extractLongevityKeywords(title, summary)
   if (!lang || lang === 'zh') return found
-  const fallback = lang === 'ar' ? 'بحث طول العمر' : 'longevity research'
+  const fallback = 'longevity research'
   return found
     .map((term) => (term === '长寿研究' ? fallback : term))
     .filter((term) => !hasChinese(term))
@@ -104,28 +104,6 @@ export default function LongevityNewsFeed() {
       sourceSep: ': ',
       login: 'Log in to read',
       upgrade: 'Upgrade to read',
-      count: (n) => `${n}`,
-    },
-    ar: {
-      kicker: 'موجز طبي',
-      columns: 'الأعمدة',
-      empty: 'لا مقالات بعد.',
-      loading: 'جارٍ التحميل…',
-      read: 'اقرأ',
-      back: 'عودة',
-      open: 'فتح',
-      source: 'المصدر',
-      takeaways: 'نقاط',
-      keywords: 'كلمات مفتاحية',
-      uploaded: 'ملف',
-      link: 'الأصل',
-      editorial: 'تحريري',
-      openWechat: 'فتح الأصل',
-      zhOnly: 'هذا المحتوى بالصينية فقط',
-      wechatSource: 'النص الكامل على WeChat. هذه البطاقة للموضوع فقط.',
-      sourceSep: ': ',
-      login: 'سجّل الدخول للقراءة',
-      upgrade: 'رقّ العضوية للقراءة',
       count: (n) => `${n}`,
     },
   }[lang || 'zh']

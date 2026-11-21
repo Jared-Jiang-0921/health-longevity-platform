@@ -15,7 +15,6 @@ export default function MyFavorites() {
   const t = {
     zh: { title: '我的收藏', empty: '暂无收藏课程，去', add: '长寿知识技能', count: '共', lessons: '门课程', unfav: '取消收藏' },
     en: { title: 'My Favorites', empty: 'No favorite courses yet. Go to', add: 'Health Skills', count: 'Total', lessons: 'courses', unfav: 'Remove favorite' },
-    ar: { title: 'مفضلتي', empty: 'لا توجد دورات مفضلة بعد. اذهب إلى', add: 'مهارات الصحة', count: 'الإجمالي', lessons: 'دورات', unfav: 'إزالة' },
   }[lang || 'zh']
   const { favorites, toggle } = useFavorites()
   const courses = favorites.map((id) => getCourseById(id)).filter(Boolean)

@@ -9,7 +9,6 @@ import './Auth.css'
 const I18N = {
   zh: { title: '设置新密码', pwd: '新密码', confirm: '确认新密码', save: '保存新密码', saving: '保存中…', back: '返回登录', okTitle: '密码已更新', okNote: '即将跳转到登录页…', loginNow: '立即登录', errLink: '链接无效，请从邮件中重新打开', errLen: '密码至少 6 位', errMatch: '两次密码不一致', errFail: '重置失败', invalid: '链接无效或已过期，请重新申请忘记密码。' },
   en: { title: 'Set New Password', pwd: 'New password', confirm: 'Confirm new password', save: 'Save Password', saving: 'Saving…', back: 'Back to login', okTitle: 'Password updated', okNote: 'Redirecting to login…', loginNow: 'Login now', errLink: 'Invalid link, please reopen from email', errLen: 'Password must be at least 6 characters', errMatch: 'Passwords do not match', errFail: 'Reset failed', invalid: 'This link is invalid or expired. Please request a new reset link.' },
-  ar: { title: 'تعيين كلمة مرور جديدة', pwd: 'كلمة المرور الجديدة', confirm: 'تأكيد كلمة المرور', save: 'حفظ كلمة المرور', saving: 'جار الحفظ…', back: 'العودة لتسجيل الدخول', okTitle: 'تم تحديث كلمة المرور', okNote: 'سيتم التحويل إلى صفحة الدخول…', loginNow: 'تسجيل الدخول الآن', errLink: 'الرابط غير صالح، افتحه من البريد مجددًا', errLen: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل', errMatch: 'كلمتا المرور غير متطابقتين', errFail: 'فشلت إعادة التعيين', invalid: 'الرابط غير صالح أو منتهي الصلاحية. يرجى طلب رابط جديد.' },
 }
 
 export default function ResetPassword() {

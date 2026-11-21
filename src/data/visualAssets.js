@@ -19,7 +19,6 @@ export const VISUAL_ASSETS = {
     alt: {
       zh: '长寿医学数字孪生驾驶舱：生物标志物、睡眠、代谢与认知健康可视化',
       en: 'Longevity medicine digital twin dashboard with biomarkers and health metrics',
-      ar: 'لوحة تحكم طب طول العمر الرقمية',
     },
     prompt:
       'Futuristic longevity medicine dashboard, human health digital twin, biomarkers, sleep, metabolism, cognition, blue white medical UI, clean, scientific, minimalist, Apple style, clinical design',
@@ -31,7 +30,6 @@ export const VISUAL_ASSETS = {
     alt: {
       zh: '中医治未病：顺四时而养生，调体质而防未病',
       en: 'TCM preventive care: seasonal wellness and constitution balance',
-      ar: 'الطب الصيني الوقائي',
     },
     prompt:
       'Chinese preventive medicine, harmony between human and nature, four seasons wellness, modern oriental healthcare, ink landscape, subtle meridian lines, luxury healthcare platform, white jade green color palette',
@@ -48,7 +46,6 @@ export const MODULE_VISUAL_ASSETS = {
     alt: {
       zh: '数字健康孪生与 AI 健康分析',
       en: 'Digital health twin and AI health analysis',
-      ar: 'التوأم الرقمي للصحة',
     },
     prompt:
       'Digital twin human body, AI health analysis, biomarker visualization, medical dashboard, clean blue white style, clinical technology, high-end SaaS design',
@@ -61,7 +58,6 @@ export const MODULE_VISUAL_ASSETS = {
     alt: {
       zh: '长寿知识图谱与神经学习网络',
       en: 'Longevity knowledge graph and neural learning',
-      ar: 'رسم معرفي للمعرفة',
     },
     prompt:
       'Longevity knowledge graph, brain neural connections, learning system, scientific education, blue medical style, clean background',
@@ -74,7 +70,6 @@ export const MODULE_VISUAL_ASSETS = {
     alt: {
       zh: '循证医学研究与实验室数据可视化',
       en: 'Evidence-based medicine research and lab data',
-      ar: 'الأدلة الطبية والبحث',
     },
     prompt:
       'Evidence based medicine, research laboratory, clinical studies, scientific data visualization, white blue minimal design',
@@ -87,7 +82,6 @@ export const MODULE_VISUAL_ASSETS = {
     alt: {
       zh: '现代化中医治未病与四季养生',
       en: 'Modern TCM preventive care and seasonal wellness',
-      ar: 'الطب الصيني الوقائي الحديث',
     },
     prompt:
       'Modern traditional Chinese medicine, preventive healthcare, four seasons wellness, meridian energy visualization, elegant ink wash elements, minimalist medical design, white and jade green palette, premium healthcare style',
@@ -100,7 +94,6 @@ export const MODULE_VISUAL_ASSETS = {
     alt: {
       zh: '前沿医学研究与顶刊突破',
       en: 'Medical research breakthroughs and journal science',
-      ar: 'أبحاث طبية رائدة',
     },
     prompt:
       'Medical research breakthrough, scientific journal visualization, future medicine, clinical innovation, clean editorial style',
@@ -113,7 +106,6 @@ export const MODULE_VISUAL_ASSETS = {
     alt: {
       zh: '医疗健康创新与产业转化生态',
       en: 'Healthcare innovation and industry ecosystem',
-      ar: 'ابتكار الرعاية الصحية',
     },
     prompt:
       'Healthcare innovation ecosystem, AI healthcare applications, industry transformation, modern business illustration, minimal medical technology design',

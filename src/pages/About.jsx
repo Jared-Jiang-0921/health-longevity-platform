@@ -6,10 +6,9 @@ import './About.css'
 export default function About() {
   const { lang } = useLocale()
   const page = getAboutPage(lang)
-  const rtl = lang === 'ar'
 
   return (
-    <article className={`page-content page-about${rtl ? ' page-about--rtl' : ''}`} dir={rtl ? 'rtl' : 'ltr'}>
+    <article className="page-content page-about">
       <header className="page-header">
         <p className="about-kicker">{page.kicker}</p>
         <h1>{page.title}</h1>

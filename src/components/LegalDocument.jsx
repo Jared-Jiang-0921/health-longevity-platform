@@ -8,16 +8,11 @@ export default function LegalDocument({ doc }) {
   const lang = normalizeLegalLang(currentLang)
   const bundle = doc[lang] || doc.en
   const meta = LEGAL_META_I18N[lang] || LEGAL_META_I18N.en
-  const isRtl = lang === 'ar'
 
   return (
-    <div
-      className={`page-content page-legal${isRtl ? ' legal-rtl' : ''}`}
-      dir={isRtl ? 'rtl' : 'ltr'}
-      lang={lang === 'zh' ? 'zh-Hans' : lang === 'ar' ? 'ar' : 'en'}
-    >
+    <div className="page-content page-legal" lang={lang === 'zh' ? 'zh-Hans' : 'en'}>
       <p className="legal-meta">
-        {lang === 'zh' ? '最后更新：' : lang === 'ar' ? 'آخر تحديث: ' : 'Last updated: '}
+        {lang === 'zh' ? '最后更新：' : 'Last updated: '}
         {meta.lastUpdated}
       </p>
 
@@ -33,7 +28,7 @@ export default function LegalDocument({ doc }) {
       ))}
 
       <p className="legal-back">
-        <Link to="/">{lang === 'zh' ? '首页' : lang === 'ar' ? 'الرئيسية' : 'Home'}</Link>
+        <Link to="/">{lang === 'zh' ? '首页' : 'Home'}</Link>
       </p>
     </div>
   )

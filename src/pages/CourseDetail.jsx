@@ -39,16 +39,6 @@ export default function CourseDetail() {
       openBook: 'Open collection',
       learn: 'Start learning',
     },
-    ar: {
-      nf: 'الدورة غير موجودة',
-      back: 'العودة للدورات',
-      intro: 'عن المجموعة',
-      cancel: 'إزالة من المفضلة',
-      fav: 'مفضلة',
-      faved: 'مفضلة',
-      openBook: 'فتح المجموعة',
-      learn: 'ابدأ التعلم',
-    },
   }[lang || 'zh']
   const { id } = useParams()
   const course = getCourseById(id)

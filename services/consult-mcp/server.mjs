@@ -544,7 +544,7 @@ async function askConsult(token, args) {
   if (question.length > 4000) {
     return { isError: true, text: '问题请控制在 4000 字以内。' }
   }
-  const lang = ['zh', 'en', 'ar'].includes(args?.lang) ? args.lang : 'zh'
+  const lang = ['zh', 'en'].includes(args?.lang) ? args.lang : 'zh'
   const sessionId = String(args?.session_id || '').trim().slice(0, 80)
   const profile = await fetchProfile(token)
   const res = await fetch(`${CONSULT_UPSTREAM}/api/ai/chat`, {
@@ -640,7 +640,7 @@ const TOOL = {
     additionalProperties: false,
     properties: {
       question: { type: 'string', description: '要咨询的问题' },
-      lang: { type: 'string', enum: ['zh', 'en', 'ar'], description: '回答语言，默认中文' },
+      lang: { type: 'string', enum: ['zh', 'en'], description: '回答语言，默认中文' },
       use_pubmed: { type: 'boolean', description: '是否检索 PubMed' },
       use_cochrane: { type: 'boolean', description: '是否检索 Cochrane' },
       use_europe_pmc: { type: 'boolean', description: '是否检索欧洲 PMC' },

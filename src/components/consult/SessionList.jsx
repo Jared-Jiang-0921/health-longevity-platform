@@ -3,7 +3,7 @@ import { useRef, useState } from 'react'
 function formatWhen(iso, lang) {
   const d = new Date(iso)
   if (Number.isNaN(d.getTime())) return ''
-  const loc = lang === 'ar' ? 'ar' : lang === 'en' ? 'en-US' : 'zh-CN'
+  const loc = lang === 'en' ? 'en-US' : 'zh-CN'
   const now = new Date()
   const sameDay = d.toDateString() === now.toDateString()
   if (sameDay) {

@@ -4,7 +4,6 @@ import { useLocale } from '../context/LocaleContext'
 const I18N = {
   zh: { show: '显示', hide: '隐藏' },
   en: { show: 'Show', hide: 'Hide' },
-  ar: { show: 'إظهار', hide: 'إخفاء' },
 }
 
 export default function PasswordField({

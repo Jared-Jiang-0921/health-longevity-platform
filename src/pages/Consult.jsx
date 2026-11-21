@@ -16,7 +16,6 @@ import './Consult.css'
 const DISCLAIMER = {
   zh: '⚠ 本平台提供的健康信息仅供参考，不构成医疗诊断、治疗建议或处方依据。如有健康问题，请及时就诊于执业医疗机构，遵从执业医师的专业判断。',
   en: '⚠ The health information provided on this platform is for reference only and does not constitute medical diagnosis, treatment advice, or prescription guidance. If you have health concerns, please consult a licensed medical professional.',
-  ar: '⚠ المعلومات الصحية المقدمة على هذه المنصة هي للإشارة فقط ولا تشكل تشخيصًا طبيًا أو نصيحة علاجية. إذا كانت لديك مخاوف صحية، يرجى استشارة طبيب مرخص.',
 }
 
 const COPY = {
@@ -304,148 +303,6 @@ const COPY = {
     quotaLine: (used, limit) => `Today ${used} / ${limit} (resets at midnight Beijing time)`,
     quotaUpgrade: 'Upgrade',
   },
-  ar: {
-    title: 'استشارة صحية بالذكاء الاصطناعي',
-    back: 'العودة للمدرب',
-    general: 'تعزيز الصحة الذاتية',
-    professional: 'استشارة مهنية',
-    modeHintGeneral: 'للجمهور: نمط الحياة والعافية فقط. بدون كتب تخصصية وبدون PubMed / Cochrane / Europe PMC.',
-    modeHintProfessional: 'للمتخصصين: الطب الأساسي والسريري والوظيفي، مع خيار PubMed وCochrane وEurope PMC.',
-    tcmTitle: 'استشارة العناية بالطب الصيني',
-    backTcm: 'العودة إلى الوقاية الصينية',
-    modeHintTcm: 'يستخدم فقط كتب الطب الصيني في هذا الموقع، ويشرح باتجاه المتلازمة والآلية ومعنى الوصفة. كتب الطب الغربي وقواعد الأدبيات متوقفة.',
-    emptyTcm: 'العناية بالطب الصيني تعتمد على كتب الموقع فقط. اتجاه المتلازمة والوصفة المرجعية مسموحان مع ذكر المتلازمة. بلا معاينة حضورية لا يُعد هذا أساساً لتناول الدواء.',
-    needLogin: 'يرجى تسجيل الدخول لاستخدام الاستشارة.',
-    login: 'تسجيل الدخول',
-    authLoading: 'جار التحقق من العضوية…',
-    profileLoading: 'جارٍ تحميل الاستبيان وملخص التقييم. يمكنك السؤال بعد لحظات.',
-    handoffReady: 'وُضع سؤالك من الصفحة السابقة في مربع الكتابة. راجعه قبل الإرسال. الإجابات للمرجعية فقط ولا تغني عن تشخيص الطبيب أو علاجه أو وصفاته.',
-    handoffPreview: 'سؤال بانتظار المراجعة',
-    unavailable: 'تعذر تحميل المحادثات السابقة. يمكنك بدء استشارة جديدة.',
-    retry: 'إعادة المحاولة',
-    modeLabel: 'نوع الاستشارة',
-    composerModeNow: 'الوضع الحالي',
-    composerSourcesOff: 'هذا الوضع لا يبحث في PubMed أو Cochrane أو Europe PMC.',
-    composerSourcesHere: 'بحث الأدبيات فوق مربع السؤال، ومغلق حتى تفتحه.',
-    composerTcmSources: 'استشارة الطب الصيني لا تبحث في PubMed أو Cochrane أو Europe PMC.',
-    composerUseProfessional: 'التبديل إلى الاستشارة المهنية',
-    composerUseGeneral: 'التبديل إلى تعزيز الصحة الذاتية',
-    sessionGeneralNote: 'هذه المحادثة المحفوظة من نوع تعزيز الصحة الذاتية، لذلك لا تظهر مفاتيح PubMed وCochrane وEurope PMC. نوع السجل يبقى كما هو.',
-    sessionProfessionalNote: 'هذه المحادثة المحفوظة مهنية. مفاتيح الأدبيات تخص هذا السجل فقط ولا تغيّر نوع المحادثات الأخرى.',
-    sessionTcmNote: 'هذه المحادثة المحفوظة للرعاية الوقائية بالطب الصيني، ولا تبحث في PubMed أو Cochrane أو Europe PMC. نوع السجل يبقى كما هو.',
-    profileAssessLocked: 'التقييمات للعضو القياسي',
-    upgrade: 'ترقية',
-    needLevel: (name) => `يتطلب هذا الوضع عضوية ${name} أو أعلى.`,
-    empty: 'اطرح أسئلة حول الصحة وطول العمر. الإجابات للمرجعية فقط.',
-    emptyGeneral: 'وضع تعزيز الصحة الذاتية: نمط الحياة والتغذية والحركة والنوم. بدون كتب تخصصية وبدون PubMed/Cochrane/Europe PMC.',
-    emptyProfessional: 'الوضع المهني: الطب الأساسي والسريري والوظيفي وعلوم طول العمر، مع خيار PubMed / Cochrane / Europe PMC.',
-    placeholder: 'اكتب سؤالك، أو اضغط صوت للتسجيل…',
-    send: 'إرسال',
-    sending: 'جارٍ الإرسال…',
-    stop: 'إيقاف',
-    thinking: 'جارٍ البحث في قاعدة المعرفة وصياغة الرد…',
-    sendFail: 'تعذر الإرسال. حاول مرة أخرى.',
-    networkFail: 'انقطع الاتصال. حاول مرة أخرى.',
-    timeout: 'انتهت المهلة. حاول مرة أخرى.',
-    blocked: 'تم حظر هذا السؤال وفق سياسات السلامة.',
-    sources: 'المصادر',
-    followups: 'يمكن المتابعة بهذه الأسئلة',
-    followupCats: {
-      western: 'طب غربي',
-      functional: 'طب وظيفي',
-      longevity: 'طول العمر',
-      tcm: 'طب صيني',
-      related: 'عن سؤالك',
-    },
-    sourcesEmpty: '',
-    sourcesError: '',
-    pubmed: 'بحث PubMed',
-    pubmedHint: 'أدبيات NCBI العلنية.',
-    cochrane: 'بحث Cochrane',
-    cochraneHint: 'مراجعات منهجية (Cochrane).',
-    europepmc: 'بحث Europe PMC',
-    europepmcHint: 'أدبيات طبية مفتوحة. Web of Science يتطلب اشتراكًا مؤسسيًا.',
-    thinkingPubmed: 'جارٍ البحث في قاعدة المعرفة والأدبيات…',
-    profileReady: 'تم ربط استبيانك وملخصات تقييم المخاطر والشيخوخة المحفوظة على الموقع إن وُجدت.',
-    profileMissing: 'لا يوجد استبيان أو تقييمات بعد؛ ستكون الإجابات أعم.',
-    profileError: 'تعذر تحميل الاستبيان؛ ستستخدم هذه الجلسة سياقًا عامًا.',
-    profileFill: 'ملء الاستبيان',
-    profileUpdate: 'تحديث الاستبيان',
-    profileRisk: 'التقييمات',
-    profileAging: 'تقييم الشيخوخة',
-    sessions: 'المحادثات',
-    newChat: 'محادثة جديدة',
-    sessionsEmpty: 'لا توجد محادثات سابقة.',
-    sessionsLoading: 'جارٍ تحميل المحادثات…',
-    sessionsError: 'تعذر تحميل قائمة المحادثات.',
-    historyLoading: 'جارٍ تحميل المحادثة…',
-    loadFail: 'تعذر تحميل هذه المحادثة.',
-    untitled: 'محادثة بدون عنوان',
-    clearAll: 'مسح',
-    clearConfirm: 'هل تريد مسح كل المحادثات؟ لا يمكن التراجع عن هذا الإجراء.',
-    deleteSession: 'حذف',
-    deleteConfirm: 'حذف هذه المحادثة؟ لا يمكن التراجع.',
-    renameSession: 'إعادة تسمية',
-    renameFail: 'تعذر إعادة تسمية المحادثة. حاول مرة أخرى.',
-    retentionNote: 'تُحفظ المحادثات 90 يومًا. لا يُحفظ نص التقارير المرفوعة في السجل.',
-    clearing: 'جارٍ المسح…',
-    downloadWord: 'تنزيل Word / WPS',
-    downloadBusy: 'جارٍ الإنشاء…',
-    downloadFail: 'فشل التصدير. حاول مرة أخرى.',
-    downvote: 'غير مفيد',
-    downvoteDone: 'تم حفظ الملاحظة',
-    downvotePick: 'سبب اختياري:',
-    downvoteSkip: 'بدون سبب',
-    downvoteOffTopic: 'خارج الموضوع',
-    downvoteNoSource: 'بلا مصدر',
-    downvoteTooLong: 'طويل جدًا',
-    downvoteUnclear: 'غير واضح',
-    downvoteOther: 'أخرى',
-    downvoteFail: 'تعذر إرسال الملاحظة.',
-    docFooter: 'تم التصدير من استشارة تشانغ جيان شينغتو. للإشارة فقط، ولا يغني عن زيارة الطبيب.',
-    filePrefix: 'استشارة-صحية',
-    attach: 'رفع',
-    attachHint: 'حتى 5 صور (JPG/PNG؛ حوّل HEIC أولاً) و3 مستندات (PDF/Word/TXT، ≤5MB لكل ملف). يمكن لصق رابط مقال أو PDF عام، ويُقرأ النص قبل إرسال السؤال. ملفات PDF الممسوحة تُقرأ كنص أولاً؛ إذا تعذر ذلك تُرفق الصفحات الأولى فقط كصور صغيرة. اضغط «صوت» للتسجيل ثم مرة أخرى للتحويل. للمراجعة فقط وليس بديلاً عن الطبيب.',
-    attachHintAdmin: 'لا حد لعدد الصور أو ملفات PDF (JPG/PNG؛ حوّل HEIC أولاً). Word/TXT ما زالا حتى 3 ملفات، وكل مستند ≤5MB. تُقرأ روابط المقالات وPDF العامة قبل إرسال السؤال. ملفات PDF الممسوحة تُقرأ كنص أولاً؛ إذا تعذر ذلك تُرفق الصفحات الأولى فقط كصور صغيرة. اضغط «صوت» للتسجيل ثم مرة أخرى للتحويل. للمراجعة فقط وليس بديلاً عن الطبيب.',
-    attachHintExempt: 'لا حد لعدد أو حجم الصور وPDF وWord وTXT (JPG/PNG/WebP؛ حوّل HEIC أولاً). الصور الملصقة داخل Word لا تُقرأ؛ ارفعها كـ JPG/PNG. تُقرأ روابط المقالات وPDF العامة قبل إرسال السؤال. ملفات PDF الممسوحة تُقرأ كنص أولاً؛ إذا تعذر ذلك تُرفق الصفحات الأولى فقط كصور صغيرة. الإرسال الواحد ما زال محدودًا بحجم طلب البوابة 25MB. اضغط «صوت» للتسجيل ثم مرة أخرى للتحويل. للمراجعة فقط وليس بديلاً عن الطبيب.',
-    attachDefault: 'يرجى مراجعة الملفات المرفقة وإعطاء إرشادات صحية عامة.',
-    attachTooLarge: 'أبقِ كل مستند أقل من 5MB؛ اضغط الصور الكبيرة قبل الرفع.',
-    attachHeic: 'لا يمكن قراءة صور HEIC هنا. على iPhone: الإعدادات → الكاميرا → الصيغ → الأكثر توافقًا، أو صدّر الصورة كـ JPG/PNG.',
-    attachScannedPdf: 'تعذر قراءة هذا الـ PDF الممسوح كنص، وتعذر تجهيز صور الصفحات. استخدم PDF قابلاً للنسخ، أو صوّر الصفحات المهمة كـ JPG/PNG.',
-    attachPdfFail: 'تعذر تحليل ملف PDF. حدّث الصفحة ثم أعد المحاولة، أو ارفع Word أو صورًا واضحة.',
-    attachEmptyDoc: 'لا يوجد نص قابل للقراءة في هذا المستند.',
-    attachOldDoc: 'احفظ ملفات .doc كـ .docx أو PDF.',
-    attachUnsupported: 'المدعوم: JPG/PNG/WebP وPDF وWord (.docx) وTXT. حوّل صور HEIC أولاً.',
-    attachLimit: 'حتى 5 صور و3 مستندات (≤5MB لكل مستند).',
-    attachLimitAdmin: 'Word وTXT ما زالا حتى 3 ملفات (≤5MB لكل ملف).',
-    attachLimitExempt: 'الإرسال الواحد ما زال محدودًا بحجم طلب البوابة 25MB. أرسل الملفات على دفعات أصغر.',
-    attachTransport: 'يتجاوز هذا الإرسال حد البوابة 25MB. أرسل الملفات على دفعات أصغر.',
-    attachImageUnread: 'بعد الضغط ما زالت الصورة أكبر مما تستطيع خدمة الاستشارة قراءته، لذا لم تُضف. استخدم JPG/PNG أصغر أو قسّمها إلى عدة صور.',
-    linkFail: 'تعذر قراءة نص الرابط. الصق النص أو ارفع الملف. لم يُعامل الرابط كأنه قُرئ.',
-    linkUnsafe: 'عنوان الرابط غير مسموح (شبكة داخلية أو منفذ غير معتاد أو كلمة مرور داخل الرابط). استخدم مقالاً أو PDF عاماً عبر https، أو الصق النص. لم يُعامل الرابط كأنه قُرئ.',
-    linkBlocked: 'رفض الموقع الطلب. الصق النص أو ارفع الملف. لم يُعامل الرابط كأنه قُرئ.',
-    linkPaywall: 'هذه الصفحة تتطلب تسجيلاً أو دفعاً، لذا لم يُقرأ النص. الصق النص أو ارفع PDF. لم يُعامل الرابط كأنه قُرئ.',
-    linkScanned: 'هذا الـ PDF بلا نص قابل للنسخ، وغالباً ما يكون مسحاً. نزّله ثم ارفعه هنا لتجربة التعرف على الصفحات. لم يُعامل الرابط كأنه قُرئ.',
-    linkTooLarge: 'الصفحة كبيرة جداً ولم يكتمل القراءة. الصق الفقرة المطلوبة أو ارفع الملف. لم يُعامل الرابط كأنه قُرئ.',
-    linkTooMany: 'يمكن قراءة رابطين عامين فقط في المرة الواحدة. احذف الروابط الزائدة ثم أعد الإرسال.',
-    linkBusy: 'طلبات قراءة الروابط كثيرة الآن. انتظر ثم أعد المحاولة. لم يُعامل الرابط كأنه قُرئ.',
-    attachRemove: 'إزالة',
-    speech: 'صوت',
-    speechHint: 'اضغط «صوت» لبدء التسجيل، ثم اضغط مرة أخرى للتوقف والتحويل إلى نص. اسمح لهذا الموقع باستخدام الميكروفون.',
-    speechListening: 'جارٍ الاستماع — اضغط للإنهاء',
-    speechTranscribing: 'جارٍ التحويل…',
-    speechFail: 'تعذر تحويل الصوت. أعد المحاولة أو اكتب.',
-    speechDenied: 'المتصفح منع الميكروفون. اضغط أيقونة القفل في شريط العنوان واسمح بالميكروفون ثم حدّث الصفحة.',
-    speechNoMic: 'لم يُعثر على ميكروفون. تحقق من الجهاز ثم أعد المحاولة.',
-    speechBusy: 'الميكروفون قيد الاستخدام من برنامج آخر.',
-    speechEmpty: 'لم يُسمع شيء. اقترب من الميكروفون وقل جملة قصيرة ثم أوقف التسجيل.',
-    speechUnsupported: 'هذا المتصفح لا يدعم التسجيل. استخدم أحدث Chrome أو Edge، أو اكتب يدويًا.',
-    thinkingUpload: 'جارٍ قراءة المرفق والبحث في قاعدة المعرفة…',
-    quotaExceeded: 'انتهت حصتك اليومية. تُعاد عند منتصف الليل بتوقيت بكين.',
-    quotaUnlimited: 'لا حد يومي',
-    quotaLine: (used, limit) => `اليوم ${used} / ${limit} (تُعاد عند منتصف الليل بتوقيت بكين)`,
-    quotaUpgrade: 'ترقية',
-  },
 }
 
 /** general: 普通会员+（每日试用额度）；professional: 高级会员+ */
@@ -474,7 +331,6 @@ export default function Consult() {
   const [params, setParams] = useSearchParams()
   const t = COPY[lang] || COPY.zh
   const disclaimer = DISCLAIMER[lang] || DISCLAIMER.zh
-  const rtl = lang === 'ar'
   const [profile, setProfile] = useState(null)
   const [profileStatus, setProfileStatus] = useState('loading')
   const [sessions, setSessions] = useState([])
@@ -787,7 +643,7 @@ export default function Consult() {
 
   if (loading) {
     return (
-      <div className={`page-consult ${rtl ? 'page-consult--rtl' : ''}`} dir={rtl ? 'rtl' : 'ltr'}>
+      <div className="page-consult">
         <aside className="consult-disclaimer page-callout page-callout--warn" role="note">
           <p>{disclaimer}</p>
         </aside>
@@ -798,7 +654,7 @@ export default function Consult() {
 
   if (!user || !token) {
     return (
-      <div className={`page-consult ${rtl ? 'page-consult--rtl' : ''}`} dir={rtl ? 'rtl' : 'ltr'}>
+      <div className="page-consult">
         <aside className="consult-disclaimer page-callout page-callout--warn" role="note">
           <p>{disclaimer}</p>
         </aside>
@@ -815,7 +671,7 @@ export default function Consult() {
   }
 
   return (
-    <div className={`page-consult ${rtl ? 'page-consult--rtl' : ''}`} dir={rtl ? 'rtl' : 'ltr'}>
+    <div className="page-consult">
       <header className="consult-top">
         <button type="button" className="consult-back" onClick={() => navigate(homePath)}>
           <span className="consult-back-arrow" aria-hidden="true" />
@@ -961,7 +817,6 @@ export default function Consult() {
                   entry={entry}
                   onSelectEntry={entry === 'tcm' ? undefined : setEntry}
                   initialDraft={composerSeed}
-                  rtl={rtl}
                   copy={chatCopy}
                   profile={profile}
                   sessionId={sessionId || null}

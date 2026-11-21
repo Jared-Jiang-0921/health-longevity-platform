@@ -12,22 +12,22 @@ const LOGO_SRC = '/images/logo-longevity-atlas.png'
 
 /** 顶栏主菜单：首页 + 六大模块（C 端） */
 const primaryNavItems = [
-  { path: '/', label: { zh: '首页', en: 'Home', ar: 'الرئيسية' } },
-  { path: '/solutions', label: { zh: 'AI长寿师', en: 'AI Coach', ar: 'مدرب AI' } },
-  { path: '/products', label: { zh: '长寿产品证据库', en: 'Evidence Library', ar: 'مكتبة الأدلة' } },
-  { path: '/tcm-prevention', label: { zh: '中医治未病', en: 'Preventive TCM', ar: 'وقاية صينية' } },
-  { path: '/health-skills', label: { zh: '长寿知识技能', en: 'Health Skills', ar: 'مهارات' } },
-  { path: '/longevity-news', label: { zh: '前沿医学资讯', en: 'Medical Insights', ar: 'مستجدات' } },
-  { path: '/translation-opportunities', label: { zh: '转化应用机会', en: 'Commercialization', ar: 'فرص' }, muted: true },
+  { path: '/', label: { zh: '首页', en: 'Home' } },
+  { path: '/solutions', label: { zh: 'AI长寿师', en: 'AI Coach' } },
+  { path: '/products', label: { zh: '长寿产品证据库', en: 'Evidence Library' } },
+  { path: '/tcm-prevention', label: { zh: '中医治未病', en: 'Preventive TCM' } },
+  { path: '/health-skills', label: { zh: '长寿知识技能', en: 'Health Skills' } },
+  { path: '/longevity-news', label: { zh: '前沿医学资讯', en: 'Medical Insights' } },
+  { path: '/translation-opportunities', label: { zh: '转化应用机会', en: 'Commercialization' }, muted: true },
 ]
 
 const adminFooterItems = [
-  { path: '/ops/payment-monitor', label: { zh: '支付巡检', en: 'Payment Monitor', ar: 'مراقبة الدفع' } },
-  { path: '/ops/users', label: { zh: '用户管理', en: 'Users Admin', ar: 'إدارة المستخدمين' } },
-  { path: '/ops/health-questionnaires', label: { zh: '问卷记录', en: 'Questionnaires', ar: 'استبيانات' } },
-  { path: '/ops/consult-reviews', label: { zh: '咨询审核', en: 'Consult Review', ar: 'مراجعة الاستشارة' } },
-  { path: '/ops/consult-quota', label: { zh: '咨询额度', en: 'Consult Quota', ar: 'حصة الاستشارة' } },
-  { path: '/ops/consult-feedback', label: { zh: '咨询点踩', en: 'Consult Feedback', ar: 'تقييم الاستشارة' } },
+  { path: '/ops/payment-monitor', label: { zh: '支付巡检', en: 'Payment Monitor' } },
+  { path: '/ops/users', label: { zh: '用户管理', en: 'Users Admin' } },
+  { path: '/ops/health-questionnaires', label: { zh: '问卷记录', en: 'Questionnaires' } },
+  { path: '/ops/consult-reviews', label: { zh: '咨询审核', en: 'Consult Review' } },
+  { path: '/ops/consult-quota', label: { zh: '咨询额度', en: 'Consult Quota' } },
+  { path: '/ops/consult-feedback', label: { zh: '咨询点踩', en: 'Consult Feedback' } },
 ]
 
 const I18N = {
@@ -68,24 +68,6 @@ const I18N = {
     footerAccount: 'Account',
     footerOrg: 'Organization',
     footerAdmin: 'Admin',
-  },
-  ar: {
-    login: 'تسجيل الدخول',
-    register: 'إنشاء حساب',
-    logout: 'تسجيل الخروج',
-    language: 'اللغة',
-    legalAria: 'قانوني',
-    footerMore: 'المزيد',
-    footerDisclaimer: 'المحتوى تعليمي فقط وليس بديلاً عن الرعاية الطبية.',
-    footerMethodology: 'تصنيف الأدلة',
-    footerSources: 'المصادر: إرشادات · PubMed · تجارب · معلومات تنظيمية',
-    footerContact: 'تواصل',
-    footerAbout: 'حول المنصة',
-    footerFavorites: 'المفضلة',
-    footerPayment: 'الدفع',
-    footerAccount: 'الحساب',
-    footerOrg: 'المؤسسة',
-    footerAdmin: 'إدارة',
   },
 }
 
@@ -148,7 +130,6 @@ export default function Layout({ children }) {
               <select value={lang} onChange={(e) => switchLang(e.target.value)} aria-label={t.language}>
                 <option value="zh">简体中文</option>
                 <option value="en">English</option>
-                <option value="ar">العربية</option>
               </select>
             </div>
             <span className="nav-auth">

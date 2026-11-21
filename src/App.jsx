@@ -54,7 +54,6 @@ function NotFoundPage() {
     <div className="page-content">
       <h1>未找到该页面</h1>
       <p>Page not found.</p>
-      <p lang="ar" dir="rtl">الصفحة غير موجودة.</p>
       <p><Link to="/">返回首页</Link></p>
     </div>
   )

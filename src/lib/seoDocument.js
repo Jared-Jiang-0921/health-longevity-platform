@@ -39,7 +39,6 @@ export function resolveSeo(pathname, lang) {
 const EDUCATION_DISCLAIMER = {
   zh: '仅供健康教育与生活方式参考，不替代专业诊疗、处方或紧急医疗处置。',
   en: 'For education and lifestyle reference only—not diagnosis, prescriptions, or emergency care.',
-  ar: 'للتعليم ونمط الحياة فقط، وليس بديلاً عن التشخيص أو الوصفات أو الطوارئ.',
 }
 
 export function buildJsonLd({ lang, pathname, title, description, canonical }) {
@@ -54,7 +53,7 @@ export function buildJsonLd({ lang, pathname, title, description, canonical }) {
     url: `${SITE_ORIGIN}/`,
     name: brand.name,
     description: brand.description,
-    inLanguage: ['zh-Hans', 'en', 'ar'],
+    inLanguage: ['zh-Hans', 'en'],
     publisher: { '@id': `${SITE_ORIGIN}/#org` },
   }
   const org = {

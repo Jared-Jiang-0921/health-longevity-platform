@@ -21,15 +21,6 @@ const HINTS = {
         premium: 'All courses and exclusive assets',
       },
     },
-    ar: {
-      title: 'المحتوى حسب العضوية',
-      lead: 'الدورات والملفات حسب مستوى العضوية. الأمثلة وواجهة الرفع للمسؤول مخفية عن الزوار والأعضاء.',
-      tiers: {
-        free: 'بعض الدورات المجانية والأساسيات',
-        standard: 'معظم الدورات ومقاطع السلسلة',
-        premium: 'كل الدورات والملفات الحصرية',
-      },
-    },
   },
   products: {
     zh: {
@@ -48,15 +39,6 @@ const HINTS = {
         free: 'Most public products and basics',
         standard: 'Standard-only products and assets',
         premium: 'Premium-only products and full evidence packs',
-      },
-    },
-    ar: {
-      title: 'المحتوى حسب العضوية',
-      lead: 'عناصر الكتالوج حسب العضوية. العروض التجريبية وواجهة الرفع مخفية عن الزوار والأعضاء.',
-      tiers: {
-        free: 'معظم المنتجات العامة والأساسيات',
-        standard: 'منتجات وملفات للأعضاء القياسيين',
-        premium: 'منتجات ومواد أدلة حصرية للمميزين',
       },
     },
   },
@@ -79,15 +61,6 @@ const HINTS = {
         premium: 'Guideline updates and exclusive uploads',
       },
     },
-    ar: {
-      title: 'المحتوى حسب العضوية',
-      lead: 'الأعمدة حسب المستوى: ملخصات للأعضاء؛ جدل وتجارب للقياسي؛ إرشادات للمميز.',
-      tiers: {
-        free: 'ملخصات أسبوعية وشرح الأدلة',
-        standard: 'مراقبة الجدل ومتابعة التجارب',
-        premium: 'تحديثات الإرشادات وملفات حصرية',
-      },
-    },
   },
   'tcm-prevention': {
     zh: {
@@ -106,15 +79,6 @@ const HINTS = {
         free: 'Module intro, plus constitution, seasonal, diet, mind–emotion, movement, East–West, herb, and formula education cards',
         standard: 'Preliminary constitution check (Standard and above)',
         premium: 'Everything in Standard, plus exclusive extensions',
-      },
-    },
-    ar: {
-      title: 'المحتوى حسب العضوية',
-      lead: 'مكتبة الطب الوقائي حسب العضوية. عينات التخطيط وواجهة الرفع مخفية عن الزوار والأعضاء.',
-      tiers: {
-        free: 'مقدمة الوحدة، مع بطاقات الأنماط والفصول والغذاء والمزاج والحركة والجسر والأعشاب والوصفات',
-        standard: 'التمييز الأولي لنمط الجسم (من العضوية القياسية فما فوق)',
-        premium: 'المكتبة كاملة مع امتدادات حصرية',
       },
     },
   },
@@ -137,15 +101,6 @@ const HINTS = {
         premium: 'Everything plus exclusive research packs',
       },
     },
-    ar: {
-      title: 'المحتوى حسب العضوية',
-      lead: 'مواد التحويل حسب العضوية. عينات الأعمدة وواجهة الرفع مخفية عن الزوار والأعضاء.',
-      tiers: {
-        free: 'بعض الاتجاهات العامة والمقدمات',
-        standard: 'كل الأعمدة ومواد التسويق',
-        premium: 'الكل مع حزم بحث حصرية',
-      },
-    },
   },
   home: {
     zh: {
@@ -166,15 +121,6 @@ const HINTS = {
         premium: 'Premium curation and full briefings',
       },
     },
-    ar: {
-      title: 'اليوم حسب العضوية',
-      lead: 'محتوى الصفحة الرئيسية حسب العضوية. العينات مخفية عن الزوار والأعضاء.',
-      tiers: {
-        free: 'بعض الملخصات العامة ونصائح المنتجات',
-        standard: 'عناصر منسقة للأعضاء القياسيين',
-        premium: 'تنسيق وملخصات حصرية للمميزين',
-      },
-    },
   },
 }
 
@@ -189,21 +135,16 @@ const UI = {
     register: 'Sign up',
     upgrade: 'Upgrade',
   },
-  ar: {
-    login: 'تسجيل الدخول',
-    register: 'إنشاء حساب',
-    upgrade: 'ترقية العضوية',
-  },
 }
 
 export function getModuleAccessHint(moduleKey, lang = 'zh') {
-  const key = lang === 'en' || lang === 'ar' ? lang : 'zh'
+  const key = lang === 'en' ? lang : 'zh'
   const pack = HINTS[moduleKey]
   if (!pack) return null
   return pack[key] || pack.zh
 }
 
 export function getModuleAccessHintUi(lang = 'zh') {
-  const key = lang === 'en' || lang === 'ar' ? lang : 'zh'
+  const key = lang === 'en' ? lang : 'zh'
   return UI[key] || UI.zh
 }
