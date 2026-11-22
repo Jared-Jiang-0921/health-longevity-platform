@@ -19,6 +19,7 @@ const Products = lazy(() => import('./pages/Products'))
 const NmnEvidence = lazy(() => import('./pages/NmnEvidence'))
 const Omega3Evidence = lazy(() => import('./pages/Omega3Evidence'))
 const VitaminDEvidence = lazy(() => import('./pages/VitaminDEvidence'))
+const CreatineEvidence = lazy(() => import('./pages/CreatineEvidence'))
 const ProductDetail = lazy(() => import('./pages/ProductDetail'))
 const LongevityNews = lazy(() => import('./pages/LongevityNews'))
 const LongevityNewsArticle = lazy(() => import('./pages/LongevityNewsArticle'))
@@ -100,6 +101,7 @@ export default function App() {
           <Route path="/products/evidence/nmn" element={<NmnEvidence />} />
           <Route path="/products/evidence/omega-3" element={<Omega3Evidence />} />
           <Route path="/products/evidence/vitamin-d" element={<VitaminDEvidence />} />
+          <Route path="/products/evidence/creatine" element={<CreatineEvidence />} />
           <Route path="/products/:id" element={<ProtectedModule><ProductDetail /></ProtectedModule>} />
           <Route path="/tcm-prevention" element={<ProtectedModule><WithModuleAssets moduleKey="tcm-prevention"><TCMPrevention /></WithModuleAssets></ProtectedModule>} />
           <Route path="/tcm-prevention/constitution" element={<ProtectedModule><TcmConstitution /></ProtectedModule>} />

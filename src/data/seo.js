@@ -119,8 +119,8 @@ export const SEO_PAGES = [
     },
     lastmod: '2026-11-22',
     description: {
-      zh: '公开说明购买前如何核对成分、研究证据、监管身份和相互作用。逐条商品仍不是公开可抓取语料。成分证据目前公开 NMN / NR、EPA/DHA 与维生素 D 三页。不把商品包装成治疗方案。',
-      en: 'Public note on how to check ingredients, research, regulatory status, and interactions before buying. Individual products stay out of the public corpus. Three ingredient pages are public: NMN / NR, EPA/DHA, and vitamin D. Not sold as treatment.',
+      zh: '公开说明购买前如何核对成分、研究证据、监管身份和相互作用。逐条商品仍不是公开可抓取语料。成分证据目前公开 NMN / NR、EPA/DHA、维生素 D 与肌酸四页。不把商品包装成治疗方案。',
+      en: 'Public note on how to check ingredients, research, regulatory status, and interactions before buying. Individual products stay out of the public corpus. Four ingredient pages are public: NMN / NR, EPA/DHA, vitamin D, and creatine. Not sold as treatment.',
     },
   },
   {
@@ -169,6 +169,22 @@ export const SEO_PAGES = [
     description: {
       zh: '维生素 D3（胆钙化醇）的教育说明：VITAL 的癌症、心血管和骨折结果，Cochrane 对骨折的综述，以及 FDA 授权声称和 USPSTF 最终建议各自说明什么。不提供用量，不写成预防或治疗。',
       en: 'Educational note on vitamin D3 (cholecalciferol): what VITAL found for cancer, cardiovascular events, and fractures, what a Cochrane review found, and what FDA and USPSTF texts say. No dose. Not prevention or treatment.',
+    },
+  },
+  {
+    path: '/products/evidence/creatine',
+    type: 'evidence',
+    changefreq: 'monthly',
+    priority: '0.7',
+    index: true,
+    lastmod: '2026-11-22',
+    title: {
+      zh: '肌酸：人体证据、监管表述与不能外推的边界 | 长健星图',
+      en: 'Creatine: human evidence, regulation, and limits | Longevity Atlas',
+    },
+    description: {
+      zh: '一水肌酸的教育说明：抗阻训练试验里的瘦组织和力量差值、骨密度合并结果、有争议的记忆综述、肌肉疾病和帕金森病试验各自说明什么，以及欧盟食品声称、FDA 的 GRAS 答复和中国 2008 年批复各自不是疗效认定。不提供用量，不写成预防、治疗或运动表现保证。',
+      en: 'Educational note on creatine monohydrate: what training trials, a bone-density pool, a disputed memory review, and disease trials each show, and why an EU food claim, an FDA GRAS letter, and a 2008 Chinese reply are not efficacy. No dose. Not prevention, treatment, or a sports guarantee.',
     },
   },
   {

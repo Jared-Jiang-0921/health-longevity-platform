@@ -47,6 +47,13 @@
 - `https://www.healthlongevity.cn/products/evidence/vitamin-d` 与英文 `/en/products/evidence/vitamin-d`。路径不是 `/products/vitamin-d`。
 - 只引用已核对的 PMID 30415629、35939577、24729336，FDA 授权健康声称页面，以及 USPSTF 2018 年最终建议。2024 年工作组草案不当作现行结论。不写用量，不把试验结果写成预防或治疗。
 
+随后又加了肌酸成分证据，规则相同，仍不合并、不部署，也不改示例 Nginx、DNS 或安全组：
+
+- `https://www.healthlongevity.cn/products/evidence/creatine` 与英文 `/en/products/evidence/creatine`。路径不是 `/products/creatine`。`/products/creatine` 仍是商品详情的 noindex 壳。
+- 中文网址写入 sitemap 的 `<loc>`，英文只作为 hreflang，不另做一条英文 loc。
+- 引用已核对的 PMID 29138605、29740583、35984306、36644917、23740606、24934384、25668262、25523279、42035842，欧盟委员会条例 (EU) No 432/2012 合并文本，EFSA Journal 2011;9(7):2303 与 2016;14(2):4400，FDA 对 GRN 000931 的更正答复，卫生部卫监督函〔2008〕323号，以及国家卫生健康委 2023 年第 4 号公告。不写用量，不把肌酸写成药物、治疗或运动表现保证。
+- 示例 Nginx 仍用原来的 `try_files`。文件存在时先出这一页。本次不修改该示例文件，也不改正在监听的配置。
+
 ## 2026-11-10 线上核对后补上的
 
 核对的是当时已上线的 `https://www.healthlongevity.cn`（首页约 8.7KB，资讯页约 134KB，均为预渲染 HTML）：

@@ -7,6 +7,7 @@ import { createRequire } from 'node:module'
 import { NMN_EVIDENCE_PATH } from '../../src/data/nmnEvidenceMeta.js'
 import { OMEGA3_EVIDENCE_PATH } from '../../src/data/omega3EvidenceMeta.js'
 import { VITAMIN_D_EVIDENCE_PATH } from '../../src/data/vitaminDEvidenceMeta.js'
+import { CREATINE_EVIDENCE_PATH } from '../../src/data/creatineEvidenceMeta.js'
 import { PUBLIC_SUMMARY_UPDATED, pageIndexable } from '../../src/data/seo.js'
 import { getPageFaqs } from '../../src/data/publicSummary.js'
 import { toNewsSearchCard } from '../../src/lib/longevityNewsCard.js'
@@ -127,8 +128,8 @@ expect(evidenceEn.includes('hreflang="zh-Hans"') && evidenceEn.includes('hreflan
 expect(!/\d+\s*mg/i.test(evidenceEn) && evidenceEn.includes('No dose'), 'english pilot does not state a dose')
 expect(renderRouteHtml(template, { lang: 'zh', pathname: '/products/nmn' }) == null, 'product slug is not prerendered')
 expect(renderRouteHtml(template, { lang: 'zh', pathname: '/products/1' }) == null, 'numeric product route is not prerendered')
-expect(pageIndexable(NMN_EVIDENCE_PATH) && pageIndexable(OMEGA3_EVIDENCE_PATH) && pageIndexable(VITAMIN_D_EVIDENCE_PATH), 'ingredient evidence pages are indexable')
-expect(!pageIndexable('/products/nmn') && !pageIndexable('/products/1') && !pageIndexable('/products/omega-3') && !pageIndexable('/products/vitamin-d'), 'product slugs stay noindex')
+expect(pageIndexable(NMN_EVIDENCE_PATH) && pageIndexable(OMEGA3_EVIDENCE_PATH) && pageIndexable(VITAMIN_D_EVIDENCE_PATH) && pageIndexable(CREATINE_EVIDENCE_PATH), 'ingredient evidence pages are indexable')
+expect(!pageIndexable('/products/nmn') && !pageIndexable('/products/1') && !pageIndexable('/products/omega-3') && !pageIndexable('/products/vitamin-d') && !pageIndexable('/products/creatine'), 'product slugs stay noindex')
 expect(!pageIndexable('/products/evidence/other') && !pageIndexable('/health-skills/course-1'), 'neighbors and courses stay noindex')
 const productsText = productsHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ')
 expect(productsText.length > 800 && productsHtml.includes('/products/evidence/nmn'), 'products page explains the check and links the pilot')
@@ -169,6 +170,30 @@ expect(xml.includes('<loc>https://www.healthlongevity.cn/products/evidence/vitam
 expect(!xml.includes('/products/vitamin-d<'), 'sitemap does not list a vitamin D product URL')
 expect(llms.includes('https://www.healthlongevity.cn/products/evidence/vitamin-d'), 'llms.txt names the vitamin D page')
 expect(llms.includes('逐条商品'), 'llms.txt still keeps individual products out of the corpus')
+const creatineHtml = renderRouteHtml(template, { lang: 'zh', pathname: CREATINE_EVIDENCE_PATH })
+const creatineText = String(creatineHtml || '').replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ')
+expect(creatineHtml.includes('<title>肌酸：人体证据、监管表述与不能外推的边界 | 长健星图</title>'), 'creatine title is unique')
+expect(creatineHtml.includes('rel="canonical" href="https://www.healthlongevity.cn/products/evidence/creatine"'), 'creatine canonical')
+expect(creatineHtml.includes('content="index,follow,max-snippet:-1,max-image-preview:large"'), 'creatine is index,follow')
+expect(!/name="robots" content="[^"]*noindex/.test(creatineHtml), 'creatine robots meta is not noindex')
+expect(!creatineHtml.includes('"author"') && !creatineHtml.includes('reviewedBy'), 'creatine invents no author or reviewer')
+expect(!/\d+\s*mg/i.test(creatineHtml) && !creatineHtml.includes('毫克') && !/\d+\s*g\/d/i.test(creatineHtml) && !/\d+\s*g\b/i.test(creatineHtml), 'creatine page states no dose')
+expect(creatineHtml.includes('29138605') && creatineHtml.includes('29740583') && creatineHtml.includes('35984306') && creatineHtml.includes('25668262') && creatineHtml.includes('23740606') && creatineHtml.includes('42035842'), 'creatine cites the checked trials')
+expect(creatineHtml.includes('fda.gov') && creatineHtml.includes('eur-lex.europa.eu') && creatineHtml.includes('nhc.gov.cn'), 'creatine cites FDA, EU, and NHC pages')
+expect(creatineHtml.includes('/products/evidence/nmn') && creatineHtml.includes('/products/evidence/omega-3') && creatineHtml.includes('/products/evidence/vitamin-d'), 'creatine links the other evidence pages')
+expect(creatineText.length > 1800, 'creatine body is substantial')
+expect(renderRouteHtml(template, { lang: 'zh', pathname: '/products/creatine' }) == null, 'creatine product slug is not prerendered')
+expect(xml.includes('<loc>https://www.healthlongevity.cn/products/evidence/creatine</loc>'), 'sitemap lists the creatine page')
+expect(!xml.includes('<loc>https://www.healthlongevity.cn/en/products/evidence/creatine</loc>'), 'sitemap does not add a separate English loc')
+expect(!xml.includes('/products/creatine<'), 'sitemap does not list a creatine product URL')
+expect(llms.includes('https://www.healthlongevity.cn/products/evidence/creatine'), 'llms.txt names the creatine page')
+const creatineEn = renderRouteHtml(template, { lang: 'en', pathname: CREATINE_EVIDENCE_PATH })
+expect(creatineEn.includes('<title>Creatine: human evidence, regulation, and limits | Longevity Atlas</title>'), 'english creatine title')
+expect(creatineEn.includes('rel="canonical" href="https://www.healthlongevity.cn/en/products/evidence/creatine"'), 'english creatine has its own canonical')
+expect(creatineEn.includes('hreflang="zh-Hans"') && creatineEn.includes('hreflang="en"'), 'creatine emits hreflang')
+expect(creatineEn.includes('content="index,follow,max-snippet:-1,max-image-preview:large"'), 'english creatine is index,follow')
+expect(!/\d+\s*mg/i.test(creatineEn) && !/\d+\s*g\/d/i.test(creatineEn) && !/\d+\s*g\b/i.test(creatineEn) && creatineEn.includes('No dose'), 'english creatine does not state a dose')
+expect(!pageIndexable('/health-skills/course-1') && !pageIndexable('/en/health-skills/course-1'), 'course paths stay noindex')
 
 function visibleText(html) {
   return String(html || '').replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
