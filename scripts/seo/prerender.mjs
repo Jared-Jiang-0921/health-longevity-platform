@@ -24,6 +24,8 @@ import {
 } from '../../src/lib/newsArticleSeo.js'
 import { NMN_EVIDENCE_UPDATED } from '../../src/data/nmnEvidenceMeta.js'
 import { NMN_EVIDENCE_PATH, getNmnEvidencePage } from '../../src/data/nmnEvidencePage.js'
+import { getPublicFaqPage } from '../../src/data/publicFaq.js'
+import { getPublicMethodologyPage } from '../../src/data/publicMethodology.js'
 import { getProductsEvidenceCopy } from '../../src/data/productsEvidenceLibraryI18n.js'
 import { SEO_LANGS, SEO_PAGES, SITE_ORIGIN, absoluteUrl } from '../../src/data/seo.js'
 import { extractLongevityKeywords, toNewsSearchCard } from '../../src/lib/longevityNewsCard.js'
@@ -372,12 +374,55 @@ function evidenceBody(lang) {
   `
 }
 
+function faqBody(lang) {
+  const page = getPublicFaqPage(lang)
+  const seo = resolveSeo('/faq', lang)
+  const faqs = page.faqs
+    .map((item) => `<article><h2>${escapeHtml(item.q)}</h2><p>${escapeHtml(item.a)}</p></article>`)
+    .join('')
+  return `
+    <article>
+      <p>${escapeHtml(page.kicker)}</p>
+      <h1>${escapeHtml(seo.title)}</h1>
+      <p>${escapeHtml(page.lead)}</p>
+      <p>${escapeHtml(page.disclaimer)}</p>
+      ${faqs}
+    </article>
+  `
+}
+
+function methodologyBody(lang) {
+  const page = getPublicMethodologyPage(lang)
+  const seo = resolveSeo('/methodology', lang)
+  const sections = page.sections
+    .map((section) => {
+      const paragraphs = section.paragraphs.map((text) => `<p>${escapeHtml(text)}</p>`).join('')
+      return `<section id="${escapeHtml(section.id)}"><h2>${escapeHtml(section.heading)}</h2>${paragraphs}</section>`
+    })
+    .join('')
+  const related = page.related
+    .map((item) => `<li><a href="${escapeHtml(absoluteUrl(lang, item.path))}">${escapeHtml(item.label)}</a></li>`)
+    .join('')
+  return `
+    <article>
+      <p>${escapeHtml(page.kicker)}</p>
+      <h1>${escapeHtml(seo.title)}</h1>
+      <p>${escapeHtml(page.lead)}</p>
+      <p>${escapeHtml(page.disclaimer)}</p>
+      ${sections}
+      <section><h2>${escapeHtml(page.relatedHeading)}</h2><ul>${related}</ul></section>
+    </article>
+  `
+}
+
 function pageBody(page, lang, newsCards) {
   if (page.type === 'home') return homeBody(lang)
   if (page.path === '/about') return aboutBody(lang)
   if (page.path === '/solutions') return solutionsBody(lang)
   if (page.path === '/products') return productsBody(lang)
   if (page.path === NMN_EVIDENCE_PATH) return evidenceBody(lang)
+  if (page.path === '/faq') return faqBody(lang)
+  if (page.path === '/methodology') return methodologyBody(lang)
   if (page.type === 'legal') return legalBody(page, lang)
   if (page.path === '/longevity-news') return newsBody(lang, newsCards)
   const seo = resolveSeo(page.path, lang)

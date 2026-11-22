@@ -9,6 +9,16 @@
   status = 200
 
 [[redirects]]
+  from = "/faq"
+  to = "/faq/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/methodology"
+  to = "/methodology/index.html"
+  status = 200
+
+[[redirects]]
   from = "/solutions"
   to = "/solutions/index.html"
   status = 200
@@ -91,6 +101,16 @@
 [[redirects]]
   from = "/en/about"
   to = "/en/about/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en/faq"
+  to = "/en/faq/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en/methodology"
+  to = "/en/methodology/index.html"
   status = 200
 
 [[redirects]]

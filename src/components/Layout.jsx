@@ -44,6 +44,8 @@ const I18N = {
     footerSources: '来源：临床指南 · PubMed · 注册试验 · 监管公开信息',
     footerContact: '联系',
     footerAbout: '关于本站',
+    footerFaq: '常见问题',
+    footerMethod: '证据核对',
     footerFavorites: '我的收藏',
     footerPayment: '支付结算',
     footerAccount: '会员信息',
@@ -63,6 +65,8 @@ const I18N = {
     footerSources: 'Sources: guidelines · PubMed · trials · regulatory disclosures',
     footerContact: 'Contact',
     footerAbout: 'About',
+    footerFaq: 'Questions',
+    footerMethod: 'How evidence is checked',
     footerFavorites: 'Favorites',
     footerPayment: 'Payment',
     footerAccount: 'Account',
@@ -188,6 +192,10 @@ export default function Layout({ children }) {
           <p className="footer-copy">© {SITE_LEGAL.brandName}</p>
           <nav className="footer-legal" aria-label={t.legalAria}>
             <Link to="/about">{t.footerAbout}</Link>
+            <span className="footer-sep">·</span>
+            <Link to="/faq">{t.footerFaq}</Link>
+            <span className="footer-sep">·</span>
+            <Link to="/methodology">{t.footerMethod}</Link>
             <span className="footer-sep">·</span>
             <Link to="/terms">Terms of Service</Link>
             <span className="footer-sep">·</span>

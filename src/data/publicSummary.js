@@ -4,6 +4,7 @@
  */
 import { HOME_MODULES } from './homePageContent.js'
 import { NMN_EVIDENCE_PATH, getNmnEvidenceFaqs } from './nmnEvidenceMeta.js'
+import { getPublicFaqPage } from './publicFaq.js'
 import { getLongevityNewsModuleCopy } from './longevityNewsModuleI18n.js'
 import {
   PUBLIC_LIVE_ORIGIN,
@@ -139,7 +140,7 @@ const ABOUT_FAQS = {
     },
     {
       q: '哪些内容可以引用，哪些不能？',
-      a: `可以引用公开说明页：首页、关于本站、AI 长寿方案师、长寿知识技能入口说明、产品证据库、中医治未病、前沿医学资讯、转化应用机会，以及用户协议、隐私政策、免责声明等法律页。前沿医学资讯的每条公开卡片另有独立网址。成分证据目前只另有一页可以引用：NMN / NR（${absoluteUrl('zh', '/products/evidence/nmn')}）。逐条商品、购物页和商品详情，以及体质辨识和机会条目，仍不是公开可抓取语料。引用时请保留「仅供健康教育，不替代诊疗」的界限，并链回规范网址。登录、注册、会员账户、支付与订单、问卷答案、评估结果、咨询对话、课程学习页、管理后台和 /api 不在公开引用范围内。`,
+      a: `可以引用公开说明页：首页、关于本站、常见问题（${absoluteUrl('zh', '/faq')}）、证据核对说明（${absoluteUrl('zh', '/methodology')}）、AI 长寿方案师、长寿知识技能入口说明、产品证据库、中医治未病、前沿医学资讯、转化应用机会，以及用户协议、隐私政策、免责声明等法律页。前沿医学资讯的每条公开卡片另有独立网址。成分证据目前只另有一页可以引用：NMN / NR（${absoluteUrl('zh', '/products/evidence/nmn')}）。逐条商品、购物页和商品详情，以及体质辨识和机会条目，仍不是公开可抓取语料。引用时请保留「仅供健康教育，不替代诊疗」的界限，并链回规范网址。登录、注册、会员账户、支付与订单、问卷答案、评估结果、咨询对话、课程学习页、管理后台和 /api 不在公开引用范围内。`,
     },
     {
       q: '规范网址是哪一个？',
@@ -157,7 +158,7 @@ const ABOUT_FAQS = {
     },
     {
       q: 'What may be cited?',
-      a: `Public pages may be cited: home, about, the AI coach overview, the health-skills entry, the product evidence library, TCM prevention, medical insights, translation opportunities, and the legal pages. Each public medical-insight card also has its own URL. One ingredient evidence page may also be cited: NMN / NR (${absoluteUrl('en', '/products/evidence/nmn')}). Individual products, shopping and detail pages, constitution checks, and opportunity rows are still not a public crawlable corpus. Keep the education-not-diagnosis limit and link the canonical URL. Login, registration, accounts, payments, questionnaire answers, assessment results, consult transcripts, course players, admin, and /api are not public.`,
+      a: `Public pages may be cited: home, about, questions (${absoluteUrl('en', '/faq')}), how evidence is checked (${absoluteUrl('en', '/methodology')}), the AI coach overview, the health-skills entry, the product evidence library, TCM prevention, medical insights, translation opportunities, and the legal pages. Each public medical-insight card also has its own URL. One ingredient evidence page may also be cited: NMN / NR (${absoluteUrl('en', '/products/evidence/nmn')}). Individual products, shopping and detail pages, constitution checks, and opportunity rows are still not a public crawlable corpus. Keep the education-not-diagnosis limit and link the canonical URL. Login, registration, accounts, payments, questionnaire answers, assessment results, consult transcripts, course players, admin, and /api are not public.`,
     },
     {
       q: 'Which URL should be cited?',
@@ -199,6 +200,7 @@ export function getPageFaqs(pathname, lang) {
   const path = String(pathname || '/').replace(/\/$/, '') || '/'
   if (path === '/longevity-news') return newsFaqs(key)
   if (path === NMN_EVIDENCE_PATH) return getNmnEvidenceFaqs(key)
+  if (path === '/faq') return getPublicFaqPage(key).faqs
   const table = path === '/about' ? ABOUT_FAQS : path === '/solutions' ? SOLUTION_FAQS : null
   if (!table) return []
   return table[key] || table.zh
@@ -207,6 +209,8 @@ export function getPageFaqs(pathname, lang) {
 export const PUBLIC_CRAWL_NAV = [
   { path: '/', label: { zh: '首页', en: 'Home' } },
   { path: '/about', label: { zh: '关于本站', en: 'About' } },
+  { path: '/faq', label: { zh: '常见问题', en: 'Questions' } },
+  { path: '/methodology', label: { zh: '证据核对', en: 'Methodology' } },
   { path: '/solutions', label: { zh: 'AI长寿方案师', en: 'AI Coach' } },
   { path: '/health-skills', label: { zh: '长寿知识技能', en: 'Health Skills' } },
   { path: '/products', label: { zh: '产品证据库', en: 'Evidence Library' } },
@@ -227,6 +231,8 @@ export function getAboutPage(lang) {
     { label: key === 'zh' ? '规范站点' : 'Canonical site', href: `${SITE_ORIGIN}/`, path: '/' },
     { label: key === 'zh' ? '公开访问' : 'Public deployment', href: `${PUBLIC_LIVE_ORIGIN}/` },
     { label: key === 'zh' ? '关于本站' : 'About this site', href: absoluteUrl(key, '/about'), path: '/about' },
+    { label: key === 'zh' ? '常见问题' : 'Questions', href: absoluteUrl(key, '/faq'), path: '/faq' },
+    { label: key === 'zh' ? '证据核对说明' : 'How evidence is checked', href: absoluteUrl(key, '/methodology'), path: '/methodology' },
     { label: key === 'zh' ? '健康与医疗免责声明' : 'Health disclaimer', href: absoluteUrl(key, '/disclaimer'), path: '/disclaimer' },
     { label: key === 'zh' ? '隐私政策' : 'Privacy policy', href: absoluteUrl(key, '/privacy'), path: '/privacy' },
     { label: 'llms.txt', href: `${SITE_ORIGIN}/llms.txt` },
@@ -286,6 +292,16 @@ export function getAboutPage(lang) {
             `咨询声明：${CONSULT_DISCLAIMER.zh}`,
             '中医内容为教育参考，不替代个体辨证论治与执业医师处方。未经当场辨证，不能作为用药依据。',
             '引用公开页面时，请同时保留上述教育界限，并链接规范网址。不要把本站句子改写成诊断、治愈率或个性化处方。',
+          ],
+        },
+        {
+          id: 'editorial',
+          heading: '编辑责任',
+          paragraphs: [
+            '公开页面由运营主体发布，不署个人作者，也不设具名医学审稿人。页眉、页脚和结构化数据里的组织名称就是这一主体；本站没有作者名录。',
+            `运营主体是${SITE_LEGAL.legalEntityName}。联系邮箱：${SITE_LEGAL.contactEmail}。这是站点联系方式，不是诊疗入口。关于页上方的更新日期仍是已发布的说明日期 ${PUBLIC_SUMMARY_UPDATED}，本段不另设审稿日期。`,
+            `常见问题：${absoluteUrl('zh', '/faq')}。证据核对说明：${absoluteUrl('zh', '/methodology')}。成分证据的现例：${absoluteUrl('zh', '/products/evidence/nmn')}。这些页面不提供用量，也不把研究写成治疗或抗衰老疗效。`,
+            '登录后的商品详情、课程正文、问卷答案、评估结果和咨询对话不是上述公开页。',
           ],
         },
         {
@@ -351,6 +367,16 @@ export function getAboutPage(lang) {
             `Consult notice: ${CONSULT_DISCLAIMER.en}`,
             'TCM material is education. It does not replace in-person pattern differentiation or a licensed prescription, and it is not a basis for taking medicine without that assessment.',
             'When you cite a public page, keep that education limit and link the canonical URL. Do not rewrite a sentence into a diagnosis, a cure rate, or a personal prescription.',
+          ],
+        },
+        {
+          id: 'editorial',
+          heading: 'Editorial responsibility',
+          paragraphs: [
+            'Public pages are published by the operator. They do not name a personal author or a medical reviewer. The organization in the header, footer, and structured data is that operator. There is no author roster.',
+            `The operator is ${SITE_LEGAL.legalEntityName}. Contact: ${SITE_LEGAL.contactEmail}. That is a site mailbox, not a clinic. The date at the top of this page remains the published summary date ${PUBLIC_SUMMARY_UPDATED}. This note does not add a review date.`,
+            `Questions: ${absoluteUrl('en', '/faq')}. How evidence is checked: ${absoluteUrl('en', '/methodology')}. The ingredient example: ${absoluteUrl('en', '/products/evidence/nmn')}. Those pages give no dose and do not turn research into treatment or an anti-aging effect.`,
+            'Signed-in product details, course text, questionnaire answers, assessment results, and consult transcripts are not those public pages.',
           ],
         },
         {

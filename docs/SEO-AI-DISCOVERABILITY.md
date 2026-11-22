@@ -29,6 +29,13 @@
 - `/health-skills/` 与 `/en/health-skills/` 继续 Disallow。
 - 这一页不提供用量，也不把研究结果写成治疗或抗衰老疗效。`llms.txt` 只把这一页从“逐条商品不是公开语料”里划出来，商品详情和购物页仍不公开。
 
+同一次公开页扩充还增加了站点说明，仍不打开课程和商品目录：
+
+- `https://www.healthlongevity.cn/faq` 与英文 `/en/faq`：站点问答，使用与其他公开页相同的 FAQPage。不写用量或治疗建议。
+- `https://www.healthlongevity.cn/methodology` 与英文 `/en/methodology`：引用习惯。结构化数据仍是 WebPage。例子链到已有的 NMN 证据页，不新增论文结论。
+- `/about` 增加「编辑责任」。只写运营主体和联系邮箱，不设具名作者或医学审稿人，因此没有 `/authors`。
+- 这些路径不在 `/products/` 下。示例 Nginx 的 `location /` 会按预渲染文件提供，不需要商品壳例外，也不改正在监听的配置。
+
 ## 2026-11-10 线上核对后补上的
 
 核对的是当时已上线的 `https://www.healthlongevity.cn`（首页约 8.7KB，资讯页约 134KB，均为预渲染 HTML）：

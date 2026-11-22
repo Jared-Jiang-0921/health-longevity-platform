@@ -43,6 +43,8 @@ const LegalSale = lazy(() => import('./pages/LegalSale'))
 const LegalHealthData = lazy(() => import('./pages/LegalHealthData'))
 const LegalCookies = lazy(() => import('./pages/LegalCookies'))
 const About = lazy(() => import('./pages/About'))
+const Faq = lazy(() => import('./pages/Faq'))
+const Methodology = lazy(() => import('./pages/Methodology'))
 const Account = lazy(() => import('./pages/Account'))
 const OrgConsole = lazy(() => import('./pages/OrgConsole'))
 const OrgInviteAccept = lazy(() => import('./pages/OrgInviteAccept'))
@@ -117,6 +119,8 @@ export default function App() {
           <Route path="/org/invite/accept" element={<ProtectedModule><OrgInviteAccept /></ProtectedModule>} />
           <Route path="/tax" element={<WithModuleAssets moduleKey="tax"><Tax /></WithModuleAssets>} />
           <Route path="/about" element={<About />} />
+          <Route path="/faq" element={<Faq />} />
+          <Route path="/methodology" element={<Methodology />} />
           <Route path="/terms" element={<LegalTerms />} />
           <Route path="/privacy" element={<LegalPrivacy />} />
           <Route path="/disclaimer" element={<LegalDisclaimer />} />

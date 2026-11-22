@@ -56,8 +56,40 @@ export const SEO_PAGES = [
       en: 'About Longevity Atlas | Evidence-based longevity education',
     },
     description: {
-      zh: `长健星图是什么、面向谁、公开模块、两类长寿咨询与中医养生保健咨询、合规边界和规范网址。仅供健康教育，不替代诊疗。最近更新 ${PUBLIC_SUMMARY_UPDATED}。`,
-      en: `What Longevity Atlas is, who it is for, public modules, consult types, compliance limits, and the canonical URL. Education only—not medical care. Updated ${PUBLIC_SUMMARY_UPDATED}.`,
+      zh: `长健星图是什么、面向谁、公开模块、两类长寿咨询与中医养生保健咨询、合规边界和规范网址。编辑责任在运营主体，不设具名审稿人。仅供健康教育，不替代诊疗。最近更新 ${PUBLIC_SUMMARY_UPDATED}。`,
+      en: `What Longevity Atlas is, who it is for, public modules, consult types, compliance limits, and the canonical URL. Editorial responsibility sits with the operator; no named reviewer. Education only—not medical care. Updated ${PUBLIC_SUMMARY_UPDATED}.`,
+    },
+  },
+  {
+    path: '/faq',
+    type: 'faq',
+    changefreq: 'monthly',
+    priority: '0.6',
+    index: true,
+    lastmod: '2026-11-22',
+    title: {
+      zh: '常见问题 | 长健星图',
+      en: 'Questions | Longevity Atlas',
+    },
+    description: {
+      zh: '本站公开页与登录后内容的差别、来源如何引用、为何不提供用量或治疗建议，以及如何联系运营主体。不是医疗建议。',
+      en: 'What is public versus sign-in only, how sources are cited, why pages give no dose or treatment advice, and how to contact the operator. Not medical advice.',
+    },
+  },
+  {
+    path: '/methodology',
+    type: 'methodology',
+    changefreq: 'monthly',
+    priority: '0.6',
+    index: true,
+    lastmod: '2026-11-22',
+    title: {
+      zh: '证据如何核对与呈现 | 长健星图',
+      en: 'How evidence is checked | Longevity Atlas',
+    },
+    description: {
+      zh: '公开页如何引用带 PMID 的论文、如何区分研究发现与商品宣传、如何标注监管原文和转述，以及为何不编造作者或审稿人。不提供用量。',
+      en: 'How public pages cite papers by PMID, separate study findings from product claims, label official texts and secondary accounts, and avoid inventing authors or reviewers. No dose.',
     },
   },
   {
