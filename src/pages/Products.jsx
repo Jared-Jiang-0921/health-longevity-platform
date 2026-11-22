@@ -160,6 +160,7 @@ export default function Products() {
           <h2 id="products-boundary" className="products-reg-heading">{ev.boundaryTitle}</h2>
           <p>{ev.boundaryBody}</p>
           <p><Link to={ev.pilotPath}>{ev.pilotLabel}</Link></p>
+          <p><Link to={ev.secondPilotPath}>{ev.secondPilotLabel}</Link></p>
         </section>
       </section>
 

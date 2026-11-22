@@ -2,6 +2,7 @@
  * 公开的站点问答。只说明页面边界和引用方式，不提供用量或治疗建议。
  */
 import { NMN_EVIDENCE_PATH } from './nmnEvidenceMeta.js'
+import { OMEGA3_EVIDENCE_PATH } from './omega3EvidenceMeta.js'
 import { SITE_LEGAL } from './siteLegal.js'
 import { absoluteUrl } from './seo.js'
 
@@ -35,7 +36,7 @@ const PAGES = {
       },
       {
         q: '公开的成分证据页和登录后的商品页有什么不同？',
-        a: `目前公开的成分证据只有 NMN / NR 一页：${absoluteUrl('zh', NMN_EVIDENCE_PATH)}。它说明证据限度和监管信息，不是在售商品。/products/nmn、/products/1 以及其他商品详情仍是站内功能，爬虫看到的是 noindex 壳，规格和购物页也不进入站点地图。产品证据库栏目页只说明购买前如何核对，不把目录当成公开商品清单：${absoluteUrl('zh', '/products')}。`,
+        a: `目前公开的成分证据有两页：NMN / NR（${absoluteUrl('zh', NMN_EVIDENCE_PATH)}）和 EPA/DHA（${absoluteUrl('zh', OMEGA3_EVIDENCE_PATH)}）。它们说明证据限度和监管信息，不是在售商品。/products/nmn、/products/1 以及其他商品详情仍是站内功能，爬虫看到的是 noindex 壳，规格和购物页也不进入站点地图。产品证据库栏目页只说明购买前如何核对，不把目录当成公开商品清单：${absoluteUrl('zh', '/products')}。`,
       },
       {
         q: '本站有署名作者或医学审稿人吗？',
@@ -72,7 +73,7 @@ const PAGES = {
       },
       {
         q: 'How is a public ingredient page different from a signed-in product page?',
-        a: `The only public ingredient evidence page is NMN / NR: ${absoluteUrl('en', NMN_EVIDENCE_PATH)}. It states limits and regulatory context. It is not a product for sale. /products/nmn, /products/1, and other product details stay in-app; crawlers receive a noindex shell, and SKUs are not in the sitemap. The product overview explains how to check a claim and is not a public catalog: ${absoluteUrl('en', '/products')}.`,
+        a: `Two ingredient evidence pages are public: NMN / NR (${absoluteUrl('en', NMN_EVIDENCE_PATH)}) and EPA/DHA (${absoluteUrl('en', OMEGA3_EVIDENCE_PATH)}). They state limits and regulatory context. They are not products for sale. /products/nmn, /products/1, and other product details stay in-app; crawlers receive a noindex shell, and SKUs are not in the sitemap. The product overview explains how to check a claim and is not a public catalog: ${absoluteUrl('en', '/products')}.`,
       },
       {
         q: 'Does the site name authors or a medical reviewer?',

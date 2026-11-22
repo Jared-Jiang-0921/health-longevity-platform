@@ -327,6 +327,11 @@
   status = 200
 
 [[redirects]]
+  from = "/products/evidence/omega-3"
+  to = "/products/evidence/omega-3/index.html"
+  status = 200
+
+[[redirects]]
   from = "/products/*"
   to = "/spa-shell.html"
   status = 200
@@ -465,6 +470,11 @@
 [[redirects]]
   from = "/en/products/evidence/nmn"
   to = "/en/products/evidence/nmn/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en/products/evidence/omega-3"
+  to = "/en/products/evidence/omega-3/index.html"
   status = 200
 
 [[redirects]]

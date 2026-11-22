@@ -119,8 +119,8 @@ export const SEO_PAGES = [
     },
     lastmod: '2026-11-22',
     description: {
-      zh: '公开说明购买前如何核对成分、研究证据、监管身份和相互作用。逐条商品仍不是公开可抓取语料。成分证据目前只公开 NMN / NR 一页。不把商品包装成治疗方案。',
-      en: 'Public note on how to check ingredients, research, regulatory status, and interactions before buying. Individual products stay out of the public corpus. One ingredient page, NMN / NR, is public. Not sold as treatment.',
+      zh: '公开说明购买前如何核对成分、研究证据、监管身份和相互作用。逐条商品仍不是公开可抓取语料。成分证据目前公开 NMN / NR 与 EPA/DHA 两页。不把商品包装成治疗方案。',
+      en: 'Public note on how to check ingredients, research, regulatory status, and interactions before buying. Individual products stay out of the public corpus. Two ingredient pages are public: NMN / NR and EPA/DHA. Not sold as treatment.',
     },
   },
   {
@@ -137,6 +137,22 @@ export const SEO_PAGES = [
     description: {
       zh: '烟酰胺单核苷酸（NMN）和烟酰胺核糖（NR）的教育说明：与 NAD+ 的关系、现有人体研究及其限度、监管信息，以及妊娠、用药等人群的谨慎边界。不提供用量，不把研究结果写成治疗或抗衰老疗效。',
       en: 'Educational note on nicotinamide mononucleotide (NMN) and nicotinamide riboside (NR): relation to NAD+, what human studies do and do not show, regulatory context, and who should be cautious. No dose. Not a treatment or anti-aging claim.',
+    },
+  },
+  {
+    path: '/products/evidence/omega-3',
+    type: 'evidence',
+    changefreq: 'monthly',
+    priority: '0.7',
+    index: true,
+    lastmod: '2026-11-22',
+    title: {
+      zh: 'EPA 与 DHA（Omega-3）：人体证据、监管表述与不能外推的边界 | 长健星图',
+      en: 'EPA and DHA (omega-3): human evidence, regulation, and limits | Longevity Atlas',
+    },
+    description: {
+      zh: '二十碳五烯酸（EPA）与二十二碳六烯酸（DHA）的教育说明：处方制剂试验、一般人群补充试验和系统综述各自说明什么，以及 FDA 合格声称不是疗效认定。不提供用量，不写成预防或治疗。',
+      en: 'Educational note on EPA and DHA: what prescription-drug trials, a primary-prevention trial, and a systematic review each show, and why an FDA qualified claim is not efficacy. No dose. Not prevention or treatment.',
     },
   },
   {

@@ -2,6 +2,7 @@
  * 公开的证据核对说明。描述引用习惯，不新增未经本站页面核对的研究结论。
  */
 import { NMN_EVIDENCE_PATH } from './nmnEvidenceMeta.js'
+import { OMEGA3_EVIDENCE_PATH } from './omega3EvidenceMeta.js'
 
 const PAGES = {
   zh: {
@@ -55,6 +56,7 @@ const PAGES = {
     relatedHeading: '本站已有页面',
     related: [
       { path: NMN_EVIDENCE_PATH, label: '成分证据示例：NMN / NR' },
+      { path: OMEGA3_EVIDENCE_PATH, label: '成分证据示例：EPA 与 DHA' },
       { path: '/products', label: '产品证据库：购买前如何核对' },
       { path: '/longevity-news/ln-static-2', label: '资讯：怎样给一篇论文分证据档' },
       { path: '/longevity-news/ln-static-3', label: '资讯：NMN / NR 证据缺口的短说明' },
@@ -114,6 +116,7 @@ const PAGES = {
     relatedHeading: 'Pages already on this site',
     related: [
       { path: NMN_EVIDENCE_PATH, label: 'Ingredient example: NMN / NR' },
+      { path: OMEGA3_EVIDENCE_PATH, label: 'Ingredient example: EPA and DHA' },
       { path: '/products', label: 'Evidence library: how a claim is checked' },
       { path: '/longevity-news/ln-static-2', label: 'Insight: grading a paper' },
       { path: '/longevity-news/ln-static-3', label: 'Insight: the short NMN / NR note' },

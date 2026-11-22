@@ -36,6 +36,12 @@
 - `/about` 增加「编辑责任」。只写运营主体和联系邮箱，不设具名作者或医学审稿人，因此没有 `/authors`。
 - 这些路径不在 `/products/` 下。示例 Nginx 的 `location /` 会按预渲染文件提供，不需要商品壳例外，也不改正在监听的配置。
 
+随后又加了一页成分证据，规则与 NMN 页相同，仍不合并、不部署：
+
+- `https://www.healthlongevity.cn/products/evidence/omega-3` 与英文 `/en/products/evidence/omega-3`。路径不是 `/products/omega-3`，不会进入商品详情。
+- 只引用已核对的 PMID 30415628、33190147、30415637、32114706，以及 FDA 2019 年自己的合格声称说明。不写用量，不把试验结果写成预防或治疗。
+- 示例 Nginx 仍用原来的 `try_files`。文件存在时先出这一页。线上若把 `/products/` 无条件送到壳，才需要连同 NMN 页一起加精确路径例外。本仓库不改正在监听的配置。
+
 ## 2026-11-10 线上核对后补上的
 
 核对的是当时已上线的 `https://www.healthlongevity.cn`（首页约 8.7KB，资讯页约 134KB，均为预渲染 HTML）：
