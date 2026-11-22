@@ -119,8 +119,8 @@ export const SEO_PAGES = [
     },
     lastmod: '2026-11-22',
     description: {
-      zh: '公开说明购买前如何核对成分、研究证据、监管身份和相互作用。逐条商品仍不是公开可抓取语料。成分证据目前公开 NMN / NR、EPA/DHA、维生素 D 与肌酸四页。不把商品包装成治疗方案。',
-      en: 'Public note on how to check ingredients, research, regulatory status, and interactions before buying. Individual products stay out of the public corpus. Four ingredient pages are public: NMN / NR, EPA/DHA, vitamin D, and creatine. Not sold as treatment.',
+      zh: '公开说明购买前如何核对成分、研究证据、监管身份和相互作用。逐条商品仍不是公开可抓取语料。成分证据目前公开 NMN / NR、EPA/DHA、维生素 D、肌酸与镁五页。不把商品包装成治疗方案。',
+      en: 'Public note on how to check ingredients, research, regulatory status, and interactions before buying. Individual products stay out of the public corpus. Five ingredient pages are public: NMN / NR, EPA/DHA, vitamin D, creatine, and magnesium. Not sold as treatment.',
     },
   },
   {
@@ -185,6 +185,22 @@ export const SEO_PAGES = [
     description: {
       zh: '一水肌酸的教育说明：抗阻训练试验里的瘦组织和力量差值、骨密度合并结果、有争议的记忆综述、肌肉疾病和帕金森病试验各自说明什么，以及欧盟食品声称、FDA 的 GRAS 答复和中国 2008 年批复各自不是疗效认定。不提供用量，不写成预防、治疗或运动表现保证。',
       en: 'Educational note on creatine monohydrate: what training trials, a bone-density pool, a disputed memory review, and disease trials each show, and why an EU food claim, an FDA GRAS letter, and a 2008 Chinese reply are not efficacy. No dose. Not prevention, treatment, or a sports guarantee.',
+    },
+  },
+  {
+    path: '/products/evidence/magnesium',
+    type: 'evidence',
+    changefreq: 'monthly',
+    priority: '0.7',
+    index: true,
+    lastmod: '2026-11-22',
+    title: {
+      zh: '镁：人体证据、监管表述与不能外推的边界 | 长健星图',
+      en: 'Magnesium: human evidence, regulation, and limits | Longevity Atlas',
+    },
+    description: {
+      zh: '镁的教育说明：血压汇总差值、血糖化验指标、低质量的失眠综述和抽筋综述各自说明什么，以及欧盟食品声称、FDA 合格声称和中国营养标签用语各自不是疗效认定。不提供用量，不写成预防、治疗或抗衰老疗效。',
+      en: 'Educational note on magnesium: what blood-pressure pools, laboratory glucose measures, a low-quality insomnia review, and a cramp review each show, and why an EU food claim, an FDA qualified claim, and a Chinese nutrition-label sentence are not efficacy. No dose. Not prevention, treatment, or an anti-aging effect.',
     },
   },
   {

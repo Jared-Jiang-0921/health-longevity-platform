@@ -113,6 +113,7 @@ const PAGES = {
     related: [
       { path: '/longevity-news/ln-static-3', label: '更短的说明：NMN / NR 与「补 NAD+」叙事' },
       { path: '/products/evidence/creatine', label: '另一页成分证据：肌酸' },
+      { path: '/products/evidence/magnesium', label: '另一页成分证据：镁' },
       { path: '/products', label: '产品证据库：购买前如何核对证据' },
       { path: '/disclaimer', label: '健康与医疗免责声明' },
     ],
@@ -223,6 +224,7 @@ const PAGES = {
     related: [
       { path: '/longevity-news/ln-static-3', label: 'Shorter note: NMN, NR, and the NAD+ story' },
       { path: '/products/evidence/creatine', label: 'Other ingredient page: creatine' },
+      { path: '/products/evidence/magnesium', label: 'Other ingredient page: magnesium' },
       { path: '/products', label: 'Evidence library: how claims are checked' },
       { path: '/disclaimer', label: 'Health disclaimer' },
     ],

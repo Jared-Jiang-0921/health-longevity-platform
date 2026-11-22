@@ -342,6 +342,11 @@
   status = 200
 
 [[redirects]]
+  from = "/products/evidence/magnesium"
+  to = "/products/evidence/magnesium/index.html"
+  status = 200
+
+[[redirects]]
   from = "/products/*"
   to = "/spa-shell.html"
   status = 200
@@ -495,6 +500,11 @@
 [[redirects]]
   from = "/en/products/evidence/creatine"
   to = "/en/products/evidence/creatine/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en/products/evidence/magnesium"
+  to = "/en/products/evidence/magnesium/index.html"
   status = 200
 
 [[redirects]]
