@@ -6,6 +6,7 @@ import { HOME_MODULES } from './homePageContent.js'
 import { NMN_EVIDENCE_PATH, getNmnEvidenceFaqs } from './nmnEvidenceMeta.js'
 import { OMEGA3_EVIDENCE_PATH, getOmega3EvidenceFaqs } from './omega3EvidenceMeta.js'
 import { VITAMIN_D_EVIDENCE_PATH, getVitaminDEvidenceFaqs } from './vitaminDEvidenceMeta.js'
+import { CREATINE_EVIDENCE_PATH, getCreatineEvidenceFaqs } from './creatineEvidenceMeta.js'
 import { getPublicFaqPage } from './publicFaq.js'
 import { getLongevityNewsModuleCopy } from './longevityNewsModuleI18n.js'
 import {
@@ -142,7 +143,7 @@ const ABOUT_FAQS = {
     },
     {
       q: '哪些内容可以引用，哪些不能？',
-      a: `可以引用公开说明页：首页、关于本站、常见问题（${absoluteUrl('zh', '/faq')}）、证据核对说明（${absoluteUrl('zh', '/methodology')}）、AI 长寿方案师、长寿知识技能入口说明、产品证据库、中医治未病、前沿医学资讯、转化应用机会，以及用户协议、隐私政策、免责声明等法律页。前沿医学资讯的每条公开卡片另有独立网址。成分证据目前可以引用三页：NMN / NR（${absoluteUrl('zh', '/products/evidence/nmn')}）、EPA/DHA（${absoluteUrl('zh', '/products/evidence/omega-3')}）和维生素 D（${absoluteUrl('zh', '/products/evidence/vitamin-d')}）。逐条商品、购物页和商品详情，以及体质辨识和机会条目，仍不是公开可抓取语料。引用时请保留「仅供健康教育，不替代诊疗」的界限，并链回规范网址。登录、注册、会员账户、支付与订单、问卷答案、评估结果、咨询对话、课程学习页、管理后台和 /api 不在公开引用范围内。`,
+      a: `可以引用公开说明页：首页、关于本站、常见问题（${absoluteUrl('zh', '/faq')}）、证据核对说明（${absoluteUrl('zh', '/methodology')}）、AI 长寿方案师、长寿知识技能入口说明、产品证据库、中医治未病、前沿医学资讯、转化应用机会，以及用户协议、隐私政策、免责声明等法律页。前沿医学资讯的每条公开卡片另有独立网址。成分证据目前可以引用四页：NMN / NR（${absoluteUrl('zh', '/products/evidence/nmn')}）、EPA/DHA（${absoluteUrl('zh', '/products/evidence/omega-3')}）、维生素 D（${absoluteUrl('zh', '/products/evidence/vitamin-d')}）和肌酸（${absoluteUrl('zh', '/products/evidence/creatine')}）。逐条商品、购物页和商品详情，以及体质辨识和机会条目，仍不是公开可抓取语料。引用时请保留「仅供健康教育，不替代诊疗」的界限，并链回规范网址。登录、注册、会员账户、支付与订单、问卷答案、评估结果、咨询对话、课程学习页、管理后台和 /api 不在公开引用范围内。`,
     },
     {
       q: '规范网址是哪一个？',
@@ -160,7 +161,7 @@ const ABOUT_FAQS = {
     },
     {
       q: 'What may be cited?',
-      a: `Public pages may be cited: home, about, questions (${absoluteUrl('en', '/faq')}), how evidence is checked (${absoluteUrl('en', '/methodology')}), the AI coach overview, the health-skills entry, the product evidence library, TCM prevention, medical insights, translation opportunities, and the legal pages. Each public medical-insight card also has its own URL. Three ingredient evidence pages may also be cited: NMN / NR (${absoluteUrl('en', '/products/evidence/nmn')}), EPA/DHA (${absoluteUrl('en', '/products/evidence/omega-3')}), and vitamin D (${absoluteUrl('en', '/products/evidence/vitamin-d')}). Individual products, shopping and detail pages, constitution checks, and opportunity rows are still not a public crawlable corpus. Keep the education-not-diagnosis limit and link the canonical URL. Login, registration, accounts, payments, questionnaire answers, assessment results, consult transcripts, course players, admin, and /api are not public.`,
+      a: `Public pages may be cited: home, about, questions (${absoluteUrl('en', '/faq')}), how evidence is checked (${absoluteUrl('en', '/methodology')}), the AI coach overview, the health-skills entry, the product evidence library, TCM prevention, medical insights, translation opportunities, and the legal pages. Each public medical-insight card also has its own URL. Four ingredient evidence pages may also be cited: NMN / NR (${absoluteUrl('en', '/products/evidence/nmn')}), EPA/DHA (${absoluteUrl('en', '/products/evidence/omega-3')}), vitamin D (${absoluteUrl('en', '/products/evidence/vitamin-d')}), and creatine (${absoluteUrl('en', '/products/evidence/creatine')}). Individual products, shopping and detail pages, constitution checks, and opportunity rows are still not a public crawlable corpus. Keep the education-not-diagnosis limit and link the canonical URL. Login, registration, accounts, payments, questionnaire answers, assessment results, consult transcripts, course players, admin, and /api are not public.`,
     },
     {
       q: 'Which URL should be cited?',
@@ -204,6 +205,7 @@ export function getPageFaqs(pathname, lang) {
   if (path === NMN_EVIDENCE_PATH) return getNmnEvidenceFaqs(key)
   if (path === OMEGA3_EVIDENCE_PATH) return getOmega3EvidenceFaqs(key)
   if (path === VITAMIN_D_EVIDENCE_PATH) return getVitaminDEvidenceFaqs(key)
+  if (path === CREATINE_EVIDENCE_PATH) return getCreatineEvidenceFaqs(key)
   if (path === '/faq') return getPublicFaqPage(key).faqs
   const table = path === '/about' ? ABOUT_FAQS : path === '/solutions' ? SOLUTION_FAQS : null
   if (!table) return []
@@ -272,7 +274,7 @@ export function getAboutPage(lang) {
           id: 'modules',
           heading: '公开模块',
           paragraphs: [
-            `下列模块介绍可以公开阅读。长寿知识技能的课程正文需注册登录后按会员等级观看。初步体质辨识需登录，且向标准会员及以上开放。产品证据库、中医治未病和转化应用机会的公开页是栏目说明。逐条商品、购物页和商品详情仍不是公开可抓取语料；成分证据目前公开三页：NMN / NR（${absoluteUrl('zh', '/products/evidence/nmn')}）、EPA/DHA（${absoluteUrl('zh', '/products/evidence/omega-3')}）和维生素 D（${absoluteUrl('zh', '/products/evidence/vitamin-d')}）。体质辨识和机会条目也不是公开可抓取语料。问卷答案、评估结果和咨询对话不公开。`,
+            `下列模块介绍可以公开阅读。长寿知识技能的课程正文需注册登录后按会员等级观看。初步体质辨识需登录，且向标准会员及以上开放。产品证据库、中医治未病和转化应用机会的公开页是栏目说明。逐条商品、购物页和商品详情仍不是公开可抓取语料；成分证据目前公开四页：NMN / NR（${absoluteUrl('zh', '/products/evidence/nmn')}）、EPA/DHA（${absoluteUrl('zh', '/products/evidence/omega-3')}）、维生素 D（${absoluteUrl('zh', '/products/evidence/vitamin-d')}）和肌酸（${absoluteUrl('zh', '/products/evidence/creatine')}）。体质辨识和机会条目也不是公开可抓取语料。问卷答案、评估结果和咨询对话不公开。`,
           ],
           modules,
         },
@@ -304,7 +306,7 @@ export function getAboutPage(lang) {
           paragraphs: [
             '公开页面由运营主体发布，不署个人作者，也不设具名医学审稿人。页眉、页脚和结构化数据里的组织名称就是这一主体；本站没有作者名录。',
             `运营主体是${SITE_LEGAL.legalEntityName}。联系邮箱：${SITE_LEGAL.contactEmail}。这是站点联系方式，不是诊疗入口。关于页上方的更新日期仍是已发布的说明日期 ${PUBLIC_SUMMARY_UPDATED}，本段不另设审稿日期。`,
-            `常见问题：${absoluteUrl('zh', '/faq')}。证据核对说明：${absoluteUrl('zh', '/methodology')}。成分证据的现例：NMN / NR（${absoluteUrl('zh', '/products/evidence/nmn')}）、EPA/DHA（${absoluteUrl('zh', '/products/evidence/omega-3')}）和维生素 D（${absoluteUrl('zh', '/products/evidence/vitamin-d')}）。这些页面不提供用量，也不把研究写成治疗、预防或抗衰老疗效。`,
+            `常见问题：${absoluteUrl('zh', '/faq')}。证据核对说明：${absoluteUrl('zh', '/methodology')}。成分证据的现例：NMN / NR（${absoluteUrl('zh', '/products/evidence/nmn')}）、EPA/DHA（${absoluteUrl('zh', '/products/evidence/omega-3')}）、维生素 D（${absoluteUrl('zh', '/products/evidence/vitamin-d')}）和肌酸（${absoluteUrl('zh', '/products/evidence/creatine')}）。这些页面不提供用量，也不把研究写成治疗、预防或抗衰老疗效。`,
             '登录后的商品详情、课程正文、问卷答案、评估结果和咨询对话不是上述公开页。',
           ],
         },
@@ -347,7 +349,7 @@ export function getAboutPage(lang) {
           id: 'modules',
           heading: 'Public modules',
           paragraphs: [
-            `The introductions below are public. Health-skills course bodies require a signed-in member, by level. The constitution check requires sign-in and Standard membership or higher. The product, TCM, and translation overviews are section explanations. Individual products, shopping pages, and product details are not a public crawlable corpus. Three ingredient evidence pages are public: NMN / NR at ${absoluteUrl('en', '/products/evidence/nmn')}, EPA/DHA at ${absoluteUrl('en', '/products/evidence/omega-3')}, and vitamin D at ${absoluteUrl('en', '/products/evidence/vitamin-d')}. Constitution checks and opportunity rows are not a public crawlable corpus. Questionnaire answers, assessment results, and consult transcripts are not public.`,
+            `The introductions below are public. Health-skills course bodies require a signed-in member, by level. The constitution check requires sign-in and Standard membership or higher. The product, TCM, and translation overviews are section explanations. Individual products, shopping pages, and product details are not a public crawlable corpus. Four ingredient evidence pages are public: NMN / NR at ${absoluteUrl('en', '/products/evidence/nmn')}, EPA/DHA at ${absoluteUrl('en', '/products/evidence/omega-3')}, vitamin D at ${absoluteUrl('en', '/products/evidence/vitamin-d')}, and creatine at ${absoluteUrl('en', '/products/evidence/creatine')}. Constitution checks and opportunity rows are not a public crawlable corpus. Questionnaire answers, assessment results, and consult transcripts are not public.`,
           ],
           modules,
         },
@@ -379,7 +381,7 @@ export function getAboutPage(lang) {
           paragraphs: [
             'Public pages are published by the operator. They do not name a personal author or a medical reviewer. The organization in the header, footer, and structured data is that operator. There is no author roster.',
             `The operator is ${SITE_LEGAL.legalEntityName}. Contact: ${SITE_LEGAL.contactEmail}. That is a site mailbox, not a clinic. The date at the top of this page remains the published summary date ${PUBLIC_SUMMARY_UPDATED}. This note does not add a review date.`,
-            `Questions: ${absoluteUrl('en', '/faq')}. How evidence is checked: ${absoluteUrl('en', '/methodology')}. Ingredient examples: NMN / NR (${absoluteUrl('en', '/products/evidence/nmn')}), EPA/DHA (${absoluteUrl('en', '/products/evidence/omega-3')}), and vitamin D (${absoluteUrl('en', '/products/evidence/vitamin-d')}). Those pages give no dose and do not turn research into treatment, prevention, or an anti-aging effect.`,
+            `Questions: ${absoluteUrl('en', '/faq')}. How evidence is checked: ${absoluteUrl('en', '/methodology')}. Ingredient examples: NMN / NR (${absoluteUrl('en', '/products/evidence/nmn')}), EPA/DHA (${absoluteUrl('en', '/products/evidence/omega-3')}), vitamin D (${absoluteUrl('en', '/products/evidence/vitamin-d')}), and creatine (${absoluteUrl('en', '/products/evidence/creatine')}). Those pages give no dose and do not turn research into treatment, prevention, or an anti-aging effect.`,
             'Signed-in product details, course text, questionnaire answers, assessment results, and consult transcripts are not those public pages.',
           ],
         },

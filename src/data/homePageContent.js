@@ -45,8 +45,8 @@ export const HOME_MODULES = [
     path: '/products',
     title: { zh: '长寿产品证据库', en: 'Product Evidence Library' },
     intro: {
-      zh: '公开说明如何核对成分、研究证据、监管信息与相互作用。逐条商品不是公开可抓取语料。成分证据目前公开 NMN / NR、EPA/DHA 与维生素 D 三页。不把商品包装成治疗方案。',
-      en: 'Public overview of how to check ingredients, evidence, regulatory context, and interactions. Individual products are not a public crawlable corpus. Three ingredient pages are public: NMN / NR, EPA/DHA, and vitamin D. Not sold as treatment.',
+      zh: '公开说明如何核对成分、研究证据、监管信息与相互作用。逐条商品不是公开可抓取语料。成分证据目前公开 NMN / NR、EPA/DHA、维生素 D 与肌酸四页。不把商品包装成治疗方案。',
+      en: 'Public overview of how to check ingredients, evidence, regulatory context, and interactions. Individual products are not a public crawlable corpus. Four ingredient pages are public: NMN / NR, EPA/DHA, vitamin D, and creatine. Not sold as treatment.',
     },
     chips: {
       zh: ['成分证据', '监管信息', '相互作用'],

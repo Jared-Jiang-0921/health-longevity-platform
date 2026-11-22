@@ -4,6 +4,7 @@
 import { NMN_EVIDENCE_PATH } from './nmnEvidenceMeta.js'
 import { OMEGA3_EVIDENCE_PATH } from './omega3EvidenceMeta.js'
 import { VITAMIN_D_EVIDENCE_PATH } from './vitaminDEvidenceMeta.js'
+import { CREATINE_EVIDENCE_PATH } from './creatineEvidenceMeta.js'
 
 const PAGES = {
   zh: {
@@ -59,6 +60,7 @@ const PAGES = {
       { path: NMN_EVIDENCE_PATH, label: '成分证据示例：NMN / NR' },
       { path: OMEGA3_EVIDENCE_PATH, label: '成分证据示例：EPA 与 DHA' },
       { path: VITAMIN_D_EVIDENCE_PATH, label: '成分证据示例：维生素 D' },
+      { path: CREATINE_EVIDENCE_PATH, label: '成分证据示例：肌酸' },
       { path: '/products', label: '产品证据库：购买前如何核对' },
       { path: '/longevity-news/ln-static-2', label: '资讯：怎样给一篇论文分证据档' },
       { path: '/longevity-news/ln-static-3', label: '资讯：NMN / NR 证据缺口的短说明' },
@@ -120,6 +122,7 @@ const PAGES = {
       { path: NMN_EVIDENCE_PATH, label: 'Ingredient example: NMN / NR' },
       { path: OMEGA3_EVIDENCE_PATH, label: 'Ingredient example: EPA and DHA' },
       { path: VITAMIN_D_EVIDENCE_PATH, label: 'Ingredient example: vitamin D' },
+      { path: CREATINE_EVIDENCE_PATH, label: 'Ingredient example: creatine' },
       { path: '/products', label: 'Evidence library: how a claim is checked' },
       { path: '/longevity-news/ln-static-2', label: 'Insight: grading a paper' },
       { path: '/longevity-news/ln-static-3', label: 'Insight: the short NMN / NR note' },
