@@ -202,6 +202,12 @@ server {
         try_files $uri $uri/index.html /spa-shell.html;
     }
 
+    # /products/evidence/nmn、/products/evidence/omega-3、/products/evidence/vitamin-d（及对应 /en/ 路径）
+    # 若已预渲染为 $uri/index.html，下面的 try_files 会先给出该文件，
+    # 响应不经过 spa-shell，因此不带 X-Robots-Tag noindex，也不带 Cache-Control no-store。
+    # 这与其它公开预渲染文章一样：location 本身不另加缓存头。
+    # 线上 443 若把 /products/ 无条件指到 spa-shell.html、没有先查 $uri/index.html，
+    # 才需要在机器上为这些精确路径加例外。本仓库不改正在监听的配置。
     location ~ ^/en/products/.+ {
         try_files $uri $uri/index.html /en/spa-shell.html;
     }

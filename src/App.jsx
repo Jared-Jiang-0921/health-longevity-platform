@@ -16,6 +16,9 @@ const HealthQuestionnaire = lazy(() => import('./pages/HealthQuestionnaire'))
 const RiskAssessments = lazy(() => import('./pages/RiskAssessments'))
 const AgingAssessments = lazy(() => import('./pages/AgingAssessments'))
 const Products = lazy(() => import('./pages/Products'))
+const NmnEvidence = lazy(() => import('./pages/NmnEvidence'))
+const Omega3Evidence = lazy(() => import('./pages/Omega3Evidence'))
+const VitaminDEvidence = lazy(() => import('./pages/VitaminDEvidence'))
 const ProductDetail = lazy(() => import('./pages/ProductDetail'))
 const LongevityNews = lazy(() => import('./pages/LongevityNews'))
 const LongevityNewsArticle = lazy(() => import('./pages/LongevityNewsArticle'))
@@ -42,6 +45,8 @@ const LegalSale = lazy(() => import('./pages/LegalSale'))
 const LegalHealthData = lazy(() => import('./pages/LegalHealthData'))
 const LegalCookies = lazy(() => import('./pages/LegalCookies'))
 const About = lazy(() => import('./pages/About'))
+const Faq = lazy(() => import('./pages/Faq'))
+const Methodology = lazy(() => import('./pages/Methodology'))
 const Account = lazy(() => import('./pages/Account'))
 const OrgConsole = lazy(() => import('./pages/OrgConsole'))
 const OrgInviteAccept = lazy(() => import('./pages/OrgInviteAccept'))
@@ -92,6 +97,9 @@ export default function App() {
           <Route path="/consult" element={<ProtectedModule><Consult /></ProtectedModule>} />
           <Route path="/health-questionnaire" element={<ProtectedModule><WithModuleAssets moduleKey="health-questionnaire"><HealthQuestionnaire /></WithModuleAssets></ProtectedModule>} />
           <Route path="/products" element={<ProtectedModule><Products /></ProtectedModule>} />
+          <Route path="/products/evidence/nmn" element={<NmnEvidence />} />
+          <Route path="/products/evidence/omega-3" element={<Omega3Evidence />} />
+          <Route path="/products/evidence/vitamin-d" element={<VitaminDEvidence />} />
           <Route path="/products/:id" element={<ProtectedModule><ProductDetail /></ProtectedModule>} />
           <Route path="/tcm-prevention" element={<ProtectedModule><WithModuleAssets moduleKey="tcm-prevention"><TCMPrevention /></WithModuleAssets></ProtectedModule>} />
           <Route path="/tcm-prevention/constitution" element={<ProtectedModule><TcmConstitution /></ProtectedModule>} />
@@ -115,6 +123,8 @@ export default function App() {
           <Route path="/org/invite/accept" element={<ProtectedModule><OrgInviteAccept /></ProtectedModule>} />
           <Route path="/tax" element={<WithModuleAssets moduleKey="tax"><Tax /></WithModuleAssets>} />
           <Route path="/about" element={<About />} />
+          <Route path="/faq" element={<Faq />} />
+          <Route path="/methodology" element={<Methodology />} />
           <Route path="/terms" element={<LegalTerms />} />
           <Route path="/privacy" element={<LegalPrivacy />} />
           <Route path="/disclaimer" element={<LegalDisclaimer />} />

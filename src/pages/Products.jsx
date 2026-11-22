@@ -135,6 +135,34 @@ export default function Products() {
           <h2 id="products-intl-reg" className="products-reg-heading">{ev.intlTitle}</h2>
           <p>{ev.intlBody}</p>
         </section>
+        <section className="products-reg-block" aria-labelledby="products-check">
+          <h2 id="products-check" className="products-reg-heading">{ev.checkTitle}</h2>
+          <p>{ev.checkIntro}</p>
+          {ev.checkSteps.map((step) => (
+            <article key={step.title}>
+              <h3>{step.title}</h3>
+              <p>{step.body}</p>
+            </article>
+          ))}
+        </section>
+        <section className="products-reg-block" aria-labelledby="products-scoring">
+          <h2 id="products-scoring" className="products-reg-heading">{ev.scoringTitle}</h2>
+          <dl>
+            {ev.scoringRows.map((row) => (
+              <div key={row.dimension}>
+                <dt>{row.dimension}</dt>
+                <dd>{row.explain}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+        <section className="products-reg-block" aria-labelledby="products-boundary">
+          <h2 id="products-boundary" className="products-reg-heading">{ev.boundaryTitle}</h2>
+          <p>{ev.boundaryBody}</p>
+          <p><Link to={ev.pilotPath}>{ev.pilotLabel}</Link></p>
+          <p><Link to={ev.secondPilotPath}>{ev.secondPilotLabel}</Link></p>
+          <p><Link to={ev.thirdPilotPath}>{ev.thirdPilotLabel}</Link></p>
+        </section>
       </section>
 
       <section className="categories">

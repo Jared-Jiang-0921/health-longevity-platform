@@ -18,6 +18,35 @@
 - `/favicon.ico`、`/favicon.png`、`/favicon.svg`、`/apple-touch-icon.png` 在示例 Nginx 里用精确匹配按图片提供。资讯 Atom 在 `/longevity-news/feed.xml`。
 - `robots.txt` 仍是 `User-agent: *` / `Allow: /`，GPTBot、OAI-SearchBot、ChatGPT-User、Bytespider、DeepSeek 不单独收紧。这不表示这些系统已经引用本站。
 
+## 2026-11-22 NMN 成分证据试点
+
+只公开一页成分证据，不打开商品目录，也不打开课程。
+
+- 公开网址：`https://www.healthlongevity.cn/products/evidence/nmn`，英文 `https://www.healthlongevity.cn/en/products/evidence/nmn`。这条路径不是 `/products/:id`，所以不会进入登录后的商品详情。
+- 预渲染文件是 `products/evidence/nmn/index.html`。`robots` 为 `index,follow`，canonical 指向上述网址。不写 `noindex`，也不写 `Cache-Control: no-store`。
+- `/products/nmn`、`/products/1` 以及其他没有预渲染文件的 `/products/…` 仍回退到 `spa-shell.html`（`noindex,nofollow`）。线上 Nginx 若与示例一致，会在该 location 上加 `X-Robots-Tag: noindex, nofollow` 和 `Cache-Control: no-store`。
+- 示例配置已经是 `try_files $uri $uri/index.html /spa-shell.html`。文件存在时先出预渲染页，不经过壳。线上 443 只有在把 `/products/` 无条件送到壳、没有先查文件时，才需要为这两个精确路径加例外。本仓库不修改正在监听的 Nginx，也不改 DNS 或安全组。
+- `/health-skills/` 与 `/en/health-skills/` 继续 Disallow。
+- 这一页不提供用量，也不把研究结果写成治疗或抗衰老疗效。`llms.txt` 只把这一页从“逐条商品不是公开语料”里划出来，商品详情和购物页仍不公开。
+
+同一次公开页扩充还增加了站点说明，仍不打开课程和商品目录：
+
+- `https://www.healthlongevity.cn/faq` 与英文 `/en/faq`：站点问答，使用与其他公开页相同的 FAQPage。不写用量或治疗建议。
+- `https://www.healthlongevity.cn/methodology` 与英文 `/en/methodology`：引用习惯。结构化数据仍是 WebPage。例子链到已有的 NMN 证据页，不新增论文结论。
+- `/about` 增加「编辑责任」。只写运营主体和联系邮箱，不设具名作者或医学审稿人，因此没有 `/authors`。
+- 这些路径不在 `/products/` 下。示例 Nginx 的 `location /` 会按预渲染文件提供，不需要商品壳例外，也不改正在监听的配置。
+
+随后又加了一页成分证据，规则与 NMN 页相同，仍不合并、不部署：
+
+- `https://www.healthlongevity.cn/products/evidence/omega-3` 与英文 `/en/products/evidence/omega-3`。路径不是 `/products/omega-3`，不会进入商品详情。
+- 只引用已核对的 PMID 30415628、33190147、30415637、32114706，以及 FDA 2019 年自己的合格声称说明。不写用量，不把试验结果写成预防或治疗。
+- 示例 Nginx 仍用原来的 `try_files`。文件存在时先出这一页。线上若把 `/products/` 无条件送到壳，才需要连同 NMN 页一起加精确路径例外。本仓库不改正在监听的配置。
+
+随后又加了维生素 D 成分证据，规则相同，仍不合并、不部署：
+
+- `https://www.healthlongevity.cn/products/evidence/vitamin-d` 与英文 `/en/products/evidence/vitamin-d`。路径不是 `/products/vitamin-d`。
+- 只引用已核对的 PMID 30415629、35939577、24729336，FDA 授权健康声称页面，以及 USPSTF 2018 年最终建议。2024 年工作组草案不当作现行结论。不写用量，不把试验结果写成预防或治疗。
+
 ## 2026-11-10 线上核对后补上的
 
 核对的是当时已上线的 `https://www.healthlongevity.cn`（首页约 8.7KB，资讯页约 134KB，均为预渲染 HTML）：

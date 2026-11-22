@@ -40,7 +40,9 @@ export function buildSitemapXml(options = {}) {
   const newsLastmod = options.newsLastmod || ''
   const pages = SEO_PAGES.filter((page) => page.index).map((page) => urlEntry({
     path: page.path,
-    lastmod: page.path === '/longevity-news' && newsLastmod ? newsLastmod : PUBLIC_SUMMARY_UPDATED,
+    lastmod: page.path === '/longevity-news' && newsLastmod
+      ? newsLastmod
+      : (page.lastmod || PUBLIC_SUMMARY_UPDATED),
     changefreq: page.changefreq,
     priority: page.priority,
   }))
@@ -119,6 +121,20 @@ export function buildLlmsTxt({ articles = [] } = {}) {
   lines.push(`- 前沿医学资讯 Atom: ${SITE_ORIGIN}/longevity-news/feed.xml`)
   lines.push('')
   lines.push('登录页与注册页只是账户入口，不列入上面的可引用网址。')
+  lines.push('')
+  lines.push('## 公开的成分证据页')
+  lines.push('')
+  lines.push('逐条商品、规格、购物页和商品详情仍然不是公开可抓取语料，没有公开永久链接。课程页同样不在此列。')
+  lines.push('目前公开三页成分证据。它们不提供用量，也不把研究结果写成治疗、预防或抗衰老疗效。逐条商品和课程仍不是公开语料。')
+  lines.push(`NMN / NR：中文 ${absoluteUrl('zh', '/products/evidence/nmn')}；英文 ${absoluteUrl('en', '/products/evidence/nmn')}。`)
+  lines.push(`EPA / DHA：中文 ${absoluteUrl('zh', '/products/evidence/omega-3')}；英文 ${absoluteUrl('en', '/products/evidence/omega-3')}。`)
+  lines.push(`维生素 D：中文 ${absoluteUrl('zh', '/products/evidence/vitamin-d')}；英文 ${absoluteUrl('en', '/products/evidence/vitamin-d')}。`)
+  lines.push('')
+  lines.push('## 站点问答与引用说明')
+  lines.push('')
+  lines.push(`常见问题说明哪些页面可以引用、哪些需要登录，以及公开页不提供用量或治疗建议。中文 ${absoluteUrl('zh', '/faq')}；英文 ${absoluteUrl('en', '/faq')}。`)
+  lines.push(`证据核对说明描述怎样引用 PMID、监管原文和转述，以及为何不编造作者或审稿人。中文 ${absoluteUrl('zh', '/methodology')}；英文 ${absoluteUrl('en', '/methodology')}。`)
+  lines.push('这些说明页不打开课程，也不把商品规格列入公开语料。')
   lines.push('')
   lines.push('## 关于本文件')
   lines.push('')

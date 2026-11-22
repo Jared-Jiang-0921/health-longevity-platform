@@ -9,6 +9,16 @@
   status = 200
 
 [[redirects]]
+  from = "/faq"
+  to = "/faq/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/methodology"
+  to = "/methodology/index.html"
+  status = 200
+
+[[redirects]]
   from = "/solutions"
   to = "/solutions/index.html"
   status = 200
@@ -91,6 +101,16 @@
 [[redirects]]
   from = "/en/about"
   to = "/en/about/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en/faq"
+  to = "/en/faq/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en/methodology"
+  to = "/en/methodology/index.html"
   status = 200
 
 [[redirects]]
@@ -300,6 +320,22 @@
   to = "/spa-shell.html"
   status = 200
 
+# 必须写在 /products/* 之前，否则成分证据页会被改写成 noindex 壳。
+[[redirects]]
+  from = "/products/evidence/nmn"
+  to = "/products/evidence/nmn/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/products/evidence/omega-3"
+  to = "/products/evidence/omega-3/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/products/evidence/vitamin-d"
+  to = "/products/evidence/vitamin-d/index.html"
+  status = 200
+
 [[redirects]]
   from = "/products/*"
   to = "/spa-shell.html"
@@ -433,6 +469,22 @@
 [[redirects]]
   from = "/en/tcm-prevention/constitution/*"
   to = "/en/spa-shell.html"
+  status = 200
+
+# 必须写在 /en/products/* 之前。
+[[redirects]]
+  from = "/en/products/evidence/nmn"
+  to = "/en/products/evidence/nmn/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en/products/evidence/omega-3"
+  to = "/en/products/evidence/omega-3/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en/products/evidence/vitamin-d"
+  to = "/en/products/evidence/vitamin-d/index.html"
   status = 200
 
 [[redirects]]

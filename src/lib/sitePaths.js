@@ -57,6 +57,8 @@ export function isPassthroughPath(pathname) {
 export function isSpaDocumentPath(pathname) {
   const { routerPath } = splitSitePath(pathname)
   if (SPA_EXACT.some((rel) => matchesPrefix(routerPath, `/${rel}`))) return true
+  // 商品详情仍回退到 noindex 壳。已预渲染的成分证据页同时出现在 SEO_PAGES 里，
+  // 有文件时静态文件优先；文件不存在时仍回到这层壳，避免变成首页。
   return routerPath.startsWith('/products/') && routerPath.length > '/products/'.length
 }
 

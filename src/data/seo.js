@@ -56,8 +56,40 @@ export const SEO_PAGES = [
       en: 'About Longevity Atlas | Evidence-based longevity education',
     },
     description: {
-      zh: `长健星图是什么、面向谁、公开模块、两类长寿咨询与中医养生保健咨询、合规边界和规范网址。仅供健康教育，不替代诊疗。最近更新 ${PUBLIC_SUMMARY_UPDATED}。`,
-      en: `What Longevity Atlas is, who it is for, public modules, consult types, compliance limits, and the canonical URL. Education only—not medical care. Updated ${PUBLIC_SUMMARY_UPDATED}.`,
+      zh: `长健星图是什么、面向谁、公开模块、两类长寿咨询与中医养生保健咨询、合规边界和规范网址。编辑责任在运营主体，不设具名审稿人。仅供健康教育，不替代诊疗。最近更新 ${PUBLIC_SUMMARY_UPDATED}。`,
+      en: `What Longevity Atlas is, who it is for, public modules, consult types, compliance limits, and the canonical URL. Editorial responsibility sits with the operator; no named reviewer. Education only—not medical care. Updated ${PUBLIC_SUMMARY_UPDATED}.`,
+    },
+  },
+  {
+    path: '/faq',
+    type: 'faq',
+    changefreq: 'monthly',
+    priority: '0.6',
+    index: true,
+    lastmod: '2026-11-22',
+    title: {
+      zh: '常见问题 | 长健星图',
+      en: 'Questions | Longevity Atlas',
+    },
+    description: {
+      zh: '本站公开页与登录后内容的差别、来源如何引用、为何不提供用量或治疗建议，以及如何联系运营主体。不是医疗建议。',
+      en: 'What is public versus sign-in only, how sources are cited, why pages give no dose or treatment advice, and how to contact the operator. Not medical advice.',
+    },
+  },
+  {
+    path: '/methodology',
+    type: 'methodology',
+    changefreq: 'monthly',
+    priority: '0.6',
+    index: true,
+    lastmod: '2026-11-22',
+    title: {
+      zh: '证据如何核对与呈现 | 长健星图',
+      en: 'How evidence is checked | Longevity Atlas',
+    },
+    description: {
+      zh: '公开页如何引用带 PMID 的论文、如何区分研究发现与商品宣传、如何标注监管原文和转述，以及为何不编造作者或审稿人。不提供用量。',
+      en: 'How public pages cite papers by PMID, separate study findings from product claims, label official texts and secondary accounts, and avoid inventing authors or reviewers. No dose.',
     },
   },
   {
@@ -85,9 +117,58 @@ export const SEO_PAGES = [
       zh: '长寿产品证据库 | 长健星图',
       en: 'Product Evidence Library | Longevity Atlas',
     },
+    lastmod: '2026-11-22',
     description: {
-      zh: '公开说明如何在购买前核对成分、研究证据、监管信息与相互作用。逐条商品不是公开可抓取语料，没有独立的公开永久链接。不把商品包装成治疗方案。',
-      en: 'Public overview of how to check ingredients, research, regulatory context, and interactions before buying. Individual products are not a public crawlable corpus and have no public permalinks. Not sold as treatment.',
+      zh: '公开说明购买前如何核对成分、研究证据、监管身份和相互作用。逐条商品仍不是公开可抓取语料。成分证据目前公开 NMN / NR、EPA/DHA 与维生素 D 三页。不把商品包装成治疗方案。',
+      en: 'Public note on how to check ingredients, research, regulatory status, and interactions before buying. Individual products stay out of the public corpus. Three ingredient pages are public: NMN / NR, EPA/DHA, and vitamin D. Not sold as treatment.',
+    },
+  },
+  {
+    path: '/products/evidence/nmn',
+    type: 'evidence',
+    changefreq: 'monthly',
+    priority: '0.7',
+    index: true,
+    lastmod: '2026-11-22',
+    title: {
+      zh: 'NMN 与 NR：人体证据、监管状态与不能外推的边界 | 长健星图',
+      en: 'NMN and NR: human evidence, regulation, and limits | Longevity Atlas',
+    },
+    description: {
+      zh: '烟酰胺单核苷酸（NMN）和烟酰胺核糖（NR）的教育说明：与 NAD+ 的关系、现有人体研究及其限度、监管信息，以及妊娠、用药等人群的谨慎边界。不提供用量，不把研究结果写成治疗或抗衰老疗效。',
+      en: 'Educational note on nicotinamide mononucleotide (NMN) and nicotinamide riboside (NR): relation to NAD+, what human studies do and do not show, regulatory context, and who should be cautious. No dose. Not a treatment or anti-aging claim.',
+    },
+  },
+  {
+    path: '/products/evidence/omega-3',
+    type: 'evidence',
+    changefreq: 'monthly',
+    priority: '0.7',
+    index: true,
+    lastmod: '2026-11-22',
+    title: {
+      zh: 'EPA 与 DHA（Omega-3）：人体证据、监管表述与不能外推的边界 | 长健星图',
+      en: 'EPA and DHA (omega-3): human evidence, regulation, and limits | Longevity Atlas',
+    },
+    description: {
+      zh: '二十碳五烯酸（EPA）与二十二碳六烯酸（DHA）的教育说明：处方制剂试验、一般人群补充试验和系统综述各自说明什么，以及 FDA 合格声称不是疗效认定。不提供用量，不写成预防或治疗。',
+      en: 'Educational note on EPA and DHA: what prescription-drug trials, a primary-prevention trial, and a systematic review each show, and why an FDA qualified claim is not efficacy. No dose. Not prevention or treatment.',
+    },
+  },
+  {
+    path: '/products/evidence/vitamin-d',
+    type: 'evidence',
+    changefreq: 'monthly',
+    priority: '0.7',
+    index: true,
+    lastmod: '2026-11-22',
+    title: {
+      zh: '维生素 D：人体证据、监管表述与不能外推的边界 | 长健星图',
+      en: 'Vitamin D: human evidence, regulation, and limits | Longevity Atlas',
+    },
+    description: {
+      zh: '维生素 D3（胆钙化醇）的教育说明：VITAL 的癌症、心血管和骨折结果，Cochrane 对骨折的综述，以及 FDA 授权声称和 USPSTF 最终建议各自说明什么。不提供用量，不写成预防或治疗。',
+      en: 'Educational note on vitamin D3 (cholecalciferol): what VITAL found for cancer, cardiovascular events, and fractures, what a Cochrane review found, and what FDA and USPSTF texts say. No dose. Not prevention or treatment.',
     },
   },
   {

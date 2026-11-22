@@ -22,6 +22,13 @@ import {
   newsSitemapEntries,
   presentNewsArticle,
 } from '../../src/lib/newsArticleSeo.js'
+import { NMN_EVIDENCE_UPDATED } from '../../src/data/nmnEvidenceMeta.js'
+import { OMEGA3_EVIDENCE_PATH, OMEGA3_EVIDENCE_UPDATED, getOmega3EvidencePage } from '../../src/data/omega3EvidencePage.js'
+import { VITAMIN_D_EVIDENCE_PATH, VITAMIN_D_EVIDENCE_UPDATED, getVitaminDEvidencePage } from '../../src/data/vitaminDEvidencePage.js'
+import { NMN_EVIDENCE_PATH, getNmnEvidencePage } from '../../src/data/nmnEvidencePage.js'
+import { getPublicFaqPage } from '../../src/data/publicFaq.js'
+import { getPublicMethodologyPage } from '../../src/data/publicMethodology.js'
+import { getProductsEvidenceCopy } from '../../src/data/productsEvidenceLibraryI18n.js'
 import { SEO_LANGS, SEO_PAGES, SITE_ORIGIN, absoluteUrl } from '../../src/data/seo.js'
 import { extractLongevityKeywords, toNewsSearchCard } from '../../src/lib/longevityNewsCard.js'
 import { langSpec, renderHeadSnippet, resolveSeo } from '../../src/lib/seoDocument.js'
@@ -305,10 +312,122 @@ function newsBody(lang, cards) {
   return `<h1>${escapeHtml(seo.title)}</h1><p>${escapeHtml(seo.description)}</p><p>${escapeHtml(mod.caveatPhrase)}</p>${moduleIntro('/longevity-news', lang)}<section><h2>${escapeHtml(getFaqHeading(lang))}</h2>${faqs}</section>${sections.join('')}`
 }
 
+function productsBody(lang) {
+  const ev = getProductsEvidenceCopy(lang)
+  const seo = resolveSeo('/products', lang)
+  const steps = ev.checkSteps
+    .map((step) => `<article><h3>${escapeHtml(step.title)}</h3><p>${escapeHtml(step.body)}</p></article>`)
+    .join('')
+  const scores = ev.scoringRows
+    .map((row) => `<dt>${escapeHtml(row.dimension)}</dt><dd>${escapeHtml(row.explain)}</dd>`)
+    .join('')
+  const types = ev.productTypes.map((name) => `<li>${escapeHtml(name)}</li>`).join('')
+  return `
+    <h1>${escapeHtml(seo.title)}</h1>
+    <p>${escapeHtml(seo.description)}</p>
+    <p>${escapeHtml(ev.lead)}</p>
+    <p>${escapeHtml(ev.roleDisclaimer)}</p>
+    <section><h2>${escapeHtml(ev.checkTitle)}</h2><p>${escapeHtml(ev.checkIntro)}</p>${steps}</section>
+    <section><h2>${escapeHtml(ev.cnRegTitle)}</h2><p>${escapeHtml(ev.cnRegBody)}</p></section>
+    <section><h2>${escapeHtml(ev.intlTitle)}</h2><p>${escapeHtml(ev.intlBody)}</p></section>
+    <section><h2>${escapeHtml(ev.productTypesTitle)}</h2><ul>${types}</ul></section>
+    <section><h2>${escapeHtml(ev.scoringTitle)}</h2><dl>${scores}</dl></section>
+    <section><h2>${escapeHtml(ev.boundaryTitle)}</h2><p>${escapeHtml(ev.boundaryBody)}</p>
+      <p><a href="${escapeHtml(absoluteUrl(lang, ev.pilotPath))}">${escapeHtml(ev.pilotLabel)}</a></p>
+      <p><a href="${escapeHtml(absoluteUrl(lang, ev.secondPilotPath))}">${escapeHtml(ev.secondPilotLabel)}</a></p>
+      <p><a href="${escapeHtml(absoluteUrl(lang, ev.thirdPilotPath))}">${escapeHtml(ev.thirdPilotLabel)}</a></p>
+    </section>
+  `
+}
+
+function evidenceBody(lang, page, updated) {
+  const sections = page.sections
+    .map((section) => {
+      const paragraphs = section.paragraphs.map((text) => `<p>${escapeHtml(text)}</p>`).join('')
+      return `<section id="${escapeHtml(section.id)}"><h2>${escapeHtml(section.heading)}</h2>${paragraphs}</section>`
+    })
+    .join('')
+  const sources = page.sources
+    .map(
+      (item) =>
+        `<li><a href="${escapeHtml(item.href)}">${escapeHtml(item.label)}</a><p>${escapeHtml(item.note)}</p></li>`,
+    )
+    .join('')
+  const related = page.related
+    .map(
+      (item) =>
+        `<li><a href="${escapeHtml(absoluteUrl(lang, item.path))}">${escapeHtml(item.label)}</a></li>`,
+    )
+    .join('')
+  const faqs = page.faqs
+    .map((item) => `<article><h3>${escapeHtml(item.q)}</h3><p>${escapeHtml(item.a)}</p></article>`)
+    .join('')
+  return `
+    <article>
+      <p>${escapeHtml(page.kicker)}</p>
+      <h1>${escapeHtml(page.title)}</h1>
+      <p><time datetime="${escapeHtml(updated)}">${escapeHtml(page.updatedLabel)}：${escapeHtml(updated)}</time></p>
+      <p>${escapeHtml(page.lead)}</p>
+      <p>${escapeHtml(page.disclaimer)}</p>
+      ${sections}
+      <section><h2>${escapeHtml(page.sourcesHeading)}</h2><p>${escapeHtml(page.sourcesNote)}</p><ul>${sources}</ul></section>
+      <section><h2>${escapeHtml(page.relatedHeading)}</h2><ul>${related}</ul></section>
+      <section><h2>${escapeHtml(lang === 'en' ? 'Questions' : '常见问题')}</h2>${faqs}</section>
+    </article>
+  `
+}
+
+function faqBody(lang) {
+  const page = getPublicFaqPage(lang)
+  const seo = resolveSeo('/faq', lang)
+  const faqs = page.faqs
+    .map((item) => `<article><h2>${escapeHtml(item.q)}</h2><p>${escapeHtml(item.a)}</p></article>`)
+    .join('')
+  return `
+    <article>
+      <p>${escapeHtml(page.kicker)}</p>
+      <h1>${escapeHtml(seo.title)}</h1>
+      <p>${escapeHtml(page.lead)}</p>
+      <p>${escapeHtml(page.disclaimer)}</p>
+      ${faqs}
+    </article>
+  `
+}
+
+function methodologyBody(lang) {
+  const page = getPublicMethodologyPage(lang)
+  const seo = resolveSeo('/methodology', lang)
+  const sections = page.sections
+    .map((section) => {
+      const paragraphs = section.paragraphs.map((text) => `<p>${escapeHtml(text)}</p>`).join('')
+      return `<section id="${escapeHtml(section.id)}"><h2>${escapeHtml(section.heading)}</h2>${paragraphs}</section>`
+    })
+    .join('')
+  const related = page.related
+    .map((item) => `<li><a href="${escapeHtml(absoluteUrl(lang, item.path))}">${escapeHtml(item.label)}</a></li>`)
+    .join('')
+  return `
+    <article>
+      <p>${escapeHtml(page.kicker)}</p>
+      <h1>${escapeHtml(seo.title)}</h1>
+      <p>${escapeHtml(page.lead)}</p>
+      <p>${escapeHtml(page.disclaimer)}</p>
+      ${sections}
+      <section><h2>${escapeHtml(page.relatedHeading)}</h2><ul>${related}</ul></section>
+    </article>
+  `
+}
+
 function pageBody(page, lang, newsCards) {
   if (page.type === 'home') return homeBody(lang)
   if (page.path === '/about') return aboutBody(lang)
   if (page.path === '/solutions') return solutionsBody(lang)
+  if (page.path === '/products') return productsBody(lang)
+  if (page.path === NMN_EVIDENCE_PATH) return evidenceBody(lang, getNmnEvidencePage(lang), NMN_EVIDENCE_UPDATED)
+  if (page.path === OMEGA3_EVIDENCE_PATH) return evidenceBody(lang, getOmega3EvidencePage(lang), OMEGA3_EVIDENCE_UPDATED)
+  if (page.path === VITAMIN_D_EVIDENCE_PATH) return evidenceBody(lang, getVitaminDEvidencePage(lang), VITAMIN_D_EVIDENCE_UPDATED)
+  if (page.path === '/faq') return faqBody(lang)
+  if (page.path === '/methodology') return methodologyBody(lang)
   if (page.type === 'legal') return legalBody(page, lang)
   if (page.path === '/longevity-news') return newsBody(lang, newsCards)
   const seo = resolveSeo(page.path, lang)
@@ -377,11 +496,11 @@ export function staticNewsCards() {
 const SPA_SHELL_COPY = {
   zh: {
     title: '站内功能 | 长健星图',
-    description: '这个地址是站内功能或未公开的条目，不是可引用的公开页面。产品证据库、中医治未病和转化应用没有逐条公开语料；课程、账户和评估需登录。',
+    description: '这个地址是站内功能或未公开的条目，不是可引用的公开页面。商品详情、购物页和课程仍不是公开语料。已单独预渲染的成分证据页不使用这个壳。',
   },
   en: {
     title: 'In-app route | Longevity Atlas',
-    description: 'This address is an in-app route or an unpublished item, not a public page to cite. Product, TCM, and translation items are not a public corpus. Courses, accounts, and assessments require sign-in.',
+    description: 'This address is an in-app route or an unpublished item, not a public page to cite. Product details, shopping pages, and courses are not a public corpus. A separately prerendered ingredient page does not use this shell.',
   },
 }
 
