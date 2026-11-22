@@ -24,6 +24,7 @@ import {
 } from '../../src/lib/newsArticleSeo.js'
 import { NMN_EVIDENCE_UPDATED } from '../../src/data/nmnEvidenceMeta.js'
 import { OMEGA3_EVIDENCE_PATH, OMEGA3_EVIDENCE_UPDATED, getOmega3EvidencePage } from '../../src/data/omega3EvidencePage.js'
+import { VITAMIN_D_EVIDENCE_PATH, VITAMIN_D_EVIDENCE_UPDATED, getVitaminDEvidencePage } from '../../src/data/vitaminDEvidencePage.js'
 import { NMN_EVIDENCE_PATH, getNmnEvidencePage } from '../../src/data/nmnEvidencePage.js'
 import { getPublicFaqPage } from '../../src/data/publicFaq.js'
 import { getPublicMethodologyPage } from '../../src/data/publicMethodology.js'
@@ -334,6 +335,7 @@ function productsBody(lang) {
     <section><h2>${escapeHtml(ev.boundaryTitle)}</h2><p>${escapeHtml(ev.boundaryBody)}</p>
       <p><a href="${escapeHtml(absoluteUrl(lang, ev.pilotPath))}">${escapeHtml(ev.pilotLabel)}</a></p>
       <p><a href="${escapeHtml(absoluteUrl(lang, ev.secondPilotPath))}">${escapeHtml(ev.secondPilotLabel)}</a></p>
+      <p><a href="${escapeHtml(absoluteUrl(lang, ev.thirdPilotPath))}">${escapeHtml(ev.thirdPilotLabel)}</a></p>
     </section>
   `
 }
@@ -423,6 +425,7 @@ function pageBody(page, lang, newsCards) {
   if (page.path === '/products') return productsBody(lang)
   if (page.path === NMN_EVIDENCE_PATH) return evidenceBody(lang, getNmnEvidencePage(lang), NMN_EVIDENCE_UPDATED)
   if (page.path === OMEGA3_EVIDENCE_PATH) return evidenceBody(lang, getOmega3EvidencePage(lang), OMEGA3_EVIDENCE_UPDATED)
+  if (page.path === VITAMIN_D_EVIDENCE_PATH) return evidenceBody(lang, getVitaminDEvidencePage(lang), VITAMIN_D_EVIDENCE_UPDATED)
   if (page.path === '/faq') return faqBody(lang)
   if (page.path === '/methodology') return methodologyBody(lang)
   if (page.type === 'legal') return legalBody(page, lang)

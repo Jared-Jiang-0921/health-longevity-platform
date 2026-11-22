@@ -119,8 +119,8 @@ export const SEO_PAGES = [
     },
     lastmod: '2026-11-22',
     description: {
-      zh: '公开说明购买前如何核对成分、研究证据、监管身份和相互作用。逐条商品仍不是公开可抓取语料。成分证据目前公开 NMN / NR 与 EPA/DHA 两页。不把商品包装成治疗方案。',
-      en: 'Public note on how to check ingredients, research, regulatory status, and interactions before buying. Individual products stay out of the public corpus. Two ingredient pages are public: NMN / NR and EPA/DHA. Not sold as treatment.',
+      zh: '公开说明购买前如何核对成分、研究证据、监管身份和相互作用。逐条商品仍不是公开可抓取语料。成分证据目前公开 NMN / NR、EPA/DHA 与维生素 D 三页。不把商品包装成治疗方案。',
+      en: 'Public note on how to check ingredients, research, regulatory status, and interactions before buying. Individual products stay out of the public corpus. Three ingredient pages are public: NMN / NR, EPA/DHA, and vitamin D. Not sold as treatment.',
     },
   },
   {
@@ -153,6 +153,22 @@ export const SEO_PAGES = [
     description: {
       zh: '二十碳五烯酸（EPA）与二十二碳六烯酸（DHA）的教育说明：处方制剂试验、一般人群补充试验和系统综述各自说明什么，以及 FDA 合格声称不是疗效认定。不提供用量，不写成预防或治疗。',
       en: 'Educational note on EPA and DHA: what prescription-drug trials, a primary-prevention trial, and a systematic review each show, and why an FDA qualified claim is not efficacy. No dose. Not prevention or treatment.',
+    },
+  },
+  {
+    path: '/products/evidence/vitamin-d',
+    type: 'evidence',
+    changefreq: 'monthly',
+    priority: '0.7',
+    index: true,
+    lastmod: '2026-11-22',
+    title: {
+      zh: '维生素 D：人体证据、监管表述与不能外推的边界 | 长健星图',
+      en: 'Vitamin D: human evidence, regulation, and limits | Longevity Atlas',
+    },
+    description: {
+      zh: '维生素 D3（胆钙化醇）的教育说明：VITAL 的癌症、心血管和骨折结果，Cochrane 对骨折的综述，以及 FDA 授权声称和 USPSTF 最终建议各自说明什么。不提供用量，不写成预防或治疗。',
+      en: 'Educational note on vitamin D3 (cholecalciferol): what VITAL found for cancer, cardiovascular events, and fractures, what a Cochrane review found, and what FDA and USPSTF texts say. No dose. Not prevention or treatment.',
     },
   },
   {

@@ -202,7 +202,7 @@ server {
         try_files $uri $uri/index.html /spa-shell.html;
     }
 
-    # /products/evidence/nmn 与 /products/evidence/omega-3（及对应 /en/ 路径）
+    # /products/evidence/nmn、/products/evidence/omega-3、/products/evidence/vitamin-d（及对应 /en/ 路径）
     # 若已预渲染为 $uri/index.html，下面的 try_files 会先给出该文件，
     # 响应不经过 spa-shell，因此不带 X-Robots-Tag noindex，也不带 Cache-Control no-store。
     # 这与其它公开预渲染文章一样：location 本身不另加缓存头。

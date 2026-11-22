@@ -3,6 +3,7 @@
  */
 import { NMN_EVIDENCE_PATH } from './nmnEvidenceMeta.js'
 import { OMEGA3_EVIDENCE_PATH } from './omega3EvidenceMeta.js'
+import { VITAMIN_D_EVIDENCE_PATH } from './vitaminDEvidenceMeta.js'
 const COPY = {
   zh: {
     title: '长寿产品证据库',
@@ -51,11 +52,13 @@ const COPY = {
     ],
     boundaryTitle: '公开页到此为止',
     boundaryBody:
-      '上面是核对方法。成分证据目前公开 NMN / NR 与 EPA/DHA 两页，用来展示同一套边界：有哪些人体研究、限度在哪里、监管文件怎么读、哪些人应先问医生。其余商品详情保持不可抓取。',
+      '上面是核对方法。成分证据目前公开 NMN / NR、EPA/DHA 与维生素 D 三页，用来展示同一套边界：有哪些人体研究、限度在哪里、监管文件怎么读、哪些人应先问医生。其余商品详情保持不可抓取。',
     pilotLabel: '阅读 NMN / NR 成分证据',
     pilotPath: NMN_EVIDENCE_PATH,
     secondPilotLabel: '阅读 EPA 与 DHA 成分证据',
     secondPilotPath: OMEGA3_EVIDENCE_PATH,
+    thirdPilotLabel: '阅读维生素 D 成分证据',
+    thirdPilotPath: VITAMIN_D_EVIDENCE_PATH,
     scoringTitle: '核对时使用的信息维度',
     colDimension: '维度',
     colExplain: '说明',
@@ -116,11 +119,13 @@ const COPY = {
     ],
     boundaryTitle: 'What stays public',
     boundaryBody:
-      'The text above is the checking method. Two ingredient pages are public, NMN / NR and EPA/DHA, and they use the same limits: which human studies exist, where they stop, how to read a regulator’s text, and who should ask a clinician first. Other product pages stay out of the crawlable corpus.',
+      'The text above is the checking method. Three ingredient pages are public, NMN / NR, EPA/DHA, and vitamin D, and they use the same limits: which human studies exist, where they stop, how to read a regulator’s text, and who should ask a clinician first. Other product pages stay out of the crawlable corpus.',
     pilotLabel: 'Read the NMN / NR evidence page',
     pilotPath: NMN_EVIDENCE_PATH,
     secondPilotLabel: 'Read the EPA and DHA evidence page',
     secondPilotPath: OMEGA3_EVIDENCE_PATH,
+    thirdPilotLabel: 'Read the vitamin D evidence page',
+    thirdPilotPath: VITAMIN_D_EVIDENCE_PATH,
     scoringTitle: 'Dimensions used in a check',
     colDimension: 'Dimension',
     colExplain: 'What it covers',

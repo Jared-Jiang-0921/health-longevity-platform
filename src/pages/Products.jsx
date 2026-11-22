@@ -161,6 +161,7 @@ export default function Products() {
           <p>{ev.boundaryBody}</p>
           <p><Link to={ev.pilotPath}>{ev.pilotLabel}</Link></p>
           <p><Link to={ev.secondPilotPath}>{ev.secondPilotLabel}</Link></p>
+          <p><Link to={ev.thirdPilotPath}>{ev.thirdPilotLabel}</Link></p>
         </section>
       </section>
 

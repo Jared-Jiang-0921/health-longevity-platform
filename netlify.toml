@@ -332,6 +332,11 @@
   status = 200
 
 [[redirects]]
+  from = "/products/evidence/vitamin-d"
+  to = "/products/evidence/vitamin-d/index.html"
+  status = 200
+
+[[redirects]]
   from = "/products/*"
   to = "/spa-shell.html"
   status = 200
@@ -475,6 +480,11 @@
 [[redirects]]
   from = "/en/products/evidence/omega-3"
   to = "/en/products/evidence/omega-3/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en/products/evidence/vitamin-d"
+  to = "/en/products/evidence/vitamin-d/index.html"
   status = 200
 
 [[redirects]]

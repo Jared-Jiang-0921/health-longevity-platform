@@ -6,6 +6,7 @@ import fs from 'node:fs'
 import { createRequire } from 'node:module'
 import { NMN_EVIDENCE_PATH } from '../../src/data/nmnEvidenceMeta.js'
 import { OMEGA3_EVIDENCE_PATH } from '../../src/data/omega3EvidenceMeta.js'
+import { VITAMIN_D_EVIDENCE_PATH } from '../../src/data/vitaminDEvidenceMeta.js'
 import { PUBLIC_SUMMARY_UPDATED, pageIndexable } from '../../src/data/seo.js'
 import { getPageFaqs } from '../../src/data/publicSummary.js'
 import { toNewsSearchCard } from '../../src/lib/longevityNewsCard.js'
@@ -126,11 +127,12 @@ expect(evidenceEn.includes('hreflang="zh-Hans"') && evidenceEn.includes('hreflan
 expect(!/\d+\s*mg/i.test(evidenceEn) && evidenceEn.includes('No dose'), 'english pilot does not state a dose')
 expect(renderRouteHtml(template, { lang: 'zh', pathname: '/products/nmn' }) == null, 'product slug is not prerendered')
 expect(renderRouteHtml(template, { lang: 'zh', pathname: '/products/1' }) == null, 'numeric product route is not prerendered')
-expect(pageIndexable(NMN_EVIDENCE_PATH) && pageIndexable(OMEGA3_EVIDENCE_PATH) && !pageIndexable('/products/nmn') && !pageIndexable('/products/1') && !pageIndexable('/products/omega-3'), 'ingredient pages are indexable and product slugs are not')
+expect(pageIndexable(NMN_EVIDENCE_PATH) && pageIndexable(OMEGA3_EVIDENCE_PATH) && pageIndexable(VITAMIN_D_EVIDENCE_PATH), 'ingredient evidence pages are indexable')
+expect(!pageIndexable('/products/nmn') && !pageIndexable('/products/1') && !pageIndexable('/products/omega-3') && !pageIndexable('/products/vitamin-d'), 'product slugs stay noindex')
 expect(!pageIndexable('/products/evidence/other') && !pageIndexable('/health-skills/course-1'), 'neighbors and courses stay noindex')
 const productsText = productsHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ')
 expect(productsText.length > 800 && productsHtml.includes('/products/evidence/nmn'), 'products page explains the check and links the pilot')
-expect(!productsHtml.includes('维生素 D') && !productsHtml.includes('Omega-3'), 'public products page does not name demo SKUs')
+expect(!productsHtml.includes('维生素 D3') && !productsHtml.includes('Omega-3'), 'public products page does not name demo SKUs')
 expect(xml.includes('<loc>https://www.healthlongevity.cn/products/evidence/nmn</loc>'), 'sitemap lists the pilot URL')
 expect(!xml.includes('/products/nmn<') && !xml.includes('/products/1<'), 'sitemap does not list product-app URLs')
 expect(llms.includes('https://www.healthlongevity.cn/products/evidence/nmn'), 'llms.txt names the pilot page')
@@ -150,6 +152,22 @@ expect(renderRouteHtml(template, { lang: 'zh', pathname: '/products/omega-3' }) 
 expect(xml.includes('<loc>https://www.healthlongevity.cn/products/evidence/omega-3</loc>'), 'sitemap lists the omega-3 page')
 expect(!xml.includes('/products/omega-3<'), 'sitemap does not list an omega-3 product URL')
 expect(llms.includes('https://www.healthlongevity.cn/products/evidence/omega-3'), 'llms.txt names the omega-3 page')
+const vitaminHtml = renderRouteHtml(template, { lang: 'zh', pathname: VITAMIN_D_EVIDENCE_PATH })
+const vitaminText = String(vitaminHtml || '').replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ')
+expect(vitaminHtml.includes('<title>维生素 D：人体证据、监管表述与不能外推的边界 | 长健星图</title>'), 'vitamin D title is unique')
+expect(vitaminHtml.includes('rel="canonical" href="https://www.healthlongevity.cn/products/evidence/vitamin-d"'), 'vitamin D canonical')
+expect(vitaminHtml.includes('content="index,follow,max-snippet:-1,max-image-preview:large"'), 'vitamin D is index,follow')
+expect(!/name="robots" content="[^"]*noindex/.test(vitaminHtml), 'vitamin D robots meta is not noindex')
+expect(!vitaminHtml.includes('"author"') && !vitaminHtml.includes('reviewedBy'), 'vitamin D invents no author or reviewer')
+expect(!/\d+\s*mg/i.test(vitaminHtml) && !vitaminHtml.includes('毫克') && !/\d+\s*IU/i.test(vitaminHtml), 'vitamin D page states no dose')
+expect(vitaminHtml.includes('30415629') && vitaminHtml.includes('35939577') && vitaminHtml.includes('24729336'), 'vitamin D cites the checked trials')
+expect(vitaminHtml.includes('fda.gov') && vitaminHtml.includes('uspreventiveservicestaskforce.org'), 'vitamin D cites FDA and USPSTF pages')
+expect(vitaminHtml.includes('/products/evidence/nmn') && vitaminHtml.includes('/products/evidence/omega-3'), 'vitamin D links the other evidence pages')
+expect(vitaminText.length > 1800, 'vitamin D body is substantial')
+expect(renderRouteHtml(template, { lang: 'zh', pathname: '/products/vitamin-d' }) == null, 'vitamin D product slug is not prerendered')
+expect(xml.includes('<loc>https://www.healthlongevity.cn/products/evidence/vitamin-d</loc>'), 'sitemap lists the vitamin D page')
+expect(!xml.includes('/products/vitamin-d<'), 'sitemap does not list a vitamin D product URL')
+expect(llms.includes('https://www.healthlongevity.cn/products/evidence/vitamin-d'), 'llms.txt names the vitamin D page')
 expect(llms.includes('逐条商品'), 'llms.txt still keeps individual products out of the corpus')
 
 function visibleText(html) {
