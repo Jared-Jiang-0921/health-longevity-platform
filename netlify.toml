@@ -300,6 +300,12 @@
   to = "/spa-shell.html"
   status = 200
 
+# 必须写在 /products/* 之前，否则成分证据页会被改写成 noindex 壳。
+[[redirects]]
+  from = "/products/evidence/nmn"
+  to = "/products/evidence/nmn/index.html"
+  status = 200
+
 [[redirects]]
   from = "/products/*"
   to = "/spa-shell.html"
@@ -433,6 +439,12 @@
 [[redirects]]
   from = "/en/tcm-prevention/constitution/*"
   to = "/en/spa-shell.html"
+  status = 200
+
+# 必须写在 /en/products/* 之前。
+[[redirects]]
+  from = "/en/products/evidence/nmn"
+  to = "/en/products/evidence/nmn/index.html"
   status = 200
 
 [[redirects]]

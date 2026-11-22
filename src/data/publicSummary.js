@@ -3,6 +3,7 @@
  * 以便和已经上线的免责声明、咨询边界保持一致。
  */
 import { HOME_MODULES } from './homePageContent.js'
+import { NMN_EVIDENCE_PATH, getNmnEvidenceFaqs } from './nmnEvidenceMeta.js'
 import { getLongevityNewsModuleCopy } from './longevityNewsModuleI18n.js'
 import {
   PUBLIC_LIVE_ORIGIN,
@@ -138,7 +139,7 @@ const ABOUT_FAQS = {
     },
     {
       q: '哪些内容可以引用，哪些不能？',
-      a: '可以引用公开说明页：首页、关于本站、AI 长寿方案师、长寿知识技能入口说明、产品证据库、中医治未病、前沿医学资讯、转化应用机会，以及用户协议、隐私政策、免责声明等法律页。前沿医学资讯的每条公开卡片另有独立网址。产品证据库、中医治未病和转化应用机会的公开页是栏目说明，逐条商品、体质辨识和机会条目不是公开可抓取语料。引用时请保留「仅供健康教育，不替代诊疗」的界限，并链回规范网址。登录、注册、会员账户、支付与订单、问卷答案、评估结果、咨询对话、课程学习页、管理后台和 /api 不在公开引用范围内。',
+      a: `可以引用公开说明页：首页、关于本站、AI 长寿方案师、长寿知识技能入口说明、产品证据库、中医治未病、前沿医学资讯、转化应用机会，以及用户协议、隐私政策、免责声明等法律页。前沿医学资讯的每条公开卡片另有独立网址。成分证据目前只另有一页可以引用：NMN / NR（${absoluteUrl('zh', '/products/evidence/nmn')}）。逐条商品、购物页和商品详情，以及体质辨识和机会条目，仍不是公开可抓取语料。引用时请保留「仅供健康教育，不替代诊疗」的界限，并链回规范网址。登录、注册、会员账户、支付与订单、问卷答案、评估结果、咨询对话、课程学习页、管理后台和 /api 不在公开引用范围内。`,
     },
     {
       q: '规范网址是哪一个？',
@@ -156,7 +157,7 @@ const ABOUT_FAQS = {
     },
     {
       q: 'What may be cited?',
-      a: 'Public pages may be cited: home, about, the AI coach overview, the health-skills entry, the product evidence library, TCM prevention, medical insights, translation opportunities, and the legal pages. Each public medical-insight card also has its own URL. The product, TCM, and translation overviews are section explanations; individual products, constitution checks, and opportunity rows are not a public crawlable corpus. Keep the education-not-diagnosis limit and link the canonical URL. Login, registration, accounts, payments, questionnaire answers, assessment results, consult transcripts, course players, admin, and /api are not public.',
+      a: `Public pages may be cited: home, about, the AI coach overview, the health-skills entry, the product evidence library, TCM prevention, medical insights, translation opportunities, and the legal pages. Each public medical-insight card also has its own URL. One ingredient evidence page may also be cited: NMN / NR (${absoluteUrl('en', '/products/evidence/nmn')}). Individual products, shopping and detail pages, constitution checks, and opportunity rows are still not a public crawlable corpus. Keep the education-not-diagnosis limit and link the canonical URL. Login, registration, accounts, payments, questionnaire answers, assessment results, consult transcripts, course players, admin, and /api are not public.`,
     },
     {
       q: 'Which URL should be cited?',
@@ -197,6 +198,7 @@ export function getPageFaqs(pathname, lang) {
   const key = pickLang(lang)
   const path = String(pathname || '/').replace(/\/$/, '') || '/'
   if (path === '/longevity-news') return newsFaqs(key)
+  if (path === NMN_EVIDENCE_PATH) return getNmnEvidenceFaqs(key)
   const table = path === '/about' ? ABOUT_FAQS : path === '/solutions' ? SOLUTION_FAQS : null
   if (!table) return []
   return table[key] || table.zh
@@ -260,7 +262,7 @@ export function getAboutPage(lang) {
           id: 'modules',
           heading: '公开模块',
           paragraphs: [
-            '下列模块介绍可以公开阅读。长寿知识技能的课程正文需注册登录后按会员等级观看。初步体质辨识需登录，且向标准会员及以上开放。产品证据库、中医治未病和转化应用机会的公开页是栏目说明，逐条商品、体质辨识和机会条目不是公开可抓取语料。问卷答案、评估结果和咨询对话不公开。',
+            `下列模块介绍可以公开阅读。长寿知识技能的课程正文需注册登录后按会员等级观看。初步体质辨识需登录，且向标准会员及以上开放。产品证据库、中医治未病和转化应用机会的公开页是栏目说明。逐条商品、购物页和商品详情仍不是公开可抓取语料；成分证据目前只公开 NMN / NR 一页：${absoluteUrl('zh', '/products/evidence/nmn')}。体质辨识和机会条目也不是公开可抓取语料。问卷答案、评估结果和咨询对话不公开。`,
           ],
           modules,
         },
@@ -325,7 +327,7 @@ export function getAboutPage(lang) {
           id: 'modules',
           heading: 'Public modules',
           paragraphs: [
-            'The introductions below are public. Health-skills course bodies require a signed-in member, by level. The constitution check requires sign-in and Standard membership or higher. The product, TCM, and translation overviews are section explanations; individual products, constitution checks, and opportunity rows are not a public crawlable corpus. Questionnaire answers, assessment results, and consult transcripts are not public.',
+            `The introductions below are public. Health-skills course bodies require a signed-in member, by level. The constitution check requires sign-in and Standard membership or higher. The product, TCM, and translation overviews are section explanations. Individual products, shopping pages, and product details are not a public crawlable corpus. One ingredient evidence page is public: NMN / NR at ${absoluteUrl('en', '/products/evidence/nmn')}. Constitution checks and opportunity rows are not a public crawlable corpus. Questionnaire answers, assessment results, and consult transcripts are not public.`,
           ],
           modules,
         },

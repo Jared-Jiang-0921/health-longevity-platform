@@ -4,7 +4,8 @@
  */
 import fs from 'node:fs'
 import { createRequire } from 'node:module'
-import { PUBLIC_SUMMARY_UPDATED } from '../../src/data/seo.js'
+import { NMN_EVIDENCE_PATH } from '../../src/data/nmnEvidenceMeta.js'
+import { PUBLIC_SUMMARY_UPDATED, pageIndexable } from '../../src/data/seo.js'
 import { getPageFaqs } from '../../src/data/publicSummary.js'
 import { toNewsSearchCard } from '../../src/lib/longevityNewsCard.js'
 import {
@@ -105,6 +106,35 @@ expect(!shell.includes('rel="canonical" href="https://www.healthlongevity.cn/"')
 expect(shell.includes('不是可引用的公开页面'), 'spa shell body is not the homepage')
 expect(shell.includes('<script type="module"'), 'spa shell still boots the app')
 
+const evidenceHtml = renderRouteHtml(template, { lang: 'zh', pathname: NMN_EVIDENCE_PATH })
+const evidenceText = String(evidenceHtml || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ')
+expect(Boolean(evidenceHtml), 'pilot evidence page prerenders')
+expect(evidenceHtml.includes('<title>NMN 与 NR：人体证据、监管状态与不能外推的边界 | 长健星图</title>'), 'pilot title is unique')
+expect(evidenceHtml.includes('rel="canonical" href="https://www.healthlongevity.cn/products/evidence/nmn"'), 'pilot canonical is its own URL')
+expect(evidenceHtml.includes('content="index,follow,max-snippet:-1,max-image-preview:large"'), 'pilot robots is index,follow')
+expect(!evidenceHtml.includes('noindex') && !evidenceHtml.includes('no-store'), 'pilot html has no noindex or no-store')
+expect(!evidenceHtml.includes('"author"') && !evidenceHtml.includes('reviewedBy'), 'pilot JSON-LD invents no author or reviewer')
+expect(!/\d+\s*mg/i.test(evidenceHtml) && !evidenceHtml.includes('毫克'), 'pilot page does not state a dose')
+expect(evidenceHtml.includes('不提供用量'), 'pilot page says it gives no dose')
+expect(evidenceHtml.includes('39531138') && evidenceHtml.includes('samr.gov.cn'), 'pilot cites the meta-analysis and the SAMR reply')
+expect(evidenceHtml.includes('/longevity-news/ln-static-3'), 'pilot links the existing NMN note')
+expect(evidenceText.length > 1800, 'pilot body is substantial')
+const evidenceEn = renderRouteHtml(template, { lang: 'en', pathname: NMN_EVIDENCE_PATH })
+expect(evidenceEn.includes('rel="canonical" href="https://www.healthlongevity.cn/en/products/evidence/nmn"'), 'english pilot has its own canonical')
+expect(evidenceEn.includes('hreflang="zh-Hans"') && evidenceEn.includes('hreflang="en"'), 'pilot emits hreflang')
+expect(!/\d+\s*mg/i.test(evidenceEn) && evidenceEn.includes('No dose'), 'english pilot does not state a dose')
+expect(renderRouteHtml(template, { lang: 'zh', pathname: '/products/nmn' }) == null, 'product slug is not prerendered')
+expect(renderRouteHtml(template, { lang: 'zh', pathname: '/products/1' }) == null, 'numeric product route is not prerendered')
+expect(pageIndexable(NMN_EVIDENCE_PATH) && !pageIndexable('/products/nmn') && !pageIndexable('/products/1'), 'only the evidence path is indexable')
+expect(!pageIndexable('/products/evidence/other') && !pageIndexable('/health-skills/course-1'), 'neighbors and courses stay noindex')
+const productsText = productsHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ')
+expect(productsText.length > 800 && productsHtml.includes('/products/evidence/nmn'), 'products page explains the check and links the pilot')
+expect(!productsHtml.includes('维生素 D') && !productsHtml.includes('Omega-3'), 'public products page does not name demo SKUs')
+expect(xml.includes('<loc>https://www.healthlongevity.cn/products/evidence/nmn</loc>'), 'sitemap lists the pilot URL')
+expect(!xml.includes('/products/nmn<') && !xml.includes('/products/1<'), 'sitemap does not list product-app URLs')
+expect(llms.includes('https://www.healthlongevity.cn/products/evidence/nmn'), 'llms.txt names the pilot page')
+expect(llms.includes('逐条商品'), 'llms.txt still keeps individual products out of the corpus')
+
 const feed = buildNewsAtom({ articles: [...cards, thin] })
 expect(feed.includes(`https://www.healthlongevity.cn/longevity-news/${thin.id}`), 'feed lists the title-only permalink')
 expect(feed.includes('https://www.healthlongevity.cn/longevity-news/ln-static-1'), 'feed lists the static article')
@@ -178,6 +208,12 @@ expect(!netlify.includes('longevity-news/*'), 'netlify does not spa-fallback unk
 for (const rule of netlifySpaRedirects()) {
   expect(netlify.includes(`from = "${rule.from}"`), `netlify keeps ${rule.from}`)
 }
+const evidenceRedirect = netlify.indexOf('from = "/products/evidence/nmn"')
+const productWildcard = netlify.indexOf('from = "/products/*"')
+const evidenceEnRedirect = netlify.indexOf('from = "/en/products/evidence/nmn"')
+const productEnWildcard = netlify.indexOf('from = "/en/products/*"')
+expect(evidenceRedirect > 0 && evidenceRedirect < productWildcard, 'netlify serves the evidence file before the product shell')
+expect(evidenceEnRedirect > 0 && evidenceEnRedirect < productEnWildcard, 'netlify serves the english evidence file before the product shell')
 
 const nginx = fs.readFileSync(new URL('../../deploy/nginx-healthlongevity.conf.example', import.meta.url), 'utf8')
 expect(nginx.includes('return 301 https://www.healthlongevity.cn$request_uri;'), 'nginx example 301 keeps path and query')
@@ -188,6 +224,8 @@ expect(!nginx.includes('try_files $uri $uri/index.html /en/index.html'), 'nginx 
 expect(nginx.includes('try_files $uri $uri/index.html /spa-shell.html'), 'nginx example falls unknown product paths to the noindex shell')
 expect(nginx.includes('try_files $uri $uri/index.html /en/spa-shell.html'), 'nginx example falls localized spa paths to the english shell')
 expect(nginx.includes('location ~ ^/products/.+'), 'nginx example still names product item paths')
+expect(nginx.includes('/products/evidence/nmn'), 'nginx example notes the allowlisted evidence file')
+expect(nginx.includes('不带 X-Robots-Tag noindex'), 'nginx example says the evidence file is not the noindex shell')
 expect(nginx.includes('public, max-age=600'), 'nginx example gives the homepage a short public cache')
 for (const [iconPath, mime] of [
   ['/favicon.ico', 'image/x-icon'],
@@ -208,6 +246,8 @@ for (const name of ['account', 'payment', 'favorites', 'health-skills', 'health-
 
 const robots = fs.readFileSync(new URL('../../public/robots.txt', import.meta.url), 'utf8')
 expect(robots.includes('User-agent: *') && robots.includes('Allow: /'), 'robots allows every crawler by default')
+expect(robots.includes('Disallow: /health-skills/') && robots.includes('Disallow: /en/health-skills/'), 'robots still blocks course pages')
+expect(!robots.includes('Disallow: /products'), 'robots does not block the public products or evidence pages')
 for (const name of ['GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'Bytespider', 'DeepSeek']) {
   expect(robots.includes(name), `robots keeps ${name} allowed`)
   expect(!new RegExp(`User-agent:\\s*${name}[\\s\\S]*?Disallow:\\s*/`).test(robots), `${name} is not disallowed`)

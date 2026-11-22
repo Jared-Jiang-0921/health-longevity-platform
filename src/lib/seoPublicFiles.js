@@ -40,7 +40,9 @@ export function buildSitemapXml(options = {}) {
   const newsLastmod = options.newsLastmod || ''
   const pages = SEO_PAGES.filter((page) => page.index).map((page) => urlEntry({
     path: page.path,
-    lastmod: page.path === '/longevity-news' && newsLastmod ? newsLastmod : PUBLIC_SUMMARY_UPDATED,
+    lastmod: page.path === '/longevity-news' && newsLastmod
+      ? newsLastmod
+      : (page.lastmod || PUBLIC_SUMMARY_UPDATED),
     changefreq: page.changefreq,
     priority: page.priority,
   }))
@@ -119,6 +121,11 @@ export function buildLlmsTxt({ articles = [] } = {}) {
   lines.push(`- 前沿医学资讯 Atom: ${SITE_ORIGIN}/longevity-news/feed.xml`)
   lines.push('')
   lines.push('登录页与注册页只是账户入口，不列入上面的可引用网址。')
+  lines.push('')
+  lines.push('## 公开的成分证据页')
+  lines.push('')
+  lines.push('逐条商品、规格、购物页和商品详情仍然不是公开可抓取语料，没有公开永久链接。课程页同样不在此列。')
+  lines.push(`目前只公开一页成分证据，讨论 NMN / NR 的人体证据限度、监管信息和不宜自行外推的边界。它不提供用量，也不把研究结果写成治疗或抗衰老疗效。中文 ${absoluteUrl('zh', '/products/evidence/nmn')}；英文 ${absoluteUrl('en', '/products/evidence/nmn')}。`)
   lines.push('')
   lines.push('## 关于本文件')
   lines.push('')

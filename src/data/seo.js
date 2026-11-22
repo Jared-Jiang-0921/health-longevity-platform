@@ -85,9 +85,26 @@ export const SEO_PAGES = [
       zh: '长寿产品证据库 | 长健星图',
       en: 'Product Evidence Library | Longevity Atlas',
     },
+    lastmod: '2026-11-22',
     description: {
-      zh: '公开说明如何在购买前核对成分、研究证据、监管信息与相互作用。逐条商品不是公开可抓取语料，没有独立的公开永久链接。不把商品包装成治疗方案。',
-      en: 'Public overview of how to check ingredients, research, regulatory context, and interactions before buying. Individual products are not a public crawlable corpus and have no public permalinks. Not sold as treatment.',
+      zh: '公开说明购买前如何核对成分、研究证据、监管身份和相互作用。逐条商品仍不是公开可抓取语料。成分证据目前只公开 NMN / NR 一页。不把商品包装成治疗方案。',
+      en: 'Public note on how to check ingredients, research, regulatory status, and interactions before buying. Individual products stay out of the public corpus. One ingredient page, NMN / NR, is public. Not sold as treatment.',
+    },
+  },
+  {
+    path: '/products/evidence/nmn',
+    type: 'evidence',
+    changefreq: 'monthly',
+    priority: '0.7',
+    index: true,
+    lastmod: '2026-11-22',
+    title: {
+      zh: 'NMN 与 NR：人体证据、监管状态与不能外推的边界 | 长健星图',
+      en: 'NMN and NR: human evidence, regulation, and limits | Longevity Atlas',
+    },
+    description: {
+      zh: '烟酰胺单核苷酸（NMN）和烟酰胺核糖（NR）的教育说明：与 NAD+ 的关系、现有人体研究及其限度、监管信息，以及妊娠、用药等人群的谨慎边界。不提供用量，不把研究结果写成治疗或抗衰老疗效。',
+      en: 'Educational note on nicotinamide mononucleotide (NMN) and nicotinamide riboside (NR): relation to NAD+, what human studies do and do not show, regulatory context, and who should be cautious. No dose. Not a treatment or anti-aging claim.',
     },
   },
   {

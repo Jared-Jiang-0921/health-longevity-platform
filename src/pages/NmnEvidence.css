@@ -1,0 +1,38 @@
+.page-nmn-evidence h2 {
+  margin: 1.75rem 0 0.6rem;
+  font-size: 1.15rem;
+}
+
+.page-nmn-evidence h3 {
+  margin: 0.85rem 0 0.35rem;
+  font-size: 1rem;
+}
+
+.nmn-kicker {
+  margin: 0 0 0.35rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+}
+
+.nmn-updated {
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.nmn-lead {
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.nmn-sources {
+  padding-left: 1.2rem;
+}
+
+.nmn-sources li {
+  margin: 0 0 0.85rem;
+}
+
+.nmn-sources span {
+  display: block;
+  margin-top: 0.2rem;
+}
