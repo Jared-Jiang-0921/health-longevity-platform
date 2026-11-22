@@ -5,7 +5,7 @@ const COPY = {
   zh: {
     title: '前沿医学资讯',
     lead:
-      '精选经同行评审的文献与权威公开信息，也收录公众号解读。每篇在本站显示为检索卡片（标题、关键词、摘要），完整正文请打开微信原文。',
+      '精选经同行评审的文献与权威公开信息，也收录公众号解读。每条公开卡片都有独立网址，页上是标题、关键词和教育性摘要。微信不允许转载全文，完整正文请打开来源页。',
     sourcesTitle: '内容来源（示例）',
     sourcesBody:
       'PubMed；Nature、Science、Cell、The Lancet、NEJM、JAMA、BMJ 等学术期刊与子刊；Cochrane 系统综述；WHO、FDA、NMPA 等监管机构公开信息；国家卫健委、中华医学会等发布的指南与共识（以公开可检索版本为准）。',
@@ -30,7 +30,7 @@ const COPY = {
   en: {
     title: 'Frontier Medical Insights',
     lead:
-      'Curated interpretation of peer-reviewed literature and authoritative public sources. Browse by column, then open each piece. Admins can upload PDFs and media into the matching column.',
+      'Curated interpretation of peer-reviewed literature and authoritative public sources. Every public card has its own URL, with a title, keywords, and an educational abstract. WeChat full text is not republished; open the source page for the original.',
     sourcesTitle: 'Sources (examples)',
     sourcesBody:
       'PubMed; journals such as Nature, Science, Cell, The Lancet, NEJM, JAMA, BMJ and their family titles; Cochrane reviews; regulator communications (e.g., WHO, FDA, NMPA); national guidelines and society consensus where publicly retrievable.',

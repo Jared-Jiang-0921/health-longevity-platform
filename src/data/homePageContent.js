@@ -45,8 +45,8 @@ export const HOME_MODULES = [
     path: '/products',
     title: { zh: '长寿产品证据库', en: 'Product Evidence Library' },
     intro: {
-      zh: '汇集健康产品与补充剂的成分说明、研究证据、监管信息与相互作用提示，并标明适用人群与谨慎事项。帮助您在购买前完成「证据核对」，不做治疗方案包装。',
-      en: 'Ingredients, research evidence, regulatory context, interactions, and who should use or avoid each product—evidence-first, not sold as treatment.',
+      zh: '公开说明如何核对成分、研究证据、监管信息与相互作用。逐条商品不是公开可抓取语料，只在站内目录查看。不做治疗方案包装。',
+      en: 'Public overview of how to check ingredients, evidence, regulatory context, and interactions. Individual products are not a public crawlable corpus. Not sold as treatment.',
     },
     chips: {
       zh: ['成分证据', '监管信息', '相互作用'],
@@ -57,8 +57,8 @@ export const HOME_MODULES = [
     path: '/tcm-prevention',
     title: { zh: '中医药特色 · 治未病', en: 'TCM Preventive Care' },
     intro: {
-      zh: '以中医治未病思想结合现代预防医学：体质辨识、四时养生、饮食调养、情志调摄与导引运动，并提供药食同源与经典方资料。强调教育参考，不替代辨证论治与处方。',
-      en: 'TCM preventive care plus modern prevention—constitution, seasons, diet, mind–body, movement, with herbs and classical formulas (education only).',
+      zh: '以中医治未病思想结合现代预防医学的公开说明：体质、四时、饮食、情志与导引。体质辨识需登录，不是公开可抓取语料。教育参考，不替代辨证论治与处方。',
+      en: 'Public overview of TCM preventive care plus modern prevention. The constitution check requires sign-in and is not a public crawlable corpus. Education only.',
     },
     chips: {
       zh: ['体质调养', '四时养生', '药食同源'],
@@ -98,8 +98,8 @@ export const HOME_MODULES = [
     path: '/translation-opportunities',
     title: { zh: '转化应用机遇', en: 'Translation & Commercialization' },
     intro: {
-      zh: '面向创业者、投资人与产业团队：从研究、指南与临床需求中提炼可落地的技术、产品与服务形态，并提示监管、证据与获客等关键风险。涵盖产业趋势、商业模式与机会库。',
-      en: 'For founders and industry: translational signals, business models, opportunity bank, and compliance risks—from research to viable products and services.',
+      zh: '面向创业者、投资人与产业团队的公开说明：从研究与指南中提示技术、产品与服务形态，以及监管、证据与获客风险。机会条目没有逐条公开永久链接。',
+      en: 'Public overview for founders and industry: translational signals and regulatory, evidence, and adoption risks. Individual opportunities are not published as public permalinks.',
     },
     chips: {
       zh: ['产业趋势', '商业模式', '合规风险'],

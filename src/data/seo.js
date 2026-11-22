@@ -4,7 +4,7 @@ export const SITE_ORIGIN = 'https://www.healthlongevity.cn'
 /** 当前公开部署。规范网址仍是 SITE_ORIGIN，此地址只在关于页与 llms.txt 中标明。 */
 export const PUBLIC_LIVE_ORIGIN = 'https://healthlongevityplatform.vercel.app'
 /** 关于页与 AI 摘要的编辑日期（不是每次构建时间）。 */
-export const PUBLIC_SUMMARY_UPDATED = '2026-11-07'
+export const PUBLIC_SUMMARY_UPDATED = '2026-11-22'
 export const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/images/logo-longevity-atlas.png`
 
 export const SEO_LANGS = [
@@ -86,8 +86,8 @@ export const SEO_PAGES = [
       en: 'Product Evidence Library | Longevity Atlas',
     },
     description: {
-      zh: '健康产品与补充剂的成分、研究证据、监管信息与相互作用提示，帮助购买前完成证据核对。',
-      en: 'Ingredients, research evidence, regulatory context and interactions—evidence-first, not sold as treatment.',
+      zh: '公开说明如何在购买前核对成分、研究证据、监管信息与相互作用。逐条商品不是公开可抓取语料，没有独立的公开永久链接。不把商品包装成治疗方案。',
+      en: 'Public overview of how to check ingredients, research, regulatory context, and interactions before buying. Individual products are not a public crawlable corpus and have no public permalinks. Not sold as treatment.',
     },
   },
   {
@@ -101,8 +101,8 @@ export const SEO_PAGES = [
       en: 'TCM Preventive Care | Longevity Atlas',
     },
     description: {
-      zh: '中医治未病结合现代预防：体质、四时、饮食、情志与导引。教育参考，不替代辨证论治。',
-      en: 'TCM preventive care plus modern prevention—constitution, seasons, diet and movement. Education only.',
+      zh: '中医治未病结合现代预防的公开说明：体质、四时、饮食、情志与导引。体质辨识和方药条目需登录，不是公开可抓取语料。教育参考，不替代辨证论治。',
+      en: 'Public overview of TCM preventive care plus modern prevention. Constitution checks and formula entries require sign-in and are not a public crawlable corpus. Education only.',
     },
   },
   {
@@ -116,8 +116,8 @@ export const SEO_PAGES = [
       en: 'Medical Insights | Longevity Atlas',
     },
     description: {
-      zh: '长寿与预防医学前沿资讯卡片：公众号解读的标题、关键词与摘要可被检索；完整正文打开微信原文。覆盖衰老时钟、NMN、运动、睡眠与临床试验。',
-      en: 'Longevity insight cards with titles, keywords and summaries for search; full WeChat posts stay on the original page.',
+      zh: '每条公开资讯卡片都有独立网址和教育性摘要。已写摘要的用原文；只有标题的用本站说明。不转载微信公众号全文，完整正文打开来源页。',
+      en: 'Each public insight card has its own URL and an educational abstract. Author-written summaries are kept; title-only cards get an original note. WeChat full text stays on the source page.',
     },
   },
   {
@@ -131,8 +131,8 @@ export const SEO_PAGES = [
       en: 'Translation Opportunities | Longevity Atlas',
     },
     description: {
-      zh: '健康长寿领域的转化与应用机会梳理，供研究与产业参考。',
-      en: 'Translation and commercialization opportunities in longevity, for research and industry reference.',
+      zh: '健康长寿领域转化与应用的公开说明，供研究与产业参考。机会条目没有逐条公开永久链接，本页不是可抓取的项目库。',
+      en: 'Public overview of translation and commercialization in longevity, for research and industry reference. Individual opportunities are not published as a crawlable item corpus.',
     },
   },
   {
@@ -170,7 +170,7 @@ export const SEO_PAGES = [
     type: 'auth',
     changefreq: 'monthly',
     priority: '0.3',
-    index: true,
+    index: false,
     title: {
       zh: '会员登录 | 长健星图',
       en: 'Member login | Longevity Atlas',
@@ -185,7 +185,7 @@ export const SEO_PAGES = [
     type: 'auth',
     changefreq: 'monthly',
     priority: '0.4',
-    index: true,
+    index: false,
     title: {
       zh: '注册会员 | 长健星图',
       en: 'Create an account | Longevity Atlas',

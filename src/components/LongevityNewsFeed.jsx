@@ -11,7 +11,7 @@ import {
 import { articleDisplay, getLongevityNewsArticles } from '../data/longevityNewsArticles'
 import { hasLevelAccess, shouldShowMembershipBadge } from '../data/membership'
 import { extractLongevityKeywords, newsCardExcerpt } from '../lib/longevityNewsCard'
-import { isSubstantiveNewsCard, newsArticleRouterPath } from '../lib/newsArticleSeo'
+import { isPublicNewsCard, newsArticleRouterPath } from '../lib/newsArticleSeo'
 import { getMembershipLevelLabel } from '../i18n/terms'
 import ContentLockNotice from './ContentLockNotice'
 import { moduleAssetUrl } from '../lib/moduleAssetUrl'
@@ -225,7 +225,7 @@ export default function LongevityNewsFeed() {
           ) : null}
         </div>
         <h3 className="ln-card-title">
-          {isSubstantiveNewsCard(item) ? (
+          {isPublicNewsCard(item) ? (
             <Link to={newsArticleRouterPath(item.id)}>{item.title}</Link>
           ) : item.title}
         </h3>

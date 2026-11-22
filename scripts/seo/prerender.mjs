@@ -12,7 +12,7 @@ import { getLongevityNewsModuleCopy } from '../../src/data/longevityNewsModuleI1
 import { PUBLIC_CRAWL_NAV, getAboutPage, getFaqHeading, getSolutionsPublicCopy } from '../../src/data/publicSummary.js'
 import {
   articleLanguages,
-  isSubstantiveNewsCard,
+  isPublicNewsCard,
   newsArticleAlternates,
   newsArticleJsonLd,
   newsArticleRouterPath,
@@ -25,7 +25,7 @@ import {
 import { SEO_LANGS, SEO_PAGES, SITE_ORIGIN, absoluteUrl } from '../../src/data/seo.js'
 import { extractLongevityKeywords, toNewsSearchCard } from '../../src/lib/longevityNewsCard.js'
 import { langSpec, renderHeadSnippet, resolveSeo } from '../../src/lib/seoDocument.js'
-import { buildLlmsTxt, buildSitemapXml } from '../../src/lib/seoPublicFiles.js'
+import { buildLlmsTxt, buildNewsAtom, buildSitemapXml } from '../../src/lib/seoPublicFiles.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const rootDir = path.resolve(__dirname, '../..')
@@ -257,10 +257,10 @@ function newsJsonLd(lang, cards) {
         '@type': 'Article',
         headline: shown.title,
         keywords: (shown.keywords || []).join(', '),
-        description: shown.excerpt || shown.title,
-        url: articleLanguages(shown).includes(lang)
+        description: shown.abstract || shown.excerpt || shown.title,
+        url: isPublicNewsCard(shown, lang) && articleLanguages(shown).includes(lang)
           ? absoluteUrl(lang, newsArticleRouterPath(shown.id))
-          : `${canonical}#${encodeURIComponent(shown.id)}`,
+          : absoluteUrl('zh', newsArticleRouterPath(shown.id)),
         isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
         ...(shown.url ? { isBasedOn: shown.url } : {}),
       },
@@ -287,10 +287,12 @@ function newsBody(lang, cards) {
         const kws = card.keywords.length
           ? `<p>${escapeHtml(keywordLabel)}: ${escapeHtml(card.keywords.join(', '))}</p>`
           : ''
-        const excerpt = card.excerpt ? `<p>${escapeHtml(card.excerpt)}</p>` : ''
+        const blurb = card.excerpt || String(card.abstract || '').slice(0, 220)
+        const excerpt = blurb ? `<p>${escapeHtml(blurb)}</p>` : ''
         const onlyZh = card.zhOnly ? `<p>${escapeHtml('This item is in Chinese only')}</p>` : ''
-        const heading = isSubstantiveNewsCard(card, lang)
-          ? `<a href="${escapeHtml(absoluteUrl(lang, newsArticleRouterPath(card.id)))}">${escapeHtml(card.title)}</a>`
+        const hrefLang = articleLanguages(card).includes(lang) ? lang : 'zh'
+        const heading = isPublicNewsCard(card, lang)
+          ? `<a href="${escapeHtml(absoluteUrl(hrefLang, newsArticleRouterPath(card.id)))}">${escapeHtml(card.title)}</a>`
           : escapeHtml(card.title)
         const dated = card.publishedAt ? `<p><time datetime="${escapeHtml(card.publishedAt)}">${escapeHtml(card.publishedAt)}</time></p>` : ''
         return `<article id="${escapeHtml(card.id)}"><h3>${heading}</h3>${dated}${onlyZh}${kws}${excerpt}</article>`
@@ -333,11 +335,13 @@ function stripBaselineSeo(html) {
 function newsArticleBody(view, lang) {
   const mod = getLongevityNewsModuleCopy(lang)
   const takes = (view.takeaways || []).filter(Boolean)
-  const list = takes.length
+  const abstract = view.abstract || ''
+  const takesAreAbstract = takes.length > 0 && abstract === takes.join(lang === 'en' ? ' ' : '；')
+  const list = takes.length && !takesAreAbstract
     ? `<h2>${escapeHtml(lang === 'zh' ? '阅读要点' : 'Takeaways')}</h2><ul>${takes.map((line) => `<li>${escapeHtml(line)}</li>`).join('')}</ul>`
     : ''
   const dated = view.publishedAt ? `<p><time datetime="${escapeHtml(view.publishedAt)}">${escapeHtml(view.publishedAt)}</time></p>` : ''
-  const excerpt = view.excerpt ? `<p>${escapeHtml(view.excerpt)}</p>` : ''
+  const excerpt = abstract ? `<p>${escapeHtml(abstract)}</p>` : ''
   const source = view.url && /^https?:\/\//i.test(view.url)
     ? `<p>${escapeHtml(lang === 'zh' ? '来源页' : 'Source page')}：<a href="${escapeHtml(view.url)}">${escapeHtml(view.url)}</a></p>`
     : ''
@@ -370,9 +374,40 @@ export function staticNewsCards() {
   return getLongevityNewsArticles().map((item) => toNewsSearchCard(item)).filter((card) => card.title)
 }
 
+const SPA_SHELL_COPY = {
+  zh: {
+    title: '站内功能 | 长健星图',
+    description: '这个地址是站内功能或未公开的条目，不是可引用的公开页面。产品证据库、中医治未病和转化应用没有逐条公开语料；课程、账户和评估需登录。',
+  },
+  en: {
+    title: 'In-app route | Longevity Atlas',
+    description: 'This address is an in-app route or an unpublished item, not a public page to cite. Product, TCM, and translation items are not a public corpus. Courses, accounts, and assessments require sign-in.',
+  },
+}
+
+export function renderSpaShellHtml(template, { lang }) {
+  const copy = SPA_SHELL_COPY[lang] || SPA_SHELL_COPY.zh
+  return injectHtml(template, {
+    lang,
+    pathname: '/',
+    body: `<h1>${escapeHtml(copy.title)}</h1><p>${escapeHtml(copy.description)}</p>`,
+    head: {
+      seo: {
+        title: copy.title,
+        description: copy.description,
+        canonical: '',
+        robots: 'noindex,nofollow',
+        indexable: false,
+      },
+      jsonLd: null,
+      alternates: [],
+    },
+  })
+}
+
 export function renderNewsArticleHtml(template, { lang, card }) {
   const view = presentNewsArticle(card, lang)
-  if (!articleLanguages(card).includes(lang) || !isSubstantiveNewsCard(view, lang)) return null
+  if (!articleLanguages(card).includes(lang) || !isPublicNewsCard(view, lang)) return null
   return injectHtml(template, {
     lang,
     pathname: newsArticleRouterPath(view.id),
@@ -389,9 +424,10 @@ export function renderRouteHtml(template, { lang, pathname, newsCards = [] }) {
   const page = SEO_PAGES.find((item) => item.path === pathname)
   if (!page) return null
   const cards = page.path === '/longevity-news' && newsCards.length === 0 ? staticNewsCards() : newsCards
+  const feedHref = `${SITE_ORIGIN}/longevity-news/feed.xml`
   const extraHead =
     page.path === '/longevity-news'
-      ? `<script type="application/ld+json" data-seo-news="1">${JSON.stringify(newsJsonLd(lang, cards)).replace(/</g, '\\u003c')}</script>`
+      ? `<link rel="alternate" type="application/atom+xml" href="${feedHref}" title="前沿医学资讯" />\n    <script type="application/ld+json" data-seo-news="1">${JSON.stringify(newsJsonLd(lang, cards)).replace(/</g, '\\u003c')}</script>`
       : ''
   return injectHtml(template, {
     lang,
@@ -430,12 +466,23 @@ async function main() {
       count += 1
     }
   }
+  for (const spec of SEO_LANGS) {
+    const shell = renderSpaShellHtml(template, { lang: spec.id })
+    const shellPath = spec.prefix
+      ? path.join(distDir, spec.prefix.replace(/^\//, ''), 'spa-shell.html')
+      : path.join(distDir, 'spa-shell.html')
+    await fs.mkdir(path.dirname(shellPath), { recursive: true })
+    await fs.writeFile(shellPath, shell, 'utf8')
+  }
   await fs.writeFile(path.join(distDir, 'sitemap.xml'), buildSitemapXml({
     extra: newsSitemapEntries(newsCards),
     newsLastmod: newsHubLastmod(newsCards),
   }), 'utf8')
   await fs.writeFile(path.join(distDir, 'llms.txt'), buildLlmsTxt({ articles: newsCards }), 'utf8')
-  console.log(`[seo] prerendered ${count} HTML pages + sitemap.xml + llms.txt → ${distDir}`)
+  const feedPath = path.join(distDir, 'longevity-news', 'feed.xml')
+  await fs.mkdir(path.dirname(feedPath), { recursive: true })
+  await fs.writeFile(feedPath, buildNewsAtom({ articles: newsCards }), 'utf8')
+  console.log(`[seo] prerendered ${count} HTML pages + spa shells + sitemap.xml + llms.txt + feed.xml → ${distDir}`)
 }
 
 const isDirectRun = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)

@@ -1,6 +1,6 @@
 /**
- * 资讯卡片的稳定网址。只给已有摘要或阅读要点的条目单独建页，
- * 避免把只有标题的检索卡片再做成一批空页面。
+ * 资讯卡片的稳定网址。每条有标题的公开卡片都有 /longevity-news/<id>。
+ * 已写摘要或阅读要点的用原文；只有标题的用本站撰写的教育性说明，不转载微信全文。
  */
 import { getLongevityNewsArticles, articleDisplay } from '../data/longevityNewsArticles.js'
 import { PUBLIC_SUMMARY_UPDATED, SEO_LANGS, absoluteUrl } from '../data/seo.js'
@@ -45,7 +45,7 @@ export function presentNewsArticle(card, lang) {
   const view = article ? articleDisplay(article, key) : null
   const summary = view?.summary || card?.summary || ''
   const title = String(view?.title || card?.title || '').trim()
-  return {
+  const base = {
     id: card?.id || '',
     column: card?.column || '',
     title,
@@ -57,26 +57,68 @@ export function presentNewsArticle(card, lang) {
     publishedAt: validContentDate(card?.publishedAt),
     zhOnly: view ? view.zhOnly : key !== 'zh' && hasChinese(`${title} ${summary}`),
   }
+  return { ...base, abstract: newsArticleAbstract(base, key) }
+}
+
+export function usableNewsExcerpt(view) {
+  const excerpt = String(view?.excerpt || '').trim()
+  const title = String(view?.title || '').trim()
+  if (!excerpt || excerpt === title) return ''
+  if (excerpt.length < EXCERPT_MIN) return ''
+  return excerpt
+}
+
+function columnPhrase(view, lang) {
+  const column = String(view?.column || '').trim()
+  if (!column) return ''
+  if (lang === 'en' && hasChinese(column)) return ''
+  return column
+}
+
+function generatedEducationalAbstract(view, lang) {
+  const title = String(view?.title || '').trim()
+  const column = columnPhrase(view, lang)
+  if (lang === 'en') {
+    const place = column ? ` in “${column}”` : ''
+    return `Educational index card for “${title}”${place}. Longevity Atlas does not republish WeChat full text. This URL keeps the title, topic words, and this original note so the item can be cited on its own. Read mechanism studies, observational associations, and human trials separately. Current research may suggest a possible link; a single report is not proof of a treatment. Open the source page for the original.`
+  }
+  const place = column ? `，栏目为「${column}」` : ''
+  return `「${title}」是长健星图前沿医学资讯中的一条教育性检索卡片${place}。本站不转载微信公众号全文，只在这个独立网址上保留标题、主题词和这段原创说明，供检索与引用。阅读时请把机制研究、人群观察和人体干预分开：目前研究提示可能相关，但仍需要更多高质量临床证据，不能把单篇报道当成已经证实的治疗结论。原文请打开来源页。`
+}
+
+/** 单篇页和 JSON-LD 使用的说明。与标题相同的句子不算摘要。 */
+export function newsArticleAbstract(view, lang = 'zh') {
+  const excerpt = usableNewsExcerpt(view)
+  if (excerpt) return excerpt
+  const takes = (view?.takeaways || []).map((line) => String(line || '').trim()).filter(Boolean)
+  if (takes.length) return takes.join(lang === 'en' ? ' ' : '；')
+  return generatedEducationalAbstract(view, lang)
 }
 
 export function isSubstantiveNewsCard(card, lang = 'zh') {
   const view = card?.excerpt !== undefined && card?.takeaways ? card : presentNewsArticle(card, lang)
   if (!view.title || !NEWS_ID_RE.test(view.id || card?.id || '')) return false
   const takes = (view.takeaways || []).filter(Boolean)
-  return view.excerpt.length >= EXCERPT_MIN || takes.length > 0
+  return String(view.excerpt || '').trim().length >= EXCERPT_MIN || takes.length > 0
+}
+
+/** 有标题、id 合法的公开卡片都建独立页，包括只有标题的条目。 */
+export function isPublicNewsCard(card, lang = 'zh') {
+  const view = card?.title ? card : presentNewsArticle(card, lang)
+  return Boolean(String(view?.title || '').trim() && NEWS_ID_RE.test(view?.id || card?.id || ''))
 }
 
 export function articleLanguages(card) {
   return ['zh', 'en'].filter((lang) => {
     const view = presentNewsArticle(card, lang)
-    if (!isSubstantiveNewsCard(view, lang)) return false
+    if (!isPublicNewsCard(view, lang)) return false
     if (lang !== 'zh' && view.zhOnly) return false
     return true
   })
 }
 
-/** 栏目页补上证据说明的日期。条目自己的日期另计，不随每次构建刷新。 */
-export const NEWS_HUB_COPY_UPDATED = '2026-11-10'
+/** 栏目页补上「每条卡片都有独立网址」说明的日期。条目自己的日期另计。 */
+export const NEWS_HUB_COPY_UPDATED = '2026-11-22'
 
 export function newsHubLastmod(cards) {
   const dates = [
@@ -92,9 +134,13 @@ export function newsSitemapEntries(cards) {
     const langs = articleLanguages(card)
     if (!langs.includes('zh')) continue
     const view = presentNewsArticle(card, 'zh')
+    const ownDate = view.publishedAt || PUBLIC_SUMMARY_UPDATED
+    const lastmod = isSubstantiveNewsCard(view, 'zh')
+      ? ownDate
+      : [ownDate, NEWS_HUB_COPY_UPDATED].sort().at(-1)
     entries.push({
       path: newsArticleRouterPath(view.id),
-      lastmod: view.publishedAt,
+      lastmod,
       changefreq: 'yearly',
       priority: '0.5',
       langs,
@@ -108,7 +154,7 @@ export function newsArticleJsonLd(view, lang) {
   const article = {
     '@type': 'Article',
     headline: view.title,
-    description: view.excerpt || view.takeaways.filter(Boolean).join(' '),
+    description: view.abstract || newsArticleAbstract(view, lang),
     inLanguage: lang === 'zh' ? 'zh-Hans' : lang,
     url: canonical,
     mainEntityOfPage: canonical,
@@ -136,7 +182,7 @@ export function newsArticleAlternates(card) {
 export function newsArticleSeoFields(view, lang) {
   const path = newsArticleRouterPath(view.id)
   const brand = lang === 'zh' ? '长健星图' : 'Longevity Atlas'
-  const description = (view.excerpt || view.takeaways.filter(Boolean)[0] || view.title).slice(0, 180)
+  const description = (view.abstract || newsArticleAbstract(view, lang)).slice(0, 180)
   return {
     title: `${view.title} | ${brand}`,
     description,
