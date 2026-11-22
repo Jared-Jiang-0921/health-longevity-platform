@@ -56,7 +56,7 @@ const PAGES = {
         paragraphs: [
           '本页不提供用量，不比较品牌，不链接购物车。论文里的用量是那一次试验的设计，不是给读者的用法。标签上的「每份若干」也不是本页的建议。',
           '不能把 REDUCE-IT 写成零售鱼油预防心肌梗死或中风。不能把甘油三酯下降写成已经减少死亡。不能把 VITAL 或 STRENGTH 的主要结果改成相反的广告句。不能把 FDA 的合格声称写成本站认为可以预防高血压或冠心病。不能写成抗衰老。',
-          'NMN / NR、维生素 D 和肌酸那几页用的是别的证据和同一条界限：研究归研究，商品声称归商品声称。这些页面都不提供用法。',
+          'NMN / NR、维生素 D、肌酸和镁那几页用的是别的证据和同一条界限：研究归研究，商品声称归商品声称。这些页面都不提供用法。',
         ],
       },
     ],
@@ -97,6 +97,7 @@ const PAGES = {
       { path: '/products/evidence/nmn', label: '另一页成分证据：NMN / NR' },
       { path: '/products/evidence/vitamin-d', label: '另一页成分证据：维生素 D' },
       { path: '/products/evidence/creatine', label: '另一页成分证据：肌酸' },
+      { path: '/products/evidence/magnesium', label: '另一页成分证据：镁' },
       { path: '/products', label: '产品证据库：购买前如何核对' },
       { path: '/longevity-news/ln-static-2', label: '资讯：怎样给一篇论文分证据档' },
       { path: '/disclaimer', label: '健康与医疗免责声明' },
@@ -152,7 +153,7 @@ const PAGES = {
         paragraphs: [
           'This page gives no dose, compares no brands, and does not link to a cart. A dose in a paper belongs to that trial. A “per serving” line on a label is not advice from this page.',
           'REDUCE-IT is not evidence that a retail fish oil prevents myocardial infarction or stroke. A lower triglyceride is not fewer deaths. The primary results of VITAL and STRENGTH are not advertising copy with the sign flipped. FDA’s qualified wording is not this site’s conclusion that hypertension or coronary disease is prevented. There is no anti-aging claim.',
-          'The NMN / NR, vitamin D, and creatine pages use other evidence and the same limit: a study is not a product claim. None of these pages gives a dose.',
+          'The NMN / NR, vitamin D, creatine, and magnesium pages use other evidence and the same limit: a study is not a product claim. None of these pages gives a dose.',
         ],
       },
     ],
@@ -193,6 +194,7 @@ const PAGES = {
       { path: '/products/evidence/nmn', label: 'Other ingredient page: NMN / NR' },
       { path: '/products/evidence/vitamin-d', label: 'Other ingredient page: vitamin D' },
       { path: '/products/evidence/creatine', label: 'Other ingredient page: creatine' },
+      { path: '/products/evidence/magnesium', label: 'Other ingredient page: magnesium' },
       { path: '/products', label: 'Evidence library: how a claim is checked' },
       { path: '/longevity-news/ln-static-2', label: 'Insight: grading a paper' },
       { path: '/disclaimer', label: 'Health disclaimer' },

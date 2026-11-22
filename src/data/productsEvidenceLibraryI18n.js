@@ -5,6 +5,7 @@ import { NMN_EVIDENCE_PATH } from './nmnEvidenceMeta.js'
 import { OMEGA3_EVIDENCE_PATH } from './omega3EvidenceMeta.js'
 import { VITAMIN_D_EVIDENCE_PATH } from './vitaminDEvidenceMeta.js'
 import { CREATINE_EVIDENCE_PATH } from './creatineEvidenceMeta.js'
+import { MAGNESIUM_EVIDENCE_PATH } from './magnesiumEvidenceMeta.js'
 const COPY = {
   zh: {
     title: '长寿产品证据库',
@@ -53,7 +54,7 @@ const COPY = {
     ],
     boundaryTitle: '公开页到此为止',
     boundaryBody:
-      '上面是核对方法。成分证据目前公开 NMN / NR、EPA/DHA、维生素 D 与肌酸四页，用来展示同一套边界：有哪些人体研究、限度在哪里、监管文件怎么读、哪些人应先问医生。其余商品详情保持不可抓取。',
+      '上面是核对方法。成分证据目前公开 NMN / NR、EPA/DHA、维生素 D、肌酸与镁五页，用来展示同一套边界：有哪些人体研究、限度在哪里、监管文件怎么读、哪些人应先问医生。其余商品详情保持不可抓取。',
     pilotLabel: '阅读 NMN / NR 成分证据',
     pilotPath: NMN_EVIDENCE_PATH,
     secondPilotLabel: '阅读 EPA 与 DHA 成分证据',
@@ -62,6 +63,8 @@ const COPY = {
     thirdPilotPath: VITAMIN_D_EVIDENCE_PATH,
     fourthPilotLabel: '阅读肌酸成分证据',
     fourthPilotPath: CREATINE_EVIDENCE_PATH,
+    fifthPilotLabel: '阅读镁成分证据',
+    fifthPilotPath: MAGNESIUM_EVIDENCE_PATH,
     scoringTitle: '核对时使用的信息维度',
     colDimension: '维度',
     colExplain: '说明',
@@ -122,7 +125,7 @@ const COPY = {
     ],
     boundaryTitle: 'What stays public',
     boundaryBody:
-      'The text above is the checking method. Four ingredient pages are public, NMN / NR, EPA/DHA, vitamin D, and creatine, and they use the same limits: which human studies exist, where they stop, how to read a regulator’s text, and who should ask a clinician first. Other product pages stay out of the crawlable corpus.',
+      'The text above is the checking method. Five ingredient pages are public, NMN / NR, EPA/DHA, vitamin D, creatine, and magnesium, and they use the same limits: which human studies exist, where they stop, how to read a regulator’s text, and who should ask a clinician first. Other product pages stay out of the crawlable corpus.',
     pilotLabel: 'Read the NMN / NR evidence page',
     pilotPath: NMN_EVIDENCE_PATH,
     secondPilotLabel: 'Read the EPA and DHA evidence page',
@@ -131,6 +134,8 @@ const COPY = {
     thirdPilotPath: VITAMIN_D_EVIDENCE_PATH,
     fourthPilotLabel: 'Read the creatine evidence page',
     fourthPilotPath: CREATINE_EVIDENCE_PATH,
+    fifthPilotLabel: 'Read the magnesium evidence page',
+    fifthPilotPath: MAGNESIUM_EVIDENCE_PATH,
     scoringTitle: 'Dimensions used in a check',
     colDimension: 'Dimension',
     colExplain: 'What it covers',

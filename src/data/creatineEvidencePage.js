@@ -58,7 +58,7 @@ const PAGES = {
         paragraphs: [
           '本页不提供用量，不比较品牌，不链接购物车。论文、EFSA 意见和法规附件里的数量是那一次试验或那一条标签规则的条件，不是给读者的用法。1.37 kg 也不是目标。',
           '不能把 Chilibeck 的汇总写成不训练也能增肌，或写成运动表现已经得到保证。不能把 Forbes 的骨密度合并结果写成预防骨折。不能把有争议的记忆综述写成预防痴呆或抗衰老。不能把肌营养不良试验或帕金森病试验写成零售胶囊的用途；本页不建议把肌酸当作这些疾病的治疗。不能把欧盟的许可声称或 FDA 的「没有问题」写成治愈、预防或长寿疗效。不能把 2008 年中国批复里的「肌肉耐力」写成广告句。',
-          'NMN / NR、EPA / DHA 和维生素 D 那几页用的是别的证据、同一条界限：研究归研究，商品声称归商品声称。这些页面都不提供用法。',
+          'NMN / NR、EPA / DHA、维生素 D 和镁那几页用的是别的证据、同一条界限：研究归研究，商品声称归商品声称。这些页面都不提供用法。',
         ],
       },
     ],
@@ -154,6 +154,7 @@ const PAGES = {
       { path: '/products/evidence/nmn', label: '另一页成分证据：NMN / NR' },
       { path: '/products/evidence/omega-3', label: '另一页成分证据：EPA 与 DHA' },
       { path: '/products/evidence/vitamin-d', label: '另一页成分证据：维生素 D' },
+      { path: '/products/evidence/magnesium', label: '另一页成分证据：镁' },
       { path: '/products', label: '产品证据库：购买前如何核对' },
       { path: '/longevity-news/ln-static-2', label: '资讯：怎样给一篇论文分证据档' },
       { path: '/disclaimer', label: '健康与医疗免责声明' },
@@ -211,7 +212,7 @@ const PAGES = {
         paragraphs: [
           'This page gives no dose, compares no brands, and does not link to a cart. A number in a paper, an EFSA opinion, or a regulation annex is a condition of that trial or that labeling rule. It is not an instruction for a reader. The 1.37 kg figure is not a target.',
           'The Chilibeck pool is not evidence of muscle gain without training and not a sports guarantee. The Forbes bone-density pool is not fracture prevention. The disputed memory review is not dementia prevention and not an anti-aging effect. Trials in muscular dystrophy and in Parkinson disease are not uses for a retail capsule. This page does not recommend creatine as treatment for those diseases. An EU permitted claim and FDA’s “no questions” letter are not a cure, a prevention claim, or a longevity effect. The 2008 Chinese reply’s phrase about muscle endurance is not advertising copy.',
-          'The NMN / NR, EPA / DHA, and vitamin D pages use other evidence and the same limit: a study is not a product claim. None of these pages gives a dose.',
+          'The NMN / NR, EPA / DHA, vitamin D, and magnesium pages use other evidence and the same limit: a study is not a product claim. None of these pages gives a dose.',
         ],
       },
     ],
@@ -307,6 +308,7 @@ const PAGES = {
       { path: '/products/evidence/nmn', label: 'Other ingredient page: NMN / NR' },
       { path: '/products/evidence/omega-3', label: 'Other ingredient page: EPA and DHA' },
       { path: '/products/evidence/vitamin-d', label: 'Other ingredient page: vitamin D' },
+      { path: '/products/evidence/magnesium', label: 'Other ingredient page: magnesium' },
       { path: '/products', label: 'Evidence library: how a claim is checked' },
       { path: '/longevity-news/ln-static-2', label: 'Insight: grading a paper' },
       { path: '/disclaimer', label: 'Health disclaimer' },

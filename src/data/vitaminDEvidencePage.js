@@ -56,7 +56,7 @@ const PAGES = {
         paragraphs: [
           '本页不提供用量，不比较品牌，不链接购物车。论文和法规里出现的数量是那一次试验或那一条标签规则的条件，不是给读者的用法。',
           '不能把 VITAL 写成补充维生素 D 预防癌症或心血管病。不能把骨折附属分析写成对骨质疏松患者的治疗结论。不能把 Cochrane 里维生素 D 加钙的小幅减少写成某个鱼油式胶囊或单独维生素 D 已经能够预防骨折。不能把 FDA 的授权声称写成抗衰老或治愈骨质疏松。',
-          'NMN / NR 页、EPA / DHA 页和肌酸页用的是别的证据、同一条界限：研究归研究，商品声称归商品声称。这些页面都不提供用法。',
+          'NMN / NR 页、EPA / DHA 页、肌酸页和镁页用的是别的证据、同一条界限：研究归研究，商品声称归商品声称。这些页面都不提供用法。',
         ],
       },
     ],
@@ -102,6 +102,7 @@ const PAGES = {
       { path: '/products/evidence/nmn', label: '另一页成分证据：NMN / NR' },
       { path: '/products/evidence/omega-3', label: '另一页成分证据：EPA 与 DHA' },
       { path: '/products/evidence/creatine', label: '另一页成分证据：肌酸' },
+      { path: '/products/evidence/magnesium', label: '另一页成分证据：镁' },
       { path: '/products', label: '产品证据库：购买前如何核对' },
       { path: '/longevity-news/ln-static-2', label: '资讯：怎样给一篇论文分证据档' },
       { path: '/disclaimer', label: '健康与医疗免责声明' },
@@ -157,7 +158,7 @@ const PAGES = {
         paragraphs: [
           'This page gives no dose, compares no brands, and does not link to a cart. A number in a paper or a labeling rule is a condition of that trial or that rule. It is not an instruction for a reader.',
           'VITAL is not evidence that vitamin D prevents cancer or cardiovascular disease. The fracture ancillary study is not a treatment result for people with osteoporosis. The Cochrane finding on vitamin D plus calcium is not proof that vitamin D alone, or a named capsule, prevents fractures. FDA’s authorized wording is not an anti-aging claim and not a cure for osteoporosis.',
-          'The NMN / NR, EPA / DHA, and creatine pages use other evidence and the same limit: a study is not a product claim. None of these pages gives a dose.',
+          'The NMN / NR, EPA / DHA, creatine, and magnesium pages use other evidence and the same limit: a study is not a product claim. None of these pages gives a dose.',
         ],
       },
     ],
@@ -203,6 +204,7 @@ const PAGES = {
       { path: '/products/evidence/nmn', label: 'Other ingredient page: NMN / NR' },
       { path: '/products/evidence/omega-3', label: 'Other ingredient page: EPA and DHA' },
       { path: '/products/evidence/creatine', label: 'Other ingredient page: creatine' },
+      { path: '/products/evidence/magnesium', label: 'Other ingredient page: magnesium' },
       { path: '/products', label: 'Evidence library: how a claim is checked' },
       { path: '/longevity-news/ln-static-2', label: 'Insight: grading a paper' },
       { path: '/disclaimer', label: 'Health disclaimer' },

@@ -163,6 +163,7 @@ export default function Products() {
           <p><Link to={ev.secondPilotPath}>{ev.secondPilotLabel}</Link></p>
           <p><Link to={ev.thirdPilotPath}>{ev.thirdPilotLabel}</Link></p>
           <p><Link to={ev.fourthPilotPath}>{ev.fourthPilotLabel}</Link></p>
+          <p><Link to={ev.fifthPilotPath}>{ev.fifthPilotLabel}</Link></p>
         </section>
       </section>
 

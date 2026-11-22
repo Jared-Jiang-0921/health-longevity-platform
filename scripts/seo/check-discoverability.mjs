@@ -8,6 +8,7 @@ import { NMN_EVIDENCE_PATH } from '../../src/data/nmnEvidenceMeta.js'
 import { OMEGA3_EVIDENCE_PATH } from '../../src/data/omega3EvidenceMeta.js'
 import { VITAMIN_D_EVIDENCE_PATH } from '../../src/data/vitaminDEvidenceMeta.js'
 import { CREATINE_EVIDENCE_PATH } from '../../src/data/creatineEvidenceMeta.js'
+import { MAGNESIUM_EVIDENCE_PATH } from '../../src/data/magnesiumEvidenceMeta.js'
 import { PUBLIC_SUMMARY_UPDATED, pageIndexable } from '../../src/data/seo.js'
 import { getPageFaqs } from '../../src/data/publicSummary.js'
 import { toNewsSearchCard } from '../../src/lib/longevityNewsCard.js'
@@ -128,8 +129,8 @@ expect(evidenceEn.includes('hreflang="zh-Hans"') && evidenceEn.includes('hreflan
 expect(!/\d+\s*mg/i.test(evidenceEn) && evidenceEn.includes('No dose'), 'english pilot does not state a dose')
 expect(renderRouteHtml(template, { lang: 'zh', pathname: '/products/nmn' }) == null, 'product slug is not prerendered')
 expect(renderRouteHtml(template, { lang: 'zh', pathname: '/products/1' }) == null, 'numeric product route is not prerendered')
-expect(pageIndexable(NMN_EVIDENCE_PATH) && pageIndexable(OMEGA3_EVIDENCE_PATH) && pageIndexable(VITAMIN_D_EVIDENCE_PATH) && pageIndexable(CREATINE_EVIDENCE_PATH), 'ingredient evidence pages are indexable')
-expect(!pageIndexable('/products/nmn') && !pageIndexable('/products/1') && !pageIndexable('/products/omega-3') && !pageIndexable('/products/vitamin-d') && !pageIndexable('/products/creatine'), 'product slugs stay noindex')
+expect(pageIndexable(NMN_EVIDENCE_PATH) && pageIndexable(OMEGA3_EVIDENCE_PATH) && pageIndexable(VITAMIN_D_EVIDENCE_PATH) && pageIndexable(CREATINE_EVIDENCE_PATH) && pageIndexable(MAGNESIUM_EVIDENCE_PATH), 'ingredient evidence pages are indexable')
+expect(!pageIndexable('/products/nmn') && !pageIndexable('/products/1') && !pageIndexable('/products/omega-3') && !pageIndexable('/products/vitamin-d') && !pageIndexable('/products/creatine') && !pageIndexable('/products/magnesium'), 'product slugs stay noindex')
 expect(!pageIndexable('/products/evidence/other') && !pageIndexable('/health-skills/course-1'), 'neighbors and courses stay noindex')
 const productsText = productsHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ')
 expect(productsText.length > 800 && productsHtml.includes('/products/evidence/nmn'), 'products page explains the check and links the pilot')
@@ -193,6 +194,29 @@ expect(creatineEn.includes('rel="canonical" href="https://www.healthlongevity.cn
 expect(creatineEn.includes('hreflang="zh-Hans"') && creatineEn.includes('hreflang="en"'), 'creatine emits hreflang')
 expect(creatineEn.includes('content="index,follow,max-snippet:-1,max-image-preview:large"'), 'english creatine is index,follow')
 expect(!/\d+\s*mg/i.test(creatineEn) && !/\d+\s*g\/d/i.test(creatineEn) && !/\d+\s*g\b/i.test(creatineEn) && creatineEn.includes('No dose'), 'english creatine does not state a dose')
+const magnesiumHtml = renderRouteHtml(template, { lang: 'zh', pathname: MAGNESIUM_EVIDENCE_PATH })
+const magnesiumText = String(magnesiumHtml || '').replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ')
+expect(magnesiumHtml.includes('<title>镁：人体证据、监管表述与不能外推的边界 | 长健星图</title>'), 'magnesium title is unique')
+expect(magnesiumHtml.includes('rel="canonical" href="https://www.healthlongevity.cn/products/evidence/magnesium"'), 'magnesium canonical')
+expect(magnesiumHtml.includes('content="index,follow,max-snippet:-1,max-image-preview:large"'), 'magnesium is index,follow')
+expect(!/name="robots" content="[^"]*noindex/.test(magnesiumHtml), 'magnesium robots meta is not noindex')
+expect(!magnesiumHtml.includes('"author"') && !magnesiumHtml.includes('reviewedBy'), 'magnesium invents no author or reviewer')
+expect(!/\d+\s*mg/i.test(magnesiumHtml) && !magnesiumHtml.includes('毫克') && !/\d+\s*g\/d/i.test(magnesiumHtml) && !/\d+\s*g\b/i.test(magnesiumHtml), 'magnesium page states no dose')
+expect(magnesiumHtml.includes('41000008') && magnesiumHtml.includes('27402922') && magnesiumHtml.includes('34836329') && magnesiumHtml.includes('33865376') && magnesiumHtml.includes('32956536') && magnesiumHtml.includes('24696187') && magnesiumHtml.includes('30220246'), 'magnesium cites the checked studies')
+expect(magnesiumHtml.includes('fda.gov') && magnesiumHtml.includes('eur-lex.europa.eu') && magnesiumHtml.includes('nhc.gov.cn'), 'magnesium cites FDA, EU, and NHC pages')
+expect(magnesiumHtml.includes('/products/evidence/nmn') && magnesiumHtml.includes('/products/evidence/omega-3') && magnesiumHtml.includes('/products/evidence/vitamin-d') && magnesiumHtml.includes('/products/evidence/creatine'), 'magnesium links the other evidence pages')
+expect(magnesiumText.length > 1800, 'magnesium body is substantial')
+expect(renderRouteHtml(template, { lang: 'zh', pathname: '/products/magnesium' }) == null, 'magnesium product slug is not prerendered')
+expect(xml.includes('<loc>https://www.healthlongevity.cn/products/evidence/magnesium</loc>'), 'sitemap lists the magnesium page')
+expect(!xml.includes('<loc>https://www.healthlongevity.cn/en/products/evidence/magnesium</loc>'), 'sitemap does not add a separate English loc for magnesium')
+expect(!xml.includes('/products/magnesium<'), 'sitemap does not list a magnesium product URL')
+expect(llms.includes('https://www.healthlongevity.cn/products/evidence/magnesium'), 'llms.txt names the magnesium page')
+const magnesiumEn = renderRouteHtml(template, { lang: 'en', pathname: MAGNESIUM_EVIDENCE_PATH })
+expect(magnesiumEn.includes('<title>Magnesium: human evidence, regulation, and limits | Longevity Atlas</title>'), 'english magnesium title')
+expect(magnesiumEn.includes('rel="canonical" href="https://www.healthlongevity.cn/en/products/evidence/magnesium"'), 'english magnesium has its own canonical')
+expect(magnesiumEn.includes('hreflang="zh-Hans"') && magnesiumEn.includes('hreflang="en"'), 'magnesium emits hreflang')
+expect(magnesiumEn.includes('content="index,follow,max-snippet:-1,max-image-preview:large"'), 'english magnesium is index,follow')
+expect(!/\d+\s*mg/i.test(magnesiumEn) && !/\d+\s*g\/d/i.test(magnesiumEn) && !/\d+\s*g\b/i.test(magnesiumEn) && magnesiumEn.includes('No dose'), 'english magnesium does not state a dose')
 expect(!pageIndexable('/health-skills/course-1') && !pageIndexable('/en/health-skills/course-1'), 'course paths stay noindex')
 
 function visibleText(html) {
