@@ -6,6 +6,18 @@
 
 本站内容只供健康教育与生活方式参考，不替代诊疗、处方或紧急医疗处置。提交收录时不要把页面句子改成诊断或疗效承诺。
 
+## 2026-11-22 可引用页面
+
+这次只改仓库里的预渲染、sitemap、`llms.txt` 和示例 Nginx，不改 ECS 上正在监听的配置，也不代为提交搜索引擎站长平台。
+
+- 每条有标题的公开资讯卡片都有 `/longevity-news/<id>`。已经写了摘要或阅读要点的用原文；只有标题的用本站撰写的教育性说明，并链回来源页。不转载微信公众号全文。栏目页用真正的链接，不用只有井号的锚点。单篇 JSON-LD 的 `url` 是永久链接，`description` 是这段说明。
+- 中文卡片写入 sitemap 的 `<loc>`。已经有英文稿的（`ln-static-1` 到 `ln-static-5`）同时给出英文 alternate。只有中文标题的上传卡片不另做英文译文页。
+- 栏目 `lastmod` 用公开说明日期 `2026-11-22`。已有摘要的单篇仍用条目自己的日期（`ln-static-1` 为 `2026-07-01`）。新补上说明的只有标题的卡片用 `2026-11-22` 和条目日期里较新的一天。
+- 登录和注册仍可打开，但 `noindex`，并且不写入 sitemap 和 `llms.txt` 的可引用网址。引用域名是 `https://www.healthlongevity.cn/`。`https://healthlongevityplatform.vercel.app/` 若仍可访问，只是同一套内容的并行入口。
+- 产品证据库、中医治未病、转化应用机会的公开页是栏目说明。逐条商品、体质辨识和机会条目不是公开可抓取语料，这次不为它们编造永久链接。`/products/…` 等没有预渲染文件的路径回退到 `spa-shell.html`（`noindex`，没有首页 canonical），不再回退到首页。
+- `/favicon.ico`、`/favicon.png`、`/favicon.svg`、`/apple-touch-icon.png` 在示例 Nginx 里用精确匹配按图片提供。资讯 Atom 在 `/longevity-news/feed.xml`。
+- `robots.txt` 仍是 `User-agent: *` / `Allow: /`，GPTBot、OAI-SearchBot、ChatGPT-User、Bytespider、DeepSeek 不单独收紧。这不表示这些系统已经引用本站。
+
 ## 2026-11-10 线上核对后补上的
 
 核对的是当时已上线的 `https://www.healthlongevity.cn`（首页约 8.7KB，资讯页约 134KB，均为预渲染 HTML）：

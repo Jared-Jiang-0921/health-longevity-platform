@@ -138,7 +138,9 @@ function renderHeadFromParts({ spec, seo, jsonLd, alternates }) {
     `<title>${escapeHtml(seo.title)}</title>`,
     `<meta name="description" content="${escapeHtml(seo.description)}" />`,
     `<meta name="robots" content="${seo.robots}" />`,
-    `<link rel="canonical" href="${escapeHtml(seo.canonical)}" />`,
+    ...(seo.canonical
+      ? [`<link rel="canonical" href="${escapeHtml(seo.canonical)}" />`]
+      : []),
     ...alternates.map(
       (item) =>
         `<link rel="alternate" hreflang="${escapeHtml(item.hreflang)}" href="${escapeHtml(item.href)}" />`,
@@ -147,7 +149,9 @@ function renderHeadFromParts({ spec, seo, jsonLd, alternates }) {
     `<meta property="og:site_name" content="${escapeHtml(SEO_BRAND.zh.name)}" />`,
     `<meta property="og:title" content="${escapeHtml(seo.title)}" />`,
     `<meta property="og:description" content="${escapeHtml(seo.description)}" />`,
-    `<meta property="og:url" content="${escapeHtml(seo.canonical)}" />`,
+    ...(seo.canonical
+      ? [`<meta property="og:url" content="${escapeHtml(seo.canonical)}" />`]
+      : []),
     `<meta property="og:image" content="${escapeHtml(DEFAULT_OG_IMAGE)}" />`,
     `<meta property="og:locale" content="${spec.ogLocale}" />`,
     ...SEO_LANGS.filter((item) => item.id !== spec.id).map(
@@ -158,7 +162,9 @@ function renderHeadFromParts({ spec, seo, jsonLd, alternates }) {
     `<meta name="twitter:description" content="${escapeHtml(seo.description)}" />`,
     `<meta name="twitter:image" content="${escapeHtml(DEFAULT_OG_IMAGE)}" />`,
     `<link rel="alternate" type="text/plain" href="${escapeHtml(`${SITE_ORIGIN}/llms.txt`)}" title="llms.txt" />`,
-    `<script type="application/ld+json">${JSON.stringify(jsonLd).replace(/</g, '\\u003c')}</script>`,
+    ...(jsonLd
+      ? [`<script type="application/ld+json">${JSON.stringify(jsonLd).replace(/</g, '\\u003c')}</script>`]
+      : []),
   ]
   return lines.join('\n    ')
 }

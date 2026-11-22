@@ -138,11 +138,11 @@ const ABOUT_FAQS = {
     },
     {
       q: '哪些内容可以引用，哪些不能？',
-      a: '可以引用公开说明页：首页、关于本站、AI 长寿方案师、长寿知识技能入口说明、产品证据库、中医治未病、前沿医学资讯、转化应用机会，以及用户协议、隐私政策、免责声明等法律页。引用时请保留「仅供健康教育，不替代诊疗」的界限，并链回规范网址。会员账户、支付与订单、问卷答案、评估结果、咨询对话、课程学习页、管理后台和 /api 不在公开引用范围内。',
+      a: '可以引用公开说明页：首页、关于本站、AI 长寿方案师、长寿知识技能入口说明、产品证据库、中医治未病、前沿医学资讯、转化应用机会，以及用户协议、隐私政策、免责声明等法律页。前沿医学资讯的每条公开卡片另有独立网址。产品证据库、中医治未病和转化应用机会的公开页是栏目说明，逐条商品、体质辨识和机会条目不是公开可抓取语料。引用时请保留「仅供健康教育，不替代诊疗」的界限，并链回规范网址。登录、注册、会员账户、支付与订单、问卷答案、评估结果、咨询对话、课程学习页、管理后台和 /api 不在公开引用范围内。',
     },
     {
       q: '规范网址是哪一个？',
-      a: `规范站点为 ${SITE_ORIGIN}/ 。当前公开部署亦可通过 ${PUBLIC_LIVE_ORIGIN}/ 访问，内容与规范站点一致。关于本站的说明见 ${SITE_ORIGIN}/about ，最近更新日期为 ${PUBLIC_SUMMARY_UPDATED}。`,
+      a: `引用请使用 ${SITE_ORIGIN}/ 。${PUBLIC_LIVE_ORIGIN}/ 是同一套内容的并行入口，不要把它当作另一份可引用站点。关于本站的说明见 ${SITE_ORIGIN}/about ，最近更新日期为 ${PUBLIC_SUMMARY_UPDATED}。`,
     },
   ],
   en: [
@@ -156,11 +156,11 @@ const ABOUT_FAQS = {
     },
     {
       q: 'What may be cited?',
-      a: 'Public pages may be cited: home, about, the AI coach overview, the health-skills entry, the product evidence library, TCM prevention, medical insights, translation opportunities, and the legal pages. Keep the education-not-diagnosis limit and link the canonical URL. Accounts, payments, questionnaire answers, assessment results, consult transcripts, course players, admin, and /api are not public.',
+      a: 'Public pages may be cited: home, about, the AI coach overview, the health-skills entry, the product evidence library, TCM prevention, medical insights, translation opportunities, and the legal pages. Each public medical-insight card also has its own URL. The product, TCM, and translation overviews are section explanations; individual products, constitution checks, and opportunity rows are not a public crawlable corpus. Keep the education-not-diagnosis limit and link the canonical URL. Login, registration, accounts, payments, questionnaire answers, assessment results, consult transcripts, course players, admin, and /api are not public.',
     },
     {
       q: 'Which URL should be cited?',
-      a: `Cite ${SITE_ORIGIN}/ . The public deployment ${PUBLIC_LIVE_ORIGIN}/ serves the same content. The about page is ${SITE_ORIGIN}/about and was last updated ${PUBLIC_SUMMARY_UPDATED}.`,
+      a: `Cite ${SITE_ORIGIN}/ . ${PUBLIC_LIVE_ORIGIN}/ serves the same content as a parallel entry; do not cite it as a separate site. The about page is ${SITE_ORIGIN}/about and was last updated ${PUBLIC_SUMMARY_UPDATED}.`,
     },
   ],
 }
@@ -172,19 +172,24 @@ function newsFaqs(lang) {
     zh: [
       '前沿医学资讯页面上的卡片是全文吗？',
       '这些标题可以理解成已经证实有效的治疗结论吗？',
-      '为什么很多条目只有标题和关键词？',
+      '只有标题的卡片有没有独立网址？',
     ],
     en: [
       'Are the insight cards the full text?',
       'Do these titles mean a treatment is already proven?',
-      'Why do many cards only have a title and keywords?',
+      'Does a title-only card have its own URL?',
     ],
   }
   const prompts = questions[key] || questions.zh
   return [
     { q: prompts[0], a: mod.lead },
     { q: prompts[1], a: mod.caveatPhrase },
-    { q: prompts[2], a: mod.wechatBody },
+    {
+      q: prompts[2],
+      a: key === 'en'
+        ? 'WeChat does not allow republishing a full post. Every public card still has its own URL. Cards that already have a summary or takeaways use that text. Title-only cards use an original educational note on this site, plus a link to the source page.'
+        : '微信不允许转载公众号全文。每条公开卡片仍有独立网址：已经写了摘要或阅读要点的用原文，只有标题的用本站撰写的教育性说明，并链回来源页。',
+    },
   ]
 }
 
@@ -255,7 +260,7 @@ export function getAboutPage(lang) {
           id: 'modules',
           heading: '公开模块',
           paragraphs: [
-            '下列模块介绍可以公开阅读。长寿知识技能的课程正文需注册登录后按会员等级观看。初步体质辨识需登录，且向标准会员及以上开放。问卷答案、评估结果和咨询对话不公开。',
+            '下列模块介绍可以公开阅读。长寿知识技能的课程正文需注册登录后按会员等级观看。初步体质辨识需登录，且向标准会员及以上开放。产品证据库、中医治未病和转化应用机会的公开页是栏目说明，逐条商品、体质辨识和机会条目不是公开可抓取语料。问卷答案、评估结果和咨询对话不公开。',
           ],
           modules,
         },
@@ -285,7 +290,7 @@ export function getAboutPage(lang) {
           id: 'urls',
           heading: '站点地址',
           paragraphs: [
-            '请优先引用规范站点。公开部署与规范站点是同一套内容，供当前访问使用。',
+            `请优先引用规范站点 ${SITE_ORIGIN}/ 。${PUBLIC_LIVE_ORIGIN}/ 是同一套内容的并行入口，引用时仍使用 .cn，不要把它当成另一份站点。`,
           ],
           urls,
         },
@@ -320,7 +325,7 @@ export function getAboutPage(lang) {
           id: 'modules',
           heading: 'Public modules',
           paragraphs: [
-            'The introductions below are public. Health-skills course bodies require a signed-in member, by level. The constitution check requires sign-in and Standard membership or higher. Questionnaire answers, assessment results, and consult transcripts are not public.',
+            'The introductions below are public. Health-skills course bodies require a signed-in member, by level. The constitution check requires sign-in and Standard membership or higher. The product, TCM, and translation overviews are section explanations; individual products, constitution checks, and opportunity rows are not a public crawlable corpus. Questionnaire answers, assessment results, and consult transcripts are not public.',
           ],
           modules,
         },
@@ -350,7 +355,7 @@ export function getAboutPage(lang) {
           id: 'urls',
           heading: 'Site URLs',
           paragraphs: [
-            'Cite the canonical site. The public deployment serves the same content for current access.',
+            `Cite ${SITE_ORIGIN}/ . ${PUBLIC_LIVE_ORIGIN}/ is the same content on a parallel entry. Citations should still use the .cn host, not a second site.`,
           ],
           urls,
         },

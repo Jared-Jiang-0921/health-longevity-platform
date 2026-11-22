@@ -4,9 +4,9 @@ import { fileURLToPath } from 'node:url'
 import { splitLocalePath } from '../../src/lib/localePath.js'
 import { pageIndexable } from '../../src/data/seo.js'
 import { newsArticleIdFromPath, newsHubLastmod, newsSitemapEntries } from '../../src/lib/newsArticleSeo.js'
-import { documentStatus } from '../../src/lib/sitePaths.js'
-import { buildLlmsTxt, buildSitemapXml } from '../../src/lib/seoPublicFiles.js'
-import { renderNewsArticleHtml, renderRouteHtml, staticNewsCards } from './prerender.mjs'
+import { documentStatus, isSpaDocumentPath } from '../../src/lib/sitePaths.js'
+import { buildLlmsTxt, buildNewsAtom, buildSitemapXml } from '../../src/lib/seoPublicFiles.js'
+import { renderNewsArticleHtml, renderRouteHtml, renderSpaShellHtml, staticNewsCards } from './prerender.mjs'
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const publicDir = path.join(rootDir, 'public')
@@ -74,6 +74,10 @@ function installRouting(server, { allowDevPreview, fileRoot, localeShell }) {
       sendText(res, buildLlmsTxt({ articles: newsCards }), 'text/plain; charset=utf-8')
       return
     }
+    if (pathname === '/longevity-news/feed.xml') {
+      sendText(res, buildNewsAtom({ articles: newsCards }), 'application/atom+xml; charset=utf-8')
+      return
+    }
     if (isViteInternal(pathname)) {
       next()
       return
@@ -105,7 +109,7 @@ function installRouting(server, { allowDevPreview, fileRoot, localeShell }) {
           ? '/index.html'
           : `${pathname.endsWith('/') ? pathname : `${pathname}/`}index.html`
         const { lang } = splitLocalePath(pathname)
-        const shell = lang === 'en' ? '/en/index.html' : '/index.html'
+        const shell = lang === 'en' ? '/en/spa-shell.html' : '/spa-shell.html'
         const rel = fileExists(fileRoot, indexRel) ? indexRel : shell
         const body = fs.readFileSync(path.join(fileRoot, rel.replace(/^\//, '')))
         sendText(res, body, 'text/html; charset=utf-8')
@@ -137,11 +141,8 @@ export function seoDevPlugin() {
           ? renderNewsArticleHtml(html, { lang, card: articleCard })
           : renderRouteHtml(html, { lang, pathname: routerPath, newsCards })
         if (rendered) return rendered
-        if (!pageIndexable(routerPath)) {
-          return html.replace(
-            /<meta\s+name="robots"\s+content="[^"]*"\s*\/?>/i,
-            '<meta name="robots" content="noindex,nofollow" />',
-          )
+        if (isSpaDocumentPath(ctx.originalUrl || ctx.path || '/') || !pageIndexable(routerPath)) {
+          return renderSpaShellHtml(html, { lang })
         }
         return html
       },

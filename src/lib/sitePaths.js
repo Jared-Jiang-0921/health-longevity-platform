@@ -6,8 +6,8 @@ import { SEO_PAGES } from '../data/seo.js'
 import { articleLanguages, newsArticleIdFromPath } from './newsArticleSeo.js'
 
 const LOCALES = [
-  { prefix: '', shell: '/index.html' },
-  { prefix: '/en', shell: '/en/index.html' },
+  { prefix: '', shell: '/spa-shell.html' },
+  { prefix: '/en', shell: '/en/spa-shell.html' },
 ]
 
 /** 这些前缀本身或其子路径没有一份静态文件能覆盖全部地址。 */

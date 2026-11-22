@@ -172,278 +172,317 @@
 # 动态或登录后路径。公开预渲染页的映射必须写在这些规则之前。
 [[redirects]]
   from = "/account"
-  to = "/index.html"
+  to = "/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/account/*"
-  to = "/index.html"
+  to = "/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/payment"
-  to = "/index.html"
+  to = "/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/payment/*"
-  to = "/index.html"
+  to = "/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/favorites"
-  to = "/index.html"
+  to = "/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/favorites/*"
-  to = "/index.html"
+  to = "/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/health-skills"
-  to = "/index.html"
+  to = "/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/health-skills/*"
-  to = "/index.html"
+  to = "/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/health-questionnaire"
-  to = "/index.html"
+  to = "/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/health-questionnaire/*"
-  to = "/index.html"
+  to = "/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/forgot-password"
-  to = "/index.html"
+  to = "/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/forgot-password/*"
-  to = "/index.html"
+  to = "/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/reset-password"
-  to = "/index.html"
+  to = "/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/reset-password/*"
-  to = "/index.html"
+  to = "/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/ops"
-  to = "/index.html"
+  to = "/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/ops/*"
-  to = "/index.html"
+  to = "/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/org"
-  to = "/index.html"
+  to = "/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/org/*"
-  to = "/index.html"
+  to = "/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/tax"
-  to = "/index.html"
+  to = "/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/tax/*"
-  to = "/index.html"
+  to = "/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/solutions/risk"
-  to = "/index.html"
+  to = "/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/solutions/risk/*"
-  to = "/index.html"
+  to = "/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/solutions/aging"
-  to = "/index.html"
+  to = "/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/solutions/aging/*"
-  to = "/index.html"
+  to = "/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/tcm-prevention/constitution"
-  to = "/index.html"
+  to = "/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/tcm-prevention/constitution/*"
-  to = "/index.html"
+  to = "/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/products/*"
-  to = "/index.html"
+  to = "/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/en/account"
-  to = "/en/index.html"
+  to = "/en/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/en/account/*"
-  to = "/en/index.html"
+  to = "/en/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/en/payment"
-  to = "/en/index.html"
+  to = "/en/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/en/payment/*"
-  to = "/en/index.html"
+  to = "/en/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/en/favorites"
-  to = "/en/index.html"
+  to = "/en/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/en/favorites/*"
-  to = "/en/index.html"
+  to = "/en/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/en/health-skills"
-  to = "/en/index.html"
+  to = "/en/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/en/health-skills/*"
-  to = "/en/index.html"
+  to = "/en/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/en/health-questionnaire"
-  to = "/en/index.html"
+  to = "/en/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/en/health-questionnaire/*"
-  to = "/en/index.html"
+  to = "/en/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/en/forgot-password"
-  to = "/en/index.html"
+  to = "/en/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/en/forgot-password/*"
-  to = "/en/index.html"
+  to = "/en/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/en/reset-password"
-  to = "/en/index.html"
+  to = "/en/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/en/reset-password/*"
-  to = "/en/index.html"
+  to = "/en/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/en/ops"
-  to = "/en/index.html"
+  to = "/en/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/en/ops/*"
-  to = "/en/index.html"
+  to = "/en/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/en/org"
-  to = "/en/index.html"
+  to = "/en/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/en/org/*"
-  to = "/en/index.html"
+  to = "/en/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/en/tax"
-  to = "/en/index.html"
+  to = "/en/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/en/tax/*"
-  to = "/en/index.html"
+  to = "/en/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/en/solutions/risk"
-  to = "/en/index.html"
+  to = "/en/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/en/solutions/risk/*"
-  to = "/en/index.html"
+  to = "/en/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/en/solutions/aging"
-  to = "/en/index.html"
+  to = "/en/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/en/solutions/aging/*"
-  to = "/en/index.html"
+  to = "/en/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/en/tcm-prevention/constitution"
-  to = "/en/index.html"
+  to = "/en/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/en/tcm-prevention/constitution/*"
-  to = "/en/index.html"
+  to = "/en/spa-shell.html"
   status = 200
 
 [[redirects]]
   from = "/en/products/*"
-  to = "/en/index.html"
+  to = "/en/spa-shell.html"
   status = 200
 
 [[headers]]
   for = "/robots.txt"
   [headers.values]
     Content-Type = "text/plain; charset=utf-8"
+
+[[headers]]
+  for = "/favicon.ico"
+  [headers.values]
+    Content-Type = "image/x-icon"
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/favicon.png"
+  [headers.values]
+    Content-Type = "image/png"
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/favicon.svg"
+  [headers.values]
+    Content-Type = "image/svg+xml"
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/apple-touch-icon.png"
+  [headers.values]
+    Content-Type = "image/png"
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/spa-shell.html"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+
+[[headers]]
+  for = "/en/spa-shell.html"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+
+[[headers]]
+  for = "/"
+  [headers.values]
+    Cache-Control = "public, max-age=600"
 
 [[headers]]
   for = "/sitemap.xml"

@@ -19,6 +19,10 @@ npm run build:client
 
 test -f dist/index.html
 test -f public/images/logo-longevity-atlas.png
+for icon in favicon.ico favicon.png favicon.svg apple-touch-icon.png; do
+  test -f "dist/$icon"
+  chmod 644 "dist/$icon"
+done
 
 ops_restart_api || echo "[warn] API restart failed — continue so nginx/static still go live"
 if systemctl cat healthlongevity-mcp >/dev/null 2>&1; then
@@ -31,6 +35,12 @@ else
   echo "[warn] API not ready for longevity-news prerender — static news cards will be used if the fetch keeps failing"
 fi
 npm run build:seo
+test -f dist/spa-shell.html
+test -f dist/en/spa-shell.html
+test -f dist/sitemap.xml
+test -f dist/llms.txt
+test -f dist/longevity-news/feed.xml
+test -f dist/longevity-news/ln-static-1/index.html
 
 ops_reload_nginx || echo "[warn] nginx reload skipped"
 

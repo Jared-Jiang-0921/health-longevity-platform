@@ -5,7 +5,7 @@ import { getLongevityNewsArticles } from '../data/longevityNewsArticles'
 import { getLongevityNewsModuleCopy } from '../data/longevityNewsModuleI18n'
 import { toNewsSearchCard } from '../lib/longevityNewsCard'
 import {
-  isSubstantiveNewsCard,
+  isPublicNewsCard,
   newsArticleAlternates,
   newsArticleJsonLd,
   newsArticleRouterPath,
@@ -18,8 +18,8 @@ import './LongevityNews.css'
 const STATIC_CARDS = getLongevityNewsArticles().map((item) => toNewsSearchCard(item))
 
 const LABEL = {
-  zh: { back: '返回前沿医学资讯', missing: '未找到这条资讯', source: '来源页', thin: '这条目前只有标题，完整说明仍在栏目页。' },
-  en: { back: 'Back to medical insights', missing: 'This insight was not found', source: 'Source page', thin: 'This card only has a title. The column page has the rest.' },
+  zh: { back: '返回前沿医学资讯', missing: '未找到这条资讯', source: '来源页', takeaways: '阅读要点' },
+  en: { back: 'Back to medical insights', missing: 'This insight was not found', source: 'Source page', takeaways: 'Takeaways' },
 }
 
 function uploadCard(item) {
@@ -62,13 +62,13 @@ export default function LongevityNewsArticle() {
   const card = STATIC_CARDS.find((item) => item.id === articleId)
     || uploads.map(uploadCard).find((item) => item.id === articleId)
   const view = card ? presentNewsArticle(card, lang) : null
-  const substantive = Boolean(view && isSubstantiveNewsCard(view, lang) && !(lang !== 'zh' && view.zhOnly))
+  const published = Boolean(view && isPublicNewsCard(view, lang) && !(lang !== 'zh' && view.zhOnly))
 
   useEffect(() => {
     const known = Boolean(STATIC_CARDS.find((item) => item.id === articleId) || (ready && card))
     const missing = ready && !card
     if (!known && !missing) return
-    if (view && substantive) {
+    if (view && published) {
       applySeoToDocument({
         lang,
         pathname: newsArticleRouterPath(view.id),
@@ -94,7 +94,7 @@ export default function LongevityNewsArticle() {
       alternates: [],
       replaceUnmanaged: true,
     })
-  }, [articleId, card, copy.missing, lang, mod.lead, ready, substantive, view])
+  }, [articleId, card, copy.missing, lang, mod.lead, ready, published, view])
 
   return (
     <article className="page-longevity-news ln-essay">
@@ -106,12 +106,12 @@ export default function LongevityNewsArticle() {
         <>
           <h1>{view.title}</h1>
           {view.publishedAt ? <p><time dateTime={view.publishedAt}>{view.publishedAt}</time></p> : null}
-          {substantive ? (
+          {published ? (
             <>
-              {view.excerpt ? <p>{view.excerpt}</p> : null}
-              {view.takeaways?.filter(Boolean).length ? (
+              {view.abstract ? <p>{view.abstract}</p> : null}
+              {view.takeaways?.filter(Boolean).length && view.abstract !== view.takeaways.filter(Boolean).join(lang === 'en' ? ' ' : '；') ? (
                 <>
-                  <h2>{lang === 'zh' ? '阅读要点' : 'Takeaways'}</h2>
+                  <h2>{copy.takeaways}</h2>
                   <ul>
                     {view.takeaways.filter(Boolean).map((line) => <li key={line}>{line}</li>)}
                   </ul>
@@ -123,7 +123,7 @@ export default function LongevityNewsArticle() {
               ) : null}
             </>
           ) : (
-            <p>{copy.thin}</p>
+            <p>{lang === 'en' && view.zhOnly ? 'This item is in Chinese only.' : copy.missing}</p>
           )}
           <p>{mod.caveatPhrase}</p>
         </>

@@ -42,224 +42,270 @@
           "value": "text/plain; charset=utf-8"
         }
       ]
+    },
+    {
+      "source": "/favicon.ico",
+      "headers": [
+        { "key": "Content-Type", "value": "image/x-icon" },
+        { "key": "Cache-Control", "value": "public, max-age=604800" }
+      ]
+    },
+    {
+      "source": "/favicon.png",
+      "headers": [
+        { "key": "Content-Type", "value": "image/png" },
+        { "key": "Cache-Control", "value": "public, max-age=604800" }
+      ]
+    },
+    {
+      "source": "/favicon.svg",
+      "headers": [
+        { "key": "Content-Type", "value": "image/svg+xml" },
+        { "key": "Cache-Control", "value": "public, max-age=604800" }
+      ]
+    },
+    {
+      "source": "/apple-touch-icon.png",
+      "headers": [
+        { "key": "Content-Type", "value": "image/png" },
+        { "key": "Cache-Control", "value": "public, max-age=604800" }
+      ]
+    },
+    {
+      "source": "/spa-shell.html",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+      ]
+    },
+    {
+      "source": "/en/spa-shell.html",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+      ]
+    },
+    {
+      "source": "/",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=600" }
+      ]
     }
   ],
   "rewrites": [
     {
       "source": "/account",
-      "destination": "/index.html"
+      "destination": "/spa-shell.html"
     },
     {
       "source": "/account/(.*)",
-      "destination": "/index.html"
+      "destination": "/spa-shell.html"
     },
     {
       "source": "/payment",
-      "destination": "/index.html"
+      "destination": "/spa-shell.html"
     },
     {
       "source": "/payment/(.*)",
-      "destination": "/index.html"
+      "destination": "/spa-shell.html"
     },
     {
       "source": "/favorites",
-      "destination": "/index.html"
+      "destination": "/spa-shell.html"
     },
     {
       "source": "/favorites/(.*)",
-      "destination": "/index.html"
+      "destination": "/spa-shell.html"
     },
     {
       "source": "/health-skills",
-      "destination": "/index.html"
+      "destination": "/spa-shell.html"
     },
     {
       "source": "/health-skills/(.*)",
-      "destination": "/index.html"
+      "destination": "/spa-shell.html"
     },
     {
       "source": "/health-questionnaire",
-      "destination": "/index.html"
+      "destination": "/spa-shell.html"
     },
     {
       "source": "/health-questionnaire/(.*)",
-      "destination": "/index.html"
+      "destination": "/spa-shell.html"
     },
     {
       "source": "/forgot-password",
-      "destination": "/index.html"
+      "destination": "/spa-shell.html"
     },
     {
       "source": "/forgot-password/(.*)",
-      "destination": "/index.html"
+      "destination": "/spa-shell.html"
     },
     {
       "source": "/reset-password",
-      "destination": "/index.html"
+      "destination": "/spa-shell.html"
     },
     {
       "source": "/reset-password/(.*)",
-      "destination": "/index.html"
+      "destination": "/spa-shell.html"
     },
     {
       "source": "/ops",
-      "destination": "/index.html"
+      "destination": "/spa-shell.html"
     },
     {
       "source": "/ops/(.*)",
-      "destination": "/index.html"
+      "destination": "/spa-shell.html"
     },
     {
       "source": "/org",
-      "destination": "/index.html"
+      "destination": "/spa-shell.html"
     },
     {
       "source": "/org/(.*)",
-      "destination": "/index.html"
+      "destination": "/spa-shell.html"
     },
     {
       "source": "/tax",
-      "destination": "/index.html"
+      "destination": "/spa-shell.html"
     },
     {
       "source": "/tax/(.*)",
-      "destination": "/index.html"
+      "destination": "/spa-shell.html"
     },
     {
       "source": "/solutions/risk",
-      "destination": "/index.html"
+      "destination": "/spa-shell.html"
     },
     {
       "source": "/solutions/risk/(.*)",
-      "destination": "/index.html"
+      "destination": "/spa-shell.html"
     },
     {
       "source": "/solutions/aging",
-      "destination": "/index.html"
+      "destination": "/spa-shell.html"
     },
     {
       "source": "/solutions/aging/(.*)",
-      "destination": "/index.html"
+      "destination": "/spa-shell.html"
     },
     {
       "source": "/tcm-prevention/constitution",
-      "destination": "/index.html"
+      "destination": "/spa-shell.html"
     },
     {
       "source": "/tcm-prevention/constitution/(.*)",
-      "destination": "/index.html"
+      "destination": "/spa-shell.html"
     },
     {
       "source": "/products/(.*)",
-      "destination": "/index.html"
+      "destination": "/spa-shell.html"
     },
     {
       "source": "/en/account",
-      "destination": "/en/index.html"
+      "destination": "/en/spa-shell.html"
     },
     {
       "source": "/en/account/(.*)",
-      "destination": "/en/index.html"
+      "destination": "/en/spa-shell.html"
     },
     {
       "source": "/en/payment",
-      "destination": "/en/index.html"
+      "destination": "/en/spa-shell.html"
     },
     {
       "source": "/en/payment/(.*)",
-      "destination": "/en/index.html"
+      "destination": "/en/spa-shell.html"
     },
     {
       "source": "/en/favorites",
-      "destination": "/en/index.html"
+      "destination": "/en/spa-shell.html"
     },
     {
       "source": "/en/favorites/(.*)",
-      "destination": "/en/index.html"
+      "destination": "/en/spa-shell.html"
     },
     {
       "source": "/en/health-skills",
-      "destination": "/en/index.html"
+      "destination": "/en/spa-shell.html"
     },
     {
       "source": "/en/health-skills/(.*)",
-      "destination": "/en/index.html"
+      "destination": "/en/spa-shell.html"
     },
     {
       "source": "/en/health-questionnaire",
-      "destination": "/en/index.html"
+      "destination": "/en/spa-shell.html"
     },
     {
       "source": "/en/health-questionnaire/(.*)",
-      "destination": "/en/index.html"
+      "destination": "/en/spa-shell.html"
     },
     {
       "source": "/en/forgot-password",
-      "destination": "/en/index.html"
+      "destination": "/en/spa-shell.html"
     },
     {
       "source": "/en/forgot-password/(.*)",
-      "destination": "/en/index.html"
+      "destination": "/en/spa-shell.html"
     },
     {
       "source": "/en/reset-password",
-      "destination": "/en/index.html"
+      "destination": "/en/spa-shell.html"
     },
     {
       "source": "/en/reset-password/(.*)",
-      "destination": "/en/index.html"
+      "destination": "/en/spa-shell.html"
     },
     {
       "source": "/en/ops",
-      "destination": "/en/index.html"
+      "destination": "/en/spa-shell.html"
     },
     {
       "source": "/en/ops/(.*)",
-      "destination": "/en/index.html"
+      "destination": "/en/spa-shell.html"
     },
     {
       "source": "/en/org",
-      "destination": "/en/index.html"
+      "destination": "/en/spa-shell.html"
     },
     {
       "source": "/en/org/(.*)",
-      "destination": "/en/index.html"
+      "destination": "/en/spa-shell.html"
     },
     {
       "source": "/en/tax",
-      "destination": "/en/index.html"
+      "destination": "/en/spa-shell.html"
     },
     {
       "source": "/en/tax/(.*)",
-      "destination": "/en/index.html"
+      "destination": "/en/spa-shell.html"
     },
     {
       "source": "/en/solutions/risk",
-      "destination": "/en/index.html"
+      "destination": "/en/spa-shell.html"
     },
     {
       "source": "/en/solutions/risk/(.*)",
-      "destination": "/en/index.html"
+      "destination": "/en/spa-shell.html"
     },
     {
       "source": "/en/solutions/aging",
-      "destination": "/en/index.html"
+      "destination": "/en/spa-shell.html"
     },
     {
       "source": "/en/solutions/aging/(.*)",
-      "destination": "/en/index.html"
+      "destination": "/en/spa-shell.html"
     },
     {
       "source": "/en/tcm-prevention/constitution",
-      "destination": "/en/index.html"
+      "destination": "/en/spa-shell.html"
     },
     {
       "source": "/en/tcm-prevention/constitution/(.*)",
-      "destination": "/en/index.html"
+      "destination": "/en/spa-shell.html"
     },
     {
       "source": "/en/products/(.*)",
-      "destination": "/en/index.html"
+      "destination": "/en/spa-shell.html"
     }
   ]
 }

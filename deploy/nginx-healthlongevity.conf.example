@@ -55,8 +55,41 @@ server {
         default_type text/html;
     }
 
+    # 首页短缓存。location 里写了 add_header 之后，server 级安全头不会继承，所以这里重复。
     location = / {
         try_files /index.html =404;
+        add_header Cache-Control "public, max-age=600" always;
+        add_header X-Content-Type-Options nosniff always;
+        add_header Referrer-Policy strict-origin-when-cross-origin always;
+        add_header X-Frame-Options SAMEORIGIN always;
+        add_header Permissions-Policy "geolocation=(), microphone=(self), camera=()" always;
+    }
+
+    location = /index.html {
+        try_files /index.html =404;
+        add_header Cache-Control "public, max-age=600" always;
+        add_header X-Content-Type-Options nosniff always;
+        add_header Referrer-Policy strict-origin-when-cross-origin always;
+        add_header X-Frame-Options SAMEORIGIN always;
+        add_header Permissions-Policy "geolocation=(), microphone=(self), camera=()" always;
+    }
+
+    location = /en {
+        try_files /en/index.html =404;
+        add_header Cache-Control "public, max-age=600" always;
+        add_header X-Content-Type-Options nosniff always;
+        add_header Referrer-Policy strict-origin-when-cross-origin always;
+        add_header X-Frame-Options SAMEORIGIN always;
+        add_header Permissions-Policy "geolocation=(), microphone=(self), camera=()" always;
+    }
+
+    location = /en/index.html {
+        try_files /en/index.html =404;
+        add_header Cache-Control "public, max-age=600" always;
+        add_header X-Content-Type-Options nosniff always;
+        add_header Referrer-Policy strict-origin-when-cross-origin always;
+        add_header X-Frame-Options SAMEORIGIN always;
+        add_header Permissions-Policy "geolocation=(), microphone=(self), camera=()" always;
     }
 
     location ~* \.mjs$ {
@@ -79,6 +112,36 @@ server {
         try_files $uri =404;
     }
 
+    # 根目录图标用精确匹配，和 /images/ 一样按文件提供，不回退到 HTML。
+    # 精确匹配先于按扩展名的正则，避免只放行 /images/ 时 /favicon.ico 返回 403。
+    location = /favicon.ico {
+        default_type image/x-icon;
+        try_files /favicon.ico =404;
+        add_header Cache-Control "public, max-age=604800" always;
+        add_header X-Content-Type-Options nosniff always;
+    }
+
+    location = /favicon.png {
+        default_type image/png;
+        try_files /favicon.png =404;
+        add_header Cache-Control "public, max-age=604800" always;
+        add_header X-Content-Type-Options nosniff always;
+    }
+
+    location = /favicon.svg {
+        default_type image/svg+xml;
+        try_files /favicon.svg =404;
+        add_header Cache-Control "public, max-age=604800" always;
+        add_header X-Content-Type-Options nosniff always;
+    }
+
+    location = /apple-touch-icon.png {
+        default_type image/png;
+        try_files /apple-touch-icon.png =404;
+        add_header Cache-Control "public, max-age=604800" always;
+        add_header X-Content-Type-Options nosniff always;
+    }
+
     location = /robots.txt {
         default_type text/plain;
         add_header Cache-Control "public, max-age=3600" always;
@@ -90,6 +153,35 @@ server {
         add_header Cache-Control "public, max-age=3600" always;
     }
 
+    location = /llms.txt {
+        default_type text/plain;
+        charset utf-8;
+        add_header Cache-Control "public, max-age=3600" always;
+    }
+
+    location = /longevity-news/feed.xml {
+        default_type application/atom+xml;
+        charset utf-8;
+        add_header Cache-Control "public, max-age=3600" always;
+    }
+
+    # 未预渲染的动态路径回退到这个壳，而不是首页。壳本身 noindex，且没有首页 canonical。
+    location = /spa-shell.html {
+        internal;
+        charset utf-8;
+        default_type text/html;
+        add_header X-Robots-Tag "noindex, nofollow" always;
+        add_header Cache-Control "no-store" always;
+    }
+
+    location = /en/spa-shell.html {
+        internal;
+        charset utf-8;
+        default_type text/html;
+        add_header X-Robots-Tag "noindex, nofollow" always;
+        add_header Cache-Control "no-store" always;
+    }
+
     # 阿拉伯语版已移除，旧链接永久跳到中文同一路径
     location = /ar {
         return 301 /;
@@ -99,38 +191,39 @@ server {
         rewrite ^/ar/(.*)$ /$1 permanent;
     }
 
-    # 动态或登录后路径才回退到对应语言的前端壳。已有预渲染文件时 try_files 会先用文件。
-    # 名单与 src/lib/sitePaths.js 的 SPA_EXACT 一致。未知资讯 id 不在这里，没有文件就 404。
+    # 动态或登录后路径才回退到 noindex 的前端壳，不回退到首页。
+    # 已有预渲染文件时 try_files 会先用文件。名单与 src/lib/sitePaths.js 一致。
+    # 未知资讯 id 不在这里，没有文件就 404。/products/… 没有预渲染文件时也不是首页。
     location ~ ^/en/(account|payment|favorites|health-skills|health-questionnaire|forgot-password|reset-password|ops|org|tax)(/.*)?$ {
-        try_files $uri $uri/index.html /en/index.html;
+        try_files $uri $uri/index.html /en/spa-shell.html;
     }
 
     location ~ ^/(account|payment|favorites|health-skills|health-questionnaire|forgot-password|reset-password|ops|org|tax)(/.*)?$ {
-        try_files $uri $uri/index.html /index.html;
+        try_files $uri $uri/index.html /spa-shell.html;
     }
 
     location ~ ^/en/products/.+ {
-        try_files $uri $uri/index.html /en/index.html;
+        try_files $uri $uri/index.html /en/spa-shell.html;
     }
 
     location ~ ^/products/.+ {
-        try_files $uri $uri/index.html /index.html;
+        try_files $uri $uri/index.html /spa-shell.html;
     }
 
     location ~ ^/en/solutions/(risk|aging)(/.*)?$ {
-        try_files $uri $uri/index.html /en/index.html;
+        try_files $uri $uri/index.html /en/spa-shell.html;
     }
 
     location ~ ^/solutions/(risk|aging)(/.*)?$ {
-        try_files $uri $uri/index.html /index.html;
+        try_files $uri $uri/index.html /spa-shell.html;
     }
 
     location ~ ^/en/tcm-prevention/constitution(/.*)?$ {
-        try_files $uri $uri/index.html /en/index.html;
+        try_files $uri $uri/index.html /en/spa-shell.html;
     }
 
     location ~ ^/tcm-prevention/constitution(/.*)?$ {
-        try_files $uri $uri/index.html /index.html;
+        try_files $uri $uri/index.html /spa-shell.html;
     }
 
     location / {
