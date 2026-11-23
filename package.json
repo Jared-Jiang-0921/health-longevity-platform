@@ -8,7 +8,7 @@
     "build:client": "vite build",
     "build:seo": "node scripts/seo/prerender.mjs",
     "seo:check": "node scripts/seo/check-discoverability.mjs",
-    "test": "node --test src/lib/consultUploadLimits.test.mjs src/lib/consultPdfScan.test.mjs src/lib/siteCanonical.test.mjs lib/consultLink.test.mjs",
+    "test": "node --test src/lib/consultUploadLimits.test.mjs src/lib/consultPdfScan.test.mjs src/lib/siteCanonical.test.mjs src/lib/newsSlug.test.mjs lib/consultLink.test.mjs",
     "build": "npm run build:client && npm run build:seo",
     "preview": "vite preview",
     "fc:routes": "node scripts/fc/generate-route-manifest.mjs",
@@ -43,6 +43,7 @@
     "@types/react-dom": "^18.2.19",
     "@vitejs/plugin-react": "^4.2.1",
     "path-to-regexp": "^6.1.0",
+    "pinyin-pro": "^3.29.5",
     "sharp": "^0.34.5",
     "vite": "^5.1.0"
   }

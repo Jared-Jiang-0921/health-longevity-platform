@@ -1,6 +1,7 @@
 import { PUBLIC_SUMMARY_UPDATED, SEO_LANGS, SEO_PAGES, SITE_ORIGIN, absoluteUrl } from '../data/seo.js'
 import { getAboutPage, getPageFaqs } from '../data/publicSummary.js'
 import { articleLanguages, newsArticleRouterPath, presentNewsArticle } from './newsArticleSeo.js'
+import { newsPublicId } from './newsSlug.js'
 
 function escapeXml(value) {
   return String(value || '')
@@ -153,8 +154,9 @@ export function buildLlmsTxt({ articles = [] } = {}) {
     const langs = articleLanguages(card)
     if (!langs.includes('zh')) continue
     const view = presentNewsArticle(card, 'zh')
-    const en = langs.includes('en') ? `；英文 ${absoluteUrl('en', newsArticleRouterPath(view.id))}` : ''
-    cited.push(`- ${view.title}${view.publishedAt ? ` (${view.publishedAt})` : ''}: ${absoluteUrl('zh', newsArticleRouterPath(view.id))}${en}`)
+    const permalink = newsArticleRouterPath(newsPublicId(view.id))
+    const en = langs.includes('en') ? `；英文 ${absoluteUrl('en', permalink)}` : ''
+    cited.push(`- ${view.title}${view.publishedAt ? ` (${view.publishedAt})` : ''}: ${absoluteUrl('zh', permalink)}${en}`)
   }
   if (cited.length) {
     lines.push('## 可单独引用的资讯卡片')
@@ -176,10 +178,10 @@ export function buildNewsAtom({ articles = [] } = {}) {
     const langs = articleLanguages(card)
     if (!langs.includes('zh')) continue
     const view = presentNewsArticle(card, 'zh')
-    const href = absoluteUrl('zh', newsArticleRouterPath(view.id))
+    const href = absoluteUrl('zh', newsArticleRouterPath(newsPublicId(view.id)))
     const when = view.publishedAt || updated
     const alternates = langs.includes('en')
-      ? `\n      <link rel="alternate" hreflang="en" href="${escapeXml(absoluteUrl('en', newsArticleRouterPath(view.id)))}"/>`
+      ? `\n      <link rel="alternate" hreflang="en" href="${escapeXml(absoluteUrl('en', newsArticleRouterPath(newsPublicId(view.id))))}"/>`
       : ''
     entries.push(`    <entry>
       <title>${escapeXml(view.title)}</title>

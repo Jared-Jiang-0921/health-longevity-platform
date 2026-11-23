@@ -19,9 +19,11 @@ import {
   newsArticleSeoFields,
   newsHubLastmod,
   newsReadingFaqs,
+  newsRelatedLinks,
   newsSitemapEntries,
   presentNewsArticle,
 } from '../../src/lib/newsArticleSeo.js'
+import { newsPublicId } from '../../src/lib/newsSlug.js'
 import { NMN_EVIDENCE_UPDATED } from '../../src/data/nmnEvidenceMeta.js'
 import { OMEGA3_EVIDENCE_PATH, OMEGA3_EVIDENCE_UPDATED, getOmega3EvidencePage } from '../../src/data/omega3EvidencePage.js'
 import { VITAMIN_D_EVIDENCE_PATH, VITAMIN_D_EVIDENCE_UPDATED, getVitaminDEvidencePage } from '../../src/data/vitaminDEvidencePage.js'
@@ -30,7 +32,7 @@ import { MAGNESIUM_EVIDENCE_PATH, MAGNESIUM_EVIDENCE_UPDATED, getMagnesiumEviden
 import { NMN_EVIDENCE_PATH, getNmnEvidencePage } from '../../src/data/nmnEvidencePage.js'
 import { getPublicFaqPage } from '../../src/data/publicFaq.js'
 import { getPublicMethodologyPage } from '../../src/data/publicMethodology.js'
-import { getProductsEvidenceCopy } from '../../src/data/productsEvidenceLibraryI18n.js'
+import { getProductsEvidenceCopy, ingredientEvidenceLinks } from '../../src/data/productsEvidenceLibraryI18n.js'
 import { SEO_LANGS, SEO_PAGES, SITE_ORIGIN, absoluteUrl } from '../../src/data/seo.js'
 import { extractLongevityKeywords, toNewsSearchCard } from '../../src/lib/longevityNewsCard.js'
 import { langSpec, renderHeadSnippet, resolveSeo } from '../../src/lib/seoDocument.js'
@@ -86,7 +88,19 @@ function homeBody(lang) {
     <p>${escapeHtml(copy.modulesLead)}</p>
     ${modules}
     <p><a href="${escapeHtml(absoluteUrl(lang, '/about'))}">${escapeHtml(navLabel('/about', lang))}</a></p>
+    ${evidenceNav(lang)}
   `
+}
+
+function evidenceNav(lang) {
+  const heading = lang === 'en' ? 'Ingredient evidence' : '成分证据'
+  const note = lang === 'en'
+    ? 'These five pages are public. They give no dose and do not turn research into treatment, prevention, or an anti-aging effect.'
+    : '这五页可以公开阅读。不提供用量，也不把研究写成治疗、预防或抗衰老疗效。'
+  const items = ingredientEvidenceLinks(lang)
+    .map((item) => `<li><a href="${escapeHtml(absoluteUrl(lang, item.path))}">${escapeHtml(item.label)}</a></li>`)
+    .join('')
+  return `<nav><h2>${escapeHtml(heading)}</h2><p>${escapeHtml(note)}</p><ul>${items}</ul></nav>`
 }
 
 function navLabel(routerPath, lang) {
@@ -287,8 +301,8 @@ function newsJsonLd(lang, cards) {
         keywords: (shown.keywords || []).join(', '),
         description: shown.abstract || shown.excerpt || shown.title,
         url: isPublicNewsCard(shown, lang) && articleLanguages(shown).includes(lang)
-          ? absoluteUrl(lang, newsArticleRouterPath(shown.id))
-          : absoluteUrl('zh', newsArticleRouterPath(shown.id)),
+          ? absoluteUrl(lang, newsArticleRouterPath(newsPublicId(shown.id)))
+          : absoluteUrl('zh', newsArticleRouterPath(newsPublicId(shown.id))),
         isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
         ...(shown.url ? { isBasedOn: shown.url } : {}),
       },
@@ -320,7 +334,7 @@ function newsBody(lang, cards) {
         const onlyZh = card.zhOnly ? `<p>${escapeHtml('This item is in Chinese only')}</p>` : ''
         const hrefLang = articleLanguages(card).includes(lang) ? lang : 'zh'
         const heading = isPublicNewsCard(card, lang)
-          ? `<a href="${escapeHtml(absoluteUrl(hrefLang, newsArticleRouterPath(card.id)))}">${escapeHtml(card.title)}</a>`
+          ? `<a href="${escapeHtml(absoluteUrl(hrefLang, newsArticleRouterPath(newsPublicId(card.id))))}">${escapeHtml(card.title)}</a>`
           : escapeHtml(card.title)
         const dated = card.publishedAt ? `<p><time datetime="${escapeHtml(card.publishedAt)}">${escapeHtml(card.publishedAt)}</time></p>` : ''
         return `<article id="${escapeHtml(card.id)}"><h3>${heading}</h3>${dated}${onlyZh}${kws}${excerpt}</article>`
@@ -330,7 +344,7 @@ function newsBody(lang, cards) {
   }
   const mod = getLongevityNewsModuleCopy(lang)
   const faqs = newsReadingFaqs(lang).map((item) => `<article><h3>${escapeHtml(item.q)}</h3><p>${escapeHtml(item.a)}</p></article>`).join('')
-  return `<h1>${escapeHtml(seo.title)}</h1><p>${escapeHtml(seo.description)}</p><p>${escapeHtml(mod.caveatPhrase)}</p>${moduleIntro('/longevity-news', lang)}<section><h2>${escapeHtml(getFaqHeading(lang))}</h2>${faqs}</section>${sections.join('')}`
+  return `<h1>${escapeHtml(seo.title)}</h1><p>${escapeHtml(seo.description)}</p><p>${escapeHtml(mod.caveatPhrase)}</p>${evidenceNav(lang)}<p><a href="${escapeHtml(absoluteUrl(lang, '/methodology'))}">${escapeHtml(lang === 'en' ? 'How evidence is checked' : '证据核对说明')}</a></p>${moduleIntro('/longevity-news', lang)}<section><h2>${escapeHtml(getFaqHeading(lang))}</h2>${faqs}</section>${sections.join('')}`
 }
 
 function productsBody(lang) {
@@ -348,6 +362,7 @@ function productsBody(lang) {
     <p>${escapeHtml(seo.description)}</p>
     <p>${escapeHtml(ev.lead)}</p>
     <p>${escapeHtml(ev.roleDisclaimer)}</p>
+    ${evidenceNav(lang)}
     <section><h2>${escapeHtml(ev.checkTitle)}</h2><p>${escapeHtml(ev.checkIntro)}</p>${steps}</section>
     <section><h2>${escapeHtml(ev.cnRegTitle)}</h2><p>${escapeHtml(ev.cnRegBody)}</p></section>
     <section><h2>${escapeHtml(ev.intlTitle)}</h2><p>${escapeHtml(ev.intlBody)}</p></section>
@@ -491,8 +506,12 @@ function newsArticleBody(view, lang) {
     ? `<p>${escapeHtml(lang === 'zh' ? '来源页' : 'Source page')}：<a href="${escapeHtml(view.url)}">${escapeHtml(view.url)}</a></p>`
     : ''
   const note = view.sourceNote ? `<p>${escapeHtml(view.sourceNote)}</p>` : ''
+  const related = newsRelatedLinks(view, lang)
+  const relatedHtml = related.length
+    ? `<h2>${escapeHtml(lang === 'zh' ? '相关页面' : 'Related pages')}</h2><ul>${related.map((item) => `<li><a href="${escapeHtml(absoluteUrl(lang, item.path))}">${escapeHtml(item.label)}</a></li>`).join('')}</ul>`
+    : ''
   const back = `<p><a href="${escapeHtml(absoluteUrl(lang, '/longevity-news'))}">${escapeHtml(navLabel('/longevity-news', lang))}</a></p>`
-  return `<article><h1>${escapeHtml(view.title)}</h1>${dated}${excerpt}${list}${note}${source}<p>${escapeHtml(mod.caveatPhrase)}</p>${back}</article>`
+  return `<article><h1>${escapeHtml(view.title)}</h1>${dated}${excerpt}${list}${note}${source}${relatedHtml}<p>${escapeHtml(mod.caveatPhrase)}</p>${back}</article>`
 }
 
 function injectHtml(template, { lang, pathname, body, extraHead = '', head }) {
@@ -555,7 +574,7 @@ export function renderNewsArticleHtml(template, { lang, card }) {
   if (!articleLanguages(card).includes(lang) || !isPublicNewsCard(view, lang)) return null
   return injectHtml(template, {
     lang,
-    pathname: newsArticleRouterPath(view.id),
+    pathname: newsArticleRouterPath(newsPublicId(view.id)),
     body: newsArticleBody(view, lang),
     head: {
       seo: newsArticleSeoFields(view, lang),
@@ -605,7 +624,7 @@ async function main() {
     for (const lang of articleLanguages(card)) {
       const html = renderNewsArticleHtml(template, { lang, card })
       if (!html) continue
-      const dest = distFileFor(lang, newsArticleRouterPath(card.id))
+      const dest = distFileFor(lang, newsArticleRouterPath(newsPublicId(card.id)))
       await fs.mkdir(path.dirname(dest), { recursive: true })
       await fs.writeFile(dest, html, 'utf8')
       count += 1

@@ -155,3 +155,14 @@ export function getProductsEvidenceCopy(lang) {
   const key = lang === 'en' ? lang : 'zh'
   return COPY[key] || COPY.zh
 }
+
+export function ingredientEvidenceLinks(lang) {
+  const ev = getProductsEvidenceCopy(lang)
+  return [
+    { path: ev.pilotPath, label: ev.pilotLabel },
+    { path: ev.secondPilotPath, label: ev.secondPilotLabel },
+    { path: ev.thirdPilotPath, label: ev.thirdPilotLabel },
+    { path: ev.fourthPilotPath, label: ev.fourthPilotLabel },
+    { path: ev.fifthPilotPath, label: ev.fifthPilotLabel },
+  ]
+}

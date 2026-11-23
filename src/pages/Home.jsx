@@ -17,6 +17,7 @@ import {
   getVisualAssetSources,
   getVisualAlt,
 } from '../data/visualAssets'
+import IngredientEvidenceLinks from '../components/IngredientEvidenceLinks'
 import ModuleAccessHint from '../components/ModuleAccessHint'
 import './Home.css'
 
@@ -143,6 +144,8 @@ export default function Home() {
           })}
         </div>
       </section>
+
+      <IngredientEvidenceLinks lang={lang} />
 
       {isAdmin ? (
         <section className="home-today" aria-labelledby="home-today-heading">

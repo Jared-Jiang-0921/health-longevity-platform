@@ -20,11 +20,14 @@ import {
 } from '../../src/lib/newsArticleSeo.js'
 import { buildLlmsTxt, buildNewsAtom, buildSitemapXml } from '../../src/lib/seoPublicFiles.js'
 import {
-  apexRedirectRules,
   documentStatus,
   netlifySpaRedirects,
   spaRewriteRules,
+  vercelPublicRedirectRules,
 } from '../../src/lib/sitePaths.js'
+import { NEWS_LEGACY_SLUGS } from '../../src/data/newsLegacySlugs.js'
+import { BAIDU_SITE_VERIFICATION } from '../../src/data/baiduSiteVerification.js'
+import { newsLegacyLocation } from '../../src/lib/newsSlug.js'
 import { getLongevityNewsArticles } from '../../src/data/longevityNewsArticles.js'
 import { renderNewsArticleHtml, renderRouteHtml, renderSpaShellHtml, staticNewsCards } from './prerender.mjs'
 
@@ -92,6 +95,7 @@ expect(thinArticle.description && thinArticle.description !== '只有标题', 'J
 expect(thinArticle.description.includes('不转载微信公众号全文'), 'JSON-LD description is not the WeChat post')
 const thinBody = thinHtml.slice(thinHtml.indexOf('<body'), thinHtml.indexOf('<script type="module"'))
 expect(thinBody.includes('不转载微信公众号全文'), 'crawler-visible body contains the abstract')
+expect(thinBody.includes('三层') && thinBody.includes('/methodology'), 'thin card explains how to read it and links the method page')
 
 const newsHtml = renderRouteHtml(template, { lang: 'zh', pathname: '/longevity-news', newsCards: [...cards, thin] })
 expect(newsHtml.includes('href="https://www.healthlongevity.cn/longevity-news/ln-static-1"'), 'news index links to the stable article')
@@ -102,6 +106,13 @@ expect(newsHtml.includes('application/atom+xml'), 'news index links the atom fee
 
 const productsHtml = renderRouteHtml(template, { lang: 'zh', pathname: '/products' })
 expect(productsHtml.includes('不是公开可抓取语料'), 'product overview says items are not a public corpus')
+for (const evidencePath of ['/products/evidence/nmn', '/products/evidence/omega-3', '/products/evidence/vitamin-d', '/products/evidence/creatine', '/products/evidence/magnesium']) {
+  expect(productsHtml.includes(evidencePath), `product overview links ${evidencePath}`)
+}
+const homeHtml = renderRouteHtml(template, { lang: 'zh', pathname: '/' })
+expect(homeHtml.includes('/products/evidence/nmn') && homeHtml.includes('/products/evidence/omega-3') && homeHtml.includes('/products/evidence/vitamin-d') && homeHtml.includes('/products/evidence/creatine') && homeHtml.includes('/products/evidence/magnesium'), 'home links every evidence page')
+expect(!homeHtml.includes('hreflang="ar"') && !homeHtml.includes('/ar/'), 'home does not publish an Arabic URL')
+expect(BAIDU_SITE_VERIFICATION === '' && !homeHtml.includes('baidu-site-verification'), 'baidu verification meta stays empty until a real code is set')
 expect(productsHtml.includes('rel="canonical" href="https://www.healthlongevity.cn/products"'), 'product overview canonical is the overview')
 const shell = renderSpaShellHtml(template, { lang: 'zh' })
 expect(shell.includes('noindex,nofollow'), 'spa shell is noindex')
@@ -122,6 +133,7 @@ expect(!/\d+\s*mg/i.test(evidenceHtml) && !evidenceHtml.includes('毫克'), 'pil
 expect(evidenceHtml.includes('不提供用量'), 'pilot page says it gives no dose')
 expect(evidenceHtml.includes('39531138') && evidenceHtml.includes('samr.gov.cn'), 'pilot cites the meta-analysis and the SAMR reply')
 expect(evidenceHtml.includes('/longevity-news/ln-static-3'), 'pilot links the existing NMN note')
+expect(evidenceHtml.includes('/products/evidence/omega-3') && evidenceHtml.includes('/products/evidence/vitamin-d') && evidenceHtml.includes('/products/evidence/creatine') && evidenceHtml.includes('/products/evidence/magnesium'), 'NMN page links the other four evidence pages')
 expect(evidenceText.length > 1800, 'pilot body is substantial')
 const evidenceEn = renderRouteHtml(template, { lang: 'en', pathname: NMN_EVIDENCE_PATH })
 expect(evidenceEn.includes('rel="canonical" href="https://www.healthlongevity.cn/en/products/evidence/nmn"'), 'english pilot has its own canonical')
@@ -235,7 +247,6 @@ const consultEn = renderRouteHtml(template, { lang: 'en', pathname: '/consult' }
 expect(consultHtml.includes('适合谁') && consultHtml.includes('怎么进行') && consultHtml.includes('不登录也能读到'), 'consult explanation is in the public HTML')
 expect(consultEn.includes('Who it is for') && consultEn.includes('How it works'), 'english consult explanation is public')
 expect(consultHtml.includes('href="https://www.healthlongevity.cn/consult"') || consultHtml.includes('AI 健康长寿咨询'), 'consult page names itself')
-const homeHtml = renderRouteHtml(template, { lang: 'zh', pathname: '/' })
 const homeEn = renderRouteHtml(template, { lang: 'en', pathname: '/' })
 expect(homeHtml.includes('href="https://www.healthlongevity.cn/consult"'), 'chinese home prerender links to consult')
 expect(homeEn.includes('href="https://www.healthlongevity.cn/en/consult"'), 'english home prerender links to consult')
@@ -301,7 +312,7 @@ expect(svg.includes('<svg') && svg.includes('image'), 'favicon.svg embeds the lo
 
 const vercel = JSON.parse(fs.readFileSync(new URL('../../vercel.json', import.meta.url), 'utf8'))
 expect(JSON.stringify(vercel.rewrites) === JSON.stringify(spaRewriteRules()), 'vercel rewrites match the spa list')
-expect(JSON.stringify(vercel.redirects) === JSON.stringify(apexRedirectRules()), 'vercel redirects match the canonical rules')
+expect(JSON.stringify(vercel.redirects) === JSON.stringify(vercelPublicRedirectRules()), 'vercel redirects match canonical rules plus news slug redirects')
 expect(!JSON.stringify(vercel.rewrites).includes('(?!api/)'), 'blanket homepage rewrite is gone')
 expect(!vercel.rewrites.some((rule) => rule.source.includes('longevity-news')), 'unknown news ids are not rewritten to the homepage')
 const require = createRequire(import.meta.url)
@@ -350,6 +361,18 @@ const nginx = fs.readFileSync(new URL('../../deploy/nginx-healthlongevity.conf.e
 expect(nginx.includes('return 301 https://www.healthlongevity.cn$request_uri;'), 'nginx example still sends other apex URLs to www')
 expect(nginx.includes('location = /ar { return 301 https://www.healthlongevity.cn/; }'), 'apex arabic goes straight to the Chinese home')
 expect(nginx.includes('location ~ ^/ar/(.+)$ { return 301 https://www.healthlongevity.cn/$1; }'), 'apex arabic paths skip the www /ar hop')
+expect(nginx.includes('include /opt/health-longevity-platform/deploy/nginx-news-slug-redirects.conf;'), 'nginx example includes the news slug redirects')
+const legacyId = 'upload-03c3a6ac-bcaa-4fb9-9779-122e5f0e8ee0'
+const legacySlug = NEWS_LEGACY_SLUGS[legacyId]
+expect(newsLegacyLocation(`/longevity-news/${legacyId}`) === `/longevity-news/${legacySlug}`, 'old upload path redirects to the readable slug')
+expect(newsLegacyLocation(`/en/longevity-news/${legacyId}`) === `/longevity-news/${legacySlug}`, 'english upload alias redirects to the Chinese slug')
+const mappedCard = toNewsSearchCard({ id: legacyId, title: '运动饮食认知', summary: '来自公众号' })
+const mappedXml = buildSitemapXml({ extra: newsSitemapEntries([mappedCard]) })
+expect(mappedXml.includes(`<loc>https://www.healthlongevity.cn/longevity-news/${legacySlug}</loc>`), 'sitemap uses the readable slug')
+expect(!mappedXml.includes(`/longevity-news/${legacyId}`), 'sitemap drops the upload id')
+expect(!mappedXml.includes(`/en/longevity-news/${legacySlug}`), 'chinese-only upload does not gain an English loc')
+expect(Object.keys(NEWS_LEGACY_SLUGS).length === 139, 'slug table covers the upload cards')
+expect(!llms.includes('阿拉伯语') && !xml.includes('/ar/'), 'arabic is not a public language')
 expect(nginx.includes('error_page 404 /404.html;'), 'nginx example uses a real 404')
 expect(!nginx.includes('try_files $uri $uri/index.html $uri/ /index.html'), 'nginx example does not fall unknown paths back to the homepage')
 expect(!nginx.includes('try_files $uri $uri/index.html /index.html'), 'nginx example does not fall product or course paths back to the homepage')

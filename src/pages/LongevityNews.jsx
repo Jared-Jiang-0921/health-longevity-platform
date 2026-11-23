@@ -1,7 +1,9 @@
+import { Link } from 'react-router-dom'
 import { getLongevityNewsModuleCopy } from '../data/longevityNewsModuleI18n'
 import { getFaqHeading, getPageFaqs } from '../data/publicSummary'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
+import IngredientEvidenceLinks from '../components/IngredientEvidenceLinks'
 import LongevityNewsFeed from '../components/LongevityNewsFeed'
 import ModuleAccessHint from '../components/ModuleAccessHint'
 import ModulePageHero from '../components/ModulePageHero'
@@ -18,6 +20,11 @@ export default function LongevityNews() {
       <ModulePageHero path="/longevity-news" title={mod.title}>
         <p className="module-page-hero-line">{mod.lead}</p>
       </ModulePageHero>
+
+      <IngredientEvidenceLinks lang={lang} />
+      <p>
+        <Link to="/methodology">{lang === 'en' ? 'How evidence is checked' : '证据核对说明'}</Link>
+      </p>
 
       <section className="ln-public-faq" aria-labelledby="ln-faq-heading">
         <h2 id="ln-faq-heading">{getFaqHeading(lang)}</h2>

@@ -29,6 +29,9 @@ server {
     location ~ ^/ar/(.+)/$ { return 301 https://www.healthlongevity.cn/$1; }
     location ~ ^/ar/(.+)$ { return 301 https://www.healthlongevity.cn/$1; }
 
+    # 旧资讯 upload- 地址直接到最终中文 slug。文件不在仓库监听的配置里，要和本示例一起拷到机器上。
+    include /opt/health-longevity-platform/deploy/nginx-news-slug-redirects.conf;
+
     return 301 https://www.healthlongevity.cn$request_uri;
 }
 
@@ -193,6 +196,8 @@ server {
     location = /ar/ { return 301 /; }
     location ~ ^/ar/(.+)/$ { return 301 /$1; }
     location ~ ^/ar/(.+)$ { return 301 /$1; }
+
+    include /opt/health-longevity-platform/deploy/nginx-news-slug-redirects.conf;
 
     set $seo_lang "";
     if ($arg_lang ~* "^(en|en-us|en_us)$") { set $seo_lang en; }

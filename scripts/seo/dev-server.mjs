@@ -6,6 +6,7 @@ import { pageIndexable } from '../../src/data/seo.js'
 import { newsArticleIdFromPath, newsHubLastmod, newsSitemapEntries } from '../../src/lib/newsArticleSeo.js'
 import { documentStatus, isSpaDocumentPath } from '../../src/lib/sitePaths.js'
 import { canonicalRedirectTarget } from '../../src/lib/siteCanonical.js'
+import { newsLegacyLocation } from '../../src/lib/newsSlug.js'
 import { buildLlmsTxt, buildNewsAtom, buildSitemapXml } from '../../src/lib/seoPublicFiles.js'
 import { renderNewsArticleHtml, renderRouteHtml, renderSpaShellHtml, staticNewsCards } from './prerender.mjs'
 
@@ -70,6 +71,14 @@ function installRouting(server, { allowDevPreview, fileRoot, localeShell }) {
       if (target) {
         res.statusCode = 301
         res.setHeader('Location', target)
+        res.setHeader('Cache-Control', 'no-cache')
+        res.end()
+        return
+      }
+      const legacy = newsLegacyLocation(pathname)
+      if (legacy) {
+        res.statusCode = 301
+        res.setHeader('Location', legacy)
         res.setHeader('Cache-Control', 'no-cache')
         res.end()
         return

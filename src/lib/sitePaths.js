@@ -4,6 +4,8 @@
  */
 import { SEO_PAGES } from '../data/seo.js'
 import { articleLanguages, newsArticleIdFromPath } from './newsArticleSeo.js'
+import { composeVercelRedirects, newsPublicId } from './newsSlug.js'
+import { vercelRedirectRules } from './siteCanonical.js'
 
 const LOCALES = [
   { prefix: '', shell: '/spa-shell.html' },
@@ -67,7 +69,7 @@ export function isPrerenderedDocumentPath(pathname, cards = []) {
   if (SEO_PAGES.some((page) => page.path === routerPath)) return true
   const id = newsArticleIdFromPath(routerPath)
   if (!id) return false
-  const card = (cards || []).find((item) => item.id === id)
+  const card = (cards || []).find((item) => newsPublicId(item.id) === id)
   if (!card) return false
   const lang = locale === 'en' ? locale : 'zh'
   return articleLanguages(card).includes(lang)
@@ -98,7 +100,11 @@ export function spaRewriteRules() {
   return rules
 }
 
-export { vercelRedirectRules as apexRedirectRules } from './siteCanonical.js'
+export { vercelRedirectRules as apexRedirectRules }
+
+export function vercelPublicRedirectRules() {
+  return composeVercelRedirects(vercelRedirectRules())
+}
 
 export function netlifySpaRedirects() {
   const rules = []

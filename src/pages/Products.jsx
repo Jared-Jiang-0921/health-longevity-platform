@@ -14,6 +14,7 @@ import ProductCatalogImage from '../components/ProductCatalogImage'
 import ProductEvidenceWorkbench from '../components/ProductEvidenceWorkbench'
 import ProductCatalogAdmin from '../components/ProductCatalogAdmin'
 import ModuleAccessHint from '../components/ModuleAccessHint'
+import IngredientEvidenceLinks from '../components/IngredientEvidenceLinks'
 import ModulePageHero from '../components/ModulePageHero'
 import './Products.css'
 
@@ -127,6 +128,7 @@ export default function Products() {
         <aside className="products-role-disclaimer page-callout page-callout--warn" role="note">
           <p>{ev.roleDisclaimer}</p>
         </aside>
+        <IngredientEvidenceLinks lang={lang} />
         <section className="products-reg-block" aria-labelledby="products-cn-reg">
           <h2 id="products-cn-reg" className="products-reg-heading">{ev.cnRegTitle}</h2>
           <p>{ev.cnRegBody}</p>

@@ -5,6 +5,8 @@
 # 机器可读摘要：/llms.txt
 # 关于页面：/about
 # 规范站点只有 https://www.healthlongevity.cn/ 。
+# Baiduspider 走下面的 User-agent: *，不单独放宽或收紧。
+# 百度搜索资源平台提交同一份 Sitemap。验证码留在 src/data/baiduSiteVerification.js，空着表示尚未验证。
 
 User-agent: *
 Allow: /
