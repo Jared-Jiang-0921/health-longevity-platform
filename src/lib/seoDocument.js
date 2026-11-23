@@ -1,3 +1,4 @@
+import { BAIDU_SITE_VERIFICATION } from '../data/baiduSiteVerification.js'
 import { getPageFaqs } from '../data/publicSummary.js'
 import { SITE_LEGAL } from '../data/siteLegal.js'
 import {
@@ -67,7 +68,7 @@ export function buildJsonLd({ lang, pathname, title, description, canonical }) {
     email: SITE_LEGAL.contactEmail,
   }
   const webPage = {
-    '@type': 'WebPage',
+    '@type': 'MedicalWebPage',
     '@id': `${canonical}#webpage`,
     url: canonical,
     name: title,
@@ -75,10 +76,6 @@ export function buildJsonLd({ lang, pathname, title, description, canonical }) {
     inLanguage,
     isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
     publisher: { '@id': `${SITE_ORIGIN}/#org` },
-    about: {
-      '@type': 'Thing',
-      name: lang === 'zh' ? '健康长寿与预防保健' : 'Health, longevity and prevention',
-    },
     usageInfo,
     disclaimer: usageInfo,
   }
@@ -138,6 +135,9 @@ function renderHeadFromParts({ spec, seo, jsonLd, alternates }) {
     `<title>${escapeHtml(seo.title)}</title>`,
     `<meta name="description" content="${escapeHtml(seo.description)}" />`,
     `<meta name="robots" content="${seo.robots}" />`,
+    ...(BAIDU_SITE_VERIFICATION
+      ? [`<meta name="baidu-site-verification" content="${escapeHtml(BAIDU_SITE_VERIFICATION)}" />`]
+      : []),
     ...(seo.canonical
       ? [`<link rel="canonical" href="${escapeHtml(seo.canonical)}" />`]
       : []),
@@ -213,6 +213,9 @@ export function applySeoToDocument({ lang, pathname, seo, jsonLd, alternates, re
   }
 
   appendMeta('robots', 'robots', resolved.robots)
+  if (BAIDU_SITE_VERIFICATION) {
+    appendMeta('baidu-site-verification', 'baidu-site-verification', BAIDU_SITE_VERIFICATION)
+  }
   appendMeta('description', 'description', resolved.description)
   appendLink('canonical', resolved.canonical)
   resolvedAlts.forEach((item) => appendLink('alternate', item.href, { hreflang: item.hreflang }))

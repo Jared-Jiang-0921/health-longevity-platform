@@ -178,7 +178,7 @@ export default function HealthQuestionnaire() {
         <h2>{t.confirmTitle}</h2>
         <p>
           {t.noticeBefore}{' '}
-          <Link to={`/legal/health-data?lang=${t.noticeLang}`} target="_blank" rel="noreferrer">{t.noticeDoc}</Link>
+          <Link to={t.noticeLang === 'en' ? '/en/legal/health-data' : '/legal/health-data'} target="_blank" rel="noreferrer">{t.noticeDoc}</Link>
           {t.noticeAfter}
         </p>
         <p className="health-questionnaire-muted">
@@ -301,7 +301,7 @@ export default function HealthQuestionnaire() {
           <button type="submit" className="btn-primary" disabled={busy}>
             {busy ? t.saving : t.save}
           </button>
-          <Link to="/legal/health-data?lang=zh" className="health-questionnaire-inline-link" target="_blank" rel="noreferrer">
+          <Link to="/legal/health-data" className="health-questionnaire-inline-link" target="_blank" rel="noreferrer">
             {t.viewZh}
           </Link>
         </div>

@@ -14,6 +14,7 @@ const LOGO_SRC = '/images/logo-longevity-atlas.png'
 const primaryNavItems = [
   { path: '/', label: { zh: '首页', en: 'Home' } },
   { path: '/solutions', label: { zh: 'AI长寿师', en: 'AI Coach' } },
+  { path: '/consult', label: { zh: 'AI咨询', en: 'Consult' } },
   { path: '/products', label: { zh: '长寿产品证据库', en: 'Evidence Library' } },
   { path: '/tcm-prevention', label: { zh: '中医治未病', en: 'Preventive TCM' } },
   { path: '/health-skills', label: { zh: '长寿知识技能', en: 'Health Skills' } },

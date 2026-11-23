@@ -287,12 +287,12 @@ export default function Solutions() {
         <h2>{t.intakeTitle}</h2>
         <p>
           {t.intakeLine1}
-          <Link to={`/legal/health-data?lang=${lang}`}>{t.intakeLegalDoc}</Link>
+          <Link to={lang === 'en' ? '/en/legal/health-data' : '/legal/health-data'}>{t.intakeLegalDoc}</Link>
           {t.intakeLine2}
         </p>
         <div className="solutions-intake-actions">
           <Link to="/health-questionnaire" className="consult-card-btn">{t.intakeBtn}</Link>
-          <Link to={`/legal/health-data?lang=${lang}`} className="solutions-intake-link">{t.intakeLegal}</Link>
+          <Link to={lang === 'en' ? '/en/legal/health-data' : '/legal/health-data'} className="solutions-intake-link">{t.intakeLegal}</Link>
         </div>
       </section>
 

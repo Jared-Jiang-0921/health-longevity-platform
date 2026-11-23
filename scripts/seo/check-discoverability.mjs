@@ -20,11 +20,14 @@ import {
 } from '../../src/lib/newsArticleSeo.js'
 import { buildLlmsTxt, buildNewsAtom, buildSitemapXml } from '../../src/lib/seoPublicFiles.js'
 import {
-  apexRedirectRules,
   documentStatus,
   netlifySpaRedirects,
   spaRewriteRules,
+  vercelPublicRedirectRules,
 } from '../../src/lib/sitePaths.js'
+import { NEWS_LEGACY_SLUGS } from '../../src/data/newsLegacySlugs.js'
+import { BAIDU_SITE_VERIFICATION } from '../../src/data/baiduSiteVerification.js'
+import { newsLegacyLocation } from '../../src/lib/newsSlug.js'
 import { getLongevityNewsArticles } from '../../src/data/longevityNewsArticles.js'
 import { renderNewsArticleHtml, renderRouteHtml, renderSpaShellHtml, staticNewsCards } from './prerender.mjs'
 
@@ -67,8 +70,8 @@ expect(llms.includes(PUBLIC_SUMMARY_UPDATED), 'llms.txt date is the summary date
 expect(llms.includes('https://www.healthlongevity.cn/longevity-news/ln-static-1'), 'llms.txt lists the stable article URL')
 expect(llms.includes(`https://www.healthlongevity.cn/longevity-news/${thin.id}`), 'llms.txt lists the title-only card')
 expect(llms.includes('https://www.healthlongevity.cn/en/longevity-news/ln-static-1'), 'llms.txt lists the English permalink')
-expect(llms.includes('healthlongevityplatform.vercel.app'), 'llms.txt still names the parallel host')
-expect(llms.includes('并行入口') && llms.includes('https://www.healthlongevity.cn/'), 'llms.txt tells citations to use the .cn host')
+expect(!llms.includes('healthlongevityplatform.vercel.app') && !llms.includes('并行入口'), 'llms.txt does not advertise a parallel host')
+expect(llms.includes('https://www.healthlongevity.cn/'), 'llms.txt tells citations to use the .cn host')
 expect(!llms.includes('https://www.healthlongevity.cn/login'), 'llms.txt does not list login')
 expect(!llms.includes('https://www.healthlongevity.cn/register'), 'llms.txt does not list register')
 expect(llms.includes('/longevity-news/feed.xml'), 'llms.txt lists the news feed')
@@ -92,6 +95,7 @@ expect(thinArticle.description && thinArticle.description !== '只有标题', 'J
 expect(thinArticle.description.includes('不转载微信公众号全文'), 'JSON-LD description is not the WeChat post')
 const thinBody = thinHtml.slice(thinHtml.indexOf('<body'), thinHtml.indexOf('<script type="module"'))
 expect(thinBody.includes('不转载微信公众号全文'), 'crawler-visible body contains the abstract')
+expect(thinBody.includes('三层') && thinBody.includes('/methodology'), 'thin card explains how to read it and links the method page')
 
 const newsHtml = renderRouteHtml(template, { lang: 'zh', pathname: '/longevity-news', newsCards: [...cards, thin] })
 expect(newsHtml.includes('href="https://www.healthlongevity.cn/longevity-news/ln-static-1"'), 'news index links to the stable article')
@@ -102,6 +106,13 @@ expect(newsHtml.includes('application/atom+xml'), 'news index links the atom fee
 
 const productsHtml = renderRouteHtml(template, { lang: 'zh', pathname: '/products' })
 expect(productsHtml.includes('不是公开可抓取语料'), 'product overview says items are not a public corpus')
+for (const evidencePath of ['/products/evidence/nmn', '/products/evidence/omega-3', '/products/evidence/vitamin-d', '/products/evidence/creatine', '/products/evidence/magnesium']) {
+  expect(productsHtml.includes(evidencePath), `product overview links ${evidencePath}`)
+}
+const homeHtml = renderRouteHtml(template, { lang: 'zh', pathname: '/' })
+expect(homeHtml.includes('/products/evidence/nmn') && homeHtml.includes('/products/evidence/omega-3') && homeHtml.includes('/products/evidence/vitamin-d') && homeHtml.includes('/products/evidence/creatine') && homeHtml.includes('/products/evidence/magnesium'), 'home links every evidence page')
+expect(!homeHtml.includes('hreflang="ar"') && !homeHtml.includes('/ar/'), 'home does not publish an Arabic URL')
+expect(BAIDU_SITE_VERIFICATION === '' && !homeHtml.includes('baidu-site-verification'), 'baidu verification meta stays empty until a real code is set')
 expect(productsHtml.includes('rel="canonical" href="https://www.healthlongevity.cn/products"'), 'product overview canonical is the overview')
 const shell = renderSpaShellHtml(template, { lang: 'zh' })
 expect(shell.includes('noindex,nofollow'), 'spa shell is noindex')
@@ -122,6 +133,7 @@ expect(!/\d+\s*mg/i.test(evidenceHtml) && !evidenceHtml.includes('毫克'), 'pil
 expect(evidenceHtml.includes('不提供用量'), 'pilot page says it gives no dose')
 expect(evidenceHtml.includes('39531138') && evidenceHtml.includes('samr.gov.cn'), 'pilot cites the meta-analysis and the SAMR reply')
 expect(evidenceHtml.includes('/longevity-news/ln-static-3'), 'pilot links the existing NMN note')
+expect(evidenceHtml.includes('/products/evidence/omega-3') && evidenceHtml.includes('/products/evidence/vitamin-d') && evidenceHtml.includes('/products/evidence/creatine') && evidenceHtml.includes('/products/evidence/magnesium'), 'NMN page links the other four evidence pages')
 expect(evidenceText.length > 1800, 'pilot body is substantial')
 const evidenceEn = renderRouteHtml(template, { lang: 'en', pathname: NMN_EVIDENCE_PATH })
 expect(evidenceEn.includes('rel="canonical" href="https://www.healthlongevity.cn/en/products/evidence/nmn"'), 'english pilot has its own canonical')
@@ -185,7 +197,10 @@ expect(creatineHtml.includes('/products/evidence/nmn') && creatineHtml.includes(
 expect(creatineText.length > 1800, 'creatine body is substantial')
 expect(renderRouteHtml(template, { lang: 'zh', pathname: '/products/creatine' }) == null, 'creatine product slug is not prerendered')
 expect(xml.includes('<loc>https://www.healthlongevity.cn/products/evidence/creatine</loc>'), 'sitemap lists the creatine page')
-expect(!xml.includes('<loc>https://www.healthlongevity.cn/en/products/evidence/creatine</loc>'), 'sitemap does not add a separate English loc')
+expect(xml.includes('<loc>https://www.healthlongevity.cn/en/products/evidence/creatine</loc>'), 'sitemap lists the English creatine page as its own loc')
+expect(xml.includes('<loc>https://www.healthlongevity.cn/en/</loc>') || xml.includes('<loc>https://www.healthlongevity.cn/en/</loc>'), 'sitemap lists the English home')
+expect(xml.includes('<loc>https://www.healthlongevity.cn/consult</loc>') && xml.includes('<loc>https://www.healthlongevity.cn/en/consult</loc>'), 'consult explanation is listed in both languages')
+expect(!xml.includes('<loc>https://www.healthlongevity.cn/login</loc>'), 'login stays out of the sitemap')
 expect(!xml.includes('/products/creatine<'), 'sitemap does not list a creatine product URL')
 expect(llms.includes('https://www.healthlongevity.cn/products/evidence/creatine'), 'llms.txt names the creatine page')
 const creatineEn = renderRouteHtml(template, { lang: 'en', pathname: CREATINE_EVIDENCE_PATH })
@@ -208,7 +223,7 @@ expect(magnesiumHtml.includes('/products/evidence/nmn') && magnesiumHtml.include
 expect(magnesiumText.length > 1800, 'magnesium body is substantial')
 expect(renderRouteHtml(template, { lang: 'zh', pathname: '/products/magnesium' }) == null, 'magnesium product slug is not prerendered')
 expect(xml.includes('<loc>https://www.healthlongevity.cn/products/evidence/magnesium</loc>'), 'sitemap lists the magnesium page')
-expect(!xml.includes('<loc>https://www.healthlongevity.cn/en/products/evidence/magnesium</loc>'), 'sitemap does not add a separate English loc for magnesium')
+expect(xml.includes('<loc>https://www.healthlongevity.cn/en/products/evidence/magnesium</loc>'), 'sitemap lists the English magnesium page as its own loc')
 expect(!xml.includes('/products/magnesium<'), 'sitemap does not list a magnesium product URL')
 expect(llms.includes('https://www.healthlongevity.cn/products/evidence/magnesium'), 'llms.txt names the magnesium page')
 const magnesiumEn = renderRouteHtml(template, { lang: 'en', pathname: MAGNESIUM_EVIDENCE_PATH })
@@ -225,13 +240,23 @@ function visibleText(html) {
 const faqHtml = renderRouteHtml(template, { lang: 'zh', pathname: '/faq' })
 const methodHtml = renderRouteHtml(template, { lang: 'zh', pathname: '/methodology' })
 const aboutHtml = renderRouteHtml(template, { lang: 'zh', pathname: '/about' })
+expect(aboutHtml.includes('Longevity International Limited') && !aboutHtml.includes('Longvity'), 'about page uses the corrected English company name')
+expect(!aboutHtml.includes('"@type":"Thing"'), 'about JSON-LD does not use a bare Thing node')
+const consultHtml = renderRouteHtml(template, { lang: 'zh', pathname: '/consult' })
+const consultEn = renderRouteHtml(template, { lang: 'en', pathname: '/consult' })
+expect(consultHtml.includes('适合谁') && consultHtml.includes('怎么进行') && consultHtml.includes('不登录也能读到'), 'consult explanation is in the public HTML')
+expect(consultEn.includes('Who it is for') && consultEn.includes('How it works'), 'english consult explanation is public')
+expect(consultHtml.includes('href="https://www.healthlongevity.cn/consult"') || consultHtml.includes('AI 健康长寿咨询'), 'consult page names itself')
+const homeEn = renderRouteHtml(template, { lang: 'en', pathname: '/' })
+expect(homeHtml.includes('href="https://www.healthlongevity.cn/consult"'), 'chinese home prerender links to consult')
+expect(homeEn.includes('href="https://www.healthlongevity.cn/en/consult"'), 'english home prerender links to consult')
 expect(faqHtml.includes('rel="canonical" href="https://www.healthlongevity.cn/faq"'), 'faq canonical')
 expect(faqHtml.includes('content="index,follow,max-snippet:-1,max-image-preview:large"'), 'faq is index,follow')
 expect(faqHtml.includes('"@type":"FAQPage"') && !faqHtml.includes('"author"'), 'faq uses FAQPage and invents no author')
 expect(!/name="robots" content="[^"]*noindex/.test(faqHtml) && !/\d+\s*mg/i.test(faqHtml) && !faqHtml.includes('毫克'), 'faq robots stay indexable and the page gives no dose')
 expect(visibleText(faqHtml).length > 800, 'faq body is citeable')
 expect(methodHtml.includes('rel="canonical" href="https://www.healthlongevity.cn/methodology"'), 'methodology canonical')
-expect(methodHtml.includes('"@type":"WebPage"') && !methodHtml.includes('FAQPage'), 'methodology stays a WebPage')
+expect(methodHtml.includes('"@type":"MedicalWebPage"') && !methodHtml.includes('FAQPage') && !methodHtml.includes('"@type":"Thing"'), 'methodology is a MedicalWebPage without a bare Thing')
 expect(!methodHtml.includes('"author"') && !methodHtml.includes('reviewedBy'), 'methodology invents no author or reviewer')
 expect(methodHtml.includes('/products/evidence/nmn') && methodHtml.includes('PMID'), 'methodology points at the NMN page and the PMID habit')
 expect(!/\d+\s*mg/i.test(methodHtml) && !methodHtml.includes('毫克'), 'methodology gives no dose')
@@ -287,7 +312,7 @@ expect(svg.includes('<svg') && svg.includes('image'), 'favicon.svg embeds the lo
 
 const vercel = JSON.parse(fs.readFileSync(new URL('../../vercel.json', import.meta.url), 'utf8'))
 expect(JSON.stringify(vercel.rewrites) === JSON.stringify(spaRewriteRules()), 'vercel rewrites match the spa list')
-expect(JSON.stringify(vercel.redirects) === JSON.stringify(apexRedirectRules()), 'apex redirect is host-only 301')
+expect(JSON.stringify(vercel.redirects) === JSON.stringify(vercelPublicRedirectRules()), 'vercel redirects match canonical rules plus news slug redirects')
 expect(!JSON.stringify(vercel.rewrites).includes('(?!api/)'), 'blanket homepage rewrite is gone')
 expect(!vercel.rewrites.some((rule) => rule.source.includes('longevity-news')), 'unknown news ids are not rewritten to the homepage')
 const require = createRequire(import.meta.url)
@@ -301,7 +326,9 @@ for (const rule of vercel.rewrites) {
   try { pathToRegexp(rule.source) } catch { compiled = false }
   expect(compiled, `vercel source compiles: ${rule.source}`)
 }
-expect(vercel.redirects.every((rule) => rule.statusCode === 301 && rule.has?.[0]?.value === 'healthlongevity.cn'), 'redirect is 301 for the apex host only')
+expect(vercel.redirects.every((rule) => rule.statusCode === 301), 'canonical redirects are 301')
+expect(vercel.redirects.some((rule) => rule.has?.[0]?.value === 'healthlongevityplatform.vercel.app'), 'vercel.app host redirects to the canonical site')
+expect(vercel.redirects.some((rule) => rule.source === '/ar'), 'arabic root redirects')
 expect(matches('/:path*', '/about') && matches('/:path*', '/'), 'apex redirect pattern covers / and nested paths')
 expect(!vercel.rewrites.some((rule) => matches(rule.source, '/longevity-news/not-a-real-id')), 'no rewrite matches an unknown article')
 expect(!vercel.rewrites.some((rule) => matches(rule.source, '/en/not-a-page')), 'no rewrite matches an unknown english page')
@@ -331,7 +358,21 @@ expect(evidenceRedirect > 0 && evidenceRedirect < productWildcard, 'netlify serv
 expect(evidenceEnRedirect > 0 && evidenceEnRedirect < productEnWildcard, 'netlify serves the english evidence file before the product shell')
 
 const nginx = fs.readFileSync(new URL('../../deploy/nginx-healthlongevity.conf.example', import.meta.url), 'utf8')
-expect(nginx.includes('return 301 https://www.healthlongevity.cn$request_uri;'), 'nginx example 301 keeps path and query')
+expect(nginx.includes('return 301 https://www.healthlongevity.cn$request_uri;'), 'nginx example still sends other apex URLs to www')
+expect(nginx.includes('location = /ar { return 301 https://www.healthlongevity.cn/; }'), 'apex arabic goes straight to the Chinese home')
+expect(nginx.includes('location ~ ^/ar/(.+)$ { return 301 https://www.healthlongevity.cn/$1; }'), 'apex arabic paths skip the www /ar hop')
+expect(nginx.includes('include /opt/health-longevity-platform/deploy/nginx-news-slug-redirects.conf;'), 'nginx example includes the news slug redirects')
+const legacyId = 'upload-03c3a6ac-bcaa-4fb9-9779-122e5f0e8ee0'
+const legacySlug = NEWS_LEGACY_SLUGS[legacyId]
+expect(newsLegacyLocation(`/longevity-news/${legacyId}`) === `/longevity-news/${legacySlug}`, 'old upload path redirects to the readable slug')
+expect(newsLegacyLocation(`/en/longevity-news/${legacyId}`) === `/longevity-news/${legacySlug}`, 'english upload alias redirects to the Chinese slug')
+const mappedCard = toNewsSearchCard({ id: legacyId, title: '运动饮食认知', summary: '来自公众号' })
+const mappedXml = buildSitemapXml({ extra: newsSitemapEntries([mappedCard]) })
+expect(mappedXml.includes(`<loc>https://www.healthlongevity.cn/longevity-news/${legacySlug}</loc>`), 'sitemap uses the readable slug')
+expect(!mappedXml.includes(`/longevity-news/${legacyId}`), 'sitemap drops the upload id')
+expect(!mappedXml.includes(`/en/longevity-news/${legacySlug}`), 'chinese-only upload does not gain an English loc')
+expect(Object.keys(NEWS_LEGACY_SLUGS).length === 139, 'slug table covers the upload cards')
+expect(!llms.includes('阿拉伯语') && !xml.includes('/ar/'), 'arabic is not a public language')
 expect(nginx.includes('error_page 404 /404.html;'), 'nginx example uses a real 404')
 expect(!nginx.includes('try_files $uri $uri/index.html $uri/ /index.html'), 'nginx example does not fall unknown paths back to the homepage')
 expect(!nginx.includes('try_files $uri $uri/index.html /index.html'), 'nginx example does not fall product or course paths back to the homepage')

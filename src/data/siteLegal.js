@@ -17,7 +17,7 @@ export const SITE_LEGAL = {
    * 例：「[拟注册主体名称]（筹备中）」或「某某（自然人运营，主体待定）」
    */
   /** 中英文对外法律主体名称（与注册信息一致者为准） */
-  legalEntityName: '恒悦生国际有限公司（Longvity International Limited）',
+  legalEntityName: '恒悦生国际有限公司（Longevity International Limited）',
   /** 用户联系邮箱 */
   contactEmail: 'jiangyong_gpt@outlook.com',
   /** 可选：注册地址或办公地址（留空则法律页不展示地址行） */

@@ -11,7 +11,6 @@ import { MAGNESIUM_EVIDENCE_PATH, getMagnesiumEvidenceFaqs } from './magnesiumEv
 import { getPublicFaqPage } from './publicFaq.js'
 import { getLongevityNewsModuleCopy } from './longevityNewsModuleI18n.js'
 import {
-  PUBLIC_LIVE_ORIGIN,
   PUBLIC_SUMMARY_UPDATED,
   SITE_ORIGIN,
   absoluteUrl,
@@ -93,6 +92,34 @@ export function getSolutionsPublicCopy(lang) {
   return { ...copy[key], faqHeading: getFaqHeading(key), faqs: getPageFaqs('/solutions', key) }
 }
 
+/** 咨询说明页可公开抓取。对话本身仍需登录，这段文字不要求登录。 */
+export function getConsultPublicCopy(lang) {
+  const key = pickLang(lang)
+  const solutions = getSolutionsPublicCopy(key)
+  if (key === 'en') {
+    return {
+      heading: 'AI longevity consult',
+      lead: 'This page explains the consult. Search engines can read it without an account. The conversation itself asks you to sign in.',
+      who: 'Self-care is for signed-in members managing everyday health. Professional consult and the TCM wellness consult are for Premium members, and the professional one is meant for people with a medical background.',
+      process: 'You choose a mode, optionally attach images, PDFs, or public links, and the reply stays inside that mode’s sources. A public link is read only after this site extracts the text. The model is not asked to guess from the URL alone.',
+      boundary: `${solutions.consultLead} ${solutions.medicalDisclaimer}`,
+      general: solutions.general,
+      professional: solutions.professional,
+      tcm: solutions.tcm,
+    }
+  }
+  return {
+    heading: 'AI 健康长寿咨询',
+    lead: '本页说明咨询能做什么。搜索引擎不登录也能读到这些话。真正的对话仍需要登录。',
+    who: '自我健康促进面向已登录会员的日常管理。专业咨询和中医养生保健咨询面向高级会员；专业咨询还面向有医学背景的使用者。',
+    process: '先选择一种咨询，可以附上图片、PDF，或粘贴公开网页和 PDF 链接。链接会先由本站抽出正文，再交给模型，不会只凭网址猜测。回答只走该模式自己的资料范围。',
+    boundary: `${solutions.consultLead}${solutions.medicalDisclaimer}`,
+    general: solutions.general,
+    professional: solutions.professional,
+    tcm: solutions.tcm,
+  }
+}
+
 const SOLUTION_FAQS = {
   zh: [
     {
@@ -148,7 +175,7 @@ const ABOUT_FAQS = {
     },
     {
       q: '规范网址是哪一个？',
-      a: `引用请使用 ${SITE_ORIGIN}/ 。${PUBLIC_LIVE_ORIGIN}/ 是同一套内容的并行入口，不要把它当作另一份可引用站点。关于本站的说明见 ${SITE_ORIGIN}/about ，最近更新日期为 ${PUBLIC_SUMMARY_UPDATED}。`,
+      a: `引用请使用 ${SITE_ORIGIN}/ 。这是唯一的规范站点。关于本站的说明见 ${SITE_ORIGIN}/about ，最近更新日期为 ${PUBLIC_SUMMARY_UPDATED}。`,
     },
   ],
   en: [
@@ -166,7 +193,7 @@ const ABOUT_FAQS = {
     },
     {
       q: 'Which URL should be cited?',
-      a: `Cite ${SITE_ORIGIN}/ . ${PUBLIC_LIVE_ORIGIN}/ serves the same content as a parallel entry; do not cite it as a separate site. The about page is ${SITE_ORIGIN}/about and was last updated ${PUBLIC_SUMMARY_UPDATED}.`,
+      a: `Cite ${SITE_ORIGIN}/ . That is the only canonical site. The about page is ${SITE_ORIGIN}/about and was last updated ${PUBLIC_SUMMARY_UPDATED}.`,
     },
   ],
 }
@@ -220,8 +247,14 @@ export const PUBLIC_CRAWL_NAV = [
   { path: '/faq', label: { zh: '常见问题', en: 'Questions' } },
   { path: '/methodology', label: { zh: '证据核对', en: 'Methodology' } },
   { path: '/solutions', label: { zh: 'AI长寿方案师', en: 'AI Coach' } },
+  { path: '/consult', label: { zh: 'AI咨询', en: 'Consult' } },
   { path: '/health-skills', label: { zh: '长寿知识技能', en: 'Health Skills' } },
   { path: '/products', label: { zh: '产品证据库', en: 'Evidence Library' } },
+  { path: '/products/evidence/nmn', label: { zh: 'NMN / NR', en: 'NMN / NR' } },
+  { path: '/products/evidence/omega-3', label: { zh: 'EPA/DHA', en: 'EPA/DHA' } },
+  { path: '/products/evidence/vitamin-d', label: { zh: '维生素 D', en: 'Vitamin D' } },
+  { path: '/products/evidence/creatine', label: { zh: '肌酸', en: 'Creatine' } },
+  { path: '/products/evidence/magnesium', label: { zh: '镁', en: 'Magnesium' } },
   { path: '/tcm-prevention', label: { zh: '中医治未病', en: 'Preventive TCM' } },
   { path: '/longevity-news', label: { zh: '前沿医学资讯', en: 'Medical Insights' } },
   { path: '/disclaimer', label: { zh: '免责声明', en: 'Disclaimer' } },
@@ -237,7 +270,6 @@ export function getAboutPage(lang) {
   }))
   const urls = [
     { label: key === 'zh' ? '规范站点' : 'Canonical site', href: `${SITE_ORIGIN}/`, path: '/' },
-    { label: key === 'zh' ? '公开访问' : 'Public deployment', href: `${PUBLIC_LIVE_ORIGIN}/` },
     { label: key === 'zh' ? '关于本站' : 'About this site', href: absoluteUrl(key, '/about'), path: '/about' },
     { label: key === 'zh' ? '常见问题' : 'Questions', href: absoluteUrl(key, '/faq'), path: '/faq' },
     { label: key === 'zh' ? '证据核对说明' : 'How evidence is checked', href: absoluteUrl(key, '/methodology'), path: '/methodology' },
@@ -316,7 +348,7 @@ export function getAboutPage(lang) {
           id: 'urls',
           heading: '站点地址',
           paragraphs: [
-            `请优先引用规范站点 ${SITE_ORIGIN}/ 。${PUBLIC_LIVE_ORIGIN}/ 是同一套内容的并行入口，引用时仍使用 .cn，不要把它当成另一份站点。`,
+            `请引用规范站点 ${SITE_ORIGIN}/ 。不要把其他域名上的副本写成另一份站点。`,
           ],
           urls,
         },
@@ -391,7 +423,7 @@ export function getAboutPage(lang) {
           id: 'urls',
           heading: 'Site URLs',
           paragraphs: [
-            `Cite ${SITE_ORIGIN}/ . ${PUBLIC_LIVE_ORIGIN}/ is the same content on a parallel entry. Citations should still use the .cn host, not a second site.`,
+            `Cite ${SITE_ORIGIN}/ . Do not treat a copy on another hostname as a second site.`,
           ],
           urls,
         },

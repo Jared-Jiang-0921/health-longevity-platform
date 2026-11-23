@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, Navigate, useParams } from 'react-router-dom'
 import { useLocale } from '../context/LocaleContext'
 import { getLongevityNewsArticles } from '../data/longevityNewsArticles'
 import { getLongevityNewsModuleCopy } from '../data/longevityNewsModuleI18n'
@@ -10,8 +10,10 @@ import {
   newsArticleJsonLd,
   newsArticleRouterPath,
   newsArticleSeoFields,
+  newsRelatedLinks,
   presentNewsArticle,
 } from '../lib/newsArticleSeo'
+import { newsPublicId } from '../lib/newsSlug'
 import { applySeoToDocument } from '../lib/seoDocument'
 import './LongevityNews.css'
 
@@ -59,19 +61,23 @@ export default function LongevityNewsArticle() {
     }
   }, [])
 
-  const card = STATIC_CARDS.find((item) => item.id === articleId)
-    || uploads.map(uploadCard).find((item) => item.id === articleId)
+  const allCards = [...STATIC_CARDS, ...uploads.map(uploadCard)]
+  const card = allCards.find((item) => item.id === articleId || newsPublicId(item.id) === articleId)
+  const publicId = card ? newsPublicId(card.id) : ''
   const view = card ? presentNewsArticle(card, lang) : null
   const published = Boolean(view && isPublicNewsCard(view, lang) && !(lang !== 'zh' && view.zhOnly))
 
   useEffect(() => {
-    const known = Boolean(STATIC_CARDS.find((item) => item.id === articleId) || (ready && card))
+    const known = Boolean(
+      STATIC_CARDS.find((item) => item.id === articleId || newsPublicId(item.id) === articleId)
+      || (ready && card),
+    )
     const missing = ready && !card
     if (!known && !missing) return
     if (view && published) {
       applySeoToDocument({
         lang,
-        pathname: newsArticleRouterPath(view.id),
+        pathname: newsArticleRouterPath(publicId),
         seo: newsArticleSeoFields(view, lang),
         jsonLd: newsArticleJsonLd(view, lang),
         alternates: newsArticleAlternates(card),
@@ -94,7 +100,13 @@ export default function LongevityNewsArticle() {
       alternates: [],
       replaceUnmanaged: true,
     })
-  }, [articleId, card, copy.missing, lang, mod.lead, ready, published, view])
+  }, [articleId, card, copy.missing, lang, mod.lead, publicId, ready, published, view])
+
+  if (card && publicId && publicId !== articleId) {
+    return <Navigate to={newsArticleRouterPath(publicId)} replace />
+  }
+
+  const related = view && published ? newsRelatedLinks(view, lang) : []
 
   return (
     <article className="page-longevity-news ln-essay">
@@ -114,6 +126,16 @@ export default function LongevityNewsArticle() {
                   <h2>{copy.takeaways}</h2>
                   <ul>
                     {view.takeaways.filter(Boolean).map((line) => <li key={line}>{line}</li>)}
+                  </ul>
+                </>
+              ) : null}
+              {related.length ? (
+                <>
+                  <h2>{lang === 'en' ? 'Related pages' : '相关页面'}</h2>
+                  <ul>
+                    {related.map((item) => (
+                      <li key={item.path}><Link to={item.path}>{item.label}</Link></li>
+                    ))}
                   </ul>
                 </>
               ) : null}

@@ -18,11 +18,20 @@
 #   3001 — AI 健康咨询模块（仅 /api/ai/*，需 SSE 关缓冲）
 #   3002 — consult-mcp
 
-# 裸域名整站跳到 www，路径和查询串原样保留（$request_uri）。
+# 裸域名跳到 www。阿语旧地址在这一跳里直接落到中文规范页，不再先落到 www 的 /ar。
 server {
     listen 80;
     listen [::]:80;
     server_name healthlongevity.cn;
+
+    location = /ar { return 301 https://www.healthlongevity.cn/; }
+    location = /ar/ { return 301 https://www.healthlongevity.cn/; }
+    location ~ ^/ar/(.+)/$ { return 301 https://www.healthlongevity.cn/$1; }
+    location ~ ^/ar/(.+)$ { return 301 https://www.healthlongevity.cn/$1; }
+
+    # 旧资讯 upload- 地址直接到最终中文 slug。文件不在仓库监听的配置里，要和本示例一起拷到机器上。
+    include /opt/health-longevity-platform/deploy/nginx-news-slug-redirects.conf;
+
     return 301 https://www.healthlongevity.cn$request_uri;
 }
 
@@ -182,13 +191,48 @@ server {
         add_header Cache-Control "no-store" always;
     }
 
-    # 阿拉伯语版已移除，旧链接永久跳到中文同一路径
-    location = /ar {
-        return 301 /;
+    # 阿拉伯语已停用。尾部斜杠和 ?lang= 也在这里收成规范地址。接口和静态资源不改写。
+    location = /ar { return 301 /; }
+    location = /ar/ { return 301 /; }
+    location ~ ^/ar/(.+)/$ { return 301 /$1; }
+    location ~ ^/ar/(.+)$ { return 301 /$1; }
+
+    include /opt/health-longevity-platform/deploy/nginx-news-slug-redirects.conf;
+
+    set $seo_lang "";
+    if ($arg_lang ~* "^(en|en-us|en_us)$") { set $seo_lang en; }
+    if ($arg_lang ~* "^(zh|zh-cn|zh-hans|ar|ar-ae)$") { set $seo_lang zh; }
+    if ($uri ~ "^/(api|assets|images|mcp|\\.well-known)(/|$)") { set $seo_lang ""; }
+
+    if ($seo_lang = en) {
+        rewrite ^/ar/(.+)/$ /en/$1? permanent;
+        rewrite ^/ar/(.+)$ /en/$1? permanent;
+        rewrite ^/ar/?$ /en/? permanent;
+        rewrite ^/en/(.+)/$ /en/$1? permanent;
+        rewrite ^/en/?$ /en/? permanent;
+        rewrite ^/(.+)/$ /en/$1? permanent;
+        rewrite ^/?$ /en/? permanent;
+        rewrite ^/en/(.+)$ /en/$1? permanent;
+        rewrite ^/(.+)$ /en/$1? permanent;
+    }
+    if ($seo_lang = zh) {
+        rewrite ^/ar/(.+)/$ /$1? permanent;
+        rewrite ^/ar/(.+)$ /$1? permanent;
+        rewrite ^/ar/?$ /? permanent;
+        rewrite ^/en/(.+)/$ /$1? permanent;
+        rewrite ^/en/?$ /? permanent;
+        rewrite ^/(.+)/$ /$1? permanent;
+        rewrite ^/?$ /? permanent;
+        rewrite ^/en/(.+)$ /$1? permanent;
+        rewrite ^/(.+)$ /$1? permanent;
     }
 
-    location ^~ /ar/ {
-        rewrite ^/ar/(.*)$ /$1 permanent;
+    location ~ ^/en/.+/$ {
+        rewrite ^(/en/.+)/$ $1 permanent;
+    }
+
+    location ~ ^/(?!en/?$).+/$ {
+        rewrite ^/(.+)/$ /$1 permanent;
     }
 
     # 动态或登录后路径才回退到 noindex 的前端壳，不回退到首页。

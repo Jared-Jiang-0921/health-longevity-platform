@@ -1,6 +1,7 @@
-import { PUBLIC_LIVE_ORIGIN, PUBLIC_SUMMARY_UPDATED, SEO_LANGS, SEO_PAGES, SITE_ORIGIN, absoluteUrl } from '../data/seo.js'
+import { PUBLIC_SUMMARY_UPDATED, SEO_LANGS, SEO_PAGES, SITE_ORIGIN, absoluteUrl } from '../data/seo.js'
 import { getAboutPage, getPageFaqs } from '../data/publicSummary.js'
 import { articleLanguages, newsArticleRouterPath, presentNewsArticle } from './newsArticleSeo.js'
+import { newsPublicId } from './newsSlug.js'
 
 function escapeXml(value) {
   return String(value || '')
@@ -24,11 +25,11 @@ function hreflangLinks(path, langs) {
   return lines
 }
 
-function urlEntry({ path, lastmod, changefreq, priority, langs }) {
-  const loc = absoluteUrl('zh', path)
+function urlEntry({ path, lang = 'zh', lastmod, changefreq, priority, langs }) {
+  const loc = absoluteUrl(lang, path)
   const last = lastmod ? `    <lastmod>${lastmod}</lastmod>\n` : ''
   return `  <url>
-    <loc>${loc}</loc>
+    <loc>${escapeXml(loc)}</loc>
 ${last}    <changefreq>${changefreq}</changefreq>
     <priority>${priority}</priority>
 ${hreflangLinks(path, langs).join('\n')}
@@ -38,15 +39,20 @@ ${hreflangLinks(path, langs).join('\n')}
 export function buildSitemapXml(options = {}) {
   const extra = Array.isArray(options.extra) ? options.extra : []
   const newsLastmod = options.newsLastmod || ''
-  const pages = SEO_PAGES.filter((page) => page.index).map((page) => urlEntry({
+  const pages = SEO_PAGES.filter((page) => page.index).flatMap((page) => ['zh', 'en'].map((lang) => urlEntry({
     path: page.path,
+    lang,
+    langs: ['zh', 'en'],
     lastmod: page.path === '/longevity-news' && newsLastmod
       ? newsLastmod
       : (page.lastmod || PUBLIC_SUMMARY_UPDATED),
     changefreq: page.changefreq,
     priority: page.priority,
-  }))
-  const articles = extra.map((item) => urlEntry(item))
+  })))
+  const articles = extra.flatMap((item) => {
+    const langs = Array.isArray(item.langs) && item.langs.length ? item.langs : ['zh']
+    return langs.map((lang) => urlEntry({ ...item, lang, langs }))
+  })
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
@@ -141,15 +147,16 @@ export function buildLlmsTxt({ articles = [] } = {}) {
   lines.push('## 关于本文件')
   lines.push('')
   lines.push('llms.txt 只是给程序阅读的公开目录，方便找到已经存在的页面。它不是百度或任何搜索引擎的收录承诺，也不提高排名。')
-  lines.push(`引用请使用 ${SITE_ORIGIN}/ 。${PUBLIC_LIVE_ORIGIN}/ 若仍可访问，是同一套内容的并行入口，不要把它当作另一份可引用站点。`)
+  lines.push(`引用请使用 ${SITE_ORIGIN}/ 。这是唯一的规范站点，不要把其他域名上的副本写成另一份可引用站点。`)
   lines.push('')
   const cited = []
   for (const card of articles) {
     const langs = articleLanguages(card)
     if (!langs.includes('zh')) continue
     const view = presentNewsArticle(card, 'zh')
-    const en = langs.includes('en') ? `；英文 ${absoluteUrl('en', newsArticleRouterPath(view.id))}` : ''
-    cited.push(`- ${view.title}${view.publishedAt ? ` (${view.publishedAt})` : ''}: ${absoluteUrl('zh', newsArticleRouterPath(view.id))}${en}`)
+    const permalink = newsArticleRouterPath(newsPublicId(view.id))
+    const en = langs.includes('en') ? `；英文 ${absoluteUrl('en', permalink)}` : ''
+    cited.push(`- ${view.title}${view.publishedAt ? ` (${view.publishedAt})` : ''}: ${absoluteUrl('zh', permalink)}${en}`)
   }
   if (cited.length) {
     lines.push('## 可单独引用的资讯卡片')
@@ -171,10 +178,10 @@ export function buildNewsAtom({ articles = [] } = {}) {
     const langs = articleLanguages(card)
     if (!langs.includes('zh')) continue
     const view = presentNewsArticle(card, 'zh')
-    const href = absoluteUrl('zh', newsArticleRouterPath(view.id))
+    const href = absoluteUrl('zh', newsArticleRouterPath(newsPublicId(view.id)))
     const when = view.publishedAt || updated
     const alternates = langs.includes('en')
-      ? `\n      <link rel="alternate" hreflang="en" href="${escapeXml(absoluteUrl('en', newsArticleRouterPath(view.id)))}"/>`
+      ? `\n      <link rel="alternate" hreflang="en" href="${escapeXml(absoluteUrl('en', newsArticleRouterPath(newsPublicId(view.id))))}"/>`
       : ''
     entries.push(`    <entry>
       <title>${escapeXml(view.title)}</title>

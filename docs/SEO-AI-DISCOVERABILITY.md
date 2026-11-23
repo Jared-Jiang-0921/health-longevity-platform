@@ -13,7 +13,7 @@
 - 每条有标题的公开资讯卡片都有 `/longevity-news/<id>`。已经写了摘要或阅读要点的用原文；只有标题的用本站撰写的教育性说明，并链回来源页。不转载微信公众号全文。栏目页用真正的链接，不用只有井号的锚点。单篇 JSON-LD 的 `url` 是永久链接，`description` 是这段说明。
 - 中文卡片写入 sitemap 的 `<loc>`。已经有英文稿的（`ln-static-1` 到 `ln-static-5`）同时给出英文 alternate。只有中文标题的上传卡片不另做英文译文页。
 - 栏目 `lastmod` 用公开说明日期 `2026-11-22`。已有摘要的单篇仍用条目自己的日期（`ln-static-1` 为 `2026-07-01`）。新补上说明的只有标题的卡片用 `2026-11-22` 和条目日期里较新的一天。
-- 登录和注册仍可打开，但 `noindex`，并且不写入 sitemap 和 `llms.txt` 的可引用网址。引用域名是 `https://www.healthlongevity.cn/`。`https://healthlongevityplatform.vercel.app/` 若仍可访问，只是同一套内容的并行入口。
+- 登录和注册仍可打开，但 `noindex`，并且不写入 sitemap 和 `llms.txt` 的可引用网址。引用域名是 `https://www.healthlongevity.cn/`。`https://healthlongevityplatform.vercel.app/` 应整站 301 到这个规范域名的同一路径，不再作为公开入口。
 - 产品证据库、中医治未病、转化应用机会的公开页是栏目说明。逐条商品、体质辨识和机会条目不是公开可抓取语料，这次不为它们编造永久链接。`/products/…` 等没有预渲染文件的路径回退到 `spa-shell.html`（`noindex`，没有首页 canonical），不再回退到首页。
 - `/favicon.ico`、`/favicon.png`、`/favicon.svg`、`/apple-touch-icon.png` 在示例 Nginx 里用精确匹配按图片提供。资讯 Atom 在 `/longevity-news/feed.xml`。
 - `robots.txt` 仍是 `User-agent: *` / `Allow: /`，GPTBot、OAI-SearchBot、ChatGPT-User、Bytespider、DeepSeek 不单独收紧。这不表示这些系统已经引用本站。
@@ -181,10 +181,12 @@ sudo nginx -t && sudo systemctl reload nginx
 
 ## 百度站长平台
 
-1. 打开 [百度搜索资源平台](https://ziyuan.baidu.com/)，添加站点 `https://www.healthlongevity.cn/`。
-2. 按提示完成验证（HTML 文件、CNAME 或文件验证）。验证文件同样不要被 Disallow 挡住。
-3. 在「普通收录 → 资源提交 → sitemap」填写 `https://www.healthlongevity.cn/sitemap.xml`。站点验证和提交都要站长账号操作，本仓库不能代为完成。上线后再提交一次，让单篇网址进入新地图。
-4. 提交后看抓取诊断。若百度仍抓到旧的登录墙页面，对 `/about` 使用「手动提交」一次，方便它先读到纯文本说明。
-5. 不要提交 `/api/`、账户、支付、问卷或咨询对话。这些路径已在 `robots.txt` 中禁止。
+仓库没有百度账号，也没有替站点完成验证或提交。`robots.txt` 的 `User-agent: *` 已经允许 Baiduspider 抓公开页，并禁止 `/api/`、账户、支付、问卷和咨询对话。不要再加一套只写 `Allow: /` 的 Baiduspider 分组，否则会丢掉这些 Disallow。
+
+1. 打开 [百度搜索资源平台](https://ziyuan.baidu.com/)，用自己的账号添加 `https://www.healthlongevity.cn/`。
+2. 验证用 HTML 标签时，把平台给出的 content 填进 `src/data/baiduSiteVerification.js` 的 `BAIDU_SITE_VERIFICATION`。现在是空字符串，页面上不会出现验证 meta。填上之后要重新构建并发布到自建站点，再回平台点验证。也可以用平台提供的文件验证，文件放在站点根目录，不要写进 `robots.txt` 的 Disallow。
+3. 验证通过后，在「普通收录 → 资源提交 → sitemap」填写 `https://www.healthlongevity.cn/sitemap.xml`。不要使用需要 token 的推送接口。
+4. 旧的 `/longevity-news/upload-…` 要等示例 Nginx 里的 `include` 在机器上生效后，才会 301 到可读 slug。只更新页面文件、不重载这份配置时，旧地址会 404。
+5. 不要提交 `/api/`、账户、支付、问卷或咨询对话。
 
 索引有延迟，提交成功只说明平台收到了 sitemap，不表示当天就会出现在搜索结果里。
