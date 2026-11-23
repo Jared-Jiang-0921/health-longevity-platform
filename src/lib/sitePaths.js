@@ -98,16 +98,7 @@ export function spaRewriteRules() {
   return rules
 }
 
-export function apexRedirectRules() {
-  return [
-    {
-      source: '/:path*',
-      has: [{ type: 'host', value: 'healthlongevity.cn' }],
-      destination: 'https://www.healthlongevity.cn/:path*',
-      statusCode: 301,
-    },
-  ]
-}
+export { vercelRedirectRules as apexRedirectRules } from './siteCanonical.js'
 
 export function netlifySpaRedirects() {
   const rules = []

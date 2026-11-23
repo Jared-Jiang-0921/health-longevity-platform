@@ -4,7 +4,7 @@
 # 不单独收紧 AI 爬虫：公开营销与内容页允许抓取；账户、支付、接口、后台不允许。
 # 机器可读摘要：/llms.txt
 # 关于页面：/about
-# 规范站点 Sitemap 亦适用于同一内容的公开部署。
+# 规范站点只有 https://www.healthlongevity.cn/ 。
 
 User-agent: *
 Allow: /

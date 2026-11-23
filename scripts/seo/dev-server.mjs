@@ -5,6 +5,7 @@ import { splitLocalePath } from '../../src/lib/localePath.js'
 import { pageIndexable } from '../../src/data/seo.js'
 import { newsArticleIdFromPath, newsHubLastmod, newsSitemapEntries } from '../../src/lib/newsArticleSeo.js'
 import { documentStatus, isSpaDocumentPath } from '../../src/lib/sitePaths.js'
+import { canonicalRedirectTarget } from '../../src/lib/siteCanonical.js'
 import { buildLlmsTxt, buildNewsAtom, buildSitemapXml } from '../../src/lib/seoPublicFiles.js'
 import { renderNewsArticleHtml, renderRouteHtml, renderSpaShellHtml, staticNewsCards } from './prerender.mjs'
 
@@ -57,8 +58,23 @@ function fileExists(root, pathname) {
 
 function installRouting(server, { allowDevPreview, fileRoot, localeShell }) {
   server.middlewares.use((req, res, next) => {
-    const pathname = String(req.url || '').split('?')[0]
+    const requestUrl = new URL(req.url || '/', 'http://localhost')
+    const pathname = requestUrl.pathname
     const method = req.method || 'GET'
+    if (method === 'GET' || method === 'HEAD') {
+      const target = canonicalRedirectTarget({
+        host: String(req.headers.host || '').split(':')[0],
+        pathname,
+        search: requestUrl.search,
+      })
+      if (target) {
+        res.statusCode = 301
+        res.setHeader('Location', target)
+        res.setHeader('Cache-Control', 'no-cache')
+        res.end()
+        return
+      }
+    }
     if (method !== 'GET' && method !== 'HEAD') {
       next()
       return

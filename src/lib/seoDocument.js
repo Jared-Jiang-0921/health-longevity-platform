@@ -67,7 +67,7 @@ export function buildJsonLd({ lang, pathname, title, description, canonical }) {
     email: SITE_LEGAL.contactEmail,
   }
   const webPage = {
-    '@type': 'WebPage',
+    '@type': 'MedicalWebPage',
     '@id': `${canonical}#webpage`,
     url: canonical,
     name: title,
@@ -75,10 +75,6 @@ export function buildJsonLd({ lang, pathname, title, description, canonical }) {
     inLanguage,
     isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
     publisher: { '@id': `${SITE_ORIGIN}/#org` },
-    about: {
-      '@type': 'Thing',
-      name: lang === 'zh' ? '健康长寿与预防保健' : 'Health, longevity and prevention',
-    },
     usageInfo,
     disclaimer: usageInfo,
   }

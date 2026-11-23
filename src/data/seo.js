@@ -1,8 +1,6 @@
 /** 爬虫可读 SEO：公开页 meta、hreflang、结构化数据。默认规范域名为 www。 */
 
 export const SITE_ORIGIN = 'https://www.healthlongevity.cn'
-/** 当前公开部署。规范网址仍是 SITE_ORIGIN，此地址只在关于页与 llms.txt 中标明。 */
-export const PUBLIC_LIVE_ORIGIN = 'https://healthlongevityplatform.vercel.app'
 /** 关于页与 AI 摘要的编辑日期（不是每次构建时间）。 */
 export const PUBLIC_SUMMARY_UPDATED = '2026-11-22'
 export const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/images/logo-longevity-atlas.png`
@@ -267,15 +265,15 @@ export const SEO_PAGES = [
     path: '/consult',
     type: 'module',
     changefreq: 'weekly',
-    priority: '0.8',
+    priority: '0.4',
     index: true,
     title: {
       zh: 'AI 健康长寿咨询 | 长健星图',
       en: 'AI Longevity Consult | Longevity Atlas',
     },
     description: {
-      zh: '站内 AI 健康长寿咨询。需登录会员使用，内容仅供教育参考，不替代专业诊疗。',
-      en: 'In-site AI longevity consultation for members. Educational only—not medical care.',
+      zh: '说明 AI 健康长寿咨询的流程、适合谁，以及它不能替代诊疗的边界。说明页可公开阅读；对话本身需要登录。',
+      en: 'What the AI longevity consult does, who it is for, and the limits that keep it from replacing medical care. This explanation is public; the chat itself requires sign-in.',
     },
   },
   {

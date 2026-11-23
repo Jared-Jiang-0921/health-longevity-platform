@@ -9,7 +9,7 @@ import { HOME_MODULES, getHomeCopy } from '../../src/data/homePageContent.js'
 import { getLongevityNewsArticles } from '../../src/data/longevityNewsArticles.js'
 import { LONGEVITY_NEWS_COLUMNS, columnDisplayLabel } from '../../src/data/longevityNewsColumns.js'
 import { getLongevityNewsModuleCopy } from '../../src/data/longevityNewsModuleI18n.js'
-import { PUBLIC_CRAWL_NAV, getAboutPage, getFaqHeading, getSolutionsPublicCopy } from '../../src/data/publicSummary.js'
+import { PUBLIC_CRAWL_NAV, getAboutPage, getConsultPublicCopy, getFaqHeading, getSolutionsPublicCopy } from '../../src/data/publicSummary.js'
 import {
   articleLanguages,
   isPublicNewsCard,
@@ -134,6 +134,25 @@ function aboutBody(lang) {
     <p>${escapeHtml(page.lead)}</p>
     ${sections}
     ${faqBlock(page.faqHeading, page.faqs)}
+  `
+}
+
+function consultBody(lang) {
+  const page = getConsultPublicCopy(lang)
+  return `
+    <article>
+      <h1>${escapeHtml(page.heading)}</h1>
+      <p>${escapeHtml(page.lead)}</p>
+      <h2>${escapeHtml(lang === 'zh' ? '适合谁' : 'Who it is for')}</h2>
+      <p>${escapeHtml(page.who)}</p>
+      <h2>${escapeHtml(lang === 'zh' ? '怎么进行' : 'How it works')}</h2>
+      <p>${escapeHtml(page.process)}</p>
+      <article><h3>${escapeHtml(page.general.title)}</h3><p>${escapeHtml(page.general.body)}</p></article>
+      <article><h3>${escapeHtml(page.professional.title)}</h3><p>${escapeHtml(page.professional.body)}</p></article>
+      <article><h3>${escapeHtml(page.tcm.title)}</h3><p>${escapeHtml(page.tcm.body)}</p></article>
+      <h2>${escapeHtml(lang === 'zh' ? '边界' : 'Limits')}</h2>
+      <p>${escapeHtml(page.boundary)}</p>
+    </article>
   `
 }
 
@@ -426,6 +445,7 @@ function pageBody(page, lang, newsCards) {
   if (page.type === 'home') return homeBody(lang)
   if (page.path === '/about') return aboutBody(lang)
   if (page.path === '/solutions') return solutionsBody(lang)
+  if (page.path === '/consult') return consultBody(lang)
   if (page.path === '/products') return productsBody(lang)
   if (page.path === NMN_EVIDENCE_PATH) return evidenceBody(lang, getNmnEvidencePage(lang), NMN_EVIDENCE_UPDATED)
   if (page.path === OMEGA3_EVIDENCE_PATH) return evidenceBody(lang, getOmega3EvidencePage(lang), OMEGA3_EVIDENCE_UPDATED)

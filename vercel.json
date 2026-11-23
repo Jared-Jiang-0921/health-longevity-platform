@@ -4,6 +4,177 @@
   "framework": "vite",
   "redirects": [
     {
+      "source": "/ar",
+      "destination": "https://www.healthlongevity.cn/",
+      "statusCode": 301
+    },
+    {
+      "source": "/ar/",
+      "destination": "https://www.healthlongevity.cn/",
+      "statusCode": 301
+    },
+    {
+      "source": "/ar/:path*/",
+      "destination": "https://www.healthlongevity.cn/:path*",
+      "statusCode": 301
+    },
+    {
+      "source": "/ar/:path*",
+      "destination": "https://www.healthlongevity.cn/:path*",
+      "statusCode": 301
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "lang",
+          "value": "en"
+        }
+      ],
+      "destination": "https://www.healthlongevity.cn/en/",
+      "statusCode": 301
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "query",
+          "key": "lang",
+          "value": "en"
+        }
+      ],
+      "destination": "https://www.healthlongevity.cn/en/:path*",
+      "statusCode": 301
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "lang",
+          "value": "zh"
+        }
+      ],
+      "destination": "https://www.healthlongevity.cn/",
+      "statusCode": 301
+    },
+    {
+      "source": "/en",
+      "has": [
+        {
+          "type": "query",
+          "key": "lang",
+          "value": "zh"
+        }
+      ],
+      "destination": "https://www.healthlongevity.cn/",
+      "statusCode": 301
+    },
+    {
+      "source": "/en/",
+      "has": [
+        {
+          "type": "query",
+          "key": "lang",
+          "value": "zh"
+        }
+      ],
+      "destination": "https://www.healthlongevity.cn/",
+      "statusCode": 301
+    },
+    {
+      "source": "/en/:path*",
+      "has": [
+        {
+          "type": "query",
+          "key": "lang",
+          "value": "zh"
+        }
+      ],
+      "destination": "https://www.healthlongevity.cn/:path*",
+      "statusCode": 301
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "query",
+          "key": "lang",
+          "value": "zh"
+        }
+      ],
+      "destination": "https://www.healthlongevity.cn/:path*",
+      "statusCode": 301
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "lang",
+          "value": "ar"
+        }
+      ],
+      "destination": "https://www.healthlongevity.cn/",
+      "statusCode": 301
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "query",
+          "key": "lang",
+          "value": "ar"
+        }
+      ],
+      "destination": "https://www.healthlongevity.cn/:path*",
+      "statusCode": 301
+    },
+    {
+      "source": "/en",
+      "destination": "https://www.healthlongevity.cn/en/",
+      "statusCode": 301
+    },
+    {
+      "source": "/en/:path+/",
+      "destination": "https://www.healthlongevity.cn/en/:path+",
+      "statusCode": 301
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "healthlongevityplatform.vercel.app"
+        }
+      ],
+      "destination": "https://www.healthlongevity.cn/",
+      "statusCode": 301
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "healthlongevityplatform.vercel.app"
+        }
+      ],
+      "destination": "https://www.healthlongevity.cn/:path*",
+      "statusCode": 301
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "healthlongevity.cn"
+        }
+      ],
+      "destination": "https://www.healthlongevity.cn/",
+      "statusCode": 301
+    },
+    {
       "source": "/:path*",
       "has": [
         {
@@ -46,47 +217,80 @@
     {
       "source": "/favicon.ico",
       "headers": [
-        { "key": "Content-Type", "value": "image/x-icon" },
-        { "key": "Cache-Control", "value": "public, max-age=604800" }
+        {
+          "key": "Content-Type",
+          "value": "image/x-icon"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800"
+        }
       ]
     },
     {
       "source": "/favicon.png",
       "headers": [
-        { "key": "Content-Type", "value": "image/png" },
-        { "key": "Cache-Control", "value": "public, max-age=604800" }
+        {
+          "key": "Content-Type",
+          "value": "image/png"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800"
+        }
       ]
     },
     {
       "source": "/favicon.svg",
       "headers": [
-        { "key": "Content-Type", "value": "image/svg+xml" },
-        { "key": "Cache-Control", "value": "public, max-age=604800" }
+        {
+          "key": "Content-Type",
+          "value": "image/svg+xml"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800"
+        }
       ]
     },
     {
       "source": "/apple-touch-icon.png",
       "headers": [
-        { "key": "Content-Type", "value": "image/png" },
-        { "key": "Cache-Control", "value": "public, max-age=604800" }
+        {
+          "key": "Content-Type",
+          "value": "image/png"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800"
+        }
       ]
     },
     {
       "source": "/spa-shell.html",
       "headers": [
-        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
       ]
     },
     {
       "source": "/en/spa-shell.html",
       "headers": [
-        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
       ]
     },
     {
       "source": "/",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=600" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=600"
+        }
       ]
     }
   ],
