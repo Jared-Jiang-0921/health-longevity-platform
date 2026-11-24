@@ -501,9 +501,16 @@ function newsArticleBody(view, lang) {
     ? `<h2>${escapeHtml(lang === 'zh' ? '阅读要点' : 'Takeaways')}</h2><ul>${takes.map((line) => `<li>${escapeHtml(line)}</li>`).join('')}</ul>`
     : ''
   const dated = view.publishedAt ? `<p><time datetime="${escapeHtml(view.publishedAt)}">${escapeHtml(view.publishedAt)}</time></p>` : ''
+  const revised = view.contentUpdated
+    ? `<p>${escapeHtml(lang === 'zh' ? '说明更新' : 'Note updated')}：<time datetime="${escapeHtml(view.contentUpdated)}">${escapeHtml(view.contentUpdated)}</time></p>`
+    : ''
   const excerpt = abstract ? `<p>${escapeHtml(abstract)}</p>` : ''
   const source = view.url && /^https?:\/\//i.test(view.url)
     ? `<p>${escapeHtml(lang === 'zh' ? '来源页' : 'Source page')}：<a href="${escapeHtml(view.url)}">${escapeHtml(view.url)}</a></p>`
+    : ''
+  const papers = (view.sourceLinks || []).filter((item) => item?.url && /^https?:\/\//i.test(item.url))
+  const paperHtml = papers.length
+    ? `<h2>${escapeHtml(lang === 'zh' ? '原始文献' : 'Primary sources')}</h2><ul>${papers.map((item) => `<li><a href="${escapeHtml(item.url)}">${escapeHtml(item.label || item.url)}</a></li>`).join('')}</ul>`
     : ''
   const note = view.sourceNote ? `<p>${escapeHtml(view.sourceNote)}</p>` : ''
   const related = newsRelatedLinks(view, lang)
@@ -511,7 +518,7 @@ function newsArticleBody(view, lang) {
     ? `<h2>${escapeHtml(lang === 'zh' ? '相关页面' : 'Related pages')}</h2><ul>${related.map((item) => `<li><a href="${escapeHtml(absoluteUrl(lang, item.path))}">${escapeHtml(item.label)}</a></li>`).join('')}</ul>`
     : ''
   const back = `<p><a href="${escapeHtml(absoluteUrl(lang, '/longevity-news'))}">${escapeHtml(navLabel('/longevity-news', lang))}</a></p>`
-  return `<article><h1>${escapeHtml(view.title)}</h1>${dated}${excerpt}${list}${note}${source}${relatedHtml}<p>${escapeHtml(mod.caveatPhrase)}</p>${back}</article>`
+  return `<article><h1>${escapeHtml(view.title)}</h1>${dated}${revised}${excerpt}${list}${note}${source}${paperHtml}${relatedHtml}<p>${escapeHtml(mod.caveatPhrase)}</p>${back}</article>`
 }
 
 function injectHtml(template, { lang, pathname, body, extraHead = '', head }) {

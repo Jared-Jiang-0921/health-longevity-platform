@@ -10,7 +10,8 @@ import {
 } from '../data/longevityNewsColumns'
 import { articleDisplay, getLongevityNewsArticles } from '../data/longevityNewsArticles'
 import { hasLevelAccess, shouldShowMembershipBadge } from '../data/membership'
-import { extractLongevityKeywords, newsCardExcerpt } from '../lib/longevityNewsCard'
+import { newsSourceNoteFor } from '../data/newsSourceNotes'
+import { extractLongevityKeywords, isGenericNewsSummary, newsCardExcerpt } from '../lib/longevityNewsCard'
 import { isPublicNewsCard, newsArticleRouterPath } from '../lib/newsArticleSeo'
 import { newsPublicId } from '../lib/newsSlug'
 import { getMembershipLevelLabel } from '../i18n/terms'
@@ -178,17 +179,21 @@ export default function LongevityNewsFeed() {
       .map((item) => {
         const extUrl = String(item.external_url || '').trim()
         const isLink = Boolean(extUrl) && (!item.file_size || item.mime_type === 'text/uri-list')
+        const note = lang === 'zh' && isGenericNewsSummary(item.summary) ? newsSourceNoteFor(`upload-${item.id}`) : null
+        const summary = note?.summary || item.summary || ''
         return {
           kind: isLink ? 'link' : 'upload',
           id: `upload-${item.id}`,
           assetId: item.id,
           title: item.title,
-          summary: item.summary || '',
-          excerpt: newsCardExcerpt(item.summary),
-          keywords: displayKeywords(item.title, item.summary, lang),
+          summary,
+          excerpt: newsCardExcerpt(summary),
+          keywords: displayKeywords(item.title, summary, lang),
           takeaways: [],
-          zhOnly: lang !== 'zh' && hasChinese(`${item.title || ''} ${item.summary || ''}`),
-          sourceNote: isLink ? t.wechatSource : '',
+          zhOnly: lang !== 'zh' && hasChinese(`${item.title || ''} ${summary}`),
+          sourceNote: note?.sourceNote || (isLink ? t.wechatSource : ''),
+          sourceLinks: note?.sources || [],
+          contentUpdated: note?.contentUpdated || '',
           url: extUrl,
           publishedAt: item.created_at ? String(item.created_at).slice(0, 10) : '',
           requiredLevel: item.content_level || item.required_level || columnMeta?.requiredLevel || 'free',
@@ -294,6 +299,7 @@ export default function LongevityNewsFeed() {
             {active.publishedAt ? ` · ${formatDate(active.publishedAt)}` : ''}
           </p>
           <h2 className="ln-essay-title">{active.title}</h2>
+          {active.contentUpdated ? <p className="ln-muted">说明更新：<time dateTime={active.contentUpdated}>{active.contentUpdated}</time></p> : null}
           {active.zhOnly ? <p className="ln-zh-only">{t.zhOnly}</p> : null}
           {!active.canView ? (
             <ContentLockNotice requiredLevel={active.rawRequired || active.requiredLevel} user={user} />
@@ -326,6 +332,16 @@ export default function LongevityNewsFeed() {
                 <a href={active.url} target="_blank" rel="noopener noreferrer" className="ln-wechat">
                   {active.kind === 'link' ? t.openWechat : t.open}
                 </a>
+              ) : null}
+              {active.sourceLinks?.length ? (
+                <>
+                  <h3>原始文献</h3>
+                  <ul>
+                    {active.sourceLinks.map((item) => (
+                      <li key={item.url}><a href={item.url}>{item.label || item.url}</a></li>
+                    ))}
+                  </ul>
+                </>
               ) : null}
               {active.kind === 'upload' && active.assetId ? (
                 isVideo(active.mime) ? (

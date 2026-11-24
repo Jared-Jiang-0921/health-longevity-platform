@@ -1,6 +1,6 @@
 import { PUBLIC_SUMMARY_UPDATED, SEO_LANGS, SEO_PAGES, SITE_ORIGIN, absoluteUrl } from '../data/seo.js'
 import { getAboutPage, getPageFaqs } from '../data/publicSummary.js'
-import { articleLanguages, newsArticleRouterPath, presentNewsArticle } from './newsArticleSeo.js'
+import { articleLanguages, newsArticleRouterPath, presentNewsArticle, validContentDate } from './newsArticleSeo.js'
 import { newsPublicId } from './newsSlug.js'
 
 function escapeXml(value) {
@@ -174,12 +174,14 @@ export function buildNewsAtom({ articles = [] } = {}) {
   const updated = PUBLIC_SUMMARY_UPDATED
   const feedUrl = `${SITE_ORIGIN}/longevity-news/feed.xml`
   const entries = []
+  let newest = updated
   for (const card of articles || []) {
     const langs = articleLanguages(card)
     if (!langs.includes('zh')) continue
     const view = presentNewsArticle(card, 'zh')
     const href = absoluteUrl('zh', newsArticleRouterPath(newsPublicId(view.id)))
-    const when = view.publishedAt || updated
+    const when = [validContentDate(view.contentUpdated), view.publishedAt].filter(Boolean).sort().at(-1) || updated
+    if (when > newest) newest = when
     const alternates = langs.includes('en')
       ? `\n      <link rel="alternate" hreflang="en" href="${escapeXml(absoluteUrl('en', newsArticleRouterPath(newsPublicId(view.id))))}"/>`
       : ''
@@ -198,7 +200,7 @@ export function buildNewsAtom({ articles = [] } = {}) {
   <link rel="self" href="${feedUrl}"/>
   <link rel="alternate" href="${absoluteUrl('zh', '/longevity-news')}"/>
   <id>${feedUrl}</id>
-  <updated>${atomDate(updated)}</updated>
+  <updated>${atomDate(newest)}</updated>
 ${entries.join('\n')}
 </feed>
 `
