@@ -3,9 +3,10 @@
  * 已写摘要或阅读要点的用原文；只有标题的用本站撰写的教育性说明，不转载微信全文。
  */
 import { getLongevityNewsArticles, articleDisplay } from '../data/longevityNewsArticles.js'
+import { newsSourceNoteFor } from '../data/newsSourceNotes.js'
 import { PUBLIC_SUMMARY_UPDATED, SEO_LANGS, absoluteUrl } from '../data/seo.js'
 import { getPageFaqs } from '../data/publicSummary.js'
-import { extractLongevityKeywords, newsCardExcerpt } from './longevityNewsCard.js'
+import { extractLongevityKeywords, isGenericNewsSummary, newsCardExcerpt } from './longevityNewsCard.js'
 import { newsPublicId } from './newsSlug.js'
 
 export const NEWS_ID_RE = /^[A-Za-z0-9][A-Za-z0-9_-]{0,80}$/
@@ -44,7 +45,9 @@ export function presentNewsArticle(card, lang) {
   const key = lang === 'en' ? lang : 'zh'
   const article = getLongevityNewsArticles().find((item) => item.id === card?.id)
   const view = article ? articleDisplay(article, key) : null
-  const summary = view?.summary || card?.summary || ''
+  const storedSummary = view?.summary || card?.summary || ''
+  const note = key === 'zh' && isGenericNewsSummary(storedSummary) ? newsSourceNoteFor(card?.id) : null
+  const summary = note?.summary || storedSummary
   const title = String(view?.title || card?.title || '').trim()
   const base = {
     id: card?.id || '',
@@ -54,9 +57,11 @@ export function presentNewsArticle(card, lang) {
     summary,
     excerpt: newsCardExcerpt(summary),
     takeaways: view?.takeaways || card?.takeaways || [],
-    sourceNote: view?.sourceNote || card?.sourceNote || '',
+    sourceNote: note?.sourceNote || view?.sourceNote || card?.sourceNote || '',
+    sourceLinks: Array.isArray(note?.sources) ? note.sources : [],
     url: card?.url || '',
     publishedAt: validContentDate(card?.publishedAt),
+    contentUpdated: validContentDate(note?.contentUpdated),
     zhOnly: view ? view.zhOnly : key !== 'zh' && hasChinese(`${title} ${summary}`),
   }
   return { ...base, abstract: newsArticleAbstract(base, key) }
@@ -163,11 +168,12 @@ export function articleLanguages(card) {
 export const NEWS_HUB_COPY_UPDATED = '2026-11-22'
 
 export function newsHubLastmod(cards) {
-  const dates = [
-    NEWS_HUB_COPY_UPDATED,
-    ...(cards || []).map((card) => validContentDate(card.publishedAt)),
-  ].filter(Boolean).sort()
-  return dates.at(-1) || PUBLIC_SUMMARY_UPDATED
+  const dates = [NEWS_HUB_COPY_UPDATED]
+  for (const card of cards || []) {
+    dates.push(validContentDate(card.publishedAt))
+    dates.push(validContentDate(presentNewsArticle(card, 'zh').contentUpdated))
+  }
+  return dates.filter(Boolean).sort().at(-1) || PUBLIC_SUMMARY_UPDATED
 }
 
 export function newsSitemapEntries(cards) {
@@ -177,9 +183,12 @@ export function newsSitemapEntries(cards) {
     if (!langs.includes('zh')) continue
     const view = presentNewsArticle(card, 'zh')
     const ownDate = view.publishedAt || PUBLIC_SUMMARY_UPDATED
-    const lastmod = isSubstantiveNewsCard(view, 'zh')
-      ? ownDate
-      : [ownDate, NEWS_HUB_COPY_UPDATED].sort().at(-1)
+    const contentUpdated = validContentDate(view.contentUpdated)
+    const lastmod = contentUpdated
+      ? [ownDate, contentUpdated].filter(Boolean).sort().at(-1)
+      : isSubstantiveNewsCard(view, 'zh')
+        ? ownDate
+        : [ownDate, NEWS_HUB_COPY_UPDATED].sort().at(-1)
     entries.push({
       path: newsArticleRouterPath(newsPublicId(view.id)),
       lastmod,
@@ -203,7 +212,10 @@ export function newsArticleJsonLd(view, lang) {
     isPartOf: { '@id': `${absoluteUrl('zh', '/longevity-news')}#webpage` },
   }
   if (view.publishedAt) article.datePublished = view.publishedAt
+  if (view.contentUpdated) article.dateModified = view.contentUpdated
   if (view.url && /^https?:\/\//i.test(view.url)) article.isBasedOn = view.url
+  const citations = (view.sourceLinks || []).map((item) => item.url).filter((url) => /^https?:\/\//i.test(url))
+  if (citations.length) article.citation = citations
   return {
     '@context': 'https://schema.org',
     '@graph': [article],

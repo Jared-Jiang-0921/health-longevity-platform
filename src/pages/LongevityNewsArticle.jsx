@@ -118,6 +118,9 @@ export default function LongevityNewsArticle() {
         <>
           <h1>{view.title}</h1>
           {view.publishedAt ? <p><time dateTime={view.publishedAt}>{view.publishedAt}</time></p> : null}
+          {view.contentUpdated ? (
+            <p>{lang === 'zh' ? '说明更新' : 'Note updated'}：<time dateTime={view.contentUpdated}>{view.contentUpdated}</time></p>
+          ) : null}
           {published ? (
             <>
               {view.abstract ? <p>{view.abstract}</p> : null}
@@ -142,6 +145,16 @@ export default function LongevityNewsArticle() {
               {view.sourceNote ? <p>{view.sourceNote}</p> : null}
               {view.url && /^https?:\/\//i.test(view.url) ? (
                 <p>{copy.source}：<a href={view.url}>{view.url}</a></p>
+              ) : null}
+              {view.sourceLinks?.length ? (
+                <>
+                  <h2>{lang === 'zh' ? '原始文献' : 'Primary sources'}</h2>
+                  <ul>
+                    {view.sourceLinks.map((item) => (
+                      <li key={item.url}><a href={item.url}>{item.label || item.url}</a></li>
+                    ))}
+                  </ul>
+                </>
               ) : null}
             </>
           ) : (

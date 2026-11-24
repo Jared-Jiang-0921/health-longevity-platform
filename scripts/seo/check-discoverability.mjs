@@ -12,11 +12,13 @@ import { MAGNESIUM_EVIDENCE_PATH } from '../../src/data/magnesiumEvidenceMeta.js
 import { PUBLIC_SUMMARY_UPDATED, pageIndexable } from '../../src/data/seo.js'
 import { getPageFaqs } from '../../src/data/publicSummary.js'
 import { toNewsSearchCard } from '../../src/lib/longevityNewsCard.js'
+import { NEWS_SOURCE_NOTE_UPDATED, NEWS_SOURCE_NOTES } from '../../src/data/newsSourceNotes.js'
 import {
   isPublicNewsCard,
   isSubstantiveNewsCard,
   newsHubLastmod,
   newsSitemapEntries,
+  presentNewsArticle,
 } from '../../src/lib/newsArticleSeo.js'
 import { buildLlmsTxt, buildNewsAtom, buildSitemapXml } from '../../src/lib/seoPublicFiles.js'
 import {
@@ -96,6 +98,52 @@ expect(thinArticle.description.includes('不转载微信公众号全文'), 'JSON
 const thinBody = thinHtml.slice(thinHtml.indexOf('<body'), thinHtml.indexOf('<script type="module"'))
 expect(thinBody.includes('不转载微信公众号全文'), 'crawler-visible body contains the abstract')
 expect(thinBody.includes('三层') && thinBody.includes('/methodology'), 'thin card explains how to read it and links the method page')
+
+const sourcedIds = {
+  'upload-f4730be8-76a2-4475-b45e-cbfb8aa66b2c': ['35029144', '10.7554/eLife.73420', 'xue-shu-lun-wen-zong-jie-dunedinpace-yi-zhong-ji-yu-dna-jia-ji-hua-de-s-f4730be8'],
+  'upload-2def5389-e046-43c6-bbbe-2fcc81dfec76': ['39900648', '10.1038/s43587-024-00793-y', 'mei-tian-3-ke-yu-you-3-nian-rang-ni-shao-lao-3-ge-yue-do-health-shi-yan-2def5389'],
+  'upload-2a674455-2145-4949-96f0-791dacd37ac7': ['40409468', '10.1016/j.ajcnut.2025.05.003', 'ha-fo-zhong-bang-vital-wan-ren-yan-jiu-shou-ci-zheng-shi-duan-li-bao-hu-2a674455'],
+  'upload-cc56ccc8-a5cf-4f84-98d0-d82f75af2978': ['30221596', '10.1056/NEJMoa1800722', 'mei-tian-yi-pian-di-ji-liang-a-si-pi-lin-neng-yan-chang-jian-kang-shou-cc56ccc8'],
+  'upload-03c3a6ac-bcaa-4fb9-9779-122e5f0e8ee0': ['25771249', '10.1016/S0140-6736(15)60461-5', 'yun-dong-yin-shi-he-ren-zhi-xun-lian-yi-qi-zuo-zhen-neng-rang-da-nao-la-03c3a6ac'],
+}
+expect(Object.keys(NEWS_SOURCE_NOTES).length === 5, 'only five title-only cards receive a sourced abstract')
+expect(Object.keys(sourcedIds).every((id) => NEWS_SOURCE_NOTES[id]?.contentUpdated === NEWS_SOURCE_NOTE_UPDATED), 'sourced notes use the day they were written')
+for (const [id, [pmid, doi, slug]] of Object.entries(sourcedIds)) {
+  expect(NEWS_LEGACY_SLUGS[id] === slug, `${id} keeps its pinyin slug`)
+  const card = toNewsSearchCard({
+    id,
+    title: '原标题',
+    summary: '来自公众号「长寿文献学习」',
+    external_url: 'https://mp.weixin.qq.com/s/example',
+    created_at: '2026-08-01',
+  })
+  const view = presentNewsArticle(card, 'zh')
+  expect(isSubstantiveNewsCard(view, 'zh'), `${id} abstract is substantive`)
+  expect(view.contentUpdated === NEWS_SOURCE_NOTE_UPDATED, `${id} content date is the note date`)
+  expect(view.summary.includes(`PMID ${pmid}`) && view.summary.includes(doi), `${id} names PMID and DOI`)
+  expect(!view.summary.includes('毫克') && !/\d+\s*mg/i.test(view.summary), `${id} does not copy a dose`)
+  const html = renderNewsArticleHtml(template, { lang: 'zh', card })
+  const body = html.slice(html.indexOf('<body'), html.indexOf('<script type="module"'))
+  expect(html.includes(`rel="canonical" href="https://www.healthlongevity.cn/longevity-news/${slug}"`), `${id} canonical is the pinyin slug`)
+  expect(!html.includes(`<link rel="alternate" hreflang="en" href="https://www.healthlongevity.cn/en/longevity-news/${slug}"`), `${id} does not gain an English alternate`)
+  expect(!html.includes('"author"') && !html.includes('reviewedBy'), `${id} invents no author or reviewer`)
+  expect(body.includes(`PMID ${pmid}`) && body.includes(`https://pubmed.ncbi.nlm.nih.gov/${pmid}/`), `${id} shows the PubMed URL in HTML`)
+  expect(body.includes(`https://doi.org/${doi}`), `${id} shows the DOI URL in HTML`)
+  expect(body.includes('说明更新') && body.includes(NEWS_SOURCE_NOTE_UPDATED), `${id} shows the note date`)
+  expect(body.includes('https://mp.weixin.qq.com/s/example'), `${id} keeps the original source link`)
+  const oneXml = buildSitemapXml({ extra: newsSitemapEntries([card]) })
+  expect(oneXml.includes(`<loc>https://www.healthlongevity.cn/longevity-news/${slug}</loc>`), `${id} sitemap loc stays Chinese`)
+  expect(oneXml.includes(`<lastmod>${NEWS_SOURCE_NOTE_UPDATED}</lastmod>`), `${id} lastmod is the note date`)
+  expect(!oneXml.includes(`/longevity-news/${id}`) && !oneXml.includes(`/en/longevity-news/${slug}`), `${id} sitemap drops the upload id and the English loc`)
+}
+const unmatched = toNewsSearchCard({
+  id: 'upload-268df06e-0a8f-4576-ae3f-faeb04b74d44',
+  title: '970人随访3年：甲基化时钟与身体功能出现同向变化',
+  summary: '来自公众号「长寿文献学习」',
+})
+const unmatchedView = presentNewsArticle(unmatched, 'zh')
+expect(!isSubstantiveNewsCard(unmatchedView, 'zh'), 'an unmatched title stays title-only')
+expect(unmatchedView.abstract.includes('不转载微信公众号全文'), 'an unmatched title keeps the educational note')
 
 const newsHtml = renderRouteHtml(template, { lang: 'zh', pathname: '/longevity-news', newsCards: [...cards, thin] })
 expect(newsHtml.includes('href="https://www.healthlongevity.cn/longevity-news/ln-static-1"'), 'news index links to the stable article')
