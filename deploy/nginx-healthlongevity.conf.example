@@ -29,7 +29,9 @@ server {
     location ~ ^/ar/(.+)/$ { return 301 https://www.healthlongevity.cn/$1; }
     location ~ ^/ar/(.+)$ { return 301 https://www.healthlongevity.cn/$1; }
 
-    # 旧资讯 upload- 地址直接到最终中文 slug。文件不在仓库监听的配置里，要和本示例一起拷到机器上。
+    # 旧资讯 upload- 地址，含 /ar/ 前缀，用精确匹配一跳到中文 slug。
+    # 精确匹配优先于上面的 /ar/ 正则，所以不会先落到无 /ar 的旧地址。
+    # 文件不在正在监听的配置里，要和本示例一起拷到机器上。
     include /opt/health-longevity-platform/deploy/nginx-news-slug-redirects.conf;
 
     return 301 https://www.healthlongevity.cn$request_uri;
@@ -197,6 +199,7 @@ server {
     location ~ ^/ar/(.+)/$ { return 301 /$1; }
     location ~ ^/ar/(.+)$ { return 301 /$1; }
 
+    # 同裸域名：include 里的 location = /ar/longevity-news/upload-… 优先于上面的正则。
     include /opt/health-longevity-platform/deploy/nginx-news-slug-redirects.conf;
 
     set $seo_lang "";

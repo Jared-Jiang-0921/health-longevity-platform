@@ -208,3 +208,19 @@ sudo nginx -t && sudo systemctl reload nginx
 5. 不要提交 `/api/`、账户、支付、问卷或咨询对话。
 
 索引有延迟，提交成功只说明平台收到了 sitemap，不表示当天就会出现在搜索结果里。
+
+## 发布后核对两处跳转
+
+下面两条在仓库里已经写成 301，但要等对应环境发布后才生效。Vercel 项目要重新部署 `vercel.json`；自建站要让 `deploy/nginx-news-slug-redirects.conf` 被正在监听的配置 include，再 `nginx -t` 并重载。这次不部署。
+
+```bash
+curl -sI https://healthlongevityplatform.vercel.app/en/ | grep -iE 'HTTP/|^location:'
+# 期望：301，Location: https://www.healthlongevity.cn/en/
+
+curl -sI https://www.healthlongevity.cn/ar/longevity-news/upload-02ed4811-f8b7-4eef-ac5f-60a231fde76f | grep -iE 'HTTP/|^location:'
+# 期望：301，Location 直接是
+# https://www.healthlongevity.cn/longevity-news/ni-de-sheng-wu-zhong-you-duo-qiang-shou-wan-shang-de-shou-biao-yi-jing-02ed4811
+# 中间不应再出现 /longevity-news/upload-02ed4811-f8b7-4eef-ac5f-60a231fde76f
+```
+
+`/en`（没有尾斜杠）、`/ar/`、`/ar/consult`，以及不带 `/ar` 的旧 `upload-` 和 `/en/longevity-news/upload-` 仍应一跳到各自现在的中文规范地址。不要为只有中文的资讯另做英文网址。
