@@ -33,6 +33,8 @@ test('lang query leaves the parameter page and keeps other query values', () => 
 
 test('the Vercel hostname redirects to the same canonical path', () => {
   assert.equal(go('healthlongevityplatform.vercel.app', '/'), 'https://www.healthlongevity.cn/')
+  assert.equal(go('healthlongevityplatform.vercel.app', '/en/'), 'https://www.healthlongevity.cn/en/')
+  assert.equal(go('healthlongevityplatform.vercel.app', '/en'), 'https://www.healthlongevity.cn/en/')
   assert.equal(go('healthlongevityplatform.vercel.app', '/en/about'), 'https://www.healthlongevity.cn/en/about')
   assert.equal(go('healthlongevityplatform.vercel.app', '/ar/consult/'), 'https://www.healthlongevity.cn/consult')
   assert.equal(go('localhost', '/about/'), '/about')

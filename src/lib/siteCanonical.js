@@ -99,6 +99,8 @@ export function vercelRedirectRules() {
     { source: '/:path*', has: lang('ar'), destination: `${www}/:path*`, statusCode: 301 },
     { source: '/en', destination: `${www}/en/`, statusCode: 301 },
     { source: '/en/:path+/', destination: `${www}/en/:path+`, statusCode: 301 },
+    // /:path* 配不到带尾斜杠的 /en/。这条只补已有主机规则的那个 Vercel 域名。
+    { source: '/en/', has: host(VERCEL_PUBLIC_HOST), destination: `${www}/en/`, statusCode: 301 },
     { source: '/', has: host(VERCEL_PUBLIC_HOST), destination: `${www}/`, statusCode: 301 },
     { source: '/:path*', has: host(VERCEL_PUBLIC_HOST), destination: `${www}/:path*`, statusCode: 301 },
     { source: '/', has: host('healthlongevity.cn'), destination: `${www}/`, statusCode: 301 },

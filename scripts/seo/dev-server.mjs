@@ -63,6 +63,14 @@ function installRouting(server, { allowDevPreview, fileRoot, localeShell }) {
     const pathname = requestUrl.pathname
     const method = req.method || 'GET'
     if (method === 'GET' || method === 'HEAD') {
+      const legacy = newsLegacyLocation(pathname)
+      if (legacy) {
+        res.statusCode = 301
+        res.setHeader('Location', legacy)
+        res.setHeader('Cache-Control', 'no-cache')
+        res.end()
+        return
+      }
       const target = canonicalRedirectTarget({
         host: String(req.headers.host || '').split(':')[0],
         pathname,
@@ -71,14 +79,6 @@ function installRouting(server, { allowDevPreview, fileRoot, localeShell }) {
       if (target) {
         res.statusCode = 301
         res.setHeader('Location', target)
-        res.setHeader('Cache-Control', 'no-cache')
-        res.end()
-        return
-      }
-      const legacy = newsLegacyLocation(pathname)
-      if (legacy) {
-        res.statusCode = 301
-        res.setHeader('Location', legacy)
         res.setHeader('Cache-Control', 'no-cache')
         res.end()
         return

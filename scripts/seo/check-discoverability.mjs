@@ -414,6 +414,9 @@ const legacyId = 'upload-03c3a6ac-bcaa-4fb9-9779-122e5f0e8ee0'
 const legacySlug = NEWS_LEGACY_SLUGS[legacyId]
 expect(newsLegacyLocation(`/longevity-news/${legacyId}`) === `/longevity-news/${legacySlug}`, 'old upload path redirects to the readable slug')
 expect(newsLegacyLocation(`/en/longevity-news/${legacyId}`) === `/longevity-news/${legacySlug}`, 'english upload alias redirects to the Chinese slug')
+expect(newsLegacyLocation(`/ar/longevity-news/${legacyId}`) === `/longevity-news/${legacySlug}`, 'arabic upload alias redirects to the Chinese slug in one step')
+const enSlashRule = vercel.redirects.find((rule) => rule.source === '/en/' && rule.has?.[0]?.value === 'healthlongevityplatform.vercel.app')
+expect(enSlashRule?.destination === 'https://www.healthlongevity.cn/en/' && enSlashRule.statusCode === 301, 'vercel /en/ on the public host redirects to the canonical english home')
 const mappedCard = toNewsSearchCard({ id: legacyId, title: '运动饮食认知', summary: '来自公众号' })
 const mappedXml = buildSitemapXml({ extra: newsSitemapEntries([mappedCard]) })
 expect(mappedXml.includes(`<loc>https://www.healthlongevity.cn/longevity-news/${legacySlug}</loc>`), 'sitemap uses the readable slug')

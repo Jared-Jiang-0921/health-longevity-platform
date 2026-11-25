@@ -1532,6 +1532,17 @@
       "statusCode": 301
     },
     {
+      "source": "/en/",
+      "has": [
+        {
+          "type": "host",
+          "value": "healthlongevityplatform.vercel.app"
+        }
+      ],
+      "destination": "https://www.healthlongevity.cn/en/",
+      "statusCode": 301
+    },
+    {
       "source": "/",
       "has": [
         {

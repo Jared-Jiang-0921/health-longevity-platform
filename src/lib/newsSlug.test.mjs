@@ -8,8 +8,9 @@ import {
   newsLegacyLocation,
   newsLegacyRedirectRules,
   newsPublicId,
+  nginxNewsRedirectConf,
 } from './newsSlug.js'
-import { vercelRedirectRules } from './siteCanonical.js'
+import { VERCEL_PUBLIC_HOST, vercelRedirectRules } from './siteCanonical.js'
 import { documentStatus } from './sitePaths.js'
 import { toNewsSearchCard } from './longevityNewsCard.js'
 import { buildSitemapXml } from './seoPublicFiles.js'
@@ -33,7 +34,8 @@ test('legacy upload URLs redirect once to the Chinese slug', () => {
   assert.equal(newsLegacyLocation(`/en/longevity-news/${id}/`), `/longevity-news/${slug}`)
   assert.equal(newsLegacyLocation(`/longevity-news/${slug}`), '')
   assert.equal(newsLegacyLocation('/longevity-news/ln-static-1'), '')
-  assert.equal(newsLegacyLocation('/ar/longevity-news/' + id), '')
+  assert.equal(newsLegacyLocation(`/ar/longevity-news/${id}`), `/longevity-news/${slug}`)
+  assert.equal(newsLegacyLocation(`/ar/en/longevity-news/${id}/`), `/longevity-news/${slug}`)
 
   const card = toNewsSearchCard({ id, title: '只有标题', summary: '来自公众号' })
   const xml = buildSitemapXml({ extra: newsSitemapEntries([card]) })
@@ -58,5 +60,15 @@ test('vercel and nginx lists use the same slug table', () => {
   const slug = NEWS_LEGACY_SLUGS[id]
   assert.match(nginx, new RegExp(`location = /longevity-news/${id} \\{ return 301 https://www.healthlongevity.cn/longevity-news/${slug}; \\}`))
   assert.match(nginx, new RegExp(`location = /en/longevity-news/${id} \\{ return 301 https://www.healthlongevity.cn/longevity-news/${slug}; \\}`))
-  assert.equal(nginx.includes('/ar/'), false)
+  assert.equal(nginx, nginxNewsRedirectConf(NEWS_LEGACY_SLUGS))
+  const arabicId = 'upload-02ed4811-f8b7-4eef-ac5f-60a231fde76f'
+  const arabicSlug = NEWS_LEGACY_SLUGS[arabicId]
+  const arabicDest = `https://www.healthlongevity.cn/longevity-news/${arabicSlug}`
+  assert.match(nginx, new RegExp(`location = /ar/longevity-news/${arabicId} \\{ return 301 ${arabicDest}; \\}`))
+  assert.match(nginx, new RegExp(`location = /ar/longevity-news/${arabicId}/ \\{ return 301 ${arabicDest}; \\}`))
+  assert.match(nginx, new RegExp(`location = /ar/en/longevity-news/${arabicId} \\{ return 301 ${arabicDest}; \\}`))
+  assert.equal(nginx.includes(`/en/longevity-news/${arabicSlug}`), false)
+  const enSlash = vercelRedirectRules().find((rule) => rule.source === '/en/' && rule.has?.[0]?.value === VERCEL_PUBLIC_HOST)
+  assert.equal(enSlash?.destination, 'https://www.healthlongevity.cn/en/')
+  assert.equal(enSlash?.statusCode, 301)
 })

@@ -9,7 +9,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { pinyin } from 'pinyin-pro'
-import { CANONICAL_ORIGIN } from '../../src/lib/siteCanonical.js'
+import { nginxNewsRedirectConf } from '../../src/lib/newsSlug.js'
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const slugFile = path.join(rootDir, 'src/data/newsLegacySlugs.js')
@@ -80,17 +80,7 @@ function writeSlugModule(map) {
 }
 
 function writeNginx(map) {
-  const lines = [
-    '# 由 scripts/seo/build-news-slugs.mjs 生成。',
-    '# 这是仓库里的跳转片段，不会自动写进正在监听的 Nginx。',
-    '# 把本文件放到示例配置 include 的路径后，再 nginx -t 并重载。',
-  ]
-  for (const id of Object.keys(map).sort()) {
-    const dest = `${CANONICAL_ORIGIN}/longevity-news/${map[id]}`
-    lines.push(`location = /longevity-news/${id} { return 301 ${dest}; }`)
-    lines.push(`location = /en/longevity-news/${id} { return 301 ${dest}; }`)
-  }
-  fs.writeFileSync(nginxFile, `${lines.join('\n')}\n`)
+  fs.writeFileSync(nginxFile, nginxNewsRedirectConf(map))
 }
 
 const items = await loadItems()
